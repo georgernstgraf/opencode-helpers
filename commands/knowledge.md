@@ -9,6 +9,8 @@ materials for a technical college in vienna.
 class is $1
 weeks is $2
 
+If there is no folder $1, STOP. The user made a typo.
+
 please create a german `knowledge_<class>_<isodate-today>.md` file within the folder `<class>` as follows:
 
 - analyze all commits from the last $2 weeks which changed files in folder $1, using git.
