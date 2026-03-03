@@ -23,6 +23,21 @@ Break the request into a logical sequence of atomic units:
 - If specialized sub-agents are available, delegate the "Logic" or "Validation" units to them.
 - **Constraint**: Complete one unit fully before moving to the next to maintain state integrity.
 
+### 5. Parallel Execution Protocol
+If the environment supports concurrent tool calls or multiple sub-agents, apply the "Fan-Out" strategy:
+
+- **Prerequisite**: Establish the "Contract" (e.g., TypeScript interfaces, Drizzle schema, or API signatures) before parallelizing.
+- **Identification**: Identify independent modules that do not import from one another (e.g., `Service A` and `Service B`, or `Backend Logic` and `Frontend Component`).
+- **Dispatch**:
+    - **Agent 1 (Logic)**: Implement business rules and unit tests.
+    - **Agent 2 (Presentation/UI)**: Build components/views based on the established contract.
+    - **Agent 3 (Docs/Refactor)**: Update READMEs and JSDocs based on the new types.
+- **Fan-In (Synchronization)**: Once sub-agents return, the Orchestrator must perform a "Integration Check" to verify that all parallel outputs align and the project compiles.
+
+### Parallelization Constraints
+- **Shared State**: Never assign two agents to the same file simultaneously to avoid write-conflicts.
+- **Dependency blocking**: If Task B requires the output of Task A, they must remain sequential.
+
 ### 4. Quality Control
 - **Type Safety**: Ensure all new code adheres to the project's typing standards.
 - **Verification**: Run local checks (compilation, linting, or dry-runs) after implementation.
