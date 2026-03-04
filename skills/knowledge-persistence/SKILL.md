@@ -14,21 +14,20 @@ Create any missing files. Never delete existing content unless it is
 explicitly outdated or contradicted by newer information.
 
 ```text
-.opencode/
-└── knowledge/
-    ├── HANDOFF.md
-    ├── DECISIONS.md
-    ├── CONVENTIONS.md
-    ├── PITFALLS.md
-    ├── DOMAIN.md
-    └── STATE.md
+docs/ai/
+├── HANDOFF.md
+├── DECISIONS.md
+├── CONVENTIONS.md
+├── PITFALLS.md
+├── DOMAIN.md
+└── STATE.md
 ```
 
 ## Protocol
 
 ### Step 1: Discovery
 
-- Read all existing files in `.opencode/knowledge/` to understand what is
+- Read all existing files in `docs/ai/` to understand what is
   already persisted.
 - If the directory does not exist, create it.
 - If a file does not exist, create it with the template provided below.
@@ -54,7 +53,7 @@ explicitly outdated or contradicted by newer information.
 
 - Check the task list maintained during this session.
 - If any tasks are still [PENDING] or [IN PROGRESS], write them to
-  `.opencode/knowledge/HANDOFF.md` using the template below.
+  `docs/ai/HANDOFF.md` using the template below.
 - Include: the current branch, each open task with file paths and
   line numbers where applicable, and any context the next agent
   needs to avoid re-discovery.
@@ -197,12 +196,12 @@ block only if it is not already present.
 ```markdown
 ## Knowledge Bootstrap
 Before starting any task, read the following files in order:
-1. `.opencode/knowledge/HANDOFF.md` ← **read first, act on it**
-2. `.opencode/knowledge/CONVENTIONS.md`
-3. `.opencode/knowledge/DECISIONS.md`
-4. `.opencode/knowledge/PITFALLS.md`
-5. `.opencode/knowledge/STATE.md`
-6. `.opencode/knowledge/DOMAIN.md` (if task involves business logic)
+1. `docs/ai/HANDOFF.md` ← **read first, act on it**
+2. `docs/ai/CONVENTIONS.md`
+3. `docs/ai/DECISIONS.md`
+4. `docs/ai/PITFALLS.md`
+5. `docs/ai/STATE.md`
+6. `docs/ai/DOMAIN.md` (if task involves business logic)
 
 If `HANDOFF.md` contains open tasks, complete them before starting
 any new work unless the user explicitly says otherwise.
