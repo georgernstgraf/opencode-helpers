@@ -4,7 +4,7 @@
 This skill extracts the agent's accumulated understanding from the current
 session and persists it into a structured set of knowledge files on disk.
 Use this skill at the end of a productive session, or when explicitly asked
-to "save context," "persist knowledge," or "update knowledge files."
+to "save context", "persist knowledge", or "update knowledge file".
 
 ## Target Structure
 Ensure the following directory and files exist relative to the project root.
@@ -14,6 +14,7 @@ explicitly outdated or contradicted by newer information.
 ```text
 .opencode/
 └── knowledge/
+    ├── HANDOFF.md
     ├── DECISIONS.md
     ├── CONVENTIONS.md
     ├── PITFALLS.md
@@ -35,6 +36,16 @@ explicitly outdated or contradicted by newer information.
   changes that emerged during this session and are NOT yet in the file.
 - Ignore transient chatter, failed attempts that were fully superseded,
   and speculative discussion that did not lead to a conclusion.
+
+### Step 3b: Write HANDOFF.md
+- Check the task list maintained during this session.
+- If any tasks are still [PENDING] or [IN PROGRESS], write them to
+  `.opencode/knowledge/HANDOFF.md` using the template below.
+- Include: the current branch, each open task with file paths and
+  line numbers where applicable, and any context the next agent
+  needs to avoid re-discovery.
+- If all tasks are complete, clear the file body and write only:
+  `No pending tasks. Last cleared: YYYY-MM-DD.`
 
 ### Step 3: Write Updates
 - Append new entries to the appropriate file.
@@ -58,7 +69,7 @@ explicitly outdated or contradicted by newer information.
 Records architectural and technical decisions with rationale.
 Each entry must have a date, a title, and a reason.
 
-````markdown
+```markdown
 # Decisions
 
 Architectural and technical decisions made in this project.
@@ -76,7 +87,7 @@ Records coding patterns, naming rules, file layout, and style
 agreements that the agent must follow without re-discovering them.
 Entries are terse, imperative, and grouped by topic.
 
-````markdown
+```markdown
 # Conventions
 
 Coding patterns, naming rules, and style agreements for this project.
@@ -103,7 +114,7 @@ Records hard-won knowledge: things that failed, subtle bugs,
 ordering issues, and non-obvious constraints. The purpose is to
 prevent a new agent from repeating mistakes.
 
-````markdown
+```markdown
 # Pitfalls
 
 Things that do not work, subtle bugs, and non-obvious constraints.
@@ -117,7 +128,7 @@ Records business logic, domain rules, and relationships that are
 not obvious from the code alone. Only populate this file when the
 project has meaningful domain logic.
 
-````markdown
+```markdown
 # Domain Knowledge
 
 Business rules and domain relationships not obvious from code.
@@ -133,7 +144,7 @@ Business rules and domain relationships not obvious from code.
 Records the current project status. This is the most volatile file.
 It is overwritten (not appended) on every persistence run.
 
-````markdown
+```markdown
 # Project State
 
 Current status as of YYYY-MM-DD.
@@ -159,14 +170,18 @@ Ensure this block exists in the project's `AGENTS.md`. If `AGENTS.md`
 does not exist, create it with this content. If it exists, append this
 block only if it is not already present.
 
-````markdown
+```markdown
 ## Knowledge Bootstrap
 Before starting any task, read the following files in order:
-1. `.opencode/knowledge/CONVENTIONS.md`
-2. `.opencode/knowledge/DECISIONS.md`
-3. `.opencode/knowledge/PITFALLS.md`
-4. `.opencode/knowledge/STATE.md`
-5. `.opencode/knowledge/DOMAIN.md` (if task involves business logic)
+1. `.opencode/knowledge/HANDOFF.md` ← **read first, act on it**
+2. `.opencode/knowledge/CONVENTIONS.md`
+3. `.opencode/knowledge/DECISIONS.md`
+4. `.opencode/knowledge/PITFALLS.md`
+5. `.opencode/knowledge/STATE.md`
+6. `.opencode/knowledge/DOMAIN.md` (if task involves business logic)
+
+If `HANDOFF.md` contains open tasks, complete them before starting
+any new work unless the user explicitly says otherwise.
 ```
 
 ## Constraints
