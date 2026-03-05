@@ -5,9 +5,10 @@ description: Assessment of knowledge tests
 
 In this directory, you will find the submissions which students have handed
 in. The "knowledge-" files contain the questions and their respective
-solutions.
+solutions. Students might have ticked ambiguous questions with a "-" and commented
+on why the think this is context-dependent.
 
-## Please create 3 german markdown files:
+## Please create 3 german markdown files
 
 - GRADINGS.md with a comprehensive table showing the evaluations of each student (ordered alphabetically, by student, not by grade) in the Austrian grading system.
 - INDIVIDUAL.md with detailed assessements of each students submissions.
@@ -35,5 +36,3 @@ EMAIL.json shall be a .json array containing object with 3 fields each:
 - mailto: recipient email address
 - subject: Ergebnis der Wissensüberprüfung am <isodate>
 - body: <YOUR INDIVIDUAL ASSESSMENT>
-
-
