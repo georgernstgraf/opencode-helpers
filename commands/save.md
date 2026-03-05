@@ -1,10 +1,9 @@
 ---
-description: Persist session knowledge to _agents/ files
+description: Persist session knowledge to docs/ai/ files
 ---
 
 Review our entire conversation and update the knowledge files in
-_agents/.
-
+docs/ai/.
 Use the knowledge-persistence skill for this.
 
 For each file, only add what is new or changed. Do not duplicate
