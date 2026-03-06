@@ -11,6 +11,10 @@ Follow these without question. Do not deviate unless explicitly told.
 
 <!-- e.g., "One class per file, file name matches class name" -->
 
+- Keep slash commands short; use them as entrypoints, not long procedures.
+- Move reusable multi-step workflows into `skills/<name>/SKILL.md`.
+- Prefer thin commands that pass arguments and constraints into a skill.
+
 ## Naming
 
 <!-- e.g., "Use camelCase for variables, PascalCase for types" -->

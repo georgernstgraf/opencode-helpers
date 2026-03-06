@@ -13,9 +13,9 @@ project to supercharge your opencode sessions.
 ```
 opencode-helpers/
 ├── commands/           # Slash commands for opencode
-│   ├── save.md         # Persist session knowledge to _agents/
-│   ├── knowledge.md    # Create mini-exams from git history
-│   ├── knowledge-assess.md  # Assess student submissions
+│   ├── save.md         # Persist session knowledge to docs/ai/
+│   ├── knowledge.md    # Thin wrapper for exam-generation skill
+│   ├── knowledge-assess.md  # Thin wrapper for assessment skill
 │   ├── issue-start.md  # Start working on a GitHub issue
 │   ├── issue-commit.md # Save progress to an issue
 │   ├── issue-finish.md # Complete task and close issue
@@ -23,6 +23,8 @@ opencode-helpers/
 │   └── security.md     # Security audit report
 ├── skills/             # Reusable skill definitions
 │   ├── knowledge-persistence/  # Persist agent knowledge across sessions
+│   ├── knowledge-exam/ # Generate exams from git history
+│   ├── knowledge-assessment/   # Assess student submissions
 │   └── orchestrator/   # Manage complex multi-step tasks
 ├── docs/ai/            # Knowledge persistence templates
 │   ├── HANDOFF.md      # Pending tasks for next session
@@ -47,8 +49,8 @@ opencode-helpers/
 | Command | Description |
 |---------|-------------|
 | `/save` | Persist session knowledge to `docs/ai/` files |
-| `/knowledge <class> <weeks>` | Create mini-exam from recent git commits |
-| `/knowledge-assess` | Assess student submissions against solutions |
+| `/knowledge <class> <weeks>` | Run the exam-generation skill for a class |
+| `/knowledge-assess` | Run the assessment skill for student submissions |
 | `/issue-start [issue\|#new]` | Start or continue working on a GitHub issue |
 | `/issue-commit` | Save progress to an issue (keeps it open) |
 | `/issue-finish` | Complete task, commit, push, and close issue |
@@ -62,10 +64,29 @@ opencode-helpers/
 Extracts accumulated understanding from a session and persists it to structured
 knowledge files. Use at the end of productive sessions or when asked to "save context".
 
+### knowledge-exam
+
+Generates German mini-exams and separate solution files from recent Git history
+for a given class folder.
+
+### knowledge-assessment
+
+Grades student knowledge-check submissions, writes German reports, and produces
+bulk email JSON payloads.
+
 ### orchestrator
 
 Manages complex, multi-step tasks requiring architectural planning and systematic
 execution. Use for features involving 3+ files or non-linear solutions.
+
+## Command vs Skill
+
+- Use a command when the main value is a short, ergonomic entrypoint with a few
+  arguments.
+- Promote the workflow into a skill when the instructions grow into a reusable
+  protocol with multiple steps, constraints, outputs, or decision rules.
+- Prefer thin commands that pass context into a dedicated skill rather than
+  embedding long operational procedures directly in the command file.
 
 ## Knowledge Files (`docs/ai/`)
 

@@ -1,22 +1,17 @@
 ---
-description: create knowledge_<isodate>.md klasse wochen
+description: Generate a class knowledge exam from recent Git history
 ---
-# Task: create a mini-exam
+Create a German mini-exam for class `$1` based on the last `$2` weeks.
 
-This is a teacher's repo providing documents and learning
-materials to students at a technical college in vienna.
+Use the `knowledge-exam` skill for the full workflow.
 
-class is $1
-weeks is $2
+Pass these inputs into the skill:
 
-If there is no folder "$1", STOP. The user made a typo.
+- `class`: `$1`
+- `weeks`: `$2`
 
-please create a german `knowledge_<class>_<isodate-today>.md` file within the folder `<class>` as follows:
+Important constraints:
 
-- analyze all commits from the last $2 weeks which changed files in folder $1, using git.
-- those commits are often very minimalistic. Assume the teacher explained a lot around the content of those commits during the lectures in class.
-- make 12 multiple choice questions with 1-4 true answers each, referring to the topics that were covered. Each of these questions shall have the weight of 2 points. Some of the answers will appear ambiguous or context-dependent to the student, so give them the option to tick with a "-" sign and to comment why the are undecided.
-- also create 3 free-form questions where the student has to answer with free text. Each of these questions shall have the weight of 8 points.
-- do not put the solutions into this file, but rather:
-- also create a german `knowledge_<class>_<isodate-today>_solutions.md` with the teachers solutions, the pattern `**/*_solutions.md` should be git-ignored.
-- DO NOT COMMIT
+- If folder `$1` does not exist, stop and report the typo.
+- Create the student exam and separate teacher solutions inside folder `$1`.
+- Do not commit any generated files.
