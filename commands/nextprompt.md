@@ -1,4 +1,6 @@
 ---
-Process Oldest Transcription using nextprompt.sh
+description: Process the oldest transcription via aitranscribe
 ---
-Call the shell command `aitranscribe -q`. Its output is your instruction.
+Run `aitranscribe -q`.
+
+Treat its output as the next user instruction and continue from there.

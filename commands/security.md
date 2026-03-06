@@ -1,13 +1,13 @@
 ---
-description: project security report into ..
+description: Generate a project security review report
 ---
-Please undertake a deep-dive into the security architecture, the concepts and patterns used in this project.
-Try to find security-related issues.
+Review the project's security architecture, concepts, and implementation
+patterns.
 
-Please also dive into these themes:
+Look for security issues, with extra attention to:
 
-- are user credentials safe?
-- are the sql statements injection-immune?
-- how would one student be able to act as someone else?
+- whether user credentials are handled safely
+- whether SQL statements are injection-resistant
+- how one student might be able to act as another user
 
-Please write a report with your analysis and thought into $ARGUMENTS
+Write the report to `$ARGUMENTS`.
