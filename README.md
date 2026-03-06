@@ -64,6 +64,19 @@ opencode-helpers/
 Extracts accumulated understanding from a session and persists it to structured
 knowledge files. Use at the end of productive sessions or when asked to "save context".
 
+The intended persisted output is the `docs/ai/` knowledge set:
+
+- `HANDOFF.md` for open tasks and next-session context
+- `CONVENTIONS.md` for ongoing rules and working patterns
+- `DECISIONS.md` for durable choices with rationale
+- `PITFALLS.md` for hard-won constraints and non-obvious failures
+- `DOMAIN.md` for business or domain rules when relevant
+- `STATE.md` for the current focus, completed work, pending work, and blockers
+
+The `/save` command is the entrypoint for this workflow. In this template repo,
+the command and skill document the intended behavior clearly so projects can
+adopt or implement the persistence flow consistently.
+
 ### knowledge-exam
 
 Generates German mini-exams and separate solution files from recent Git history
