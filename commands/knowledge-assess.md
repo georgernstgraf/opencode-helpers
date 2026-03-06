@@ -18,4 +18,5 @@ Important constraints:
 - Use the Austrian grading system.
 - Keep `CLASS.md` anonymous because it may be committed publicly.
 - Retrieve recipient email addresses from `vacuum.db`.
-- Address students using polite German (`Sie`).
+- Use class-based email salutations and closings as defined in the
+  `knowledge-assessment` skill.

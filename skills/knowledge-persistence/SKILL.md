@@ -25,14 +25,14 @@ docs/ai/
 
 ## Protocol
 
-### Step 1: Discovery
+### 1. Discovery
 
 - Read all existing files in `docs/ai/` to understand what is
   already persisted.
 - If the directory does not exist, create it.
 - If a file does not exist, create it with the template provided below.
 
-### Step 2: Diff Against Session
+### 2. Diff Against Session
 
 - Review the full conversation history of the current session.
 - For each knowledge file, identify facts, decisions, patterns, or status
@@ -40,7 +40,7 @@ docs/ai/
 - Ignore transient chatter, failed attempts that were fully superseded,
   and speculative discussion that did not lead to a conclusion.
 
-### Step 3: Write Updates
+### 3. Write Updates
 
 - Append new entries to the appropriate file.
 - If an existing entry is now outdated, replace it in-place and prepend
@@ -49,7 +49,7 @@ docs/ai/
 - Write only facts. One item per bullet. No preamble, no commentary,
   no summaries at the top of the file.
 
-### Step 3b: Write HANDOFF.md
+### 4. Write `HANDOFF.md`
 
 - Check the task list maintained during this session.
 - If any tasks are still [PENDING] or [IN PROGRESS], write them to
@@ -70,12 +70,12 @@ docs/ai/
 - This keeps HANDOFF.md small and actionable while large work is
   properly tracked in GitHub.
 
-### Step 4: Update AGENTS.md
+### 5. Update `AGENTS.md`
 
 - Ensure the project-level `AGENTS.md` (in project root or `.opencode/`)
   contains the bootstrap instruction block. If it does not, append it.
 
-### Step 5: Confirmation
+### 6. Confirmation
 
 - After writing, list every file that was created or modified, and for each
   show the number of entries added, updated, or removed.

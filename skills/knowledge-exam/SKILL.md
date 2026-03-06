@@ -11,6 +11,12 @@ material covered in class.
 - `class`: target class folder name
 - `weeks`: number of weeks of Git history to analyze
 
+## Class Context
+
+- The following classes are addressed informally in related communication:
+  `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
+- All other classes use formal address in related communication.
+
 ## Protocol
 
 ### 1. Validate Inputs
