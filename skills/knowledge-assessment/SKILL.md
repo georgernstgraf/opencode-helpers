@@ -37,7 +37,15 @@ communicating individual results.
 ### 2. Grade Submissions
 
 - Evaluate each submission against the available solutions.
-- Use the Austrian grading system for the overall result.
+- Use the defined point totals instead of an Austrian school grading scheme.
+- Grade multiple-choice questions per answer option: award 1 point for each
+  option that was handled correctly, whether it was correctly checked or
+  correctly left blank.
+- Do not award partial fractions within an option; each option is worth either
+  1 point or 0 points.
+- Treat each multiple-choice question as worth 4 points total because it has
+  exactly 4 answer options.
+- Treat each free-text question as worth 15 points.
 - Keep grading consistent across all students.
 
 ### 3. Create Report Files

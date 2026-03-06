@@ -49,14 +49,17 @@ material covered in class.
 
 - Create `knowledge_<class>_<isodate>.md` inside the class folder.
 - Write the exam in German.
-- Include exactly 12 multiple-choice questions.
-- Each multiple-choice question must have 1 to 4 correct answers.
-- Each multiple-choice question is worth 2 points.
+- Include exactly 10 multiple-choice questions.
+- Each multiple-choice question must have exactly 4 answer options.
+- Each multiple-choice question is worth 4 points total.
+- Score multiple-choice questions per option: award 1 point for each option that
+  is handled correctly, whether it was correctly checked or correctly left
+  blank.
 - For every multiple-choice question, explicitly allow students to mark `-`
   and briefly explain why they consider the answer ambiguous or
   context-dependent.
 - Include exactly 3 free-form questions.
-- Each free-form question is worth 8 points.
+- Each free-form question is worth 15 points.
 
 ### 4. Generate Solution File
 

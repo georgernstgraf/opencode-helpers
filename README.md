@@ -80,12 +80,15 @@ adopt or implement the persistence flow consistently.
 ### knowledge-exam
 
 Generates German mini-exams and separate solution files from recent Git history
-for a given class folder.
+for a given class folder. The workflow uses 10 multiple-choice questions with 4
+answer options each and 3 free-text questions. Multiple-choice questions are
+scored per option, and free-text questions are worth 15 points each.
 
 ### knowledge-assessment
 
 Grades student knowledge-check submissions, writes German reports, and produces
-bulk email JSON payloads.
+bulk email JSON payloads. The assessment uses the same point-based model as the
+exam skill instead of an Austrian school grading scheme.
 
 ### orchestrator
 

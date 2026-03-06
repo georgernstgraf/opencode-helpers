@@ -15,7 +15,8 @@ Required outputs:
 Important constraints:
 
 - If multiple submission versions exist, grade the highest version only.
-- Use the Austrian grading system.
+- Use the point-based scoring rules defined in the `knowledge-assessment`
+  skill.
 - Keep `CLASS.md` anonymous because it may be committed publicly.
 - Retrieve recipient email addresses from `vacuum.db`.
 - Use class-based email salutations and closings as defined in the
