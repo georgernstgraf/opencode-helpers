@@ -14,6 +14,8 @@ Follow these without question. Do not deviate unless explicitly told.
 - Keep slash commands short; use them as entrypoints, not long procedures.
 - Move reusable multi-step workflows into `skills/<name>/SKILL.md`.
 - Prefer thin commands that pass arguments and constraints into a skill.
+- Every `skills/<name>/SKILL.md` must start with OpenCode YAML frontmatter.
+- Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
 
 ## Naming
 

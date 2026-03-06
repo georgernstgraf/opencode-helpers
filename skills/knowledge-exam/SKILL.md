@@ -1,3 +1,13 @@
+---
+name: knowledge-exam
+description: Generate German knowledge-check exams and solution files from class Git history
+license: MIT
+compatibility: opencode
+metadata:
+  category: education
+  output: exam
+---
+
 # Knowledge Exam Skill
 
 ## Purpose

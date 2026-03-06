@@ -1,3 +1,13 @@
+---
+name: orchestrator
+description: Coordinate complex multi-step tasks with planning, delegation, and verification
+license: MIT
+compatibility: opencode
+metadata:
+  category: workflow
+  scope: execution
+---
+
 # Orchestrator Skill
 
 ## Purpose

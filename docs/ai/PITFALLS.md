@@ -12,3 +12,4 @@ Read this file carefully before making changes in affected areas.
 
 - Always read existing files before editing - opencode requires this
 - Never assume a library is available - check imports/package files first
+- OpenCode may show linked skills as `None` when `SKILL.md` files are missing required YAML frontmatter

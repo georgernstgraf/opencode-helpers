@@ -1,3 +1,13 @@
+---
+name: knowledge-assessment
+description: Assess German knowledge-check submissions and prepare reports and email payloads
+license: MIT
+compatibility: opencode
+metadata:
+  category: education
+  output: assessment
+---
+
 # Knowledge Assessment Skill
 
 ## Purpose

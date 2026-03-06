@@ -1,3 +1,13 @@
+---
+name: knowledge-persistence
+description: Persist session context into the structured docs/ai knowledge files
+license: MIT
+compatibility: opencode
+metadata:
+  category: workflow
+  scope: documentation
+---
+
 # Knowledge Persistence Skill
 
 ## Purpose
