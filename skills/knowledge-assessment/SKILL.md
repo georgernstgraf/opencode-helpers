@@ -41,8 +41,8 @@ communicating individual results.
 - Grade multiple-choice questions per answer option: award 1 point for each
   option that was handled correctly, whether it was correctly checked or
   correctly left blank.
-- Do not award partial fractions within an option; each option is worth either
-  1 point or 0 points.
+- Do not award partial fractions within an option; each option is worth
+  either 1 point or 0 points.
 - Treat each multiple-choice question as worth 4 points total because it has
   exactly 4 answer options.
 - Treat each free-text question as worth 15 points.
@@ -51,8 +51,7 @@ communicating individual results.
 ### 3. Create Report Files
 
 - Create `GRADINGS.md` in German.
-- Include a comprehensive table ordered alphabetically by student name, not by
-  grade.
+- Include a comprehensive table ordered alphabetically by student name, not by grade.
 - Create `INDIVIDUAL.md` in German.
 - Provide a detailed assessment for each student's submission.
 - Create `CLASS.md` in German.
