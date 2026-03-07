@@ -23,7 +23,8 @@ communicating individual results.
   address should be used
 - Matching knowledge-check files with questions and solutions, including a
   solutions file in the same directory that can be used as the reference for
-  correct answers
+  correct answers and for the total achievable points listed at the bottom of
+  that file
 - `vacuum.db` for student email address lookup
 
 ## Protocol
@@ -40,6 +41,8 @@ communicating individual results.
 ### 2. Grade Submissions
 
 - Evaluate each submission against the available solutions.
+- Read the total achievable points from the bottom of the knowledge solutions
+  Markdown file and treat that value as the authoritative total.
 - Use the defined point totals instead of an Austrian school grading scheme.
 - Grade multiple-choice questions per answer option: award 1 point for each
   option that was handled correctly, whether it was correctly checked or
@@ -57,6 +60,8 @@ communicating individual results.
 - Include a comprehensive table ordered alphabetically by student name, not by grade.
 - Create `INDIVIDUAL.md` in German.
 - Provide a relatively detailed assessment for each student's submission.
+- Ensure every reported score in `INDIVIDUAL.md` is consistent with the
+  authoritative total achievable points from the solutions file.
 - Use a respectful teacher-to-student tone that is friendly, warm, and
   encouraging without becoming informal where the class context requires a
   formal address.
@@ -89,9 +94,11 @@ communicating individual results.
   - `mailto`: recipient email address
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
   - `body`: the student's individual assessment text
+- Ensure every reported score inside the email body is consistent with the
+  authoritative total achievable points from the solutions file.
 - Build the email body in German and include the correct greeting:
-  - Formal: `Liebe Frau [Last Name]` or `Lieber Herr [Last Name]`
-  - Informal: `Liebe [First Name]` or `Lieber [First Name]`
+  - Formal: `Sehr geehrte Frau [Last Name],` or `Sehr geehrter Herr [Last Name],`
+  - Informal: `Liebe [First Name],` or `Lieber [First Name],`
 - End each email body with the correct closing formula:
   - Formal: `Mit freundlichen Grüßen,` followed by two new lines and then
     `   Georg Graf`
@@ -118,8 +125,12 @@ communicating individual results.
   effort.
 - The email greeting and closing in `EMAIL.json` must follow the class-based
   formal or informal rules exactly.
+- All salutations must include the trailing comma exactly as specified.
 - `EMAIL.json` bodies must preserve the paragraph spacing and readable newline
   structure from the corresponding individual assessments.
+- If any point-total consistency error appears between the solutions file,
+  `INDIVIDUAL.md`, or `EMAIL.json`, stop immediately instead of generating or
+  continuing with inconsistent output.
 
 ## Output Expectations
 
