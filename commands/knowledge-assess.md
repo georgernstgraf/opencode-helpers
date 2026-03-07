@@ -21,3 +21,5 @@ Important constraints:
 - Retrieve recipient email addresses from `vacuum.db`.
 - Use class-based email salutations and closings as defined in the
   `knowledge-assessment` skill.
+- Keep the individual feedback and email bodies warm, respectful, well
+  structured, and detailed as defined in the `knowledge-assessment` skill.

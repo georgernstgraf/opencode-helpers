@@ -53,7 +53,15 @@ communicating individual results.
 - Create `GRADINGS.md` in German.
 - Include a comprehensive table ordered alphabetically by student name, not by grade.
 - Create `INDIVIDUAL.md` in German.
-- Provide a detailed assessment for each student's submission.
+- Provide a relatively detailed assessment for each student's submission.
+- Use a respectful teacher-to-student tone that is friendly, warm, and
+  encouraging without becoming informal where the class context requires a
+  formal address.
+- Structure each individual assessment with a fair amount of newlines so it is
+  easy to read when copied directly into an email.
+- Discuss both strengths and weaknesses in meaningful detail.
+- Include an in-depth analysis of specific questions or answer patterns that
+  were handled correctly or incorrectly.
 - Create `CLASS.md` in German.
 - Summarize the most common mistakes across the class and add recommendations
   for the teacher on how to address them.
@@ -82,9 +90,9 @@ communicating individual results.
   - Informal: `Liebe [First Name]` or `Lieber [First Name]`
 - End each email body with the correct closing formula:
   - Formal: `Mit freundlichen Grüßen,` followed by two new lines and then
-    `   Georg Graf.`
-  - Informal: `Liebe Grüße` followed by two new lines and then
-    `   Georg Graf.`
+    `   Georg Graf`
+  - Informal: `Lieben Gruß,` followed by two new lines and then
+    `   Georg Graf`
 - If the gender still cannot be determined with high confidence, do not guess.
   Use `Guten Tag [First Name] [Last Name],` as a neutral fallback greeting,
   keep the class-based closing formula, and flag the case in `INDIVIDUAL.md`
@@ -95,9 +103,13 @@ communicating individual results.
 - Write all report files in German.
 - Treat `INDIVIDUAL.md` as the source for the personalized email bodies.
 - Keep `CLASS.md` anonymous.
-- Prefer deterministic, auditable grading language over vague praise.
+- Prefer deterministic, auditable grading language over vague praise while
+  still conveying warmth, respect, and genuine appreciation for the student's
+  effort.
 - The email greeting and closing in `EMAIL.json` must follow the class-based
   formal or informal rules exactly.
+- `EMAIL.json` bodies must preserve the paragraph spacing and readable newline
+  structure from the corresponding individual assessments.
 
 ## Output Expectations
 
