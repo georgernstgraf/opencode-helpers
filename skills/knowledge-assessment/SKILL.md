@@ -87,7 +87,7 @@ communicating individual results.
 - Create `EMAIL.json` as a JSON array.
 - Each object must contain exactly these fields:
   - `mailto`: recipient email address
-  - `subject`: `Ergebnis der Wissensueberpruefung am <isodate>`
+  - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
   - `body`: the student's individual assessment text
 - Build the email body in German and include the correct greeting:
   - Formal: `Liebe Frau [Last Name]` or `Lieber Herr [Last Name]`
@@ -110,6 +110,9 @@ communicating individual results.
 - Write all report files in German.
 - Treat `INDIVIDUAL.md` as the source for the personalized email bodies.
 - Keep `CLASS.md` anonymous.
+- UTF-8 is explicitly allowed and preferred in both Markdown and JSON outputs.
+- Do not replace German umlauts with transliterations such as `ae`, `oe`, or
+  `ue` unless the surrounding source material explicitly requires that form.
 - Prefer deterministic, auditable grading language over vague praise while
   still conveying warmth, respect, and genuine appreciation for the student's
   effort.

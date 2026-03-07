@@ -73,6 +73,9 @@ material covered in class.
 - Do not commit any generated files.
 - Preserve existing files unless the task explicitly requires replacement.
 - Follow the repository convention that `**/*_solutions.md` stays git-ignored.
+- UTF-8 is explicitly allowed and preferred in generated Markdown files.
+- Do not replace German umlauts with transliterations such as `ae`, `oe`, or
+  `ue` unless the surrounding source material explicitly requires that form.
 
 ## Output Expectations
 
