@@ -18,11 +18,13 @@ communicating individual results.
 
 ## Inputs
 
-- Student submission files in the current directory
-- Matching knowledge-check files with questions and solutions
+- Student submission files in the current directory; each submission filename
+  contains the class identifier that determines whether formal or informal
+  address should be used
+- Matching knowledge-check files with questions and solutions, including a
+  solutions file in the same directory that can be used as the reference for
+  correct answers
 - `vacuum.db` for student email address lookup
-- Class membership to decide whether the email should use formal or informal
-  address
 
 ## Protocol
 
@@ -30,6 +32,7 @@ communicating individual results.
 
 - Inspect the current directory for student submission files and the matching
   knowledge-check files containing the questions and solutions.
+- Derive the class for each submission from its filename.
 - If a student submitted multiple versions, grade only the highest version.
 - Read any student comments where they used `-` to mark an answer as ambiguous
   or context-dependent, and consider that explanation during assessment.
@@ -77,7 +80,8 @@ communicating individual results.
   the correct German form.
 - If the gender is not clear from the first name alone, use additional context
   such as class records, submission wording, or other available student data.
-- Determine the addressing style from the class:
+- Determine the addressing style from the class parsed from the submission
+  filename:
   - Informal classes: `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
   - All other classes use formal address.
 - Create `EMAIL.json` as a JSON array.
