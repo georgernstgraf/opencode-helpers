@@ -104,9 +104,9 @@ communicating individual results.
     `   Georg Graf`
   - Informal: `Lieben Gruß,` followed by two new lines and then
     `   Georg Graf`
-- Include a note in every email body stating that a file with the correct
-  solutions has been uploaded to the Git repository. Place this note near the
-  end of the body, before the closing formula.
+- Include this exact first-person note in every email body: `Ich habe die Datei
+  mit den korrekten Lösungen in das Git-Repository hochgeladen.` Place this
+  note near the end of the body, before the closing formula.
 - If the gender still cannot be determined with high confidence, do not guess.
   Use `Guten Tag [First Name] [Last Name],` as a neutral fallback greeting,
   keep the class-based closing formula, and flag the case in `INDIVIDUAL.md`
