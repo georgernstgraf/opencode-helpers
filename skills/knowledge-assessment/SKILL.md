@@ -34,6 +34,9 @@ communicating individual results.
 - Inspect the current directory for student submission files and the matching
   knowledge-check files containing the questions and solutions.
 - Derive the class for each submission from its filename.
+- Determine the addressing style from the class using these rules:
+  - Informal classes: `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
+  - All other classes use formal address.
 - If a student submitted multiple versions, grade only the highest version.
 - Read any student comments where they used `-` to mark an answer as ambiguous
   or context-dependent, and consider that explanation during assessment.
@@ -53,18 +56,24 @@ communicating individual results.
   exactly 4 answer options.
 - Treat each free-text question as worth 15 points.
 - Keep grading consistent across all students.
+- When parsing free-text answers, treat text that starts immediately after a
+  separator such as `---` on the same line as a valid answer, not as an empty
+  section.
+- More generally, do not classify a free-text response as unanswered before
+  checking whether substantive answer text appears on the same line as a
+  heading or separator, or directly after Markdown markers.
 
 ### 3. Create Report Files
 
 - Create `GRADINGS.md` in German.
-- Include a comprehensive table ordered alphabetically by student name, not by grade.
+- Include a comprehensive table ordered alphabetically by student name, not by
+  grade.
 - Create `INDIVIDUAL.md` in German.
 - Provide a relatively detailed assessment for each student's submission.
 - Ensure every reported score in `INDIVIDUAL.md` is consistent with the
   authoritative total achievable points from the solutions file.
 - Use a respectful teacher-to-student tone that is friendly, warm, and
-  encouraging without becoming informal where the class context requires a
-  formal address.
+  encouraging without becoming inappropriately informal.
 - Structure each individual assessment with a fair amount of newlines so it is
   easy to read when copied directly into an email.
 - Discuss both strengths and weaknesses in meaningful detail.
@@ -85,10 +94,6 @@ communicating individual results.
   the correct German form.
 - If the gender is not clear from the first name alone, use additional context
   such as class records, submission wording, or other available student data.
-- Determine the addressing style from the class parsed from the submission
-  filename:
-  - Informal classes: `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
-  - All other classes use formal address.
 - Create `EMAIL.json` as a JSON array.
 - Each object must contain exactly these fields:
   - `mailto`: recipient email address
@@ -115,9 +120,12 @@ communicating individual results.
 ### 5. Constraints
 
 - Write all report files in German.
+- Write `EMAIL.json` bodies in German.
 - Treat `INDIVIDUAL.md` as the source for the personalized email bodies.
 - Keep `CLASS.md` anonymous.
 - UTF-8 is explicitly allowed and preferred in both Markdown and JSON outputs.
+- Write German umlauts and Eszett in natural UTF-8 form in generated `.md`
+  and `.json` files, for example `ä`, `ö`, `ü`, `Ä`, `Ö`, `Ü`, and `ß`.
 - Do not replace German umlauts with transliterations such as `ae`, `oe`, or
   `ue` unless the surrounding source material explicitly requires that form.
 - Prefer deterministic, auditable grading language over vague praise while

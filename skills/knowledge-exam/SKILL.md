@@ -21,12 +21,6 @@ material covered in class.
 - `class`: target class folder name
 - `weeks`: number of weeks of Git history to analyze
 
-## Class Context
-
-- The following classes are addressed informally in related communication:
-  `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
-- All other classes use formal address in related communication.
-
 ## Protocol
 
 ### 1. Validate Inputs
@@ -35,6 +29,9 @@ material covered in class.
 - If the folder does not exist, stop immediately and report that the class name
   appears to be invalid.
 - Compute today's ISO date for the output filenames.
+- The following classes are addressed informally in related communication:
+  `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
+- All other classes use formal address in related communication.
 
 ### 2. Inspect Source Material
 
@@ -48,7 +45,6 @@ material covered in class.
 ### 3. Generate Exam Files
 
 - Create `knowledge_<class>_<isodate>.md` inside the class folder.
-- Write the exam in German.
 - Include exactly 10 multiple-choice questions.
 - Each multiple-choice question must have exactly 4 answer options.
 - Each multiple-choice question is worth 4 points total.
@@ -64,7 +60,6 @@ material covered in class.
 ### 4. Generate Solution File
 
 - Create `knowledge_<class>_<isodate>_solutions.md` in the same folder.
-- Write the teacher solutions in German.
 - Keep the student-facing exam and the solution file separate.
 - Do not include the solutions in the student-facing exam file.
 
@@ -73,6 +68,7 @@ material covered in class.
 - Do not commit any generated files.
 - Preserve existing files unless the task explicitly requires replacement.
 - Follow the repository convention that `**/*_solutions.md` stays git-ignored.
+- Write both generated Markdown files in German.
 - UTF-8 is explicitly allowed and preferred in generated Markdown files.
 - Do not replace German umlauts with transliterations such as `ae`, `oe`, or
   `ue` unless the surrounding source material explicitly requires that form.

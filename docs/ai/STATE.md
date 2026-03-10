@@ -1,10 +1,10 @@
-# Current State (2026-03-07)
+# Current State (2026-03-10)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Template repository with refined knowledge exam and assessment workflows, updated scoring model, and improved feedback tone.
+Template repository with refined teaching skills, standalone skill-loading safety, and improved grading workflow wording.
 
 ## Completed (this cycle)
 
@@ -24,12 +24,18 @@ Template repository with refined knowledge exam and assessment workflows, update
 - [x] Updated sign-off formulas for formal and informal contexts
 - [x] Added requirement for structured, detailed individual feedback with clear paragraph spacing
 - [x] Added note in email bodies about solutions file uploaded to Git repository
+- [x] Reviewed repeated content across teaching-related skills
+- [x] Removed accidental duplicate parsing instructions from `skills/knowledge-assessment/SKILL.md`
+- [x] Tightened `skills/knowledge-exam/SKILL.md` while keeping it fully standalone for skill loading
+- [x] Tightened `skills/knowledge-assessment/SKILL.md` while keeping it fully standalone for skill loading
+- [x] Avoided shared sidecar skill context because `skill` loading should not depend on adjacent helper files
 
 ## Pending
 
 - [ ] Add more example commands as needs arise
 - [ ] Consider adding utility scripts
 - [ ] Validate skill loading from the linked `.config/OpenCode/Skills` environment
+- [ ] Review non-teaching skills for safe wording cleanup without introducing cross-file dependencies
 
 ## Blockers
 
@@ -37,4 +43,4 @@ None
 
 ## Next Session Suggestion
 
-Validate linked skill discovery in OpenCode and continue refining teaching workflow automation as needed.
+Validate linked skill discovery in OpenCode and continue refining standalone skill wording as needed.
