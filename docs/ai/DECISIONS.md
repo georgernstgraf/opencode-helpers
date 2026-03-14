@@ -28,3 +28,9 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Skills are loaded via the `skill` tool from global OpenCode config, so standalone `SKILL.md` files are safer than sidecar references
 - **Considered**: A shared `skills/_shared/` folder for cross-skill teaching context
 - **Tradeoff**: Some content repetition remains, but runtime behavior is more reliable and portable
+
+## 2026-03-14: Centralize issue commands behind a dedicated workflow skill
+- **Choice**: Refactor `issue-start`, `issue-commit`, and `issue-finish` into thin command wrappers around a shared `issue-workflow` skill
+- **Reason**: The issue lifecycle rules, GitHub interactions, and commit requirements should stay consistent across all issue-oriented commands
+- **Considered**: Keeping separate embedded instructions in each command file
+- **Tradeoff**: The skill becomes broader, but maintenance is simpler and behavior stays aligned

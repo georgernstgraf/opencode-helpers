@@ -26,7 +26,7 @@ Before starting any task, read the following files in order:
 If the user says "continue", "resume", or "finish where we left off":
 read and act on HANDOFF.md immediately without asking clarifying questions. If `HANDOFF.md` contains open tasks, complete them before starting any new work unless the user explicitly says otherwise.
 
-When the user asks to save context or invokes the save workflow, the intended
+When the user asks to save context or invokes the knowledge-persist workflow, the intended
 knowledge-persistence output is the `docs/ai/` knowledge set:
 
 - `HANDOFF.md` for open tasks and next-session context

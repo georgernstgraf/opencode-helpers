@@ -1,10 +1,10 @@
-# Current State (2026-03-10)
+# Current State (2026-03-14)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Template repository with refined teaching skills, standalone skill-loading safety, and improved grading workflow wording.
+Template repository with refined skill-backed workflows, issue lifecycle reuse, and knowledge persistence integration.
 
 ## Completed (this cycle)
 
@@ -16,7 +16,7 @@ Template repository with refined teaching skills, standalone skill-loading safet
 - [x] Refactored knowledge exam and assessment workflows into thin commands plus dedicated skills
 - [x] Standardized command wording and skill documentation structure
 - [x] Added class-based German salutation rules and fallback guidance to the knowledge-assessment skill
-- [x] Documented the intended `/save` knowledge-persistence outputs in `AGENTS.md` and `README.md`
+- [x] Documented the intended `/knowledge-persist` knowledge-persistence outputs in `AGENTS.md` and `README.md`
 - [x] Added OpenCode YAML frontmatter metadata to all existing skills
 - [x] Updated scoring model to 10 MC questions (4 points each) and 3 free-text questions (15 points each)
 - [x] Removed Austrian school grading references, replaced with point-based scoring
@@ -29,6 +29,10 @@ Template repository with refined teaching skills, standalone skill-loading safet
 - [x] Tightened `skills/knowledge-exam/SKILL.md` while keeping it fully standalone for skill loading
 - [x] Tightened `skills/knowledge-assessment/SKILL.md` while keeping it fully standalone for skill loading
 - [x] Avoided shared sidecar skill context because `skill` loading should not depend on adjacent helper files
+- [x] Renamed `/save` to `/knowledge-persist`
+- [x] Updated `/issue-finish` to include knowledge persistence
+- [x] Refactored issue commands into thin wrappers around a new `issue-workflow` skill
+- [x] Documented that issue-workflow commits must include a GitHub issue number
 
 ## Pending
 
@@ -36,6 +40,7 @@ Template repository with refined teaching skills, standalone skill-loading safet
 - [ ] Consider adding utility scripts
 - [ ] Validate skill loading from the linked `.config/OpenCode/Skills` environment
 - [ ] Review non-teaching skills for safe wording cleanup without introducing cross-file dependencies
+- [ ] Consider adding an explicit `/issue-comment` command if issue-only status updates become common
 
 ## Blockers
 
@@ -43,4 +48,4 @@ None
 
 ## Next Session Suggestion
 
-Validate linked skill discovery in OpenCode and continue refining standalone skill wording as needed.
+Validate linked skill discovery in OpenCode and confirm the new issue-workflow behavior is ergonomic in practice.

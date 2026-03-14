@@ -13,7 +13,7 @@ project to supercharge your opencode sessions.
 ```
 opencode-helpers/
 ├── commands/           # Slash commands for opencode
-│   ├── save.md         # Persist session knowledge to docs/ai/
+│   ├── knowledge-persist.md # Persist session knowledge to docs/ai/
 │   ├── knowledge.md    # Thin wrapper for exam-generation skill
 │   ├── knowledge-assess.md  # Thin wrapper for assessment skill
 │   ├── issue-start.md  # Start working on a GitHub issue
@@ -23,6 +23,7 @@ opencode-helpers/
 │   └── security.md     # Security audit report
 ├── skills/             # Reusable skill definitions
 │   ├── knowledge-persistence/  # Persist agent knowledge across sessions
+│   ├── issue-workflow/  # Manage issue-centered delivery workflows
 │   ├── knowledge-exam/ # Generate exams from git history
 │   ├── knowledge-assessment/   # Assess student submissions
 │   └── orchestrator/   # Manage complex multi-step tasks
@@ -48,7 +49,7 @@ opencode-helpers/
 
 | Command | Description |
 |---------|-------------|
-| `/save` | Persist session knowledge to `docs/ai/` files |
+| `/knowledge-persist` | Persist session knowledge to `docs/ai/` files |
 | `/knowledge <class> <weeks>` | Run the exam-generation skill for a class |
 | `/knowledge-assess` | Run the assessment skill for student submissions |
 | `/issue-start [issue\|#new]` | Start or continue working on a GitHub issue |
@@ -58,6 +59,12 @@ opencode-helpers/
 | `/security <output>` | Generate security audit report |
 
 ## Skills
+
+### issue-workflow
+
+Handles issue-based delivery from kickoff through checkpoint commits to final
+completion. It is the shared workflow behind the issue commands and enforces
+that every workflow-created commit references a GitHub issue number.
 
 ### knowledge-persistence
 
@@ -73,7 +80,7 @@ The intended persisted output is the `docs/ai/` knowledge set:
 - `DOMAIN.md` for business or domain rules when relevant
 - `STATE.md` for the current focus, completed work, pending work, and blockers
 
-The `/save` command is the entrypoint for this workflow. In this template repo,
+The `/knowledge-persist` command is the entrypoint for this workflow. In this template repo,
 the command and skill document the intended behavior clearly so projects can
 adopt or implement the persistence flow consistently.
 
