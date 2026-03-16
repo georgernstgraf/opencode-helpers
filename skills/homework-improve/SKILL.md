@@ -43,9 +43,17 @@ student-facing `Hausübungen.md` file in German.
 ### 3. Inspect Source Material
 
 - Analyze Git commits that changed files inside the class folder.
-- Use the commit history as a teaching timeline and infer the likely homework
-  context from the touched files, especially `README.md` and related lesson
-  material in the same class folder.
+- Use the commit history as a teaching timeline, but do not treat commits as
+  mere file-change events.
+- Read the relevant changed material, especially `README.md` and related lesson
+  files in the same class folder, until you understand what topic was being
+  taught, which concepts were being practiced, and what a possible homework
+  assignment would reinforce if one was actually given.
+- Distinguish carefully between classroom content and actual homework.
+- Do not assume that every lesson resulted in homework; some commits may only
+  document in-class work or teaching material.
+- Only create a homework entry when the repository evidence shows or strongly
+  implies that an assignment was given.
 - When multiple commits belong to the same teaching unit or homework date,
   synthesize them into one coherent homework entry instead of repeating them.
 - When an existing `Hausübungen.md` already contains older entries, it is not
@@ -57,9 +65,14 @@ student-facing `Hausübungen.md` file in German.
 - Add or update homework sections using German Markdown headings such as:
   - `## Hausübung vom 16. März`
   - `### Thema: async / await zur Erleichterung bei Promise-Programmierung`
+- Base each homework entry on actual understanding of the topic and assignment,
+  not on superficial paraphrasing of commit messages.
 - Expand terse homework notes into explicit, student-friendly instructions.
 - Reference the relevant topic, expected outcome, and any useful context from
   the corresponding class material.
+- If the material clarifies the lesson topic but does not support that a real
+  assignment was agreed, do not invent tasks or create a homework entry from
+  that lesson alone.
 - Keep the writing concise but clearer and more actionable than the source
   notes.
 - Maintain newest-on-top ordering across the full file.
@@ -73,6 +86,11 @@ student-facing `Hausübungen.md` file in German.
 - Do not fabricate precise dates or details when the Git history does not
   support them; in that case, use the best defensible phrasing based on the
   available repository evidence.
+- Do not invent homework assignments that are not supported by repository
+  evidence.
+- If the available material is enough to understand the lesson topic but not
+  enough to prove that homework was actually assigned, prefer omission over
+  speculation.
 
 ## Output Expectations
 

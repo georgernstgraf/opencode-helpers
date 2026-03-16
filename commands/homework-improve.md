@@ -16,4 +16,8 @@ Important constraints:
 - Keep the file in German.
 - Keep newest homework entries at the top.
 - Make the workflow re-entrant so existing covered dates are not recreated.
+- Understand the actual lesson topic from the changed class material, not just
+  the commit metadata.
+- Do not invent homework when the repository evidence does not show that an
+  assignment was actually given.
 - Do not commit any generated changes.
