@@ -17,6 +17,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Every `skills/<name>/SKILL.md` must start with OpenCode YAML frontmatter.
 - Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
 - Keep issue-related commands as thin wrappers around the shared `issue-workflow` skill.
+- Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
 
 ## Naming
 

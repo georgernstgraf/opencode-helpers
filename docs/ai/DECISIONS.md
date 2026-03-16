@@ -34,3 +34,9 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: The issue lifecycle rules, GitHub interactions, and commit requirements should stay consistent across all issue-oriented commands
 - **Considered**: Keeping separate embedded instructions in each command file
 - **Tradeoff**: The skill becomes broader, but maintenance is simpler and behavior stays aligned
+
+## 2026-03-16: Add homework-improve as a standalone education skill
+- **Choice**: Implement `/homework-improve` as a thin command wrapper around a dedicated `homework-improve` skill that writes `Hausübungen.md`
+- **Reason**: The workflow needs reusable rules for class-folder history analysis, German homework expansion, newest-first ordering, and re-entrant updates
+- **Considered**: Embedding the workflow directly in the command file, or overloading `knowledge-exam` with homework behavior
+- **Tradeoff**: One more standalone skill to maintain, but the homework workflow stays explicit and reusable

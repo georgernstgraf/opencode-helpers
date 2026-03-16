@@ -1,10 +1,10 @@
-# Current State (2026-03-14)
+# Current State (2026-03-16)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Template repository with refined skill-backed workflows, issue lifecycle reuse, and knowledge persistence integration.
+Template repository with refined skill-backed workflows, issue lifecycle reuse, knowledge persistence integration, and a new homework-improvement workflow.
 
 ## Completed (this cycle)
 
@@ -33,6 +33,9 @@ Template repository with refined skill-backed workflows, issue lifecycle reuse, 
 - [x] Updated `/issue-finish` to include knowledge persistence
 - [x] Refactored issue commands into thin wrappers around a new `issue-workflow` skill
 - [x] Documented that issue-workflow commits must include a GitHub issue number
+- [x] Added `/homework-improve` as a thin command wrapper for class homework enrichment
+- [x] Added standalone `homework-improve` skill for re-entrant `Hausübungen.md` generation from class Git history
+- [x] Confirmed the intended homework output filename is `Hausübungen.md`
 
 ## Pending
 
@@ -48,4 +51,4 @@ None
 
 ## Next Session Suggestion
 
-Validate linked skill discovery in OpenCode and confirm the new issue-workflow behavior is ergonomic in practice.
+Validate linked skill discovery in OpenCode and confirm the new `homework-improve` workflow is ergonomic in practice.
