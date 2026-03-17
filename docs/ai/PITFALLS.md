@@ -16,3 +16,4 @@ Read this file carefully before making changes in affected areas.
 - Do not move runtime-critical skill instructions into adjacent helper Markdown files unless skill loading is known to include them
 - Do not allow issue workflow commits without a GitHub issue number in the commit message
 - When passing Markdown with backticks to `gh issue comment` through the shell, quote it safely or the shell may try to execute the backticked fragments before posting the comment
+- OpenCode has no built-in throttling for parallel sub-agent execution - always batch concurrent agents to avoid overwhelming API rate limits

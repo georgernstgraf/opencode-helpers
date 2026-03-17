@@ -40,3 +40,15 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: The workflow needs reusable rules for class-folder history analysis, German homework expansion, newest-first ordering, and re-entrant updates
 - **Considered**: Embedding the workflow directly in the command file, or overloading `knowledge-exam` with homework behavior
 - **Tradeoff**: One more standalone skill to maintain, but the homework workflow stays explicit and reusable
+
+## 2026-03-18: RepoGrader delegates to repo-report skill for commit analysis
+- **Choice**: RepoGrader agent invokes `repo-report` skill for homework-agnostic analysis, then post-processes for assignment matching
+- **Reason**: Separates concerns - skill handles commit inspection, agent handles homework-specific context
+- **Considered**: Embedding all analysis logic in the agent
+- **Tradeoff**: Two files to maintain, but skill is reusable for non-grading scenarios
+
+## 2026-03-18: Batched parallel execution for RepoGrader sub-agents
+- **Choice**: Execute RepoGrader agents in configurable batches (default 5 concurrent), not all at once
+- **Reason**: OpenCode has no built-in throttling; 30 parallel sub-agents could overwhelm machine/API limits
+- **Considered**: Fully parallel or fully sequential execution
+- **Tradeoff**: Slightly more complex command logic, but safer for rate limits and system resources

@@ -19,6 +19,13 @@ Follow these without question. Do not deviate unless explicitly told.
 - Keep issue-related commands as thin wrappers around the shared `issue-workflow` skill.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
 
+## Grading Workflow
+
+- RepoGrader agents run in batches (default 5 concurrent) to avoid overwhelming API rate limits
+- All grading reports written in German with 0-100 score (Endbewertung)
+- EMAIL.json contains full grading reports as email body (long emails expected)
+- Formal/informal address determined from `klasse` column in database: informal classes are `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
+
 ## Naming
 
 <!-- e.g., "Use camelCase for variables, PascalCase for types" -->

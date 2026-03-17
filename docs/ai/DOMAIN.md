@@ -23,10 +23,22 @@ Only populate this file when the project has meaningful domain logic.
 - **Exam generation**: Git history analysis → German exam file → separate solutions file
 - **Assessment**: Student submissions → point-based grading → individual feedback → class patterns → bulk email JSON
 - **Email composition**: Individual assessment → structured paragraphs → solutions note → sign-off → EMAIL.json
+- **Repository grading**: Student repos → batched RepoGrader agents → German grading reports → EMAIL.json with full reports
 
 ## Constraints
 
 - All exam and assessment content must be written in German
+- All repository grading reports must be written in German
 - `CLASS.md` must remain anonymous for public repository use
 - `*_solutions.md` files are git-ignored to avoid exposing answers
 - Individual assessments must preserve paragraph spacing when copied to email bodies
+- Email body contains the ENTIRE grading report (long emails expected)
+
+## Database
+
+- **Location**: `/home/georg/OneDrive/uploadthing.db`
+- **Table**: `users` with columns `email`, `name`, `klasse`
+- **Purpose**: Email address lookup and class-based address style determination
+- **Address style by class**:
+  - Informal (`Liebe [First Name]`): `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
+  - Formal (`Sehr geehrte Frau [Last Name]`): all other classes
