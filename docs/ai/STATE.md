@@ -17,6 +17,7 @@ Education-focused commands and skills for German class workflows.
 - [x] Updated `docs/ai/DOMAIN.md` with Central Configuration section
 - [x] Updated `docs/ai/CONVENTIONS.md` to reference shared skill
 - [x] Eliminated duplicated class lists and email formulas across grading workflows
+- [x] Changed default batch size from 5 to 7 concurrent sub-agents in repograde
 
 ## Pending
 
