@@ -47,11 +47,11 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Embedding all analysis logic in the agent
 - **Tradeoff**: Two files to maintain, but skill is reusable for non-grading scenarios
 
-## 2026-03-18: Batched parallel execution for RepoGrader sub-agents
-- **Choice**: Execute RepoGrader agents in configurable batches (default 5 concurrent), not all at once
-- **Reason**: OpenCode has no built-in throttling; 30 parallel sub-agents could overwhelm machine/API limits
-- **Considered**: Fully parallel or fully sequential execution
-- **Tradeoff**: Slightly more complex command logic, but safer for rate limits and system resources
+## 2026-03-18: Dynamic concurrency for RepoGrader sub-agents
+- **Choice**: Execute RepoGrader agents with dynamic concurrency (default 7 concurrent), starting the next agent immediately after one completes (with ~3 second delay)
+- **Reason**: Maintains maximum throughput while keeping concurrent agents at a safe limit; OpenCode has no built-in throttling
+- **Considered**: Batched execution (wait for all to complete before next batch), fully parallel or fully sequential execution
+- **Tradeoff**: More complex than simple batching, but maximizes throughput without overwhelming API limits
 
 ## 2026-03-18: Add /homework command as read-only homework suggestion generator
 - **Choice**: Implement `/homework` as a thin command wrapper around a dedicated `homework` skill that outputs suggestions without modifying files

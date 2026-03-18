@@ -32,7 +32,7 @@ All grading-related skills and commands reference this shared configuration.
 - **Exam generation**: Git history analysis → German exam file → separate solutions file
 - **Assessment**: Student submissions → point-based grading → individual feedback → class patterns → bulk email JSON
 - **Email composition**: Individual assessment → structured paragraphs → solutions note → sign-off → EMAIL.json
-- **Repository grading**: Student repos → batched RepoGrader agents → German grading reports → EMAIL.json with full reports
+- **Repository grading**: Student repos → dynamically concurrent RepoGrader agents (7 max) → German grading reports → EMAIL.json with full reports
 
 ## Constraints
 

@@ -1,6 +1,6 @@
 ---
 name: repograde
-description: Grade Student Repositories with configurable batch size (default: 7 concurrent)
+description: Grade Student Repositories with dynamic concurrency (default: 7 concurrent)
 ---
 # Grade Student Repositories
 
@@ -25,8 +25,9 @@ Reference `skills/grading-shared/SKILL.md` for centralized configuration.
 ### Phase 1: Run RepoGrader Agents
 
 - Run one `@repograder` agent instance per student directory
-- Execute in batches of **$1 concurrent instances maximum** (default: 7)
-- As each sub-agent completes, start the next one to maintain maximum throughput
+- Maintain **$1 concurrent instances maximum** (default: 7) at all times
+- When a sub-agent completes, immediately start the next one after a random delay of ~3 seconds
+- This ensures continuous throughput with $1 agents working concurrently until all directories are processed
 - Continue until all student directories are processed
 
 ### Phase 2: Generate Bulk Email JSON
@@ -66,10 +67,9 @@ After all agents complete, generate a single `EMAIL.json` file:
 
 ## Progress Reporting
 
-After each batch completes, report:
-- Completed batch number and total batches (e.g., "Batch 2/6 complete")
-- Number of students processed so far
-- After all batches: "All grading complete. Generating EMAIL.json..."
+Report progress as agents complete:
+- Number of students processed so far (e.g., "5/23 complete")
+- After all agents: "All grading complete. Generating EMAIL.json..."
 
 ## Input
 

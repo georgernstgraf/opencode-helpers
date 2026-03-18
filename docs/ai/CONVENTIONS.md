@@ -21,7 +21,9 @@ Follow these without question. Do not deviate unless explicitly told.
 
 ## Grading Workflow
 
-- RepoGrader agents run in batches (default 5 concurrent) to avoid overwhelming API rate limits
+- RepoGrader agents run with dynamic concurrency (default 7 concurrent)
+- When an agent completes, the next starts immediately after a ~3 second delay
+- This maintains maximum throughput while avoiding overwhelming API rate limits
 - All grading reports written in German with 0-100 score (Endbewertung)
 - EMAIL.json contains full grading reports as email body (long emails expected)
 - Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration
