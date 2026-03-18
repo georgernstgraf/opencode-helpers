@@ -11,6 +11,12 @@ Education-focused commands and skills for German class workflows.
 - [x] Added `/homework` command (read-only homework suggestion generator)
 - [x] Added `homework` skill for 24-hour commit analysis with 2-4 exercise suggestions
 - [x] Skill outputs directly to user (no file modifications)
+- [x] Created `skills/grading-shared/SKILL.md` with centralized configuration
+- [x] Updated `knowledge-assessment` skill to reference shared config
+- [x] Updated `repograde` command to reference shared config
+- [x] Updated `docs/ai/DOMAIN.md` with Central Configuration section
+- [x] Updated `docs/ai/CONVENTIONS.md` to reference shared skill
+- [x] Eliminated duplicated class lists and email formulas across grading workflows
 
 ## Pending
 

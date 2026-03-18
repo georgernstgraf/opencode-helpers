@@ -58,3 +58,9 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Teachers need quick homework ideas from recent lesson commits; unlike `/homework-improve`, this should be read-only for easy copy-paste
 - **Considered**: Combining with `/homework-improve`, or extending `/knowledge-exam`
 - **Tradeoff**: Another standalone skill, but keeps the read-only output pattern explicit and separate from file-modifying workflows
+
+## 2026-03-18: Centralize grading configuration in grading-shared skill
+- **Choice**: Create `skills/grading-shared/SKILL.md` as single source of truth for class-to-address-style mapping, email formulas, and database patterns
+- **Reason**: Both `knowledge-assessment` and `repograde` were duplicating class lists, email greetings/closings, and database lookup patterns
+- **Considered**: Keeping configuration duplicated in each skill, or using a JSON config file
+- **Tradeoff**: One more skill file, but eliminates duplication and ensures consistency across grading workflows

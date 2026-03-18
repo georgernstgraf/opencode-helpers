@@ -16,6 +16,16 @@ This skill assesses student submissions for a knowledge-check exam, produces
 teacher-facing reports in German, and prepares structured email payloads for
 communicating individual results.
 
+## Dependencies
+
+This skill requires the `grading-shared` skill for:
+- Class-to-address-style mapping
+- Email generation protocol (greetings, closings, gender determination)
+- Database lookup patterns
+- Email JSON structure
+
+Reference `skills/grading-shared/SKILL.md` for centralized configuration.
+
 ## Inputs
 
 - Student submission files in the current directory; each submission filename
@@ -34,9 +44,8 @@ communicating individual results.
 - Inspect the current directory for student submission files and the matching
   knowledge-check files containing the questions and solutions.
 - Derive the class for each submission from its filename.
-- Determine the addressing style from the class using these rules:
-  - Informal classes: `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
-  - All other classes use formal address.
+- Determine the addressing style from the class using the centralized
+  configuration in `grading-shared` skill.
 - If a student submitted multiple versions, grade only the highest version.
 - Read any student comments where they used `-` to mark an answer as ambiguous
   or context-dependent, and consider that explanation during assessment.
@@ -87,35 +96,28 @@ communicating individual results.
 
 ### 4. Create Bulk Email JSON
 
-- Query the `vacuum.db` SQLite database to retrieve student email addresses from
-  the `users` table.
-- Match students carefully so that each result is sent to the correct person.
-- Determine the student's gender from the first name so the salutation matches
-  the correct German form.
-- If the gender is not clear from the first name alone, use additional context
-  such as class records, submission wording, or other available student data.
+Follow the `grading-shared` skill protocol for:
+- Database lookup (use `vacuum.db` in current directory)
+- Gender determination and fallback handling
+- Email JSON structure
+- Greeting and closing formulas
+
+Additional requirements specific to knowledge-check:
+
 - Create `EMAIL.json` as a JSON array.
-- Each object must contain exactly these fields:
+- Each object must contain exactly these fields (see `grading-shared` for structure):
   - `mailto`: recipient email address
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
   - `body`: the student's individual assessment text
 - Ensure every reported score inside the email body is consistent with the
   authoritative total achievable points from the solutions file.
-- Build the email body in German and include the correct greeting:
-  - Formal: `Sehr geehrte Frau [Last Name],` or `Sehr geehrter Herr [Last Name],`
-  - Informal: `Liebe [First Name],` or `Lieber [First Name],`
-- End each email body with the correct closing formula:
-  - Formal: `Mit freundlichen Grüßen,` followed by two new lines and then
-    `   Georg Graf`
-  - Informal: `Lieben Gruß,` followed by two new lines and then
-    `   Georg Graf`
+- Use greeting and closing formulas from `grading-shared` based on class
+  address style.
 - Include this exact first-person note in every email body: `Ich habe die Datei
   mit den korrekten Lösungen in das Git-Repository hochgeladen.` Place this
   note near the end of the body, before the closing formula.
-- If the gender still cannot be determined with high confidence, do not guess.
-  Use `Guten Tag [First Name] [Last Name],` as a neutral fallback greeting,
-  keep the class-based closing formula, and flag the case in `INDIVIDUAL.md`
-  for manual review before the emails are sent.
+- If gender cannot be determined, use neutral fallback greeting per
+  `grading-shared` protocol and flag in `INDIVIDUAL.md` for manual review.
 
 ### 5. Constraints
 
@@ -131,11 +133,8 @@ communicating individual results.
 - Prefer deterministic, auditable grading language over vague praise while
   still conveying warmth, respect, and genuine appreciation for the student's
   effort.
-- The email greeting and closing in `EMAIL.json` must follow the class-based
-  formal or informal rules exactly.
-- All salutations must include the trailing comma exactly as specified.
-- `EMAIL.json` bodies must preserve the paragraph spacing and readable newline
-  structure from the corresponding individual assessments.
+- Follow email constraints from `grading-shared` (greeting, closing, trailing
+  comma, paragraph spacing).
 - If any point-total consistency error appears between the solutions file,
   `INDIVIDUAL.md`, or `EMAIL.json`, stop immediately instead of generating or
   continuing with inconsistent output.

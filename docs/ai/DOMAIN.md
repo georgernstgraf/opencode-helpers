@@ -3,6 +3,17 @@
 Business rules and domain relationships not obvious from code.
 Only populate this file when the project has meaningful domain logic.
 
+## Central Configuration
+
+The `grading-shared` skill (`skills/grading-shared/SKILL.md`) provides centralized
+configuration for all grading workflows:
+- Class-to-address-style mapping
+- Email generation protocol (greetings, closings, gender determination)
+- Database lookup patterns
+- Email JSON structure
+
+All grading-related skills and commands reference this shared configuration.
+
 ## Entities
 
 - **Student**: Submits knowledge-check answers, receives personalized feedback via email
@@ -14,9 +25,7 @@ Only populate this file when the project has meaningful domain logic.
 - Knowledge exams contain exactly 10 multiple-choice questions and 3 free-text questions
 - Multiple-choice questions have exactly 4 answer options, worth 4 points total (1 point per correctly handled option)
 - Free-text questions are worth 15 points each
-- Formal address classes use `Liebe Frau [Last Name]` or `Lieber Herr [Last Name]`
-- Informal address classes (`2ahwii`, `3ahwii`, `5ahwii`, `4aaif`) use `Liebe [First Name]` or `Lieber [First Name]`
-- Email sign-offs differ by class: formal uses `Mit freundlichen Grüßen,`, informal uses `Lieben Gruß,`
+- Address style and email formulas: see `grading-shared` skill for centralized configuration
 
 ## Workflows
 
@@ -36,9 +45,11 @@ Only populate this file when the project has meaningful domain logic.
 
 ## Database
 
-- **Location**: `/home/georg/OneDrive/uploadthing.db`
-- **Table**: `users` with columns `email`, `name`, `klasse`
-- **Purpose**: Email address lookup and class-based address style determination
-- **Address style by class**:
-  - Informal (`Liebe [First Name]`): `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
-  - Formal (`Sehr geehrte Frau [Last Name]`): all other classes
+Databases and lookup protocol are defined in `grading-shared` skill.
+
+| Database | Path | Purpose |
+|----------|------|---------|
+| UploadThing | `/home/georg/OneDrive/uploadthing.db` | Repository grading |
+| Vacuum | `vacuum.db` (current directory) | Knowledge-check grading |
+
+Table schema: `users` with columns `email`, `name`, `klasse`

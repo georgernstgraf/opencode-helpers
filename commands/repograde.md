@@ -6,6 +6,16 @@ description: Grade Student Repositories with configurable batch size (default: 5
 
 Every directory within this folder is named after a student. Invoke the `@repograder` agent for each individual directory.
 
+## Dependencies
+
+This command uses the `grading-shared` skill for:
+- Class-to-address-style mapping
+- Email generation protocol (greetings, closings, gender determination)
+- Database lookup patterns
+- Email JSON structure
+
+Reference `skills/grading-shared/SKILL.md` for centralized configuration.
+
 ## Parameters
 
 - `$1` (optional): Maximum concurrent sub-agents. Default: `5`
@@ -26,13 +36,12 @@ After all agents complete, generate a single `EMAIL.json` file:
 1. **Collect Results**: Read all `*_grading.md` files from the repo root
 2. **Database Lookup**: Query `/home/georg/OneDrive/uploadthing.db` SQLite database
    - Table: `users`
-   - Match students by name to retrieve email addresses
-3. **Determine Address Style**: Use the hardcoded list to determine formal vs informal greeting:
-   - **Informal classes** (use informal `Liebe [First Name],` or `Lieber [First Name],`): `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
-   - **Formal classes** (all others): `Sehr geehrte Frau [Last Name],` or `Sehr geehrter Herr [Last Name],`
-4. **Generate EMAIL.json**: Create a JSON array with one object per student
+   - Match students by name to retrieve email addresses and class
+3. **Determine Address Style**: Use `grading-shared` skill configuration
+   - Reference class-to-address-style mapping from shared skill
+4. **Generate EMAIL.json**: Create a JSON array following `grading-shared` structure
 
-**Email JSON Structure:**
+**Email JSON Structure (see `grading-shared` for full details):**
 ```json
 [
   {
@@ -46,14 +55,9 @@ After all agents complete, generate a single `EMAIL.json` file:
 
 **Email Body Requirements:**
 - Language: German
-- Greeting (based on address style from step 4):
-  - Formal: `Sehr geehrte Frau [Last Name],` or `Sehr geehrter Herr [Last Name],`
-  - Informal: `Liebe [First Name],` or `Lieber [First Name],`
-  - Neutral fallback: `Guten Tag [First Name] [Last Name],`
+- Greeting: Use formulas from `grading-shared` based on class address style
 - **Content: The ENTIRE grading report from `<basename>_grading.md`** - the email body should be the full, detailed report
-- Closing:
-  - Formal: `Mit freundlichen Grüßen,` + two newlines + `   Georg Graf`
-  - Informal: `Lieben Gruß,` + two newlines + `   Georg Graf`
+- Closing: Use formulas from `grading-shared` based on class address style
 
 **If student not found in database:**
 - Set `mailto: null`

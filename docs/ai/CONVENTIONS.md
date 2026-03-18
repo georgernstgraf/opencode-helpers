@@ -24,7 +24,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - RepoGrader agents run in batches (default 5 concurrent) to avoid overwhelming API rate limits
 - All grading reports written in German with 0-100 score (Endbewertung)
 - EMAIL.json contains full grading reports as email body (long emails expected)
-- Formal/informal address determined from `klasse` column in database: informal classes are `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`
+- Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration
 
 ## Naming
 
