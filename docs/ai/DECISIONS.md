@@ -52,3 +52,9 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: OpenCode has no built-in throttling; 30 parallel sub-agents could overwhelm machine/API limits
 - **Considered**: Fully parallel or fully sequential execution
 - **Tradeoff**: Slightly more complex command logic, but safer for rate limits and system resources
+
+## 2026-03-18: Add /homework command as read-only homework suggestion generator
+- **Choice**: Implement `/homework` as a thin command wrapper around a dedicated `homework` skill that outputs suggestions without modifying files
+- **Reason**: Teachers need quick homework ideas from recent lesson commits; unlike `/homework-improve`, this should be read-only for easy copy-paste
+- **Considered**: Combining with `/homework-improve`, or extending `/knowledge-exam`
+- **Tradeoff**: Another standalone skill, but keeps the read-only output pattern explicit and separate from file-modifying workflows
