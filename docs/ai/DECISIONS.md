@@ -47,6 +47,12 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Keeping a separate generic analysis skill, or preserving the older agent-plus-skill split
 - **Tradeoff**: The repograde skill becomes broader, but the grading workflow is clearer and easier to maintain
 
+## 2026-03-19: Repograde writes basename-derived artifact files only
+- **Choice**: In `repograde`, generate only `<basename>_grading.md` and `<basename>_email.json` per repository, and reserve shared `EMAIL.json` for the bulk-mode master aggregation step
+- **Reason**: Artifact-based outputs are clearer than mutating `INDIVIDUAL.md` or `CLASS.md`, and they make the subagent/master split explicit in bulk mode
+- **Considered**: Continuing to write `INDIVIDUAL.md` and `CLASS.md`, or allowing subagents to append directly to shared `EMAIL.json`
+- **Tradeoff**: Bulk mode needs an explicit fan-in aggregation step, but per-repository outputs are simpler and less error-prone
+
 ## 2026-03-18: Dynamic concurrency for RepoGrader sub-agents
 - **Choice**: Execute RepoGrader agents with dynamic concurrency (default 4 concurrent), starting the next agent immediately after one completes (with ~3 second delay)
 - **Reason**: Maintains maximum throughput while keeping concurrent agents at a safe limit; OpenCode has no built-in throttling

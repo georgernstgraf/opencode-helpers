@@ -18,6 +18,8 @@ Education-focused commands and skills for German class workflows, with repositor
 - [x] Absorbed `repo-report` into `repograde`
 - [x] Removed the obsolete `repograder` agent path
 - [x] Updated issue #22 title/body and progress notes to reflect explicit single-repo path behavior and mandatory `grading-shared` usage in both modes
+- [x] Switched `repograde` outputs to basename-derived artifact files instead of `INDIVIDUAL.md` / `CLASS.md`
+- [x] Defined bulk mode so subagents write only per-repo artifacts and the master workflow creates shared `EMAIL.json` afterward
 - [x] Updated `docs/ai/DOMAIN.md` with Central Configuration section
 - [x] Updated `docs/ai/CONVENTIONS.md` to reference shared skill
 - [x] Eliminated duplicated class lists and email formulas across grading workflows

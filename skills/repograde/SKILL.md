@@ -21,6 +21,9 @@ This skill must use the `grading-shared` skill in both single-repo and bulk
 mode for address style, email formulas, database lookup, and email JSON
 structure.
 
+Derive output filenames from the repository basename, while using the provided
+repository path verbatim to locate the repository.
+
 ## Input
 
 - `$1` (optional): explicit repository path
@@ -43,17 +46,18 @@ Protocol:
 1. Treat `$1` as the target repository path exactly as passed.
 2. Verify that `Hausübungen.md` exists in the repository. If it does not,
    stop immediately.
-3. Read `Hausübungen.md` to identify homework periods and expectations.
-4. Inspect the repository history and actual commit content, not just commit
+3. Derive the output stem from `basename "$1"` or equivalent.
+4. Read `Hausübungen.md` to identify homework periods and expectations.
+5. Inspect the repository history and actual commit content, not just commit
    messages.
-5. Evaluate work against the homework periods and produce an updated grading
+6. Evaluate work against the homework periods and produce an updated grading
    result.
-6. Update `INDIVIDUAL.md` with the refreshed German grading.
-7. Optionally update `CLASS.md` if a class-level nudge or pattern update is
-   warranted. Keep `CLASS.md` anonymous.
-8. Do not modify shared `EMAIL.json`.
-9. Generate `$1_email.json` semantics for the provided repository target as a
-   JSON array with exactly one object, following `grading-shared` structure.
+7. Do not write `INDIVIDUAL.md`.
+8. Do not write `CLASS.md`.
+9. Do not modify shared `EMAIL.json`.
+10. Generate `<basename>_grading.md` as the repository grading report.
+11. Generate `<basename>_email.json` as a JSON array with exactly one object,
+    following `grading-shared` structure.
 
 ### 2. Bulk mode
 
@@ -66,9 +70,12 @@ Protocol:
    progress at once.
 3. When one grading run completes, start the next after an approximately
    3-second delay.
-4. Continue until all repositories are processed.
-5. Produce the expected grading outputs for all repositories.
-6. Generate shared `EMAIL.json` only in bulk mode, using `grading-shared`
+4. Each subagent must derive its output stem from the repository basename and
+   write only `<basename>_grading.md` plus `<basename>_email.json`.
+5. Subagents must never write shared `EMAIL.json`.
+6. Continue until all repositories are processed.
+7. After all subagents finish, the master workflow must read the generated
+   `*_email.json` files and create shared `EMAIL.json` using `grading-shared`
    rules.
 
 ## Repository Analysis
@@ -123,16 +130,17 @@ After repository analysis, map the detected work onto the homework schedule in
 
 ### Single-repo mode
 
-- Updated `INDIVIDUAL.md` in German
-- Optionally updated `CLASS.md` in German and anonymized
-- A one-entry JSON array for the repository-specific email payload following
-  `grading-shared` rules
+- `<basename>_grading.md` in German
+- `<basename>_email.json` as a one-entry JSON array following `grading-shared`
+  rules
 
 ### Bulk mode
 
-- Per-student grading outputs in German
-- Shared `EMAIL.json` built from the individual grading results and
-  `grading-shared` rules
+- Per-repository `<basename>_grading.md` files in German
+- Per-repository `<basename>_email.json` files following `grading-shared`
+  rules
+- Shared `EMAIL.json`, created only by the master workflow after all per-repo
+  outputs are finished
 
 ## Email and Database Rules
 
@@ -170,7 +178,9 @@ Reports should include, where applicable:
 
 - Do not commit changes or modify repository history.
 - In single-repo mode, stop if `Hausübungen.md` is missing.
+- In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
 - In single-repo mode, never write shared `EMAIL.json`.
-- In bulk mode, keep the concurrent grading workflow.
+- In bulk mode, keep the concurrent grading workflow and generate shared
+  `EMAIL.json` only after all per-repo outputs are complete.
 - Use proper quoting for paths with spaces.
 - Preserve natural German umlauts in generated German content.

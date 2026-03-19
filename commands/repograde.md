@@ -14,6 +14,6 @@ Pass these inputs into the skill:
 Required behavior to preserve:
 
 - If exactly one argument is provided, treat it as an explicit repository path and use it verbatim.
-- In single-repo mode, require `Hausübungen.md`, update `INDIVIDUAL.md`, optionally nudge `CLASS.md`, and write `$1_email.json` instead of shared `EMAIL.json`.
-- In bulk mode, preserve the concurrent multi-repository grading workflow.
+- In single-repo mode, require `Hausübungen.md`, derive the output stem from `basename($1)`, and write only `<basename>_grading.md` plus `<basename>_email.json`.
+- In bulk mode, preserve the concurrent multi-repository grading workflow, have each subagent write only basename-derived per-repo artifacts, and generate shared `EMAIL.json` only after all subagents finish.
 - Keep detailed grading, repository analysis, database lookup, and email generation rules inside the `repograde` skill.

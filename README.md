@@ -105,7 +105,8 @@ exam skill instead of an Austrian school grading scheme.
 Grades student repositories using one shared workflow for repository analysis,
 homework matching, report generation, and email payload creation. The command is
 kept thin while the skill handles both explicit single-repo mode and no-argument
-bulk mode, always using `grading-shared` for shared grading rules.
+bulk mode, emits basename-derived per-repo artifacts, and generates shared
+`EMAIL.json` only after bulk processing completes.
 
 ## Command vs Skill
 
