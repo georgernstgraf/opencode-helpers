@@ -21,9 +21,10 @@ Follow these without question. Do not deviate unless explicitly told.
 
 ## Grading Workflow
 
-- RepoGrader agents run with dynamic concurrency (default 7 concurrent)
-- When an agent completes, the next starts immediately after a ~3 second delay
-- This maintains maximum throughput while avoiding overwhelming API rate limits
+- `repograde` is the canonical repository-grading workflow; keep `/repograde` as a thin wrapper around `skills/repograde/SKILL.md`.
+- In `/repograde`, treat a single argument as an explicit repository path and use it verbatim.
+- Single-repo and bulk repository grading must both use `grading-shared` for address style, email formulas, database lookup, and email JSON structure.
+- In bulk repository grading, use dynamic concurrency with default 4 concurrent runs and an approximately 3-second delay before starting the next run.
 - All grading reports written in German with 0-100 score (Endbewertung)
 - EMAIL.json contains full grading reports as email body (long emails expected)
 - Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration

@@ -1,89 +1,19 @@
 ---
 name: repograde
-description: Grade Student Repositories with dynamic concurrency (4 concurrent)
+description: Grade student repositories via the repograde skill
 ---
 # Grade Student Repositories
 
-Every directory within this folder is named after a student. Invoke the `@repograder` agent for each individual directory.
+Use the `repograde` skill for this.
 
-## Dependencies
+Pass these inputs into the skill:
 
-This command uses the `grading-shared` skill for:
-- Class-to-address-style mapping
-- Email generation protocol (greetings, closings, gender determination)
-- Database lookup patterns
-- Email JSON structure
+- `context`: current user request, current arguments, and the explicit issue #22 constraints
+- `grading-shared`: required in both single-repo and bulk mode
 
-Reference `skills/grading-shared/SKILL.md` for centralized configuration.
+Required behavior to preserve:
 
-## Parameters
-
-- `$1` (optional): Maximum concurrent sub-agents. Default: `4`
-
-## Execution
-
-### Phase 1: Run RepoGrader Agents
-
-- Run one `@repograder` agent instance per student directory
-- Maintain **`$1` concurrent instances maximum** (default: 4) at all times
-- When a sub-agent completes, immediately start the next one after a random delay of ~3 seconds
-- This ensures continuous throughput with $1 agents working concurrently until all directories are processed
-- Continue until all student directories are processed
-
-### Phase 2: Generate Bulk Email JSON
-
-After all agents complete, generate a single `EMAIL.json` file:
-
-1. **Collect Results**: Read all `*_grading.md` files from the repo root
-2. **Database Lookup**: Query `/home/georg/OneDrive/uploadthing.db` SQLite database
-   - Table: `users`
-   - Match students by name to retrieve email addresses and class
-3. **Determine Address Style**: Use `grading-shared` skill configuration
-   - Reference class-to-address-style mapping from shared skill
-4. **Generate EMAIL.json**: Create a JSON array following `grading-shared` structure
-
-**Email JSON Structure (see `grading-shared` for full details):**
-```json
-[
-  {
-    "mailto": "student@example.com",
-    "subject": "Repository-Bewertung - Max Mustermann",
-    "body": "<personalized German assessment>"
-  },
-  ...
-]
-```
-
-**Email Body Requirements:**
-- Language: German
-- Greeting: Use formulas from `grading-shared` based on class address style
-- **Content: The ENTIRE grading report from `<basename>_grading.md`** - the email body should be the full, detailed report
-- Closing: Use formulas from `grading-shared` based on class address style
-
-**If student not found in database:**
-- Set `mailto: null`
-- Add `note` field with explanation
-- Flag for manual review
-
-## Progress Reporting
-
-Report progress as agents complete:
-- Number of students processed so far (e.g., "5/23 complete")
-- After all agents: "All grading complete. Generating EMAIL.json..."
-
-## Input
-
-Pass each student's directory path to the sub-agent. Handle paths with spaces correctly:
-
-- Use proper quoting when passing paths (e.g., `"./John Doe"` or `'./John Doe'`)
-- Each directory corresponds to one student's repository
-
-## Constraints
-
-- Do not commit anything (this folder is not a git repo)
-- Output files (`*_grading.md`) will be placed in the repo root
-- `EMAIL.json` will be placed in the repo root
-- **All grading reports must be written in German**
-- All email bodies in German with UTF-8 encoding
-- Email body contains the FULL grading report (long emails are expected)
-- Preserve German umlauts in natural form (ä, ö, ü, ß)
+- If exactly one argument is provided, treat it as an explicit repository path and use it verbatim.
+- In single-repo mode, require `Hausübungen.md`, update `INDIVIDUAL.md`, optionally nudge `CLASS.md`, and write `$1_email.json` instead of shared `EMAIL.json`.
+- In bulk mode, preserve the concurrent multi-repository grading workflow.
+- Keep detailed grading, repository analysis, database lookup, and email generation rules inside the `repograde` skill.

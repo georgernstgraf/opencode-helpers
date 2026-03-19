@@ -22,11 +22,13 @@ opencode-helpers/
 │   ├── nextprompt.md   # Process next transcription
 │   └── security.md     # Security audit report
 ├── skills/             # Reusable skill definitions
-│   ├── knowledge-persistence/  # Persist agent knowledge across sessions
-│   ├── issue-workflow/  # Manage issue-centered delivery workflows
+│   ├── grading-shared/ # Shared grading configuration and email rules
+│   ├── issue-workflow/ # Manage issue-centered delivery workflows
+│   ├── knowledge-assessment/ # Assess student submissions
 │   ├── knowledge-exam/ # Generate exams from git history
-│   ├── knowledge-assessment/   # Assess student submissions
-│   └── orchestrator/   # Manage complex multi-step tasks
+│   ├── knowledge-persistence/ # Persist agent knowledge across sessions
+│   ├── repograde/      # Grade student repositories in single or bulk mode
+│   └── homework/       # Suggest short homework from recent history
 ├── docs/ai/            # Knowledge persistence templates
 │   ├── HANDOFF.md      # Pending tasks for next session
 │   ├── CONVENTIONS.md  # Coding conventions
@@ -55,6 +57,7 @@ opencode-helpers/
 | `/issue-start [issue\|#new]` | Start or continue working on a GitHub issue |
 | `/issue-commit` | Save progress to an issue (keeps it open) |
 | `/issue-finish` | Complete task, commit, push, and close issue |
+| `/repograde [repo-path]` | Grade one explicit repo path or run bulk grading |
 | `/nextprompt` | Process oldest transcription via aitranscribe |
 | `/security <output>` | Generate security audit report |
 
@@ -97,10 +100,12 @@ Grades student knowledge-check submissions, writes German reports, and produces
 bulk email JSON payloads. The assessment uses the same point-based model as the
 exam skill instead of an Austrian school grading scheme.
 
-### orchestrator
+### repograde
 
-Manages complex, multi-step tasks requiring architectural planning and systematic
-execution. Use for features involving 3+ files or non-linear solutions.
+Grades student repositories using one shared workflow for repository analysis,
+homework matching, report generation, and email payload creation. The command is
+kept thin while the skill handles both explicit single-repo mode and no-argument
+bulk mode, always using `grading-shared` for shared grading rules.
 
 ## Command vs Skill
 

@@ -41,14 +41,14 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Embedding the workflow directly in the command file, or overloading `knowledge-exam` with homework behavior
 - **Tradeoff**: One more standalone skill to maintain, but the homework workflow stays explicit and reusable
 
-## 2026-03-18: RepoGrader delegates to repo-report skill for commit analysis
-- **Choice**: RepoGrader agent invokes `repo-report` skill for homework-agnostic analysis, then post-processes for assignment matching
-- **Reason**: Separates concerns - skill handles commit inspection, agent handles homework-specific context
-- **Considered**: Embedding all analysis logic in the agent
-- **Tradeoff**: Two files to maintain, but skill is reusable for non-grading scenarios
+## 2026-03-18: Consolidate repo-report into repograde
+- **Choice**: Absorb the former `repo-report` analysis workflow into `skills/repograde/SKILL.md`
+- **Reason**: Repository grading should have one authoritative skill, while `/repograde` stays a thin command wrapper and both single-repo and bulk mode share the same logic
+- **Considered**: Keeping a separate generic analysis skill, or preserving the older agent-plus-skill split
+- **Tradeoff**: The repograde skill becomes broader, but the grading workflow is clearer and easier to maintain
 
 ## 2026-03-18: Dynamic concurrency for RepoGrader sub-agents
-- **Choice**: Execute RepoGrader agents with dynamic concurrency (default 7 concurrent), starting the next agent immediately after one completes (with ~3 second delay)
+- **Choice**: Execute RepoGrader agents with dynamic concurrency (default 4 concurrent), starting the next agent immediately after one completes (with ~3 second delay)
 - **Reason**: Maintains maximum throughput while keeping concurrent agents at a safe limit; OpenCode has no built-in throttling
 - **Considered**: Batched execution (wait for all to complete before next batch), fully parallel or fully sequential execution
 - **Tradeoff**: More complex than simple batching, but maximizes throughput without overwhelming API limits

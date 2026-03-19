@@ -1,10 +1,10 @@
-# Current State (2026-03-18)
+# Current State (2026-03-19)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Education-focused commands and skills for German class workflows.
+Education-focused commands and skills for German class workflows, with repository grading consolidated into `repograde`.
 
 ## Completed (this cycle)
 
@@ -14,17 +14,21 @@ Education-focused commands and skills for German class workflows.
 - [x] Created `skills/grading-shared/SKILL.md` with centralized configuration
 - [x] Updated `knowledge-assessment` skill to reference shared config
 - [x] Updated `repograde` command to reference shared config
+- [x] Refactored `repograde` into a thin command plus dedicated `repograde` skill
+- [x] Absorbed `repo-report` into `repograde`
+- [x] Removed the obsolete `repograder` agent path
+- [x] Updated issue #22 title/body and progress notes to reflect explicit single-repo path behavior and mandatory `grading-shared` usage in both modes
 - [x] Updated `docs/ai/DOMAIN.md` with Central Configuration section
 - [x] Updated `docs/ai/CONVENTIONS.md` to reference shared skill
 - [x] Eliminated duplicated class lists and email formulas across grading workflows
-- [x] Replaced batched execution with dynamic concurrency (7 concurrent, ~3s delay) in repograde
+- [x] Replaced batched execution with dynamic concurrency (4 concurrent, ~3s delay) in repograde
 
 ## Pending
 
 - [ ] Add more example commands as needs arise
 - [ ] Consider adding utility scripts
 - [ ] Validate skill loading from the linked `.config/OpenCode/Skills` environment
-- [ ] Test RepoGrader workflow with real student repositories
+- [ ] Test `repograde` single-repo and bulk workflows with real student repositories
 
 ## Blockers
 
@@ -32,4 +36,4 @@ None
 
 ## Next Session Suggestion
 
-Test the `/homework` command with a real class folder to validate the workflow.
+Test the `repograde` workflow with a real student repository in single-repo mode, then verify bulk mode against a folder of repositories.
