@@ -15,4 +15,4 @@ Important constraints:
 - Analyze Git commits from the last 24 hours that changed files inside the class folder.
 - **Do NOT modify any files.** Output the homework suggestion directly for the user to copy.
 - Keep the suggestion in German.
-- Make the assignment short and focused (2-4 exercises).
+- Make the assignment short and focused (2-5 exercises).
