@@ -1,6 +1,6 @@
 ---
 name: repograde
-description: Grade Student Repositories with dynamic concurrency (default: 7 concurrent)
+description: Grade Student Repositories with dynamic concurrency (4 concurrent)
 ---
 # Grade Student Repositories
 
@@ -18,14 +18,14 @@ Reference `skills/grading-shared/SKILL.md` for centralized configuration.
 
 ## Parameters
 
-- `$1` (optional): Maximum concurrent sub-agents. Default: `7`
+- `$1` (optional): Maximum concurrent sub-agents. Default: `4`
 
 ## Execution
 
 ### Phase 1: Run RepoGrader Agents
 
 - Run one `@repograder` agent instance per student directory
-- Maintain **$1 concurrent instances maximum** (default: 7) at all times
+- Maintain **`$1` concurrent instances maximum** (default: 4) at all times
 - When a sub-agent completes, immediately start the next one after a random delay of ~3 seconds
 - This ensures continuous throughput with $1 agents working concurrently until all directories are processed
 - Continue until all student directories are processed
