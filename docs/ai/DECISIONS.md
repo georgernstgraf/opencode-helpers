@@ -70,3 +70,9 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Both `knowledge-assessment` and `repograde` were duplicating class lists, email greetings/closings, and database lookup patterns
 - **Considered**: Keeping configuration duplicated in each skill, or using a JSON config file
 - **Tradeoff**: One more skill file, but eliminates duplication and ensures consistency across grading workflows
+
+## 2026-03-21: Require second-person address (Du/Sie) in all grading content
+- **Choice**: All grading content (grading reports, INDIVIDUAL.md, email bodies) must address students directly in second person, matching the class-based email salutation style
+- **Reason**: Third-person address ("der Schüler hat...") is inconsistent with email salutations and feels impersonal; students should be addressed directly
+- **Considered**: Mixed third-person in reports with second-person in emails, or only second-person in emails
+- **Tradeoff**: Requires careful grammar (Sie vs Du conjugation), but creates consistent student experience

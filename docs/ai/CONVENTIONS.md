@@ -23,7 +23,8 @@ Follow these without question. Do not deviate unless explicitly told.
 
 - `repograde` is the canonical repository-grading workflow; keep `/repograde` as a thin wrapper around `skills/repograde/SKILL.md`.
 - In `/repograde`, treat a single argument as an explicit repository path and use it verbatim.
-- Single-repo and bulk repository grading must both use `grading-shared` for address style, email formulas, database lookup, and email JSON structure.
+- Single-repo and bulk repository grading must both use `grading-shared` for address style, email formulas, database lookup, email JSON structure, and second-person address rules.
+- All grading content must use second-person address (Sie or Du based on class); never use third-person to refer to the student.
 - In `repograde`, derive output filenames from the repository basename; single-repo and bulk per-repo outputs are `<basename>_grading.md` and `<basename>_email.json`.
 - `repograde` must never write `INDIVIDUAL.md` or `CLASS.md`.
 - Shared `EMAIL.json` is created only by the bulk-mode master workflow after all per-repo outputs are finished.
