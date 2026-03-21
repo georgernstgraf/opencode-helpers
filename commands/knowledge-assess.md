@@ -1,6 +1,10 @@
 ---
 description: Assess knowledge-check submissions and prepare reports
 ---
+IMPORTANT: This command must be invoked from a local folder, NOT from within
+a Git repository. The `vacuum.db` file must exist in the current working
+directory at start; if missing, the command will stop immediately.
+
 Assess the student knowledge-check submissions in the current directory.
 
 Use the `knowledge-assessment` skill for the full workflow.

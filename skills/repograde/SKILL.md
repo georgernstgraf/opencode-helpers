@@ -24,6 +24,19 @@ structure, and second-person address requirements.
 Derive output filenames from the repository basename, while using the provided
 repository path verbatim to locate the repository.
 
+## Execution Context
+
+This skill operates from a local folder (current working directory), NOT from
+within a Git repository. Calling this skill from inside a Git repository is
+an error.
+
+The skill grades student Git repositories by:
+1. Reading `Hausübungen.md` from the current working directory
+2. Accessing student repositories at the paths provided (these already exist;
+   do NOT clone them)
+3. Using `git pull` to verify the latest version is checked out
+4. Inspecting the repository content for grading
+
 ## Input
 
 - `$1` (optional): explicit repository path
@@ -44,19 +57,24 @@ Use this mode when `$1` is present.
 Protocol:
 
 1. Treat `$1` as the target repository path exactly as passed.
-2. Verify that `Hausübungen.md` exists in the repository. If it does not,
-   stop immediately.
-3. Derive the output stem from `basename "$1"` or equivalent.
-4. Read `Hausübungen.md` to identify homework periods and expectations.
-5. Inspect the repository history and actual commit content, not just commit
+2. Verify that `Hausübungen.md` exists in the current working directory.
+   If it does not, stop immediately. (Hausübungen.md is NEVER inside the
+   student repository.)
+3. Navigate to the student repository at path $1.
+4. Run `git pull` to verify latest version is checked out.
+5. Run `git status` to check for uncommitted changes. If found, stop immediately.
+6. Derive the output stem from `basename "$1"` or equivalent.
+7. Read `Hausübungen.md` from the current working directory to identify
+   homework periods and expectations.
+8. Inspect the repository history and actual commit content, not just commit
    messages.
-6. Evaluate work against the homework periods and produce an updated grading
+9. Evaluate work against the homework periods and produce an updated grading
    result.
-7. Do not write `INDIVIDUAL.md`.
-8. Do not write `CLASS.md`.
-9. Do not modify shared `EMAIL.json`.
-10. Generate `<basename>_grading.md` as the repository grading report.
-11. Generate `<basename>_email.json` as a JSON array with exactly one object,
+10. Do not write `INDIVIDUAL.md`.
+11. Do not write `CLASS.md`.
+12. Do not modify shared `EMAIL.json`.
+13. Generate `<basename>_grading.md` as the repository grading report.
+14. Generate `<basename>_email.json` as a JSON array with exactly one object,
     following `grading-shared` structure.
 
 ### 2. Bulk mode
@@ -65,7 +83,8 @@ Use this mode when no argument is provided.
 
 Protocol:
 
-1. Treat each directory in the current folder as one student repository.
+1. Treat each directory path as a student repository to grade. These are
+   separate Git repositories (do NOT clone them).
 2. Maintain dynamic concurrency with a default maximum of 4 repositories in
    progress at once.
 3. When one grading run completes, start the next after an approximately
@@ -81,6 +100,16 @@ Protocol:
 ## Repository Analysis
 
 In both modes, inspect repository content directly.
+
+### Pre-Grading Verification
+
+Before inspecting repository content, verify repository state:
+
+1. Navigate to the student repository directory
+2. Run `git pull` to ensure latest version is checked out
+3. Run `git status` to check for uncommitted changes
+4. If uncommitted changes exist, STOP IMMEDIATELY and report to user
+5. If pull fails or reports errors, STOP IMMEDIATELY and report to user
 
 ### Discovery
 
@@ -119,7 +148,7 @@ general programming constructs.
 ## Homework Matching
 
 After repository analysis, map the detected work onto the homework schedule in
-`Hausübungen.md`.
+`Hausübungen.md` (from the current working directory).
 
 - Identify assignment periods from the homework list.
 - Match commits to the corresponding homework period by date and content.
@@ -211,6 +240,9 @@ ist, dass Sie die Fremdschlüssel-Beziehung sauber modelliert haben.
 
 ## Constraints
 
+- This skill must NOT be invoked from within a Git repository.
+- This skill must NOT clone student repositories; use `git pull` to update.
+- If uncommitted changes exist in any student repository, STOP IMMEDIATELY.
 - Do not commit changes or modify repository history.
 - All grading content must use second-person address (Sie or Du).
 - Never use third-person references to the student.

@@ -27,16 +27,26 @@ This skill requires the `grading-shared` skill for:
 
 Reference `skills/grading-shared/SKILL.md` for centralized configuration.
 
+## Execution Context
+
+This skill operates from a local folder (current working directory), NOT from
+within a Git repository. Calling this skill from inside a Git repository is
+an error.
+
+The skill grades student submissions located in the current working directory
+alongside knowledge-check solution files.
+
 ## Inputs
 
-- Student submission files in the current directory; each submission filename
-  contains the class identifier that determines whether formal or informal
-  address should be used
+- Student submission files in the current working directory (local folder,
+  NOT a Git repository); each submission filename contains the class
+  identifier that determines whether formal or informal address should be used
 - Matching knowledge-check files with questions and solutions, including a
   solutions file in the same directory that can be used as the reference for
   correct answers and for the total achievable points listed at the bottom of
   that file
-- `vacuum.db` for student email address lookup
+- `vacuum.db` for student email address lookup; must exist in the current
+  working directory at start; if missing, stop immediately (do not create or copy)
 
 ## Protocol
 
@@ -175,6 +185,7 @@ Additional requirements specific to knowledge-check:
 
 ### 5. Constraints
 
+- This skill must NOT be invoked from within a Git repository.
 - Write all report files in German.
 - Write `EMAIL.json` bodies in German.
 - All student-facing content must use second-person address (Sie or Du).

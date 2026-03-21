@@ -4,6 +4,12 @@ description: Grade student repositories via the repograde skill
 ---
 # Grade Student Repositories
 
+IMPORTANT: This command must be invoked from a local folder, NOT from within
+a Git repository. The `Hausübungen.md` file must exist in the current
+working directory. Student repositories must already exist locally; this
+command will NOT clone them. If any student repository has uncommitted
+changes, the command will stop immediately.
+
 Use the `repograde` skill for this.
 
 Pass these inputs into the skill:

@@ -146,7 +146,7 @@ Before finalizing any grading output, verify:
 | Database | Path | Purpose |
 |----------|------|---------|
 | UploadThing | `/home/georg/OneDrive/uploadthing.db` | Repository grading |
-| Vacuum | `vacuum.db` (current directory) | Knowledge-check grading |
+| Vacuum | `vacuum.db` (current directory) | Knowledge-check grading (must exist at start; error if missing) |
 
 ### Schema
 
@@ -164,7 +164,8 @@ Table: `users`
 2. Normalize class comparison to uppercase: `WHERE UPPER(klasse) = UPPER(?)`
 3. Retrieve `email` and `klasse` columns
 4. Use `klasse` to determine address style
-5. If not found, set `mailto: null` and add `note` field for manual review
+5. If `vacuum.db` is missing at start, stop immediately with error
+6. If student not found, set `mailto: null` and add `note` field for manual review
 
 ## Email JSON Structure
 
