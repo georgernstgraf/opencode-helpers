@@ -27,5 +27,6 @@ Read this file carefully before making changes in affected areas.
 
 - Never assume grading commands run from within a Git repository - they operate from a local folder (CWD)
 - `Hausübungen.md` is always in the CWD, never inside a student repository
+- `Hausübungen.md` may be a symbolic link; follow symlinks when reading
 - Student repositories must already exist locally; never attempt to clone them
 - If any student repository has uncommitted changes, grading must stop immediately

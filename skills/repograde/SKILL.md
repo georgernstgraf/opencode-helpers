@@ -32,6 +32,7 @@ an error.
 
 The skill grades student Git repositories by:
 1. Reading `Hausübungen.md` from the current working directory
+   (may be a symbolic link; follow symlinks when reading)
 2. Accessing student repositories at the paths provided (these already exist;
    do NOT clone them)
 3. Using `git pull` to verify the latest version is checked out
