@@ -17,9 +17,25 @@ Pass these inputs into the skill:
 - `context`: current user request, current arguments, and the explicit issue #22 constraints
 - `grading-shared`: required in both single-repo and bulk mode
 
-Required behavior to preserve:
+MODE SELECTION:
 
-- If exactly one argument is provided, treat it as an explicit repository path and use it verbatim.
-- In single-repo mode, require `Hausübungen.md`, derive the output stem from `basename($1)`, and write only `<basename>_grading.md` plus `<basename>_email.json`.
-- In bulk mode, preserve the concurrent multi-repository grading workflow, have each subagent write only basename-derived per-repo artifacts, and generate shared `EMAIL.json` only after all subagents finish.
-- Keep detailed grading, repository analysis, database lookup, and email generation rules inside the `repograde` skill.
+IF exactly one argument is provided:
+  → Use SINGLE-REPO MODE
+ELSE:
+  → Use BULK MODE (no arguments)
+
+SINGLE-REPO MODE:
+- Treat the argument as the explicit repository path and use it verbatim
+- Require `Hausübungen.md` in the current working directory
+- Derive output stem from `basename($1)`
+- Write only `<basename>_grading.md` plus `<basename>_email.json`
+- Do NOT write `INDIVIDUAL.md`, `CLASS.md`, or shared `EMAIL.json`
+
+BULK MODE:
+- Treat each directory as a student repository
+- Use concurrent multi-repository grading (max 4 concurrent)
+- Each subagent writes only basename-derived per-repo artifacts
+- Generate shared `EMAIL.json` only after all subagents finish
+
+All grading rules, repository analysis, database lookup, and email generation
+remain inside the `repograde` skill.
