@@ -22,3 +22,10 @@ Read this file carefully before making changes in affected areas.
 ## Database
 
 - Class lookup in `uploadthing.db` is case-sensitive; `klasse` column stores uppercase (e.g., "2AHWII") but `grading-shared` config uses lowercase ("2ahwii"); always use `UPPER(klasse)` comparison
+
+## Grading Workflow
+
+- Never assume grading commands run from within a Git repository - they operate from a local folder (CWD)
+- `Hausübungen.md` is always in the CWD, never inside a student repository
+- Student repositories must already exist locally; never attempt to clone them
+- If any student repository has uncommitted changes, grading must stop immediately

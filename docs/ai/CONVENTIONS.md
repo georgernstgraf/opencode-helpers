@@ -22,6 +22,10 @@ Follow these without question. Do not deviate unless explicitly told.
 ## Grading Workflow
 
 - `repograde` is the canonical repository-grading workflow; keep `/repograde` as a thin wrapper around `skills/repograde/SKILL.md`.
+- Grading commands operate from a local folder (CWD), NOT from within a Git repository.
+- `Hausübungen.md` must exist in the CWD before invoking grading commands; it is never inside a student repository.
+- Student repositories must already exist locally; never clone them as part of grading.
+- Before grading, use `git pull` to verify latest version and `git status` to check for uncommitted changes; if uncommitted changes exist, stop immediately.
 - In `/repograde`, treat a single argument as an explicit repository path and use it verbatim.
 - Single-repo and bulk repository grading must both use `grading-shared` for address style, email formulas, database lookup, email JSON structure, and second-person address rules.
 - All grading content must use second-person address (Sie or Du based on class); never use third-person to refer to the student.
@@ -32,6 +36,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - All grading reports written in German with 0-100 score (Endbewertung)
 - EMAIL.json contains full grading reports as email body (long emails expected)
 - Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration
+- `vacuum.db` must exist at start of `knowledge-assessment`; if missing, stop immediately (do not create or copy)
 
 ## Naming
 
