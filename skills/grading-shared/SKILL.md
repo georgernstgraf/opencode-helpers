@@ -13,8 +13,9 @@ metadata:
 ## Purpose
 
 This skill provides centralized configuration for all grading workflows,
-ensuring consistent email formatting, address styles, and database access
-across different assessment types.
+ensuring consistent email formatting, address styles, second-person address
+throughout all grading content, and database access across different
+assessment types.
 
 ## Usage
 
@@ -39,8 +40,9 @@ Determine formal vs informal address based on class identifier:
 
 When processing student data:
 1. Extract class identifier from filename, directory, or database
-2. Check if class is in the informal list above
-3. Apply corresponding address style throughout
+2. Normalize to uppercase for comparison: `UPPER(klasse)`
+3. Check if class is in the informal list above
+4. Apply corresponding address style throughout all grading content
 
 ## Email Generation Protocol
 
@@ -79,7 +81,63 @@ When gender is not clear from first name:
 1. Use class records or submission wording as additional context
 2. If still uncertain, use neutral fallback: `Guten Tag [First Name] [Last Name],`
 3. Keep class-based closing formula (formal or informal based on class)
-4. Flag case for manual review
+4. Flag case for manual review in the output files
+
+## Second-Person Address in Grading Content
+
+### Requirement
+
+ALL grading content must address the student directly in the second person,
+matching the email salutation style. This applies to:
+- `_grading.md` files (repograde)
+- `INDIVIDUAL.md` files (knowledge-assessment)
+- Email body text in `EMAIL.json`
+
+### Pronoun and Verb conjugation
+
+| Style | Pronoun | Verb Conjugation | Example |
+|-------|---------|-----------------|---------|
+| Formal (Sie) | Sie | 3rd person plural formal | "Sie haben die Aufgabe gut gelöst" |
+| Informal (Du) | Du | 2nd person informal | "Du hast die Aufgabe gut gelöst" |
+
+### Grading Content Examples
+
+**Formal Address (Sie) - Wrong ❌:**
+```
+Der Student hat die Aufgabe gut gelöst. Er hat sich bemüht.
+```
+
+**Formal Address (Sie) - Correct ✅:**
+```
+Sie haben die Aufgabe gut gelöst. Sie haben sich bemüht.
+```
+
+**Informal Address (Du) - Wrong ❌:**
+```
+Der Schüler hat die Aufgabe gut gelöst. Er hat sich bemüht.
+```
+
+**Informal Address (Du) - Correct ✅:**
+```
+Du hast die Aufgabe gut gelöst. Du hast dich bemüht.
+```
+
+### Gender-Neutral Handling for Unclear Cases
+
+When student gender cannot be determined:
+1. Use formal "Sie" (works as gender-neutral in written German)
+2. Use gender-neutral adjective forms where possible
+3. Use neutral greeting fallback: `Guten Tag [First Name] [Last Name],`
+4. Flag in output files for manual review
+
+### Consistency Checklist
+
+Before finalizing any grading output, verify:
+- [ ] Email greeting matches body address style (Sie or Du)
+- [ ] All pronouns in body refer to student as "Sie" or "Du"
+- [ ] No third-person references to the student ("der Schüler", "die Studentin")
+- [ ] Verb conjugation matches address style
+- [ ] Closing formula matches address style
 
 ## Database Access
 
@@ -103,9 +161,10 @@ Table: `users`
 ### Lookup Protocol
 
 1. Match student by name (handle variations and partial matches)
-2. Retrieve `email` and `klasse` columns
-3. Use `klasse` to determine address style
-4. If not found, set `mailto: null` and add `note` field for manual review
+2. Normalize class comparison to uppercase: `WHERE UPPER(klasse) = UPPER(?)`
+3. Retrieve `email` and `klasse` columns
+4. Use `klasse` to determine address style
+5. If not found, set `mailto: null` and add `note` field for manual review
 
 ## Email JSON Structure
 
@@ -122,6 +181,7 @@ Table: `users`
 ### Body Requirements
 
 - Language: German
+- Address student directly in second person (Sie or Du based on class)
 - Include full assessment content (long emails expected)
 - Preserve paragraph spacing and readable newline structure
 - Include greeting at start
@@ -131,6 +191,8 @@ Table: `users`
 ## Constraints
 
 - All grading content must be written in German
+- All grading content must use second-person address (Sie or Du)
+- Never use third-person to refer to the student being graded
 - Trailing comma required in all salutations
 - Two newlines before signature line
 - Three-space indentation before `Georg Graf`
@@ -140,6 +202,6 @@ Table: `users`
 ## Output Expectations
 
 This skill provides configuration only. Consuming skills produce:
-- Individual assessment files
-- EMAIL.json with personalized payloads
-- Class-wide reports (anonymized)
+- Individual assessment files (all in second-person German)
+- EMAIL.json with personalized payloads (second-person body)
+- Class-wide reports (anonymized, no student address needed)

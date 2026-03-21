@@ -18,8 +18,8 @@ workflow so repository inspection, homework matching, report writing, and email
 payload generation live in one place.
 
 This skill must use the `grading-shared` skill in both single-repo and bulk
-mode for address style, email formulas, database lookup, and email JSON
-structure.
+mode for address style, email formulas, database lookup, email JSON
+structure, and second-person address requirements.
 
 Derive output filenames from the repository basename, while using the provided
 repository path verbatim to locate the repository.
@@ -160,7 +160,8 @@ If a student cannot be matched in the database:
 
 ## Reporting Expectations
 
-All grading content must be written in German.
+All grading content must be written in German and address the student
+directly in the second person (Sie or Du based on class).
 
 Reports should include, where applicable:
 
@@ -174,9 +175,45 @@ Reports should include, where applicable:
 - diligence assessment
 - final evaluation with `Endbewertung: XX/100`
 
+### Example: Second-Person Tone (Informal/2ahwii)
+
+```
+## Repository-Übersicht
+
+Du hast in diesem Semester durchweg solide Arbeit geleistet. Dein
+Repository zeigt eine klare Struktur und regelmäßige Commits.
+
+## Hausübungen
+
+### HU1: SQL-Grundlagen
+Du hast die JOIN-Operationen korrekt implementiert. Besonders positiv
+ist, dass du die Fremdschlüssel-Beziehung sauber modelliert hast.
+
+### HU2: Normalisierung
+Hier wäre etwas mehr Sorgfalt hilfreich gewesen. Du hast die
+Dritte Normalform nicht durchgängig eingehalten.
+```
+
+### Example: Second-Person Tone (Formal/Other class)
+
+```
+## Repository-Übersicht
+
+Sie haben in diesem Semester durchweg solide Arbeit geleistet. Ihr
+Repository zeigt eine klare Struktur und regelmäßige Commits.
+
+## Hausübungen
+
+### HU1: SQL-Grundlagen
+Sie haben die JOIN-Operationen korrekt implementiert. Besonders positiv
+ist, dass Sie die Fremdschlüssel-Beziehung sauber modelliert haben.
+```
+
 ## Constraints
 
 - Do not commit changes or modify repository history.
+- All grading content must use second-person address (Sie or Du).
+- Never use third-person references to the student.
 - In single-repo mode, stop if `Hausübungen.md` is missing.
 - In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
 - In single-repo mode, never write shared `EMAIL.json`.

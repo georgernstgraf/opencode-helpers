@@ -20,6 +20,7 @@ communicating individual results.
 
 This skill requires the `grading-shared` skill for:
 - Class-to-address-style mapping
+- Second-person address rules (Sie or Du)
 - Email generation protocol (greetings, closings, gender determination)
 - Database lookup patterns
 - Email JSON structure
@@ -78,6 +79,7 @@ Reference `skills/grading-shared/SKILL.md` for centralized configuration.
 - Include a comprehensive table ordered alphabetically by student name, not by
   grade.
 - Create `INDIVIDUAL.md` in German.
+- Address each student directly in the second person (Sie or Du based on class).
 - Provide a relatively detailed assessment for each student's submission.
 - Ensure every reported score in `INDIVIDUAL.md` is consistent with the
   authoritative total achievable points from the solutions file.
@@ -93,6 +95,58 @@ Reference `skills/grading-shared/SKILL.md` for centralized configuration.
   for the teacher on how to address them.
 - Do not name any students in `CLASS.md` because it is intended for a public
   repository.
+
+### Example: Second-Person Tone in INDIVIDUAL.md (Informal/2ahwii)
+
+```
+# Individuelle Bewertung
+
+## Haas Alexander (2AHWII)
+
+Du hast bei dieser Wissensüberprüfung insgesamt 72 von 80 Punkten erreicht.
+Das ist eine solide Leistung.
+
+### Stärken
+
+Du hast Frage 3 (SQL-JOINs) vollständig und korrekt beantwortet. Auch bei
+Frage 7 (Normalisierung) hast du die Grundkonzepte gut verstanden.
+
+### Verbesserungspotenzial
+
+Bei Frage 4 (Subqueries) wäre etwas mehr Erklärung hilfreich gewesen. Du hast
+die Antwort zwar angegeben, aber den Lösungsweg nicht erläutert.
+
+### Empfehlungen
+
+Es empfiehlt sich, die Unterschiede zwischen INNER JOIN und OUTER JOIN noch
+einmal zu üben. Nutze dazu die hochgeladene Lösungedatei als Referenz.
+```
+
+### Example: Second-Person Tone in INDIVIDUAL.md (Formal/Other class)
+
+```
+# Individuelle Bewertung
+
+## Huber Maria (5AHIF)
+
+Sie haben bei dieser Wissensüberprüfung insgesamt 68 von 80 Punkten erreicht.
+Das ist eine gute Leistung.
+
+### Stärken
+
+Sie haben Frage 3 (SQL-JOINs) vollständig und korrekt beantwortet. Auch bei
+Frage 7 (Normalisierung) haben Sie die Grundkonzepte gut verstanden.
+
+### Verbesserungspotenzial
+
+Bei Frage 4 (Subqueries) wäre etwas mehr Erklärung hilfreich gewesen. Sie haben
+die Antwort zwar angegeben, aber den Lösungsweg nicht erläutert.
+
+### Empfehlungen
+
+Es empfiehlt sich, die Unterschiede zwischen INNER JOIN und OUTER JOIN noch
+einmal zu üben. Nutzen Sie dazu die hochgeladene Lösungedatei als Referenz.
+```
 
 ### 4. Create Bulk Email JSON
 
@@ -123,6 +177,8 @@ Additional requirements specific to knowledge-check:
 
 - Write all report files in German.
 - Write `EMAIL.json` bodies in German.
+- All student-facing content must use second-person address (Sie or Du).
+- Never use third-person references to the student in INDIVIDUAL.md or emails.
 - Treat `INDIVIDUAL.md` as the source for the personalized email bodies.
 - Keep `CLASS.md` anonymous.
 - UTF-8 is explicitly allowed and preferred in both Markdown and JSON outputs.
