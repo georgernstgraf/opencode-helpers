@@ -20,6 +20,8 @@ material covered in class.
 
 - `class`: target class folder name
 - `weeks`: number of weeks of Git history to analyze
+- `mc-count`: (optional) number of multiple-choice questions, default 10
+- `free-count`: (optional) number of free-text questions, default 3
 
 ## Protocol
 
@@ -33,7 +35,18 @@ material covered in class.
   `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
 - All other classes use formal address in related communication.
 
-### 2. Inspect Source Material
+### 2. Resolve Question Counts
+
+- Default values: 10 multiple-choice questions, 3 free-text questions.
+- If `mc-count` is not provided, set `mc-count = 10`.
+- If `free-count` is not provided, set `free-count = 3`.
+- If neither `mc-count` nor `free-count` was provided by the user:
+  - Before generating, ask the user: "Sollen 10 MC-Fragen und 3 Freitext-Fragen generiert werden? (j/n)"
+  - If the user confirms, proceed with defaults.
+  - If the user declines, ask for specific counts before continuing.
+- Do NOT ask for confirmation when at least one count was explicitly provided.
+
+### 3. Inspect Source Material
 
 - Analyze Git commits from the last `weeks` weeks that changed files inside the
   class folder.
@@ -42,10 +55,10 @@ material covered in class.
 - Review the changed files as needed to understand the topics that were likely
   taught.
 
-### 3. Generate Exam Files
+### 4. Generate Exam Files
 
 - Create `knowledge_<class>_<isodate>.md` inside the class folder.
-- Include exactly 10 multiple-choice questions.
+- Include exactly `mc-count` multiple-choice questions.
 - Each multiple-choice question must have exactly 4 answer options.
 - Each multiple-choice question is worth 4 points total.
 - Score multiple-choice questions per option: award 1 point for each option that
@@ -54,16 +67,16 @@ material covered in class.
 - For every multiple-choice question, explicitly allow students to mark `-`
   and briefly explain why they consider the answer ambiguous or
   context-dependent.
-- Include exactly 3 free-form questions.
+- Include exactly `free-count` free-form questions.
 - Each free-form question is worth 15 points.
 
-### 4. Generate Solution File
+### 5. Generate Solution File
 
 - Create `knowledge_<class>_<isodate>_solutions.md` in the same folder.
 - Keep the student-facing exam and the solution file separate.
 - Do not include the solutions in the student-facing exam file.
 
-### 5. Constraints
+### 6. Constraints
 
 - Do not commit any generated files.
 - Preserve existing files unless the task explicitly requires replacement.
