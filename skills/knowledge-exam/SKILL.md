@@ -61,6 +61,7 @@ material covered in class.
 - Include exactly `mc-count` multiple-choice questions.
 - Each multiple-choice question must have exactly 4 answer options.
 - Each multiple-choice question is worth 4 points total.
+- Make the questions as unambiguous as possible, put enough context in.
 - Score multiple-choice questions per option: award 1 point for each option that
   is handled correctly, whether it was correctly checked or correctly left
   blank.
@@ -69,6 +70,7 @@ material covered in class.
   context-dependent.
 - Include exactly `free-count` free-form questions.
 - Each free-form question is worth 15 points.
+- Put a friendly "Gutes Gelingen" footer at the bottom.
 
 ### 5. Generate Solution File
 
@@ -78,9 +80,9 @@ material covered in class.
 
 ### 6. Constraints
 
-- Do not commit any generated files.
+- Do not commit any generated files, EVER. The teacher will add them manually
+  after the exam is over.
 - Preserve existing files unless the task explicitly requires replacement.
-- Follow the repository convention that `**/*_solutions.md` stays git-ignored.
 - Write both generated Markdown files in German.
 - UTF-8 is explicitly allowed and preferred in generated Markdown files.
 - Do not replace German umlauts with transliterations such as `ae`, `oe`, or
