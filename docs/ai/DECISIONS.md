@@ -76,3 +76,11 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Third-person address ("der Schüler hat...") is inconsistent with email salutations and feels impersonal; students should be addressed directly
 - **Considered**: Mixed third-person in reports with second-person in emails, or only second-person in emails
 - **Tradeoff**: Requires careful grammar (Sie vs Du conjugation), but creates consistent student experience
+
+## 2026-03-23: Replace INDIVIDUAL.md with per-student grading files
+- **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
+- **Reason**: Consistent output pattern across all grading skills (repograde, knowledge-assessment, projectgrade); per-student files are easier to manage and align with `<basename>_grading.md` convention
+- **Considered**: Keeping `INDIVIDUAL.md` for knowledge-assessment only, or using a different naming scheme
+- **Tradeoff**: More files to manage in knowledge-assessment, but consistency across all grading workflows
+- **Affected skills**: `knowledge-assessment` (now outputs `<name>_grading.md` instead of `INDIVIDUAL.md`)
+- **Retained outputs**: `GRADINGS.md` and `CLASS.md` remain mandatory for knowledge-assessment

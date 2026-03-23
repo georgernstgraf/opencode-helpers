@@ -89,8 +89,7 @@ When gender is not clear from first name:
 
 ALL grading content must address the student directly in the second person,
 matching the email salutation style. This applies to:
-- `_grading.md` files (repograde)
-- `INDIVIDUAL.md` files (knowledge-assessment)
+- `*_grading.md` files (repograde, knowledge-assessment, projectgrade)
 - Email body text in `EMAIL.json`
 
 ### Pronoun and Verb conjugation
@@ -203,6 +202,7 @@ Table: `users`
 ## Output Expectations
 
 This skill provides configuration only. Consuming skills produce:
-- Individual assessment files (all in second-person German)
-- EMAIL.json with personalized payloads (second-person body)
-- Class-wide reports (anonymized, no student address needed)
+- Per-student `*_grading.md` files with individual feedback (second-person German)
+- `EMAIL.json` with personalized payloads (second-person body)
+- `GRADINGS.md` class-wide overview (where applicable)
+- `CLASS.md` anonymized class patterns (where applicable)
