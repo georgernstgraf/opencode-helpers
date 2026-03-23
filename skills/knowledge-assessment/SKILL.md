@@ -88,10 +88,10 @@ alongside knowledge-check solution files.
 - Create `GRADINGS.md` in German.
 - Include a comprehensive table ordered alphabetically by student name, not by
   grade.
-- Create `INDIVIDUAL.md` in German.
+- Create `<name>_grading.md` for each student in German (e.g., `haas_alexander_grading.md`).
 - Address each student directly in the second person (Sie or Du based on class).
 - Provide a relatively detailed assessment for each student's submission.
-- Ensure every reported score in `INDIVIDUAL.md` is consistent with the
+- Ensure every reported score in the grading file is consistent with the
   authoritative total achievable points from the solutions file.
 - Use a respectful teacher-to-student tone that is friendly, warm, and
   encouraging without becoming inappropriately informal.
@@ -105,54 +105,51 @@ alongside knowledge-check solution files.
   for the teacher on how to address them.
 - Do not name any students in `CLASS.md` because it is intended for a public
   repository.
+- Do NOT create `INDIVIDUAL.md` (deprecated; use per-student `<name>_grading.md` files).
 
-### Example: Second-Person Tone in INDIVIDUAL.md (Informal/2ahwii)
+### Example: Second-Person Tone in `<name>_grading.md` (Informal/2ahwii)
 
 ```
-# Individuelle Bewertung
-
-## Haas Alexander (2AHWII)
+# Bewertung: Haas Alexander (2AHWII)
 
 Du hast bei dieser Wissensüberprüfung insgesamt 72 von 80 Punkten erreicht.
 Das ist eine solide Leistung.
 
-### Stärken
+## Stärken
 
 Du hast Frage 3 (SQL-JOINs) vollständig und korrekt beantwortet. Auch bei
 Frage 7 (Normalisierung) hast du die Grundkonzepte gut verstanden.
 
-### Verbesserungspotenzial
+## Verbesserungspotenzial
 
 Bei Frage 4 (Subqueries) wäre etwas mehr Erklärung hilfreich gewesen. Du hast
 die Antwort zwar angegeben, aber den Lösungsweg nicht erläutert.
 
-### Empfehlungen
+## Empfehlungen
 
 Es empfiehlt sich, die Unterschiede zwischen INNER JOIN und OUTER JOIN noch
 einmal zu üben. Nutze dazu die hochgeladene Lösungedatei als Referenz.
 ```
 
-### Example: Second-Person Tone in INDIVIDUAL.md (Formal/Other class)
+### Example: Second-Person Tone in `<name>_grading.md` (Formal/Other class)
 
 ```
-# Individuelle Bewertung
-
-## Huber Maria (5AHIF)
+# Bewertung: Huber Maria (5AHIF)
 
 Sie haben bei dieser Wissensüberprüfung insgesamt 68 von 80 Punkten erreicht.
 Das ist eine gute Leistung.
 
-### Stärken
+## Stärken
 
 Sie haben Frage 3 (SQL-JOINs) vollständig und korrekt beantwortet. Auch bei
 Frage 7 (Normalisierung) haben Sie die Grundkonzepte gut verstanden.
 
-### Verbesserungspotenzial
+## Verbesserungspotenzial
 
 Bei Frage 4 (Subqueries) wäre etwas mehr Erklärung hilfreich gewesen. Sie haben
 die Antwort zwar angegeben, aber den Lösungsweg nicht erläutert.
 
-### Empfehlungen
+## Empfehlungen
 
 Es empfiehlt sich, die Unterschiede zwischen INNER JOIN und OUTER JOIN noch
 einmal zu üben. Nutzen Sie dazu die hochgeladene Lösungedatei als Referenz.
@@ -172,7 +169,7 @@ Additional requirements specific to knowledge-check:
 - Each object must contain exactly these fields (see `grading-shared` for structure):
   - `mailto`: recipient email address
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
-  - `body`: the student's individual assessment text
+  - `body`: the student's individual assessment text (from `<name>_grading.md`)
 - Ensure every reported score inside the email body is consistent with the
   authoritative total achievable points from the solutions file.
 - Use greeting and closing formulas from `grading-shared` based on class
@@ -181,7 +178,7 @@ Additional requirements specific to knowledge-check:
   mit den korrekten Lösungen in das Git-Repository hochgeladen.` Place this
   note near the end of the body, before the closing formula.
 - If gender cannot be determined, use neutral fallback greeting per
-  `grading-shared` protocol and flag in `INDIVIDUAL.md` for manual review.
+  `grading-shared` protocol and flag in the grading file for manual review.
 
 ### 5. Constraints
 
@@ -189,9 +186,10 @@ Additional requirements specific to knowledge-check:
 - Write all report files in German.
 - Write `EMAIL.json` bodies in German.
 - All student-facing content must use second-person address (Sie or Du).
-- Never use third-person references to the student in INDIVIDUAL.md or emails.
-- Treat `INDIVIDUAL.md` as the source for the personalized email bodies.
-- Keep `CLASS.md` anonymous.
+- Never use third-person references to the student in grading files or emails.
+- Use per-student `<name>_grading.md` files as the source for personalized email bodies.
+- Keep `GRADINGS.md` as a class-wide overview table.
+- Keep `CLASS.md` anonymous for public repository use.
 - UTF-8 is explicitly allowed and preferred in both Markdown and JSON outputs.
 - Write German umlauts and Eszett in natural UTF-8 form in generated `.md`
   and `.json` files, for example `ä`, `ö`, `ü`, `Ä`, `Ö`, `Ü`, and `ß`.
@@ -203,12 +201,12 @@ Additional requirements specific to knowledge-check:
 - Follow email constraints from `grading-shared` (greeting, closing, trailing
   comma, paragraph spacing).
 - If any point-total consistency error appears between the solutions file,
-  `INDIVIDUAL.md`, or `EMAIL.json`, stop immediately instead of generating or
+  grading files, or `EMAIL.json`, stop immediately instead of generating or
   continuing with inconsistent output.
 
 ## Output Expectations
 
-- `GRADINGS.md` with class-wide grading overview.
-- `INDIVIDUAL.md` with detailed per-student feedback.
-- `CLASS.md` with anonymized class patterns and teacher recommendations.
-- `EMAIL.json` with one personalized email payload per student.
+- `GRADINGS.md` with class-wide grading overview (mandatory)
+- `CLASS.md` with anonymized class patterns and teacher recommendations (mandatory)
+- `<name>_grading.md` files (one per student) with detailed individual feedback
+- `EMAIL.json` with one personalized email payload per student

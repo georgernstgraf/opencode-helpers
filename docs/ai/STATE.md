@@ -1,28 +1,24 @@
-# Current State (2026-03-21)
+# Current State (2026-03-23)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Education-focused commands and skills for German class workflows, with repository grading consolidated into `repograde`.
+Standardizing grading output across all assessment skills to use `<name>_grading.md` pattern.
 
 ## Completed (this cycle)
 
-- [x] Fixed execution context terminology: local folder vs Git repository distinction
-- [x] Added Execution Context section to `repograde` skill with explicit no-cloning rule
-- [x] Added Pre-Grading Verification with `git pull` and `git status` checks
-- [x] Added constraint: uncommitted changes = stop immediately
-- [x] Fixed `Hausübungen.md` location clarification (CWD, not inside repo)
-- [x] Added Execution Context section to `knowledge-assessment` skill
-- [x] Clarified `vacuum.db` must exist at start, error if missing
-- [x] Updated `repograde` and `knowledge-assess` commands with execution context warnings
-- [x] Updated `grading-shared` skill with vacuum.db pre-existence requirement
+- [x] Removed `INDIVIDUAL.md` from `knowledge-assessment` outputs
+- [x] Added per-student `<name>_grading.md` files to `knowledge-assessment`
+- [x] Updated `grading-shared` to reference `*_grading.md` pattern
+- [x] Updated `CONVENTIONS.md` with knowledge-assessment output rules
+- [x] Added decision record in `DECISIONS.md`
+- [x] Created PR #27 for projectgrade skill with Git repository execution context
 
 ## Pending
 
-- [ ] Test revised grading workflow with real student repositories
-- [ ] Consider adding utility scripts
-- [ ] Validate skill loading from the linked `.config/OpenCode/Skills` environment
+- [ ] Test revised grading workflows with real data
+- [ ] Validate that all grading skills produce consistent output patterns
 
 ## Blockers
 
@@ -30,4 +26,4 @@ None
 
 ## Next Session Suggestion
 
-Test the revised `repograde` workflow with a real student repository to verify execution context rules and second-person address work correctly.
+Test the `knowledge-assessment` workflow with actual student submissions to verify the new `<name>_grading.md` output pattern works correctly.

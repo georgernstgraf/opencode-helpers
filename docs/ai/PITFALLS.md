@@ -26,7 +26,15 @@ Read this file carefully before making changes in affected areas.
 ## Grading Workflow
 
 - Never assume grading commands run from within a Git repository - they operate from a local folder (CWD)
+- `projectgrade` is the exception: it MUST run from within a Git repository (the project being evaluated)
 - `Hausübungen.md` is always in the CWD, never inside a student repository
 - `Hausübungen.md` may be a symbolic link; follow symlinks when reading
 - Student repositories must already exist locally; never attempt to clone them
 - If any student repository has uncommitted changes, grading must stop immediately
+- All grading skills use `<name>_grading.md` pattern; `INDIVIDUAL.md` is deprecated
+- `knowledge-assessment` outputs `GRADINGS.md` and `CLASS.md` (both mandatory) plus per-student `<name>_grading.md` files
+
+## Project Configuration
+
+- OpenClaw-specific configuration (agent binding, Telegram groups, memory settings) belongs in OpenClaw's channel config, not in `AGENTS.md` or other project files
+- Project `AGENTS.md` should contain only project-relevant instructions and conventions
