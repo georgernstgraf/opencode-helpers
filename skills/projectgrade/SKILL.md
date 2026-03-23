@@ -26,78 +26,53 @@ database lookup, email JSON structure, and second-person address requirements.
 
 ## Execution Context
 
-This skill operates from a local folder (current working directory), NOT from
-within a Git repository. Calling this skill from inside a Git repository is
-an error.
+This skill MUST be invoked from within the Git repository being evaluated.
+Calling this skill from outside a Git repository is an error.
 
-The skill grades student project repositories by:
-1. Accessing student repositories at the paths provided (these already exist;
-   do NOT clone them)
-2. Using `git pull` to verify the latest version is checked out
+The skill grades a single collaborative project repository where multiple
+students contribute via branches and GitHub Issues by:
+1. Verifying we are inside a Git repository (error if not)
+2. Using `git pull` to ensure the latest version is checked out
 3. Inspecting the repository content and Git history for grading
 4. Querying GitHub API for issue metadata (creation, edits, comments)
 5. Mapping contributor email addresses to student names via uploadthing.db
 
 ## Input
 
-- `$1` (optional): explicit repository path
 - `--gh-token`: GitHub token for API access (optional, defaults to environment)
 
 Behavior:
 
-- If exactly one argument is provided, treat it as an explicit repository path
-  and use it verbatim.
-- If no argument is provided, run bulk mode for multiple student repositories in
-  the current folder.
+- This skill operates on the current Git repository (CWD must be a Git repo)
+- No repository path argument is needed; we are already inside the project
 
-## Modes
+## Protocol
 
-### 1. Single-repo mode
-
-Use this mode when `$1` is present.
-
-Protocol:
-
-1. Treat `$1` as the target repository path exactly as passed.
-2. Navigate to the student repository at path $1.
-3. Run `git pull` to verify latest version is checked out.
-4. Run `git status` to check for uncommitted changes. If found, stop immediately.
-5. Derive the output stem from `basename "$1"` or equivalent.
-6. Extract all unique contributor email addresses from git commits.
-7. Query the uploadthing database to map emails to student names.
-8. Analyze GitHub Issues participation (see Issue Analysis section).
-9. Generate `<basename>_grading.md` as the repository grading report.
-10. Generate `<basename>_email.json` as a JSON array with student entries,
-    following `grading-shared` structure.
-
-### 2. Bulk mode
-
-Use this mode when no argument is provided.
-
-Protocol:
-
-1. Treat each directory path as a student repository to grade. These are
-   separate Git repositories (do NOT clone them).
-2. Maintain dynamic concurrency with a default maximum of 4 repositories in
-   progress at once.
-3. When one grading run completes, start the next after an approximately
-   3-second delay.
-4. Each subagent must derive its output stem from the repository basename and
-   write only `<basename>_grading.md` plus `<basename>_email.json`.
-5. Continue until all repositories are processed.
-6. After all subagents finish, the master workflow must read the generated
-   `*_email.json` files and create shared `EMAIL.json` using `grading-shared`
-   rules.
+1. Verify we are in a Git repository. If not, STOP IMMEDIATELY with error.
+2. Run `git pull` to verify latest version is checked out.
+3. Run `git status` to check for uncommitted changes. If found, stop immediately.
+4. Derive the output stem from `basename "$(git rev-parse --show-toplevel)"` or
+   the current directory name.
+5. Extract all unique contributor email addresses from git commits.
+6. Query the uploadthing database to map emails to student names.
+7. Analyze GitHub Issues participation (see Issue Analysis section).
+8. Generate `<basename>_grading.md` as the repository grading report.
+9. Generate `<basename>_email.json` as a JSON array with student entries,
+   following `grading-shared` structure.
 
 ## Repository Analysis
 
-In both modes, inspect repository content directly.
+Inspect repository content directly from within the current Git repository.
 
 ### Pre-Grading Verification
 
 Before inspecting repository content, verify repository state:
 
-1. Navigate to the student repository directory
+1. Verify we are inside a Git repository:
+   ```bash
+   git rev-parse --is-inside-work-tree
+   ```
+   If this returns `false` or errors, STOP IMMEDIATELY and report to user.
 2. Run `git pull` to ensure latest version is checked out
 3. Run `git status` to check for uncommitted changes
 4. If uncommitted changes exist, STOP IMMEDIATELY and report to user
@@ -280,17 +255,8 @@ Max: 100 points
 
 ## Outputs
 
-### Single-repo mode
-
 - `<basename>_grading.md` in German
 - `<basename>_email.json` as a JSON array following `grading-shared` rules
-
-### Bulk mode
-
-- Per-repository `<basename>_grading.md` files in German
-- Per-repository `<basename>_email.json` files following `grading-shared` rules
-- Shared `EMAIL.json`, created only by the master workflow after all per-repo
-  outputs are finished
 
 ## Grading Report Structure
 
@@ -357,15 +323,12 @@ Always use `grading-shared` for:
 
 ## Constraints
 
-- This skill must NOT be invoked from within a Git repository
-- This skill must NOT clone student repositories; use `git pull` to update
-- If uncommitted changes exist in any student repository, STOP IMMEDIATELY
+- This skill MUST be invoked from within a Git repository (the project being evaluated)
+- If not inside a Git repository, STOP IMMEDIATELY with an error
+- If uncommitted changes exist in the repository, STOP IMMEDIATELY
 - Do not commit changes or modify repository history
 - All grading content must use second-person address (Sie or Du)
 - Never use third-person references to the student
-- In single-repo mode, never write shared `EMAIL.json`
-- In bulk mode, generate shared `EMAIL.json` only after all per-repo outputs
-  are complete
 - Student identification comes from Git commit emails only
 - Issue attribution prefers email over username for accuracy
 - Grade all project contributors, not just code authors
