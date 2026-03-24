@@ -152,7 +152,7 @@ Protocol:
 1. Validate `$1` as ISO date format. If invalid, STOP IMMEDIATELY.
 2. Set cutoff date to `$1` at 0:00 AM.
 3. Treat each directory path as a student repository to grade.
-4. Maintain dynamic concurrency with a default maximum of 4 repositories in
+4. Maintain dynamic concurrency with a default maximum of 5 repositories in
    progress at once.
 5. When one grading run completes, start the next after an approximately
    3-second delay.
