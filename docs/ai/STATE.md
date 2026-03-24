@@ -1,19 +1,15 @@
-# Current State (2026-03-23)
+# Current State (2026-03-24)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Standardizing grading output across all assessment skills to use `<name>_grading.md` pattern.
+Added one-week homework submission deadline policy to `/repogradesince` command.
 
 ## Completed (this cycle)
 
-- [x] Removed `INDIVIDUAL.md` from `knowledge-assessment` outputs
-- [x] Added per-student `<name>_grading.md` files to `knowledge-assessment`
-- [x] Updated `grading-shared` to reference `*_grading.md` pattern
-- [x] Updated `CONVENTIONS.md` with knowledge-assessment output rules
-- [x] Added decision record in `DECISIONS.md`
-- [x] Created PR #27 for projectgrade skill with Git repository execution context
+- [x] Added "SUBMISSION DEADLINE POLICY" section to `commands/repogradesince.md`
+- [x] Updated `docs/ai/DOMAIN.md` with one-week homework rule
 
 ## Pending
 

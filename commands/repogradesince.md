@@ -43,6 +43,12 @@ DATE HANDLING:
 - Only process commits dated at or after this date
 - Use `git log --after="YYYY-MM-DD"` to filter commits
 
+SUBMISSION DEADLINE POLICY:
+- Students have one week to complete homework from the assignment date
+- Example: Assignment dated March 11th → due March 18th
+- Submissions are only considered late after the one-week deadline
+- When grading, factor this deadline into the evaluation
+
 SINGLE-REPO MODE (two arguments):
 - `$1` = ISO date (cutoff)
 - `$2` = repository path

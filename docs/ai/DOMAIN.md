@@ -26,6 +26,7 @@ All grading-related skills and commands reference this shared configuration.
 - Multiple-choice questions have exactly 4 answer options, worth 4 points total (1 point per correctly handled option)
 - Free-text questions are worth 15 points each
 - Address style and email formulas: see `grading-shared` skill for centralized configuration
+- Students have one week to complete homework from the assignment date (e.g., March 11th assignment → March 18th deadline); submissions are only late after this one-week period
 
 ## Workflows
 
