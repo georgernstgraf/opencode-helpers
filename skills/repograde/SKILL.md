@@ -146,6 +146,46 @@ general programming constructs.
 - Detect inactive gaps between first and last relevant commits.
 - Use evidence-based diligence signals such as `high`, `medium`, or `low`.
 
+## Hausübungen.md Semantic Analysis (CRITICAL)
+
+**You MUST perform a thorough semantic analysis of the Hausübungen.md file.**
+
+This is not optional. Many agents fail at this step because they:
+- Only read the first entry
+- Miss dates embedded in the text (not just headings)
+- Fail to convert German date formats to ISO
+- Skip entries that don't match a naive pattern match
+
+### Required Analysis Steps
+
+1. **Read the ENTIRE file** - do not stop after the first homework entry
+2. **Extract ALL date references** from:
+   - Headings: `## Hausübung vom 18. Februar`
+   - Inline dates: `Abgabe bis 25. Februar`
+   - Date ranges: `Zeitraum: 10.-18. März`
+   - Relative dates: `nächste Woche`, `in 2 Wochen` (convert to absolute)
+3. **Normalize ALL dates to ISO format** (YYYY-MM-DD)
+4. **Build a complete homework list** before matching to commits
+
+### Semantic Date Extraction
+
+Look for these patterns throughout the file:
+
+| Pattern | Example | Extraction |
+|---------|---------|------------|
+| `vom DD. Monat` | `vom 18. Februar` | 2026-02-18 (infer year) |
+| `vom DD. Monat YYYY` | `vom 18. Februar 2026` | 2026-02-18 |
+| `DD.MM.YYYY` | `18.02.2026` | 2026-02-18 |
+| `bis DD. Monat` | `Abgabe bis 25. Februar` | 2026-02-25 (deadline) |
+| `Zeitraum: DD.-DD. Monat` | `Zeitraum: 10.-18. März` | 2026-03-10 to 2026-03-18 |
+
+### Year Inference
+
+When year is not explicit:
+- Use the current grading context (e.g., if evaluating 2026 repositories, homeworks are likely 2026)
+- Cross-reference with commit dates in the repository
+- When in doubt, ask the user for clarification
+
 ## Hausübungen.md Format Specification
 
 The homework file follows this structure:
