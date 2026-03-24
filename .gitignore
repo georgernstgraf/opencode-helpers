@@ -11,3 +11,6 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+# Skills directory (not tracked)
+skills/
