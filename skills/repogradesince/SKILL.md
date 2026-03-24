@@ -214,19 +214,113 @@ general programming constructs.
 - Detect inactive gaps between first and last relevant commits.
 - Use evidence-based diligence signals such as `high`, `medium`, or `low`.
 
+## Hausübungen.md Format Specification
+
+The homework file follows this structure:
+
+```markdown
+## Hausübung vom DD. Monat [YYYY]
+### Thema: [Topic description]
+[Assignment details...]
+
+## Hausübung vom DD. Monat [YYYY]
+### Thema: [Topic description]
+[Assignment details...]
+```
+
+### Date Formats
+
+The file may use any of these date formats:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| German month name | `vom 16. März` | Year optional, infer from context |
+| German month name with year | `vom 16. März 2025` | Full date |
+| Numeric German | `vom 16.03.2025` | DD.MM.YYYY |
+| ISO date | `vom 2025-03-16` | YYYY-MM-DD |
+
+### Month Name Mapping
+
+```
+Januar = 01    Juli = 07
+Februar = 02   August = 08
+März = 03      September = 09
+April = 04     Oktober = 10
+Mai = 05       November = 11
+Juni = 06      Dezember = 12
+```
+
+### Parsing Algorithm
+
+When reading `Hausübungen.md`:
+
+1. **Extract the date from each `## Hausübung vom...` heading**
+2. **Convert to ISO date (YYYY-MM-DD)**:
+   - If year is missing, infer from current grading context
+   - Handle both `16. März` and `16.03.2025` formats
+3. **Build a homework list with**: `(iso_date, heading, content)`
+
+### Critical Parsing Rules
+
+**DO NOT** assume the first entry is the only relevant one. You must:
+
+1. Parse ALL homework entries in the file, not just the first or most recent
+2. Convert every entry's date to ISO format for comparison
+3. For each entry, check if it matches the requested grading period
+
+**Common Failure Pattern (AVOID THIS):**
+```
+❌ WRONG: Read Hausübungen.md, see first entry is "vom 18. Februar",
+         requested date is 2026-02-10, conclude "no matching homework"
+✅ CORRECT: Parse ALL entries, find "vom 10. Februar" (matches),
+            "vom 18. Februar" (after cutoff), "vom 25. Februar" (after cutoff)
+```
+
 ## Homework Matching
 
 After repository analysis, map the detected work onto the homework schedule in
 `Hausübungen.md` (from the current working directory).
 
-- Identify assignment periods from the homework list.
-- Match commits to the corresponding homework period by date and content.
-- **Important**: Only include homework periods that overlap with or follow the
-  cutoff date.
-- Summarize coverage, diligence, and missing or late work per assignment.
-- Base judgments on actual code and text changes, not only on commit messages.
+### Step-by-Step Matching Process
+
+1. **Parse ALL homework entries** from `Hausübungen.md`:
+   - Read each `## Hausübung vom...` section
+   - Extract and normalize the date to ISO format
+   - Store as a list: `[(iso_date, topic, content), ...]`
+
+2. **Identify relevant homework for the cutoff date**:
+   - A homework assignment is RELEVANT if its date is **on or after** the
+     cutoff date, OR if it spans a period that includes the cutoff date
+   - Example: Cutoff `2026-02-10`, homework `vom 18. Februar` → this homework
+     is assigned AFTER the cutoff and should be considered as "upcoming work"
+     that the student should have completed
+
+3. **Match commits to homework**:
+   - For each commit after cutoff date, determine which homework it relates to
+   - Use commit date + content to identify the relevant homework period
+   - A commit dated `2026-02-20` likely belongs to homework `vom 18. Februar`
+
+4. **Build completion status for ALL relevant homeworks**:
+   - List all homeworks with dates on or after cutoff
+   - Mark each as completed (✅) or missing (❌)
+
+### Matching Examples
+
+| Cutoff Date | Hausübung Date | Match? | Reason |
+|-------------|----------------|--------|--------|
+| 2026-02-10 | 2026-02-18 | ✅ YES | Homework assigned after cutoff, student should have done it |
+| 2026-02-10 | 2026-02-05 | ❌ NO | Homework assigned before cutoff period |
+| 2026-02-10 | 2026-02-10 | ✅ YES | Exact match |
+| 2026-02-10 | 2026-03-01 | ✅ YES | Homework within grading period |
+
+### Important Considerations
+
+- **Parse ALL entries before matching** - never stop at the first entry
+- **Convert all dates to ISO format** - use the same format for comparison
+- **Include homework from the cutoff date onwards** - not just commits
 - Clearly indicate in the report that grading covers commits from
   `[cutoff date]` onwards.
+- Base judgments on actual code and text changes, not only on commit messages.
 
 ## Homework Completion Weighting (CRITICAL)
 
