@@ -146,13 +146,85 @@ general programming constructs.
 - Detect inactive gaps between first and last relevant commits.
 - Use evidence-based diligence signals such as `high`, `medium`, or `low`.
 
+## Hausübungen.md Format Specification
+
+The homework file follows this structure:
+
+```markdown
+## Hausübung vom DD. Monat [YYYY]
+### Thema: [Topic description]
+[Assignment details...]
+
+## Hausübung vom DD. Monat [YYYY]
+### Thema: [Topic description]
+[Assignment details...]
+```
+
+### Date Formats
+
+The file may use any of these date formats:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| German month name | `vom 16. März` | Year optional, infer from context |
+| German month name with year | `vom 16. März 2025` | Full date |
+| Numeric German | `vom 16.03.2025` | DD.MM.YYYY |
+| ISO date | `vom 2025-03-16` | YYYY-MM-DD |
+
+### Month Name Mapping
+
+```
+Januar = 01    Juli = 07
+Februar = 02   August = 08
+März = 03      September = 09
+April = 04     Oktober = 10
+Mai = 05       November = 11
+Juni = 06      Dezember = 12
+```
+
+### Parsing Algorithm
+
+When reading `Hausübungen.md`:
+
+1. **Extract the date from each `## Hausübung vom...` heading**
+2. **Convert to ISO date (YYYY-MM-DD)**:
+   - If year is missing, infer from current grading context
+   - Handle both `16. März` and `16.03.2025` formats
+3. **Build a homework list with**: `(iso_date, heading, content)`
+
+### Critical Parsing Rules
+
+**DO NOT** assume the first entry is the only relevant one. You must:
+
+1. Parse ALL homework entries in the file, not just the first or most recent
+2. Convert every entry's date to ISO format for comparison
+3. Match each entry against the student's commit history
+
 ## Homework Matching
 
 After repository analysis, map the detected work onto the homework schedule in
 `Hausübungen.md` (from the current working directory).
 
-- Identify assignment periods from the homework list.
-- Match commits to the corresponding homework period by date and content.
+### Step-by-Step Matching Process
+
+1. **Parse ALL homework entries** from `Hausübungen.md`:
+   - Read each `## Hausübung vom...` section
+   - Extract and normalize the date to ISO format
+   - Store as a list: `[(iso_date, topic, content), ...]`
+
+2. **Match commits to homework**:
+   - For each commit, determine which homework it relates to
+   - Use commit date + content to identify the relevant homework period
+   - A commit dated `2026-02-20` likely belongs to homework `vom 18. Februar`
+
+3. **Build completion status for ALL homeworks**:
+   - List all homeworks in the file
+   - Mark each as completed (✅) or missing (❌)
+
+### Important Considerations
+
+- **Parse ALL entries before matching** - never stop at the first entry
+- **Convert all dates to ISO format** - use the same format for comparison
 - Summarize coverage, diligence, and missing or late work per assignment.
 - Base judgments on actual code and text changes, not only on commit messages.
 
