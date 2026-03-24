@@ -91,7 +91,7 @@ Protocol:
 3. When one grading run completes, start the next after an approximately
    3-second delay.
 4. Each subagent must derive its output stem from the repository basename and
-   write only `<basename>_grading.md`.
+   write only `<basename>_grading.md` plus `<basename>_email.json`.
 5. Subagents must never write shared `EMAIL.json`.
 6. Continue until all repositories are processed.
 7. After all subagents finish, the master workflow must read the generated
