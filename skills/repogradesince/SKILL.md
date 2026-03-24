@@ -228,6 +228,93 @@ After repository analysis, map the detected work onto the homework schedule in
 - Clearly indicate in the report that grading covers commits from
   `[cutoff date]` onwards.
 
+## Homework Completion Weighting (CRITICAL)
+
+This section is essential for fair grading. A student who completes only a
+subset of assigned homework must receive a proportionally reduced score.
+
+### Completion Ratio Calculation
+
+For each homework assignment in the grading period:
+
+1. Identify ALL homework assignments from `Hausübungen.md` that fall within
+   or after the cutoff date.
+2. For each assignment, determine if the student has substantive work
+   (not just superficial edits).
+3. Calculate the completion ratio:
+
+```
+completion_ratio = completed_assignments / total_assignments
+```
+
+Example: If 3 homeworks are assigned and student completed 2:
+- completion_ratio = 2/3 ≈ 0.67
+
+### Scoring Impact
+
+The final score MUST reflect incomplete homework proportionally:
+
+1. Calculate a base score from quality of completed work (0-100).
+2. Apply completion weighting:
+
+```
+weighted_score = base_score * completion_ratio
+```
+
+**Example of correct weighting:**
+
+|Assigned| Completed | Base Score | Weighted Score |
+|--------|-----------|------------|----------------|
+| 3| 3 | 90 | 90 (90 × 1.0) |
+| 3| 2 | 90 | 60 (90 × 0.67) |
+| 3| 1 | 95 | 32 (95 × 0.33) |
+
+**Anti-Pattern (DO NOT DO THIS):**
+Assigning 90% to a student who only completed 1 of 3 assignments just because
+that one assignment was excellent. This is incorrect and unfair to students
+who completed all work.
+
+### Missing Assignment Documentation
+
+In the grading report, explicitly list:
+
+- All assigned homeworks for the period
+- Which were completed (with brief summary)
+- Which were missing or incomplete
+
+Example German phrasing:
+
+```
+##Hausübungs-Abdeckung
+
+Insgesamt waren 3 Hausübungen im Bewertungszeitraum aufgegeben:
+- HU1: ✅vollständig bearbeitet
+- HU2: ❌ nicht bearbeitet
+- HU3: ❌ nicht bearbeitet
+
+Abdeckungsquote: 1von3(33%)
+
+DieEndbewertung berücksichtigt diese unvollständige Abdeckung entsprechend.
+```
+
+### Grading Report Requirements
+
+Every grading report MUST include:
+
+1. **Hausübungs-Abdeckung section**: List all assignments and completion status
+2. **Abdeckungsquote**: The completion ratio as percentage
+3. **Weighted final score**: Base score multiplied by completion ratio
+4. **Clear explanation**: Why the score is what it is
+
+### Edge Cases
+
+- **No homeworks in period**: If no assignments fall within the grading period,
+  report this clearly and grade based on available work only.
+- **Empty repository**: If the student has no commits after the cutoff date,
+  assign 0points with clear explanation.
+- **Late submissions**: Note late submissions separately; they may still count
+  toward completion at reduced weight per instructor policy.
+
 ## Outputs
 
 ### Single-repo mode
@@ -265,9 +352,11 @@ If a student cannot be matched in the database:
 All grading content must be written in German and address the student
 directly in the second person (Sie or Du based on class).
 
-Reports should include, where applicable:
+Reports MUST include:
 
 - clear indication of the cutoff date (Commits von YYYY-MM-DD onwards)
+- **Hausübungs-Abdeckung section**: Complete list of all assigned homeworks
+  with completion status (✅/❌) and Abdeckungsquote percentage
 - repository overview
 - homework-by-homework summary (filtered to relevant periods)
 - topic coverage
@@ -276,7 +365,8 @@ Reports should include, where applicable:
 - activity over time
 - inactive gaps
 - diligence assessment
-- final evaluation with `Endbewertung: XX/100`
+- **weighted final evaluation**: Base score × completion ratio
+- final evaluation with `Endbewertung: XX/100` (the weighted score, not base)
 
 ## Constraints
 
