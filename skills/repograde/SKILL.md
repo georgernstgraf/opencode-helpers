@@ -86,7 +86,7 @@ Protocol:
 
 1. Treat each directory path as a student repository to grade. These are
    separate Git repositories (do NOT clone them).
-2. Maintain dynamic concurrency with a default maximum of 4 repositories in
+2. Maintain dynamic concurrency with a default maximum of 5 repositories in
    progress at once.
 3. When one grading run completes, start the next after an approximately
    3-second delay.
