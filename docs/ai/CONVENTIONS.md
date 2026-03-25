@@ -41,6 +41,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - EMAIL.json contains full grading reports as email body (long emails expected)
 - Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration
 - `vacuum.db` must exist at start of `knowledge-assessment`; if missing, stop immediately (do not create or copy)
+- If any student email address is missing from the database, stop immediately and present all unresolved names to the user; do not generate `EMAIL.json` until all emails are resolved
 
 ## Naming
 
