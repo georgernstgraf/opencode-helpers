@@ -462,8 +462,55 @@ Every grading report MUST include:
 - Per-repository `<basename>_grading.md` files in German
 - Per-repository `<basename>_email.json` files following `grading-shared`
   rules
+- `CLASS.md` with anonymized class-wide patterns and teacher recommendations
+  (written in German, no student names, suitable for public repository use)
 - Shared `EMAIL.json`, created only by the master workflow after all per-repo
   outputs are finished
+
+## CLASS.md Generation (Bulk Mode Only)
+
+After all per-repository grading is complete in bulk mode, generate `CLASS.md`
+as an anonymized class summary for the teacher.
+
+### Content Requirements
+
+`CLASS.md` MUST include:
+
+1. **Overview**: Summary of the grading period (cutoff date, number of
+   repositories graded)
+2. **Common Patterns**: Frequently observed strengths across submissions
+3. **Common Weaknesses**: Recurring issues or mistakes
+4. **Homework Completion Statistics**: Aggregate completion ratios
+5. **Teacher Recommendations**: Actionable suggestions for addressing issues
+
+### Anonymity Rules
+
+- NEVER include student names or repository names that identify individuals
+- Use generic terms: "einige Schüler", "viele Abgaben", "vereinzelt"
+- Focus on patterns, not individuals
+- This file may be committed to a public repository
+
+### Example Structure
+
+```markdown
+# Klassenzusammenfassung
+
+## Bewertungszeitraum
+Bewertet wurden Commits ab dem YYYY-MM-DD.
+Anzahl der bewerteten Repositories: N
+
+## Gemeinsame Stärken
+- ...
+
+## Häufige Schwächen
+- ...
+
+## Hausübungserledigung
+Durchschnittliche Abdeckungsquote: X%
+
+## Empfehlungen
+- ...
+```
 
 ## Email and Database Rules
 
@@ -514,6 +561,8 @@ Reports MUST include:
 - In single-repo mode, stop if `Hausübungen.md` is missing.
 - In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
 - In single-repo mode, never write shared `EMAIL.json`.
+- In bulk mode, generate `CLASS.md` with anonymized class patterns after all
+  per-repo grading is complete.
 - In bulk mode, keep the concurrent grading workflow and generate shared
   `EMAIL.json` only after all per-repo outputs are complete.
 - Use proper quoting for paths with spaces.

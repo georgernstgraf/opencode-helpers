@@ -61,7 +61,9 @@ BULK MODE (one argument):
 - Treat each directory as a student repository
 - Use concurrent multi-repository grading (max 4 concurrent)
 - Each subagent writes only basename-derived per-repo artifacts
-- Generate shared `EMAIL.json` only after all subagents finish
+- After all subagents finish, generate:
+  - `CLASS.md` with anonymized class-wide patterns and teacher recommendations
+  - Shared `EMAIL.json` aggregating all per-repo email payloads
 
 All grading rules, repository analysis, database lookup, and email generation
 remain inside the `repogradesince` skill.
