@@ -31,7 +31,8 @@ Follow these without question. Do not deviate unless explicitly told.
 - All grading content must use second-person address (Sie or Du based on class); never use third-person to refer to the student.
 - In `repograde`, derive output filenames from the repository basename; single-repo and bulk per-repo outputs are `<basename>_grading.md` and `<basename>_email.json`.
 - `repograde` must never write `INDIVIDUAL.md` or `CLASS.md`.
-- `repogradesince` bulk mode must write `CLASS.md` (anonymized class summary).
+- `repograde` bulk mode must write `GRADINGS.md` (class-wide overview table).
+- `repogradesince` bulk mode must write `GRADINGS.md` and `CLASS.md`.
 - `knowledge-assessment` must write per-student `<name>_grading.md` files instead of `INDIVIDUAL.md`.
 - `knowledge-assessment` must always write `GRADINGS.md` and `CLASS.md` (both mandatory).
 - Shared `EMAIL.json` is created only by the bulk-mode master workflow after all per-repo outputs are finished.

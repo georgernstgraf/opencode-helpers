@@ -62,6 +62,7 @@ BULK MODE (one argument):
 - Use concurrent multi-repository grading (max 4 concurrent)
 - Each subagent writes only basename-derived per-repo artifacts
 - After all subagents finish, generate:
+  - `GRADINGS.md` with class-wide overview table (alphabetically ordered)
   - `CLASS.md` with anonymized class-wide patterns and teacher recommendations
   - Shared `EMAIL.json` aggregating all per-repo email payloads
 
