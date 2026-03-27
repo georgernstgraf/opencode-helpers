@@ -21,6 +21,7 @@ Follow these without question. Do not deviate unless explicitly told.
 
 ## Grading Workflow
 
+- **All grading skills must output a percentage (0-100%) alongside the score.** This is mandatory for every skill that produces grading outputs.
 - `repograde` is the canonical repository-grading workflow; keep `/repograde` as a thin wrapper around `skills/repograde/SKILL.md`.
 - Grading commands operate from a local folder (CWD), NOT from within a Git repository.
 - `Hausübungen.md` must exist in the CWD before invoking grading commands; it is never inside a student repository.
