@@ -281,8 +281,36 @@ After repository analysis, map the detected work onto the homework schedule in
 - Per-repository `<basename>_grading.md` files in German
 - Per-repository `<basename>_email.json` files following `grading-shared`
   rules
+- `GRADINGS.md` with a comprehensive table of all students ordered
+  alphabetically by name, including repository identifiers and final scores
 - Shared `EMAIL.json`, created only by the master workflow after all per-repo
   outputs are finished
+
+## GRADINGS.md Generation (Bulk Mode Only)
+
+After all per-repository grading is complete in bulk mode, generate `GRADINGS.md`
+as a class-wide overview table.
+
+### Content Requirements
+
+`GRADINGS.md` MUST include:
+
+1. A table with columns for student identifier (repository basename or name) and
+   final score (`Endbewertung`)
+2. Ordered alphabetically by student name, NOT by grade
+3. Written in German
+
+### Example Structure
+
+```markdown
+# Bewertungen
+
+| Name | Endbewertung |
+|------|-------------|
+| Huber Maria | 85/100 |
+| Maier Thomas | 72/100 |
+| Schmidt Anna | 91/100 |
+```
 
 ## Email and Database Rules
 
@@ -293,12 +321,11 @@ Always use `grading-shared` for:
 - gender fallback protocol
 - database lookup using `/home/georg/OneDrive/uploadthing.db`
 - email payload structure and paragraph preservation
+- **missing email address handling** (STOP if any student has no email)
 
-If a student cannot be matched in the database:
-
-- set `mailto` to `null`
-- add a note for manual review
-- do not invent contact data
+If any student cannot be matched in the database, follow the missing email
+protocol in `grading-shared`: stop, present all unresolved names to the user,
+and wait for database update before retrying.
 
 ## Reporting Expectations
 
@@ -362,6 +389,8 @@ ist, dass Sie die Fremdschlüssel-Beziehung sauber modelliert haben.
 - In single-repo mode, stop if `Hausübungen.md` is missing.
 - In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
 - In single-repo mode, never write shared `EMAIL.json`.
+- In bulk mode, generate `GRADINGS.md` with class-wide overview table after all
+  per-repo grading is complete.
 - In bulk mode, keep the concurrent grading workflow and generate shared
   `EMAIL.json` only after all per-repo outputs are complete.
 - Use proper quoting for paths with spaces.

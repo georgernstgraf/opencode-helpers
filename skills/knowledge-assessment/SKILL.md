@@ -162,6 +162,12 @@ Follow the `grading-shared` skill protocol for:
 - Gender determination and fallback handling
 - Email JSON structure
 - Greeting and closing formulas
+- **Missing email address handling** (STOP if any student has no email)
+
+If any student cannot be matched in the database, follow the missing email
+protocol in `grading-shared`: stop, present all unresolved names to the user,
+and wait for database update before retrying. Do NOT generate `EMAIL.json`
+with null mailto values.
 
 Additional requirements specific to knowledge-check:
 

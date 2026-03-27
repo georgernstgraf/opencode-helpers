@@ -164,7 +164,41 @@ Table: `users`
 3. Retrieve `email` and `klasse` columns
 4. Use `klasse` to determine address style
 5. If `vacuum.db` is missing at start, stop immediately with error
-6. If student not found, set `mailto: null` and add `note` field for manual review
+6. Track all students with missing email addresses
+
+## Missing Email Address Handling (CRITICAL)
+
+When generating `EMAIL.json`, if any student's email address cannot be found in
+the database, the workflow MUST stop before generating the file.
+
+### Protocol
+
+1. **Collect all lookups**: Perform database lookup for all students first
+2. **Check for missing emails**: After all lookups, identify students without
+   valid email addresses
+3. **If any are missing**:
+   - STOP immediately
+   - Do NOT generate `EMAIL.json`
+   - Present ALL unresolved names to the user in a clear list:
+     ```
+     Die folgenden Schüler/innen konnten nicht in der Datenbank gefunden werden:
+     - [Name 1]
+     - [Name 2]
+     - ...
+     
+     Bitte aktualisieren Sie die Datenbank und starten Sie den Vorgang erneut.
+     ```
+   - Wait for user to update the database
+   - User should confirm when database is updated
+   - Retry the entire grading process
+4. **Only proceed**: Generate `EMAIL.json` when ALL students have valid email
+   addresses
+
+### Rationale
+
+- Prevents incomplete or invalid email payloads
+- Ensures all students receive their feedback
+- Forces database maintenance rather than workarounds
 
 ## Email JSON Structure
 
