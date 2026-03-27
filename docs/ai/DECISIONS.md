@@ -77,6 +77,13 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Mixed third-person in reports with second-person in emails, or only second-person in emails
 - **Tradeoff**: Requires careful grammar (Sie vs Du conjugation), but creates consistent student experience
 
+## 2026-03-27: Add mandatory exam-date parameter to knowledge-exam skill
+- **Choice**: Require teachers to specify the exam date when generating knowledge-check exams
+- **Reason**: Exams are created ahead of time for a specific planned date; using today's date by default led to mismatches between filename dates and actual exam dates
+- **Considered**: Keeping today's date as default, or making exam-date optional with aprompt
+- **Tradeoff**: One more required parameter, but ensures exam files are correctly dated from the start
+- **Accepted formats**: ISO date (YYYY-MM-DD), literal `today`, or literal `tomorrow`
+
 ## 2026-03-23: Replace INDIVIDUAL.md with per-student grading files
 - **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
 - **Reason**: Consistent output pattern across all grading skills (repograde, knowledge-assessment, projectgrade); per-student files are easier to manage and align with `<basename>_grading.md` convention

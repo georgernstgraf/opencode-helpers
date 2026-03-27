@@ -1,15 +1,17 @@
-# Current State (2026-03-24)
+# Current State (2026-03-27)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Added one-week homework submission deadline policy to `/repogradesince` command.
+Added mandatory `exam-date` parameter to `knowledge-exam` skill.
 
 ## Completed (this cycle)
 
-- [x] Added "SUBMISSION DEADLINE POLICY" section to `commands/repogradesince.md`
-- [x] Updated `docs/ai/DOMAIN.md` with one-week homework rule
+- [x] Added `exam-date` parameter to knowledge-exam skill inputs
+- [x] Updated validation protocol to require exam-date and resolve it to ISO format
+- [x] Updated output expectations to use resolved exam-date in filenames
+- [x] Created GitHub issue #35 and documented the feature
 
 ## Pending
 

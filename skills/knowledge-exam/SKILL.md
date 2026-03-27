@@ -20,6 +20,10 @@ material covered in class.
 
 - `class`: target class folder name
 - `weeks`: number of weeks of Git history to analyze
+- `exam-date`: (mandatory) the planned exam date, must be either:
+  - An ISO date (YYYY-MM-DD format)
+  - The literal `today`
+  - The literal `tomorrow`
 - `mc-count`: (optional) number of multiple-choice questions, default 10
 - `free-count`: (optional) number of free-text questions, default 3
 
@@ -27,10 +31,16 @@ material covered in class.
 
 ### 1. Validate Inputs
 
+- **Mandatory exam-date parameter**: If `exam-date` is not provided, abort
+  immediately with an error message explaining that this parameter is required.
 - Confirm that a folder matching `class` exists in the current working tree.
 - If the folder does not exist, stop immediately and report that the class name
   appears to be invalid.
-- Compute today's ISO date for the output filenames.
+- **Resolve exam-date to ISO format**:
+  - If `exam-date` is an ISO date (YYYY-MM-DD), use it as-is.
+  - If `exam-date` is `today`, compute today's ISO date.
+  - If `exam-date` is `tomorrow`, compute tomorrow's ISO date.
+  - Store this resolved date as `<isodate>` for output filenames.
 - The following classes are addressed informally in related communication:
   `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
 - All other classes use formal address in related communication.
@@ -92,4 +102,5 @@ material covered in class.
 
 - Student exam file in German with the required question counts and scoring.
 - Separate teacher solution file in German.
-- Filenames must include the class name and today's ISO date.
+- Filenames must include the class name and the exam date in ISO format
+  (resolved from the mandatory `exam-date` parameter).
