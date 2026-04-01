@@ -28,7 +28,7 @@ opencode-helpers/
 │   ├── knowledge-exam/ # Generate exams from git history
 │   ├── knowledge-persistence/ # Persist agent knowledge across sessions
 │   ├── repograde/      # Grade student repositories in single or bulk mode
-│   └── homework/       # Suggest short homework from recent history
+│   └── homework/       # Generate per-lesson Hausübung.md from recent history
 ├── docs/ai/            # Knowledge persistence templates
 │   ├── HANDOFF.md      # Pending tasks for next session
 │   ├── CONVENTIONS.md  # Coding conventions
@@ -58,7 +58,6 @@ opencode-helpers/
 | `/issue-commit` | Save progress to an issue (keeps it open) |
 | `/issue-finish` | Complete task, commit, push, and close issue |
 | `/repograde [repo-path]` | Grade one explicit repo path or run bulk grading |
-| `/nextprompt` | Process oldest transcription via aitranscribe |
 | `/security <output>` | Generate security audit report |
 
 ## Skills
@@ -103,10 +102,11 @@ exam skill instead of an Austrian school grading scheme.
 ### repograde
 
 Grades student repositories using one shared workflow for repository analysis,
-homework matching, report generation, and email payload creation. The command is
-kept thin while the skill handles both explicit single-repo mode and no-argument
-bulk mode, emits basename-derived per-repo artifacts, and generates shared
-`EMAIL.json` only after bulk processing completes.
+homework matching (legacy `Hausübungen.md` or per-lesson `Hausübung.md`), report
+generation, and email payload creation. The command is kept thin while the skill
+handles both explicit single-repo mode and no-argument bulk mode, emits
+basename-derived per-repo artifacts, and generates shared `EMAIL.json` only
+after bulk processing completes.
 
 ## Command vs Skill
 

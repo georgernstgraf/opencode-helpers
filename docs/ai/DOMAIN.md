@@ -34,6 +34,21 @@ All grading-related skills and commands reference this shared configuration.
 - **Assessment**: Student submissions → point-based grading → individual feedback → class patterns → bulk email JSON
 - **Email composition**: Individual assessment → structured paragraphs → solutions note → sign-off → EMAIL.json
 - **Repository grading**: `repograde` skill → explicit single-repo path mode or bulk mode → per-repo `<basename>_grading.md` and `<basename>_email.json` outputs → bulk master aggregation into `EMAIL.json`
+- **Homework generation**: `homework` skill → auto-detect current lesson directory → discover sources → generate `Hausübung.md` inside lesson directory
+
+## Homework Formats
+
+Homework assignments exist in two formats; grading skills must support both:
+
+| Format | Filename | Location | Date Source |
+|--------|----------|----------|-------------|
+| Legacy cumulative | `Hausübungen.md` | CWD (class folder root) | German date parsing from headings |
+| Per-lesson | `Hausübung.md` | Inside `<YYYY-MM-DD>_<topic>` directory | Extracted from directory name |
+
+- Legacy format uses German date headings (`## Hausübung vom 16. März`)
+- Per-lesson format extracts date from directory name directly (no parsing needed)
+- If both exist for the same date, prefer per-lesson file
+- The `homework` skill only generates per-lesson format; it never creates cumulative files
 
 ## Constraints
 

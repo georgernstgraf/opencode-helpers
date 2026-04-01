@@ -18,13 +18,15 @@ Follow these without question. Do not deviate unless explicitly told.
 - Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
 - Keep issue-related commands as thin wrappers around the shared `issue-workflow` skill.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
+- Lesson directories inside class folders follow the naming pattern `<YYYY-MM-DD>_<topic>` (e.g., `2026-03-21_promises`).
+- Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
 
 ## Grading Workflow
 
 - **All grading skills must output a percentage (0-100%) alongside the score.** This is mandatory for every skill that produces grading outputs.
 - `repograde` is the canonical repository-grading workflow; keep `/repograde` as a thin wrapper around `skills/repograde/SKILL.md`.
 - Grading commands operate from a local folder (CWD), NOT from within a Git repository.
-- `Hausübungen.md` must exist in the CWD before invoking grading commands; it is never inside a student repository.
+- `Hausübungen.md` (legacy, cumulative) or per-lesson `Hausübung.md` files in `<date>_<topic>` directories provide homework assignments for grading; at least one must exist in the CWD.
 - Student repositories must already exist locally; never clone them as part of grading.
 - Before grading, use `git pull` to verify latest version and `git status` to check for uncommitted changes; if uncommitted changes exist, stop immediately.
 - In `/repograde`, treat a single argument as an explicit repository path and use it verbatim.

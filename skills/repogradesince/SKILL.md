@@ -28,8 +28,11 @@ within a Git repository. Calling this skill from inside a Git repository is
 an error.
 
 The skill grades student Git repositories by:
-1. Reading `Hausübungen.md` from the current working directory
-   (may be a symbolic link; follow symlinks when reading)
+1. Discovering homework assignments from two possible sources (see Homework
+   Discovery below):
+   - **Legacy**: a cumulative `Hausübungen.md` in the CWD
+   - **Per-lesson**: individual `Hausübung.md` files inside `<date>_<topic>`
+     subdirectories
 2. Accessing student repositories at the paths provided (these already exist;
    do NOT clone them)
 3. Using `git pull` to verify the latest version is checked out
@@ -127,15 +130,16 @@ Protocol:
 1. Validate `$1` as ISO date format. If invalid, STOP IMMEDIATELY.
 2. Set cutoff date to `$1` at 0:00 AM.
 3. Treat `$2` as the target repository path exactly as passed.
-4. Verify that `Hausübungen.md` exists in the current working directory.
-   If it does not, stop immediately. (Hausübungen.md is NEVER inside the
-   student repository.)
+4. Verify that at least one homework source exists (legacy `Hausübungen.md`
+   in CWD, or per-lesson `Hausübung.md` files in subdirectories). If neither
+   exists, stop immediately. (Homework files are NEVER inside the student
+   repository.)
 5. Navigate to the student repository at path `$2`.
 6. Run `git pull` to verify latest version is checked out.
 7. Run `git status` to check for uncommitted changes. If found, stop immediately.
 8. Derive the output stem from `basename "$2"` or equivalent.
-9. Read `Hausübungen.md` from the current working directory to identify
-   homework periods and expectations.
+9. Discover homework assignments from both sources (see Homework Discovery
+   below) and build a unified homework list.
 10. **Filter commits**: Only inspect commits dated at or after `$1T00:00:00`.
 11. Inspect the filtered repository history and actual commit content.
 12. Evaluate work against the homework periods (only for matching date ranges).
@@ -214,30 +218,41 @@ general programming constructs.
 - Detect inactive gaps between first and last relevant commits.
 - Use evidence-based diligence signals such as `high`, `medium`, or `low`.
 
-## Hausübungen.md Semantic Analysis (CRITICAL)
+## Homework Discovery (CRITICAL)
 
-**You MUST perform a thorough semantic analysis of the Hausübungen.md file.**
+Homework assignments may exist in two formats. The skill MUST discover and
+merge both sources into a unified homework list before matching against student
+commits.
 
-This is not optional. Many agents fail at this step because they:
+### Source 1: Legacy Cumulative File (`Hausübungen.md`)
+
+Check for a `Hausübungen.md` file in the current working directory (may be a
+symbolic link; follow symlinks when reading).
+
+If found, parse it using the full semantic date analysis below.
+
+#### Semantic Date Extraction
+
+**You MUST perform a thorough semantic analysis of the entire file.**
+
+Many agents fail at this step because they:
 - Only read the first entry
 - Miss dates embedded in the text (not just headings)
 - Fail to convert German date formats to ISO
 - Skip entries that don't match a naive pattern match
 
-### Required Analysis Steps
+Required steps:
 
-1. **Read the ENTIRE file** - do not stop after the first homework entry
+1. **Read the ENTIRE file** — do not stop after the first homework entry
 2. **Extract ALL date references** from:
    - Headings: `## Hausübung vom 18. Februar`
    - Inline dates: `Abgabe bis 25. Februar`
    - Date ranges: `Zeitraum: 10.-18. März`
    - Relative dates: `nächste Woche`, `in 2 Wochen` (convert to absolute)
 3. **Normalize ALL dates to ISO format** (YYYY-MM-DD)
-4. **Build a complete homework list** before matching to commits
+4. **Build a homework list**: `[(iso_date, topic, content), ...]`
 
-### Semantic Date Extraction
-
-Look for these patterns throughout the file:
+Date patterns to recognize:
 
 | Pattern | Example | Extraction |
 |---------|---------|------------|
@@ -247,39 +262,7 @@ Look for these patterns throughout the file:
 | `bis DD. Monat` | `Abgabe bis 25. Februar` | 2026-02-25 (deadline) |
 | `Zeitraum: DD.-DD. Monat` | `Zeitraum: 10.-18. März` | 2026-03-10 to 2026-03-18 |
 
-### Year Inference
-
-When year is not explicit:
-- Use the current grading context (e.g., if cutoff is 2026-02-10, homeworks are likely 2026)
-- Cross-reference with commit dates in the repository
-- When in doubt, ask the user for clarification
-
-## Hausübungen.md Format Specification
-
-The homework file follows this structure:
-
-```markdown
-## Hausübung vom DD. Monat [YYYY]
-### Thema: [Topic description]
-[Assignment details...]
-
-## Hausübung vom DD. Monat [YYYY]
-### Thema: [Topic description]
-[Assignment details...]
-```
-
-### Date Formats
-
-The file may use any of these date formats:
-
-| Format | Example | Notes |
-|--------|---------|-------|
-| German month name | `vom 16. März` | Year optional, infer from context |
-| German month name with year | `vom 16. März 2025` | Full date |
-| Numeric German | `vom 16.03.2025` | DD.MM.YYYY |
-| ISO date | `vom 2025-03-16` | YYYY-MM-DD |
-
-### Month Name Mapping
+Month name mapping:
 
 ```
 Januar = 01    Juli = 07
@@ -290,23 +273,8 @@ Mai = 05       November = 11
 Juni = 06      Dezember = 12
 ```
 
-### Parsing Algorithm
-
-When reading `Hausübungen.md`:
-
-1. **Extract the date from each `## Hausübung vom...` heading**
-2. **Convert to ISO date (YYYY-MM-DD)**:
-   - If year is missing, infer from current grading context
-   - Handle both `16. März` and `16.03.2025` formats
-3. **Build a homework list with**: `(iso_date, heading, content)`
-
-### Critical Parsing Rules
-
-**DO NOT** assume the first entry is the only relevant one. You must:
-
-1. Parse ALL homework entries in the file, not just the first or most recent
-2. Convert every entry's date to ISO format for comparison
-3. For each entry, check if it matches the requested grading period
+When year is not explicit, infer from the grading context or cross-reference
+with commit dates.
 
 **Common Failure Pattern (AVOID THIS):**
 ```
@@ -316,29 +284,46 @@ When reading `Hausübungen.md`:
             "vom 18. Februar" (after cutoff), "vom 25. Februar" (after cutoff)
 ```
 
+### Source 2: Per-Lesson Files (`Hausübung.md` in `<date>_<topic>` directories)
+
+Scan the CWD for subdirectories matching the pattern `<YYYY-MM-DD>_<topic>`.
+For each matching directory, check if `Hausübung.md` exists inside it.
+
+If found:
+- Extract the date directly from the directory name (e.g., `2026-03-21_promises`
+  → date `2026-03-21`). No German date parsing needed.
+- Extract the topic from the directory name and/or the file content.
+- Read the file content for assignment details.
+- Add to the homework list: `(iso_date, topic, content)`.
+
+### Merging Both Sources
+
+1. Collect homework entries from both sources into a single unified list.
+2. If both sources contain an entry for the same date, prefer the per-lesson
+   file. This is expected to be rare.
+3. Sort the unified list by date.
+4. If neither source provides any homework entries, report this to the user
+   and grade based on available work only.
+
 ## Homework Matching
 
-After repository analysis, map the detected work onto the homework schedule in
-`Hausübungen.md` (from the current working directory).
+After repository analysis, map the detected work onto the unified homework list.
 
 ### Step-by-Step Matching Process
 
-1. **Parse ALL homework entries** from `Hausübungen.md`:
-   - Read each `## Hausübung vom...` section
-   - Extract and normalize the date to ISO format
-   - Store as a list: `[(iso_date, topic, content), ...]`
+1. **Parse ALL homework entries** from the unified list.
 
 2. **Identify relevant homework for the cutoff date**:
    - A homework assignment is RELEVANT if its date is **on or after** the
      cutoff date, OR if it spans a period that includes the cutoff date
-   - Example: Cutoff `2026-02-10`, homework `vom 18. Februar` → this homework
-     is assigned AFTER the cutoff and should be considered as "upcoming work"
-     that the student should have completed
+   - Example: Cutoff `2026-02-10`, homework dated `2026-02-18` → this
+     homework is assigned AFTER the cutoff and should be considered as
+     "upcoming work" that the student should have completed
 
 3. **Match commits to homework**:
    - For each commit after cutoff date, determine which homework it relates to
    - Use commit date + content to identify the relevant homework period
-   - A commit dated `2026-02-20` likely belongs to homework `vom 18. Februar`
+   - A commit dated `2026-02-20` likely belongs to homework dated `2026-02-18`
 
 4. **Build completion status for ALL relevant homeworks**:
    - List all homeworks with dates on or after cutoff
@@ -346,8 +331,8 @@ After repository analysis, map the detected work onto the homework schedule in
 
 ### Matching Examples
 
-| Cutoff Date | Hausübung Date | Match? | Reason |
-|-------------|----------------|--------|--------|
+| Cutoff Date | Homework Date | Match? | Reason |
+|-------------|---------------|--------|--------|
 | 2026-02-10 | 2026-02-18 | ✅ YES | Homework assigned after cutoff, student should have done it |
 | 2026-02-10 | 2026-02-05 | ❌ NO | Homework assigned before cutoff period |
 | 2026-02-10 | 2026-02-10 | ✅ YES | Exact match |
@@ -355,9 +340,9 @@ After repository analysis, map the detected work onto the homework schedule in
 
 ### Important Considerations
 
-- **Parse ALL entries before matching** - never stop at the first entry
-- **Convert all dates to ISO format** - use the same format for comparison
-- **Include homework from the cutoff date onwards** - not just commits
+- **Parse ALL entries before matching** — never stop at the first entry
+- **Convert all dates to ISO format** — use the same format for comparison
+- **Include homework from the cutoff date onwards** — not just commits
 - Clearly indicate in the report that grading covers commits from
   `[cutoff date]` onwards.
 - Base judgments on actual code and text changes, not only on commit messages.
@@ -371,8 +356,8 @@ subset of assigned homework must receive a proportionally reduced score.
 
 For each homework assignment in the grading period:
 
-1. Identify ALL homework assignments from `Hausübungen.md` that fall within
-   or after the cutoff date.
+1. Identify ALL homework assignments from the unified homework list that fall
+   within or after the cutoff date.
 2. For each assignment, determine if the student has substantive work
    (not just superficial edits).
 3. Calculate the completion ratio:
@@ -586,7 +571,8 @@ Reports MUST include:
 - Do not commit changes or modify repository history.
 - All grading content must use second-person address (Sie or Du).
 - Never use third-person references to the student.
-- In single-repo mode, stop if `Hausübungen.md` is missing.
+- In single-repo mode, stop if no homework source is found (neither legacy
+  `Hausübungen.md` nor per-lesson `Hausübung.md` files).
 - In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
 - In single-repo mode, never write shared `EMAIL.json`.
 - In bulk mode, generate `GRADINGS.md` with class-wide overview table after all

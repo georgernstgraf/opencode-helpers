@@ -3,14 +3,6 @@
 Records architectural and technical decisions with rationale.
 Each entry documents WHAT was decided and WHY.
 
-<!-- Add decisions using this format:
-## YYYY-MM-DD: <Short Title>
-- **Choice**: What was chosen
-- **Reason**: Why this option was selected
-- **Considered**: What alternatives were evaluated
-- **Tradeoff**: Known downsides accepted
--->
-
 ## 2026-03-04: Use docs/ai/ for knowledge persistence
 - **Choice**: Store knowledge files in `docs/ai/` directory
 - **Reason**: Follows common docs structure, keeps AI context with other documentation
@@ -40,6 +32,7 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: The workflow needs reusable rules for class-folder history analysis, German homework expansion, newest-first ordering, and re-entrant updates
 - **Considered**: Embedding the workflow directly in the command file, or overloading `knowledge-exam` with homework behavior
 - **Tradeoff**: One more standalone skill to maintain, but the homework workflow stays explicit and reusable
+- **Superseded by**: 2026-04-01 unified homework decision
 
 ## 2026-03-18: Consolidate repo-report into repograde
 - **Choice**: Absorb the former `repo-report` analysis workflow into `skills/repograde/SKILL.md`
@@ -50,7 +43,7 @@ Each entry documents WHAT was decided and WHY.
 ## 2026-03-19: Repograde writes basename-derived artifact files only
 - **Choice**: In `repograde`, generate only `<basename>_grading.md` and `<basename>_email.json` per repository, and reserve shared `EMAIL.json` for the bulk-mode master aggregation step
 - **Reason**: Artifact-based outputs are clearer than mutating `INDIVIDUAL.md` or `CLASS.md`, and they make the subagent/master split explicit in bulk mode
-- **Considered**: Continuing to write `INDIVIDUAL.md` and `CLASS.md`, or allowing subagents to append directly to shared `EMAIL.json`
+- **Considered**: Continuing to write `INDIVIDUAL.md` or `CLASS.md`, or allowing subagents to append directly to shared `EMAIL.json`
 - **Tradeoff**: Bulk mode needs an explicit fan-in aggregation step, but per-repository outputs are simpler and less error-prone
 
 ## 2026-03-18: Dynamic concurrency for RepoGrader sub-agents
@@ -64,6 +57,7 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Teachers need quick homework ideas from recent lesson commits; unlike `/homework-improve`, this should be read-only for easy copy-paste
 - **Considered**: Combining with `/homework-improve`, or extending `/knowledge-exam`
 - **Tradeoff**: Another standalone skill, but keeps the read-only output pattern explicit and separate from file-modifying workflows
+- **Superseded by**: 2026-04-01 unified homework decision
 
 ## 2026-03-18: Centralize grading configuration in grading-shared skill
 - **Choice**: Create `skills/grading-shared/SKILL.md` as single source of truth for class-to-address-style mapping, email formulas, and database patterns
@@ -77,10 +71,18 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Mixed third-person in reports with second-person in emails, or only second-person in emails
 - **Tradeoff**: Requires careful grammar (Sie vs Du conjugation), but creates consistent student experience
 
+## 2026-03-23: Replace INDIVIDUAL.md with per-student grading files
+- **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
+- **Reason**: Consistent output pattern across all grading skills (repograde, knowledge-assessment, projectgrade); per-student files are easier to manage and align with `<basename>_grading.md` convention
+- **Considered**: Keeping `INDIVIDUAL.md` for knowledge-assessment only, or using a different naming scheme
+- **Tradeoff**: More files to manage in knowledge-assessment, but consistency across all grading workflows
+- **Affected skills**: `knowledge-assessment` (now outputs `<name>_grading.md` instead of `INDIVIDUAL.md`)
+- **Retained outputs**: `GRADINGS.md` and `CLASS.md` remain mandatory for knowledge-assessment
+
 ## 2026-03-27: Add mandatory exam-date parameter to knowledge-exam skill
 - **Choice**: Require teachers to specify the exam date when generating knowledge-check exams
 - **Reason**: Exams are created ahead of time for a specific planned date; using today's date by default led to mismatches between filename dates and actual exam dates
-- **Considered**: Keeping today's date as default, or making exam-date optional with aprompt
+- **Considered**: Keeping today's date as default, or making exam-date optional with a prompt
 - **Tradeoff**: One more required parameter, but ensures exam files are correctly dated from the start
 - **Accepted formats**: ISO date (YYYY-MM-DD), literal `today`, or literal `tomorrow`
 
@@ -89,9 +91,11 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Standalone invocation of knowledge-persistence was closing active GitHub issues because the skill had no constraint against it and the purpose language implied finality
 - **Considered**: Relying on agent judgment alone, or making knowledge-persistence completely silent on issues
 - **Tradeoff**: Skill is slightly more complex, but issue lifecycle ownership is now unambiguous
-- **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
-- **Reason**: Consistent output pattern across all grading skills (repograde, knowledge-assessment, projectgrade); per-student files are easier to manage and align with `<basename>_grading.md` convention
-- **Considered**: Keeping `INDIVIDUAL.md` for knowledge-assessment only, or using a different naming scheme
-- **Tradeoff**: More files to manage in knowledge-assessment, but consistency across all grading workflows
-- **Affected skills**: `knowledge-assessment` (now outputs `<name>_grading.md` instead of `INDIVIDUAL.md`)
-- **Retained outputs**: `GRADINGS.md` and `CLASS.md` remain mandatory for knowledge-assessment
+
+## 2026-04-01: Unify homework skills into per-lesson homework generation
+- **Choice**: Merge `/homework` and `/homework-improve` into a single `homework` skill with no command wrapper. The skill generates per-lesson `Hausübung.md` (singular) files inside `<YYYY-MM-DD>_<topic>` lesson directories, invoked directly from inside the class folder.
+- **Reason**: Two commands with confusing names, different output modes (read-only vs file-writing), and similar but divergent logic were unintuitive. Per-lesson files give students a single focused document instead of a cumulative file.
+- **Considered**: Keeping two commands with better names; making one smart command with a mode flag; keeping cumulative `Hausübungen.md` format
+- **Tradeoff**: Legacy `Hausübungen.md` files continue to exist in older class folders; grading skills must now support both formats (dual-source discovery)
+- **Removed**: `commands/homework.md`, `commands/homework-improve.md`, `skills/homework-improve/SKILL.md`
+- **Affected skills**: `homework` (rewritten), `repograde` (dual-source homework), `repogradesince` (dual-source homework)

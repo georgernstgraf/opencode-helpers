@@ -5,11 +5,14 @@ description: Grade student repositories filtering commits after a specified date
 # Grade Student Repositories (Date-Filtered)
 
 IMPORTANT: This command must be invoked from a local folder, NOT from within
-a Git repository. The `Hausübungen.md` file must exist in the current
-working directory (may be a symbolic link; follow symlinks when reading).
-Student repositories must already exist locally; this command will NOT clone
-them. If any student repository has uncommitted changes, the command will
-stop immediately.
+a Git repository. Homework assignments are discovered from two sources:
+- Legacy: a cumulative `Hausübungen.md` file in the current working directory
+  (may be a symbolic link; follow symlinks when reading)
+- Per-lesson: individual `Hausübung.md` files inside `<date>_<topic>`
+  subdirectories
+At least one homework source must exist. Student repositories must already
+exist locally; this command will NOT clone them. If any student repository has
+uncommitted changes, the command will stop immediately.
 
 ## Mandatory Date Parameter
 

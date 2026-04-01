@@ -28,8 +28,9 @@ Read this file carefully before making changes in affected areas.
 
 - Never assume grading commands run from within a Git repository - they operate from a local folder (CWD)
 - `projectgrade` is the exception: it MUST run from within a Git repository (the project being evaluated)
-- `Hausübungen.md` is always in the CWD, never inside a student repository
-- `Hausübungen.md` may be a symbolic link; follow symlinks when reading
+- `Hausübungen.md` (legacy) is always in the CWD, never inside a student repository
+- `Hausübungen.md` (legacy) may be a symbolic link; follow symlinks when reading
+- Per-lesson `Hausübung.md` files live inside `<date>_<topic>` directories; grading skills must discover both formats
 - Student repositories must already exist locally; never attempt to clone them
 - If any student repository has uncommitted changes, grading must stop immediately
 - All grading skills use `<name>_grading.md` pattern; `INDIVIDUAL.md` is deprecated
