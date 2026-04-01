@@ -1,17 +1,18 @@
-# Current State (2026-03-27)
+# Current State (2026-04-01)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-Added mandatory `exam-date` parameter to `knowledge-exam` skill.
+Added Issue Safety constraint to knowledge-persistence skill to prevent unintended issue closure.
 
 ## Completed (this cycle)
 
-- [x] Added `exam-date` parameter to knowledge-exam skill inputs
-- [x] Updated validation protocol to require exam-date and resolve it to ISO format
-- [x] Updated output expectations to use resolved exam-date in filenames
-- [x] Created GitHub issue #35 and documented the feature
+- [x] Softened knowledge-persistence purpose language ("at any checkpoint during or at the end")
+- [x] Added Step 6: Comment on Active Issue (traceability without closure)
+- [x] Added Issue Safety constraint to knowledge-persistence Constraints section
+- [x] Clarified skill boundary in issue-workflow finish mode
+- [x] Created GitHub issue #36
 
 ## Pending
 

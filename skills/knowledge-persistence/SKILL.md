@@ -14,8 +14,9 @@ metadata:
 
 This skill extracts the agent's accumulated understanding from the current
 session and persists it into a structured set of knowledge files on disk.
-Use this skill at the end of a productive session, or when explicitly asked
-to "save context", "persist knowledge", or "update knowledge file".
+Use this skill at any checkpoint during or at the end of a productive
+session, or when explicitly asked to "save context", "persist knowledge",
+or "update knowledge file".
 
 ## Target Structure
 
@@ -85,7 +86,17 @@ docs/ai/
 - Ensure the project-level `AGENTS.md` (in project root or `.opencode/`)
   contains the bootstrap instruction block. If it does not, append it.
 
-### 6. Confirmation
+### 6. Comment on Active Issue (if applicable)
+
+- If there is a known active GitHub issue for the current session, post a
+  brief comment summarizing what knowledge was persisted (files updated,
+  key additions). Example:
+  `gh issue comment 42 --body "Knowledge persisted: added 3 entries to CONVENTIONS.md, updated STATE.md."`
+- **NEVER close, reopen, or change the state of any issue.** This skill
+  only adds comments for traceability.
+- If no active issue is known, skip this step silently.
+
+### 7. Confirmation
 
 - After writing, list every file that was created or modified, and for each
   show the number of entries added, updated, or removed.
@@ -228,3 +239,9 @@ any new work unless the user explicitly says otherwise.
 - Total content per file should stay under 200 lines. If a file
   grows beyond that, split it by topic into sub-files within the
   same directory (e.g., `CONVENTIONS-api.md`, `CONVENTIONS-db.md`).
+- **Issue Safety**: This skill is a documentation-only operation. It
+  must NEVER close, reopen, or change the state of any GitHub issue.
+  Issue lifecycle management is the exclusive responsibility of the
+  `issue-workflow` skill's `finish` mode. When invoked standalone, this
+  skill may only create new issues (Escalation Rule) or comment on
+  existing ones.

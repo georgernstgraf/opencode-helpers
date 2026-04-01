@@ -89,6 +89,8 @@ Use this mode when the task is complete and the issue should be closed.
 - Comment on the issue with a final implementation report.
 - Persist all newly acquired session knowledge by also using the
   `knowledge-persistence` skill before finalizing the workflow.
+  Note: knowledge-persistence itself never closes issues. The issue
+  closure below is owned exclusively by this `finish` mode.
 - Review git status and remaining changes.
 - Create the final commit including the issue number.
 - Push the branch.

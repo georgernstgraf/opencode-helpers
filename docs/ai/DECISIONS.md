@@ -84,7 +84,11 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: One more required parameter, but ensures exam files are correctly dated from the start
 - **Accepted formats**: ISO date (YYYY-MM-DD), literal `today`, or literal `tomorrow`
 
-## 2026-03-23: Replace INDIVIDUAL.md with per-student grading files
+## 2026-04-01: Separate issue lifecycle from knowledge-persistence
+- **Choice**: Add an explicit Issue Safety constraint to `knowledge-persistence` prohibiting it from closing, reopening, or changing issue state; add a new "Comment on Active Issue" step for traceability without closure
+- **Reason**: Standalone invocation of knowledge-persistence was closing active GitHub issues because the skill had no constraint against it and the purpose language implied finality
+- **Considered**: Relying on agent judgment alone, or making knowledge-persistence completely silent on issues
+- **Tradeoff**: Skill is slightly more complex, but issue lifecycle ownership is now unambiguous
 - **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
 - **Reason**: Consistent output pattern across all grading skills (repograde, knowledge-assessment, projectgrade); per-student files are easier to manage and align with `<basename>_grading.md` convention
 - **Considered**: Keeping `INDIVIDUAL.md` for knowledge-assessment only, or using a different naming scheme
