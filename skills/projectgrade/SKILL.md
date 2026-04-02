@@ -21,8 +21,9 @@ Unlike `repograde`, this skill does NOT use homework assignments or `Hausübunge
 Student identification is derived exclusively from Git commit email addresses,
 then mapped to student names via the uploadthing database.
 
-This skill must use the `grading-shared` skill for address style, email formulas,
-database lookup, email JSON structure, and second-person address requirements.
+This skill relies on `grading-shared` for: address style, email formulas,
+second-person address rules, database lookup, email JSON structure,
+repository analysis protocol, and reporting protocol.
 
 ## Execution Context
 

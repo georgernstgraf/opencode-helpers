@@ -99,3 +99,16 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: Legacy `Hausübungen.md` files continue to exist in older class folders; grading skills must now support both formats (dual-source discovery)
 - **Removed**: `commands/homework.md`, `commands/homework-improve.md`, `skills/homework-improve/SKILL.md`
 - **Affected skills**: `homework` (rewritten), `repograde` (dual-source homework), `repogradesince` (dual-source homework)
+
+## 2026-04-02: Add /improve command for repository self-analysis
+- **Choice**: Create a planning-only `/improve` command that scans all commands and skills for inconsistencies, redundancies, stale references, and structural issues. Display findings to user without editing files.
+- **Reason**: Manual cross-file analysis is error-prone as the repository grows; a repeatable command ensures quality checks are on-demand
+- **Considered**: A lint-style script, automated CI checks, or relying on manual review
+- **Tradeoff**: Command depends on agent judgment rather than deterministic parsing, but catches semantic issues that scripts cannot
+
+## 2026-04-02: Factor shared grading protocols into grading-shared
+- **Choice**: Move repository analysis protocol, homework discovery protocol, bulk grading concurrency rules, German/UTF-8 constraints, and reporting examples from `repograde` and `repogradesince` into `grading-shared/SKILL.md`. Grading skills now reference `grading-shared` instead of duplicating ~120 lines each.
+- **Reason**: The two grading skills contained near-identical blocks for homework discovery (~120 lines), repository analysis (~40 lines), email/database rules (~10 lines), second-person examples (~20 lines), and German/UTF-8 constraints. Changes to shared logic had to be applied in two places.
+- **Considered**: Creating a separate `skills/homework-shared/` skill, or keeping duplication with clearer comments
+- **Tradeoff**: `grading-shared` becomes larger, but maintenance is single-source and inconsistencies are prevented
+- **Also fixed**: concurrency default standardized to 5 (was 4 vs 5), `repogradesince` duplicate Source 2 header renamed to Source 3, `knowledge-exam` command missing `exam-date` parameter, `/knowledge` usage examples corrected to `/knowledge-exam`

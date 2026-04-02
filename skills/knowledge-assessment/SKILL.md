@@ -18,14 +18,9 @@ communicating individual results.
 
 ## Dependencies
 
-This skill requires the `grading-shared` skill for:
-- Class-to-address-style mapping
-- Second-person address rules (Sie or Du)
-- Email generation protocol (greetings, closings, gender determination)
-- Database lookup patterns
-- Email JSON structure
-
-Reference `skills/grading-shared/SKILL.md` for centralized configuration.
+This skill relies on `grading-shared` for: address style, email formulas,
+second-person address rules, database lookup, email JSON structure,
+German/UTF-8 constraints, and reporting protocol.
 
 ## Execution Context
 
