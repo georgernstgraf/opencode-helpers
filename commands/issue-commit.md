@@ -15,4 +15,5 @@ Important constraints:
 
 - No commit is allowed without an associated GitHub issue number.
 - If no issue exists yet, create one before committing.
+- Persist session knowledge by invoking the `knowledge-persistence` skill before committing.
 - Keep the issue open after commenting, committing, and pushing.

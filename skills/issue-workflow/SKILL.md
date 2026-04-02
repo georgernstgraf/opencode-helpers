@@ -75,6 +75,9 @@ Use this mode when progress should be saved but the issue remains open.
   - what was completed
   - what remains
   - known risks, blockers, or follow-ups
+- Persist session knowledge by invoking the `knowledge-persistence` skill.
+  Note: knowledge-persistence never closes issues; it only adds comments
+  for traceability.
 - Review git status and staged/unstaged changes.
 - Create a commit that includes the issue number.
 - Push the branch.
