@@ -191,9 +191,16 @@ See the `issue-workflow` skill for the exact API commands. Key rules:
    - File paths and line numbers where changes should occur.
    - Patterns to follow from neighboring code or existing implementations.
    - The issue number for commit message reference.
-3. **Specify the expected output.** Tell the Task agent what to return:
+3. **Mandatory test execution.** The delegation prompt MUST instruct the
+   sub-agent to run the project's full test suite (unit tests, lint,
+   integration/instrumented tests — whatever the project requires). The
+   sub-agent must not report success until every test passes. If tests fail,
+   the sub-agent must fix the failures and re-run until green.
+4. **Specify the expected output.** Tell the Task agent what to return:
    - Files modified and a summary of changes.
-   - Whether the build passes.
+   - The exact test commands run and their full output (pass/fail per suite).
+   - Confirmation that ALL tests pass, or a list of failures if unable to
+     resolve them.
    - Any blockers or unexpected findings.
 4. **Do not micromanage.** State what needs to happen, not line-by-line how.
    Trust the Task agent to read the codebase and apply idiomatic patterns.
@@ -227,25 +234,44 @@ Implement sub-issue #<number>: <title>
 ## Verification
 <from sub-issue body>
 
+## Testing (MANDATORY — do not skip)
+You MUST run the project's full test suite after implementing your changes.
+Typical commands (use whichever the project requires):
+- Build + lint: `<build-command>`
+- Unit tests: `<test-command>`
+- Instrumented/integration tests: `<integration-test-command>`
+
+Run each command and report the full output. If ANY test fails, fix the
+failure and re-run until ALL tests pass. Do NOT report completion with
+failing tests.
+
 After completing the implementation:
-1. Ensure the build passes.
-2. Report which files were modified and what changed.
-3. Report any blockers or unexpected issues encountered.
+1. Run ALL tests and confirm every suite passes.
+2. Report the exact commands run and their results.
+3. Report which files were modified and what changed.
+4. Report any blockers or unexpected issues encountered.
 ```
 
 ### Result Collection
 
 After a Task agent completes:
 
-1. **Verify the result.** Check that the reported changes match the sub-issue
+1. **Verify test results.** Check the sub-agent's reported test output. If any
+   test suite was not run or reported failures, the sub-agent's work is
+   **rejected**. Re-delegate the same sub-issue with the failure details
+   appended, instructing the sub-agent to fix the failures and re-run all
+   tests. Do NOT proceed to step 2 until the sub-agent confirms all tests
+   pass.
+2. **Verify the result.** Check that the reported changes match the sub-issue
    tasks. If the Task agent reported a blocker, assess whether it can be
    resolved or requires user escalation.
-2. **Commit the changes.** Use the `issue-workflow` skill's `commit` or
+3. **Commit the changes.** Use the `issue-workflow` skill's `commit` or
    `finish` mode to commit with the sub-issue number.
-3. **Verify CI.** Run `gh run list --limit 3` to confirm CI passes. Do not
-   proceed to dependent sub-issues on a red CI.
-4. **Update progress.** Comment on the parent issue with completion status.
-5. **Proceed to the next sub-issue** in dependency order.
+4. **Verify CI.** Run `gh run list --limit 3` to confirm CI passes. If CI
+   fails, treat it as a test failure: re-delegate the sub-issue with the CI
+   failure details. Do not proceed to dependent sub-issues on a red CI.
+5. **Update progress.** Comment on the parent issue with completion status.
+6. **Proceed to the next sub-issue** in dependency order.
 
 ## Dependency Execution Rules
 
@@ -285,14 +311,17 @@ Work is not considered complete until ALL of the following are true:
 
 1. **All sub-issues are implemented** and their individual task checklists
    are complete.
-2. **The project builds successfully.** Run the standard build command for
+2. **Every sub-issue has all tests passing.** Each sub-agent must have run
+   the full test suite and reported green. No sub-issue is complete with
+   failing tests.
+3. **The project builds successfully.** Run the standard build command for
    the project (e.g., `./gradlew build`).
-3. **CI is green.** Verify with `gh run list --limit 3` and `gh run view <id>`.
+4. **CI is green.** Verify with `gh run list --limit 3` and `gh run view <id>`.
    Do not assume CI passes after a push — always check.
-4. **Knowledge is persisted.** Invoke the `knowledge-persistence` skill to
+5. **Knowledge is persisted.** Invoke the `knowledge-persistence` skill to
    update `docs/ai/` files with any new conventions, decisions, pitfalls,
    or architectural changes discovered during the session.
-5. **The parent issue is closed.** Use the `issue-workflow` skill's `finish`
+6. **The parent issue is closed.** Use the `issue-workflow` skill's `finish`
    mode to close the epic/parent issue with a final summary.
 
 ## Safety Constraints
@@ -303,8 +332,11 @@ Work is not considered complete until ALL of the following are true:
   existing GitHub issue.
 - **Always reference the issue number** in commit messages (e.g.,
   `feat: add session cards (#32)`).
+- **Never proceed past a failing test.** If a sub-agent reports test failures,
+  re-delegate until green. Tests are a hard gate, not a soft suggestion.
 - **Always verify CI after pushing.** A broken pipeline can go unnoticed for
-  many commits if not explicitly checked.
+  many commits if not explicitly checked. CI failure is equivalent to a test
+  failure — fix before proceeding.
 - **Do not push or close issues** if a step fails. Resolve the failure first.
 - **Do not delegate unclear requirements.** If the sub-issue description is
   ambiguous, clarify with the user before creating a Task agent prompt.

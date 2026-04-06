@@ -19,9 +19,6 @@ This agent operates with ZERO knowledge of the OpenClaw framework.
 - **ONLY skills from workspace skills/ directory** (this repository's skills)
 - Project-specific workflows only
 
-**Skill Usage Rule:**
-Only use skills available in this workspace's `skills/` directory. Ignore any OpenClaw bundled skills that may appear available.
-
 ## Project Identity
 
 Template repository providing standardized commands, skills, and knowledge
