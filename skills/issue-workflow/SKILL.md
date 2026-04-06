@@ -108,6 +108,59 @@ When creating an issue:
 - If a plan already exists, use it as the issue body or convert it into a short
   checklist.
 
+## Sub-Issues (Parent-Child Linking)
+
+GitHub supports proper parent-child issue relationships via the Sub-Issues REST
+API. Simply mentioning a parent issue number in the body text is **not
+sufficient** — it creates only a loose text reference, not a tracked
+relationship.
+
+### Creating a sub-issue
+
+1. Create the child issue with `gh issue create` as usual.
+2. Look up the **database `id`** (not the issue `number`) of the child:
+   ```bash
+   gh api repos/{owner}/{repo}/issues/CHILD_NUMBER --jq '.id'
+   ```
+3. Link it to the parent:
+   ```bash
+   gh api --method POST /repos/{owner}/{repo}/issues/PARENT_NUMBER/sub_issues \
+     --input - <<< '{"sub_issue_id": CHILD_DATABASE_ID}'
+   ```
+
+**Important:** The `sub_issue_id` field must be an **integer** (the internal
+database ID), not the human-readable issue number. Using `-f sub_issue_id=N`
+sends a string and causes a 422 validation error. Always use `--input` with a
+JSON body instead.
+
+### Listing sub-issues
+
+```bash
+gh api repos/{owner}/{repo}/issues/PARENT_NUMBER/sub_issues --jq '.[].number'
+```
+
+### Removing a sub-issue link
+
+```bash
+gh api --method DELETE /repos/{owner}/{repo}/issues/PARENT_NUMBER/sub_issue \
+  --input - <<< '{"sub_issue_id": CHILD_DATABASE_ID}'
+```
+
+### When to use sub-issues
+
+- When breaking down a parent epic into individually trackable work items.
+- When the parent issue should show a progress summary
+  (`sub_issues_summary.total` / `completed` / `percent_completed`).
+- Each sub-issue can be assigned, labeled, and closed independently; closing
+  all sub-issues does **not** auto-close the parent.
+
+### Avoiding concurrent-link conflicts
+
+When linking multiple sub-issues in rapid succession, avoid sending all
+requests in parallel — the API uses sequential priority positions and will
+return `422 Priority has already been taken`. Link them sequentially or with a
+small delay between calls.
+
 ## Reporting Guidance
 
 Issue comments should be compact but useful.

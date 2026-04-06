@@ -3,10 +3,6 @@
 Coding patterns, naming rules, and style agreements for this project.
 Follow these without question. Do not deviate unless explicitly told.
 
-## Architecture
-
-<!-- e.g., "Use layered architecture: presentation → service → repository" -->
-
 ## File Layout
 
 <!-- e.g., "One class per file, file name matches class name" -->

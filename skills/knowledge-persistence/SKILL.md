@@ -28,6 +28,7 @@ explicitly outdated or contradicted by newer information.
 docs/ai/
 ├── HANDOFF.md
 ├── DECISIONS.md
+├── ARCHITECTURE.md
 ├── CONVENTIONS.md
 ├── PITFALLS.md
 ├── DOMAIN.md
@@ -60,7 +61,19 @@ docs/ai/
 - Write only facts. One item per bullet. No preamble, no commentary,
   no summaries at the top of the file.
 
-### 4. Write `HANDOFF.md`
+### 4. Rewrite `ARCHITECTURE.md` (if structural changes occurred)
+
+- Determine whether the session introduced any structural changes:
+  new/removed/renamed commands, skills, knowledge files, or significant
+  changes to data flows, dependencies, or component relationships.
+- If no structural changes occurred, skip this step and leave
+  `ARCHITECTURE.md` unchanged.
+- If structural changes did occur, **overwrite** `docs/ai/ARCHITECTURE.md`
+  with the current system snapshot using the template below.
+- Like STATE.md, this file is overwritten (not appended) because it
+  represents a point-in-time structural map, not a chronological log.
+
+### 5. Write `HANDOFF.md`
 
 - Check the task list maintained during this session.
 - If any tasks are still [PENDING] or [IN PROGRESS], write them to
@@ -81,12 +94,12 @@ docs/ai/
 - This keeps HANDOFF.md small and actionable while large work is
   properly tracked in GitHub.
 
-### 5. Update `AGENTS.md`
+### 6. Update `AGENTS.md`
 
 - Ensure the project-level `AGENTS.md` (in project root or `.opencode/`)
   contains the bootstrap instruction block. If it does not, append it.
 
-### 6. Comment on Active Issue (if applicable)
+### 7. Comment on Active Issue (if applicable)
 
 - If there is a known active GitHub issue for the current session, post a
   brief comment summarizing what knowledge was persisted (files updated,
@@ -96,7 +109,7 @@ docs/ai/
   only adds comments for traceability.
 - If no active issue is known, skip this step silently.
 
-### 7. Confirmation
+### 8. Confirmation
 
 - After writing, list every file that was created or modified, and for each
   show the number of entries added, updated, or removed.
@@ -208,6 +221,46 @@ Current status as of YYYY-MM-DD.
 <what the next agent should start with>
 ```
 
+### ARCHITECTURE.md
+
+Living structural map of the system. Overwritten on every persistence
+run when structural changes occurred. If nothing structural changed,
+the file is left untouched.
+
+```markdown
+# Architecture
+
+Living structural map of the system as of YYYY-MM-DD.
+Overwritten when structural changes occur during a session.
+
+## Overview
+<one-paragraph description of what this system is and how it is organized>
+
+## Commands (`commands/`)
+| Command | Purpose | Delegates to |
+|---------|---------|-------------|
+| `/name`  | <what it does> | `skills/<name>` or "none" |
+
+## Skills (`skills/`)
+| Skill | Purpose | Used by |
+|-------|---------|---------|
+| `name` | <what it does> | `/<command>` |
+
+## Knowledge Files (`docs/ai/`)
+| File | Purpose | Update mode |
+|------|---------|------------|
+| HANDOFF.md | Open tasks for next session | Overwrite |
+| DECISIONS.md | Chronological record of choices | Append |
+| ARCHITECTURE.md | Living structural map | Overwrite |
+| CONVENTIONS.md | Ongoing rules to follow | Append |
+| PITFALLS.md | Hard-won failure knowledge | Append |
+| DOMAIN.md | Business/domain rules | Append |
+| STATE.md | Current project status | Overwrite |
+
+## Data Flows
+- <source> → <target>: <what flows and when>
+```
+
 ## AGENTS.md Bootstrap Block
 
 Ensure this block exists in the project's `AGENTS.md`. If `AGENTS.md`
@@ -220,9 +273,10 @@ Before starting any task, read the following files in order:
 1. `docs/ai/HANDOFF.md` ← **read first, act on it**
 2. `docs/ai/CONVENTIONS.md`
 3. `docs/ai/DECISIONS.md`
-4. `docs/ai/PITFALLS.md`
-5. `docs/ai/STATE.md`
-6. `docs/ai/DOMAIN.md` (if task involves business logic)
+4. `docs/ai/ARCHITECTURE.md`
+5. `docs/ai/PITFALLS.md`
+6. `docs/ai/STATE.md`
+7. `docs/ai/DOMAIN.md` (if task involves business logic)
 
 If `HANDOFF.md` contains open tasks, complete them before starting
 any new work unless the user explicitly says otherwise.
@@ -232,10 +286,15 @@ any new work unless the user explicitly says otherwise.
 
 - Write only verified facts from the session. Do not speculate.
 - Keep entries atomic: one fact, one bullet.
-- Respect existing content. Merge, do not overwrite (except STATE.md).
+- Respect existing content. Merge, do not overwrite (except STATE.md and
+  ARCHITECTURE.md, which are overwrite-on-change).
 - If unsure whether something belongs in DECISIONS vs CONVENTIONS,
   apply this test: "Is this a one-time choice (DECISIONS) or an
   ongoing rule to follow (CONVENTIONS)?"
+- If unsure whether something belongs in DECISIONS vs ARCHITECTURE,
+  apply this test: "Is this a chronological record of a choice
+  (DECISIONS) or a structural description of the current system
+  (ARCHITECTURE)?"
 - Total content per file should stay under 200 lines. If a file
   grows beyond that, split it by topic into sub-files within the
   same directory (e.g., `CONVENTIONS-api.md`, `CONVENTIONS-db.md`).
