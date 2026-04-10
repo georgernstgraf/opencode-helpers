@@ -20,6 +20,7 @@ Read this file carefully before making changes in affected areas.
 - When removing or renaming a skill, update every dependent command, agent, README entry, and knowledge file in the same change or stale workflow references remain behind
 - `~/.opencode/skills` is a symlink to the repo's `skills/` directory; editing one location updates both automatically
 - When refactoring shared content into `grading-shared`, keep grading-specific logic (date filtering, homework weighting) in the consuming skill — only truly shared protocols belong in `grading-shared`
+- The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command
 
 ## Database
 
@@ -27,7 +28,7 @@ Read this file carefully before making changes in affected areas.
 
 ## Grading Workflow
 
-- Never assume grading commands run from within a Git repository - they operate from a local folder (CWD)
+- Never assume grading runs from within a Git repository - it operates from a local folder (CWD)
 - `projectgrade` is the exception: it MUST run from within a Git repository (the project being evaluated)
 - `Hausübungen.md` (legacy) is always in the CWD, never inside a student repository
 - `Hausübungen.md` (legacy) may be a symbolic link; follow symlinks when reading
@@ -36,6 +37,8 @@ Read this file carefully before making changes in affected areas.
 - If any student repository has uncommitted changes, grading must stop immediately
 - All grading skills use `<name>_grading.md` pattern; `INDIVIDUAL.md` is deprecated
 - `knowledge-assessment` outputs `GRADINGS.md` and `CLASS.md` (both mandatory) plus per-student `<name>_grading.md` files
+- Email bodies must be plain ASCII text — no Markdown headers, bold, tables, or lists in email JSON bodies; only code blocks with backtick fences are allowed
+- The `repograde` skill is invoked directly (no command wrapper); it handles full-history and date-filtered grading in one skill
 
 ## Project Configuration
 

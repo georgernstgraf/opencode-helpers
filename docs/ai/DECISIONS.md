@@ -112,3 +112,13 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Creating a separate `skills/homework-shared/` skill, or keeping duplication with clearer comments
 - **Tradeoff**: `grading-shared` becomes larger, but maintenance is single-source and inconsistencies are prevented
 - **Also fixed**: concurrency default standardized to 5 (was 4 vs 5), `repogradesince` duplicate Source 2 header renamed to Source 3, `knowledge-exam` command missing `exam-date` parameter, `/knowledge` usage examples corrected to `/knowledge-exam`
+
+## 2026-04-10: Merge repograde and repogradesince into unified repograde skill
+
+- **Choice**: Remove `/repograde` and `/repogradesince` commands and the `repogradesince` skill entirely. Merge all logic into a single `repograde` skill that handles both full-history and date-filtered grading. The skill parses the user's request to determine mode (single-repo/bulk, filtered/unfiltered) instead of relying on separate command wrappers.
+- **Reason**: Two commands with similar but divergent logic, plus a separate skill duplicating ~80% of repograde, created maintenance burden. A single skill with clear mode dispatch is simpler and less error-prone.
+- **Considered**: Keeping two skills with shared base; keeping commands as thin wrappers with unified skill
+- **Tradeoff**: The `repograde` skill is now larger and handles more modes, but there is a single source of truth for repository grading
+- **Removed**: `commands/repograde.md`, `commands/repogradesince.md`, `skills/repogradesince/SKILL.md`
+- **Also added**: Plan presentation before grading starts (homework discovered, repos to grade, output files)
+- **Also added**: Email body format rules in `grading-shared` — plain ASCII text with code blocks as only allowed Markdown; praise guidelines (subtle, understated); structured email templates for homework and knowledge-check emails

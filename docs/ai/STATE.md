@@ -1,27 +1,24 @@
-# Current State (2026-04-02)
+# Current State (2026-04-10)
 
 Project status snapshot. This file is overwritten on every save.
 
 ## Current Focus
 
-/improve command and grading-shared refactoring (issue #18).
+Unified repograde skill + email body format standardization.
 
 ## Completed (this cycle)
 
-- [x] Created `commands/improve.md` — planning-only analysis command
-- [x] Fixed concurrency default (standardized to 4 across all files)
-- [x] Fixed `repogradesince/SKILL.md` duplicate Source 2 header → Source 3
-- [x] Fixed `commands/knowledge-exam.md` missing `exam-date` parameter
-- [x] Fixed `commands/knowledge-exam.md` usage examples (`/knowledge` → `/knowledge-exam`)
-- [x] Factored shared protocols into `grading-shared/SKILL.md` (repository analysis, homework discovery, bulk grading, reporting, German/UTF-8)
-- [x] Rewrote `repograde/SKILL.md` to reference grading-shared (removed ~200 lines of duplication)
-- [x] Rewrote `repogradesince/SKILL.md` to reference grading-shared (removed ~200 lines of duplication)
-- [x] Trimmed boilerplate in `projectgrade` and `knowledge-assessment`
-- [x] Updated knowledge files (CONISIONS, DECISIONS, PITFALLS, STATE)
+- [x] Added "Email Body Format" section to `grading-shared/SKILL.md`: plain ASCII text rule, code blocks as only exception, homework email structure, knowledge-check email structure, praise guidelines (subtle, understated), formal and informal examples
+- [x] Merged `repogradesince` skill logic into `repograde/SKILL.md` (date filtering, homework completion weighting, CLASS.md generation)
+- [x] Removed `commands/repograde.md` and `commands/repogradesince.md`
+- [x] Removed `skills/repogradesince/` directory
+- [x] Added plan presentation requirement to `repograde` skill (before grading starts)
+- [x] Updated `knowledge-assessment/SKILL.md` with email body format reference
+- [x] Updated all knowledge files (ARCHITECTURE, CONVENTIONS, DECISIONS, PITFALLS, DOMAIN, STATE)
 
 ## Pending
 
-- [ ] Update README.md
+None
 
 ## Blockers
 
@@ -29,4 +26,4 @@ None
 
 ## Next Session Suggestion
 
-Test the /improve command to verify it produces useful analysis output.
+Test the unified `repograde` skill to verify it correctly handles all four modes (single-repo/bulk x filtered/unfiltered) and produces plain-text email bodies.

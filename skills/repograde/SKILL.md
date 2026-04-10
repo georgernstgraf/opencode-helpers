@@ -1,6 +1,6 @@
 ---
 name: repograde
-description: Grade student repositories in single-repo or bulk mode
+description: Grade student repositories with optional date filtering in single-repo or bulk mode
 license: MIT
 compatibility: opencode
 metadata:
@@ -13,14 +13,15 @@ metadata:
 ## Purpose
 
 This skill is the canonical workflow for grading student Git repositories.
-It absorbs the former `repo-report` analysis behavior into a grading-specific
-workflow so repository inspection, homework matching, report writing, and email
-payload generation live in one place.
+It handles both full-history grading and date-filtered grading (commits
+from a specified cutoff date onwards) in a single unified workflow.
 
 This skill relies on `grading-shared` for: address style, email formulas,
-second-person address rules, database lookup, email JSON structure, repository
-analysis protocol, homework discovery protocol, bulk grading concurrency,
-German/UTF-8 constraints, and reporting protocol.
+second-person address rules, database lookup, email JSON structure, name parsing
+from repository basename (CRITICAL: last word = first name, everything before it
+= last name), repository analysis protocol, homework discovery protocol, bulk
+grading concurrency, German/UTF-8 constraints, JSON escaping rules, email body
+format, praise guidelines, and reporting protocol.
 
 Derive output filenames from the repository basename, while using the provided
 repository path verbatim to locate the repository.
@@ -36,67 +37,109 @@ contain a `_class` symlink pointing to the corresponding class folder in the
 teaching repository (e.g., `_class -> /home/georg/gitm/GRG-SWP/2ahwii/`).
 This symlink provides access to homework assignments and lesson materials.
 
-The skill grades student Git repositories by:
-1. Discovering homework assignments from multiple sources using the
-   `grading-shared` Homework Discovery Protocol
-2. Accessing student repositories at the paths provided (these already exist;
-   do NOT clone them)
-3. Using `git pull` to verify the latest version is checked out
-4. Inspecting the repository content for grading
-
 ## Input
 
-- `$1` (optional): explicit repository path
+Arguments are inferred from the user's request. Parse the user message to
+determine the mode:
 
-Behavior:
+| User provides | Mode |
+|---------------|------|
+| Nothing (just "grade" or similar) | Bulk mode, all commits |
+| Repository path only | Single-repo, all commits |
+| Date only (ISO format YYYY-MM-DD) | Bulk mode, filtered commits |
+| Date + repository path | Single-repo, filtered commits |
 
-- If exactly one argument is provided, treat it as an explicit repository path
-  and use it verbatim.
-- If no argument is provided, run bulk mode for multiple student repositories in
-  the current folder.
+### Date Validation
+
+If a date argument is detected, it MUST strictly follow ISO 8601:
+
+```
+YYYY-MM-DD
+```
+
+Valid: `2025-03-15`, `2024-12-01`
+Invalid: `2025-3-15`, `15-03-2025`, `2025/03/15`, `2025-03`
+
+If the date is invalid, STOP IMMEDIATELY with error:
+"Invalid date format: '[input]'. Expected ISO date format: YYYY-MM-DD (e.g., 2025-03-15)"
+
+### Date Filtering Logic
+
+When a date is provided:
+1. Parse the cutoff date as `YYYY-MM-DDT00:00:00` (midnight at start of day)
+2. Only inspect commits where `commit_date >= cutoff_date`
+3. Use `git log --after="YYYY-MM-DD"` to filter commits
+4. A homework is RELEVANT if its date is on or after the cutoff, or if it
+   spans a period that includes the cutoff
+
+## Plan Presentation (MANDATORY)
+
+Before starting any grading work, present a plan to the user. The plan MUST
+include:
+
+1. **Mode**: Single-repo or Bulk mode
+2. **Date filter**: If applicable, show the cutoff date; otherwise "All commits"
+3. **Homework discovered**: List all homework assignments found (date, topic,
+   source location). This requires running the full `grading-shared` Homework
+   Discovery Protocol first.
+4. **Repositories to grade**:
+   - Single-repo: show the path and basename
+   - Bulk: list all discovered student repositories (basename only), with count
+5. **Output files** that will be generated:
+   - Single-repo: `<basename>_grading.md`, `<basename>_email.json`
+   - Bulk: per-repo files + `GRADINGS.md` + shared `EMAIL.json`
+   - Date-filtered bulk also: `CLASS.md`
+
+Display this plan and proceed immediately without waiting for confirmation.
 
 ## Modes
 
 ### 1. Single-repo mode
 
-Use this mode when `$1` is present.
+Use this mode when a repository path is provided (with or without a date).
 
 Protocol:
 
-1. Treat `$1` as the target repository path exactly as passed.
-2. Navigate to the student repository at path $1.
+1. Treat the repository path as provided verbatim.
+2. Navigate to the student repository.
 3. Follow the `grading-shared` Pre-Grading Verification.
-4. Derive the output stem from `basename "$1"` or equivalent.
+4. Derive the output stem from `basename` of the repository path.
 5. Discover homework assignments using the `grading-shared` Homework Discovery
    Protocol and build a unified homework list. If no homework is found, stop
    immediately. (Homework files are NEVER inside the student repository.)
-6. Follow the `grading-shared` Repository Analysis Protocol to inspect the
+6. If a date filter is active, filter commits to only those at or after the
+   cutoff date.
+7. Follow the `grading-shared` Repository Analysis Protocol to inspect the
    repository history and actual commit content, not just commit messages.
-7. Evaluate work against the homework periods and produce an updated grading
+8. Evaluate work against the homework periods and produce an updated grading
    result.
-8. Do not write `INDIVIDUAL.md`.
-9. Do not write `CLASS.md`.
-10. Do not modify shared `EMAIL.json`.
-11. Generate `<basename>_grading.md` as the repository grading report.
-12. Generate `<basename>_email.json` as a JSON array with exactly one object,
-    following `grading-shared` Email JSON Structure.
+9. Do not write `INDIVIDUAL.md`.
+10. Do not write `CLASS.md`.
+11. Do not modify shared `EMAIL.json`.
+12. Generate `<basename>_grading.md` as the repository grading report.
+13. Generate `<basename>_email.json` as a JSON array with exactly one object,
+    following `grading-shared` Email JSON Structure and Email Body Format.
 
 ### 2. Bulk mode
 
-Use this mode when no argument is provided.
+Use this mode when no repository path is provided (with or without a date).
 
 Protocol:
 
 1. Enumerate student repositories following the `grading-shared` Bulk Grading
    Protocol directory exclusion rules.
-2. Follow the `grading-shared` Bulk Grading    Protocol for concurrency (default
+2. Follow the `grading-shared` Bulk Grading Protocol for concurrency (default
    max 5, ~3 second delay between runs).
 3. Each subagent writes only `<basename>_grading.md` plus
-    `<basename>_email.json`.
+    `<basename>_email.json`, following `grading-shared` Email JSON
+    Structure, JSON Escaping Rules, and Email Body Format.
 4. Subagents must never write shared `EMAIL.json`.
 5. Continue until all repositories are processed.
-6. After all subagents finish, aggregate per-repo `*_email.json` files into
-   shared `EMAIL.json` following `grading-shared` rules.
+6. After all subagents finish:
+   - Generate `GRADINGS.md` with class-wide overview table
+   - If a date filter is active, also generate `CLASS.md`
+   - Aggregate per-repo `*_email.json` files into shared `EMAIL.json`
+     following `grading-shared` rules, including JSON Escaping Rules
 
 ## Homework Matching
 
@@ -113,14 +156,86 @@ After repository analysis, map the detected work onto the unified homework list.
 
 3. **Build completion status for ALL homeworks**:
    - List all homeworks in the unified list
-   - Mark each as completed (✅) or missing (❌)
+   - Mark each as completed or missing
+
+### Matching with Date Filter
+
+When a cutoff date is active:
+
+| Cutoff Date | Homework Date | Match? | Reason |
+|-------------|---------------|--------|--------|
+| 2026-02-10 | 2026-02-18 | YES | Homework assigned after cutoff |
+| 2026-02-10 | 2026-02-05 | NO | Homework before cutoff period |
+| 2026-02-10 | 2026-02-10 | YES | Exact match |
+| 2026-02-10 | 2026-03-01 | YES | Homework within grading period |
 
 ### Important Considerations
 
 - **Parse ALL entries before matching** — never stop at the first entry
 - **Convert all dates to ISO format** — use the same format for comparison
-- Summarize coverage, diligence, and missing or late work per assignment.
-- Base judgments on actual code and text changes, not only on commit messages.
+- **Include homework from the cutoff date onwards** — not just commits
+- Clearly indicate in the report whether grading covers all commits or
+  from a specific date onwards
+- Base judgments on actual code and text changes, not only on commit messages
+
+## Homework Completion Weighting (CRITICAL)
+
+This section is essential for fair grading. A student who completes only a
+subset of assigned homework must receive a proportionally reduced score.
+
+### Completion Ratio Calculation
+
+For each homework assignment in the grading period:
+
+1. Identify ALL homework assignments from the unified homework list that fall
+   within the grading period (all, or from cutoff date onwards if filtered).
+2. For each assignment, determine if the student has substantive work
+   (not just superficial edits).
+3. Calculate the completion ratio:
+
+```
+completion_ratio = completed_assignments / total_assignments
+```
+
+### Scoring Impact
+
+The final score MUST reflect incomplete homework proportionally:
+
+1. Calculate a base score from quality of completed work (0-100).
+2. Apply completion weighting:
+
+```
+weighted_score = base_score * completion_ratio
+```
+
+**Example of correct weighting:**
+
+| Assigned | Completed | Base Score | Weighted Score |
+|----------|-----------|------------|----------------|
+| 3 | 3 | 90 | 90 (90 x 1.0) |
+| 3 | 2 | 90 | 60 (90 x 0.67) |
+| 3 | 1 | 95 | 32 (95 x 0.33) |
+
+**Anti-Pattern (DO NOT DO THIS):**
+Assigning 90% to a student who only completed 1 of 3 assignments just because
+that one assignment was excellent.
+
+### Missing Assignment Documentation
+
+In the grading report, explicitly list:
+
+- All assigned homeworks for the period
+- Which were completed (with brief summary)
+- Which were missing or incomplete
+- Abdeckungsquote (completion ratio as percentage)
+
+### Edge Cases
+
+- **No homeworks in period**: Report clearly, grade based on available work only.
+- **Empty repository**: Assign 0 with clear explanation.
+- **Late submissions**: Note separately; may count at reduced weight per
+  instructor policy. Students have one week to complete homework from the
+  assignment date.
 
 ## Outputs
 
@@ -128,17 +243,24 @@ After repository analysis, map the detected work onto the unified homework list.
 
 - `<basename>_grading.md` in German
 - `<basename>_email.json` as a one-entry JSON array following `grading-shared`
-  rules
+  rules and Email Body Format
 
-### Bulk mode
+### Bulk mode (all commits)
 
 - Per-repository `<basename>_grading.md` files in German
 - Per-repository `<basename>_email.json` files following `grading-shared`
-  rules
-- `GRADINGS.md` with a comprehensive table of all students ordered
-  alphabetically by name, including repository identifiers and final scores
-- Shared `EMAIL.json`, created only by the master workflow after all per-repo
-  outputs are finished
+  rules and Email Body Format
+- `GRADINGS.md` with class-wide overview table
+- Shared `EMAIL.json`, created only after all per-repo outputs are finished
+
+### Bulk mode (date-filtered)
+
+- Per-repository `<basename>_grading.md` files in German
+- Per-repository `<basename>_email.json` files following `grading-shared`
+  rules and Email Body Format
+- `GRADINGS.md` with class-wide overview table (includes cutoff date in header)
+- `CLASS.md` with anonymized class-wide patterns and teacher recommendations
+- Shared `EMAIL.json`, created only after all per-repo outputs are finished
 
 ## GRADINGS.md Generation (Bulk Mode Only)
 
@@ -153,6 +275,7 @@ as a class-wide overview table.
    final score (`Endbewertung`)
 2. Ordered alphabetically by student name, NOT by grade
 3. Written in German
+4. If date-filtered, include the cutoff date in the header
 
 ### Example Structure
 
@@ -166,19 +289,61 @@ as a class-wide overview table.
 | Schmidt Anna | 91/100 |
 ```
 
+## CLASS.md Generation (Date-Filtered Bulk Mode Only)
+
+When a date filter is active in bulk mode, also generate `CLASS.md` as an
+anonymized class summary for the teacher.
+
+### Content Requirements
+
+`CLASS.md` MUST include:
+
+1. **Overview**: Summary of the grading period (cutoff date, number of
+   repositories graded)
+2. **Common Patterns**: Frequently observed strengths across submissions
+3. **Common Weaknesses**: Recurring issues or mistakes
+4. **Homework Completion Statistics**: Aggregate completion ratios
+5. **Teacher Recommendations**: Actionable suggestions for addressing issues
+
+### Anonymity Rules
+
+- NEVER include student names or repository names that identify individuals
+- Use generic terms: "einige Schüler", "viele Abgaben", "vereinzelt"
+- Focus on patterns, not individuals
+- This file may be committed to a public repository
+
+## Reporting Expectations
+
+Reports MUST follow `grading-shared` Reporting Protocol and additionally include:
+
+- If date-filtered: clear indication of the cutoff date
+- **Hausübungs-Abdeckung section**: Complete list of all assigned homeworks
+  with completion status and Abdeckungsquote percentage
+- **Weighted final evaluation**: Base score x completion ratio
+- Final evaluation with `Endbewertung: XX/100` (the weighted score, not base)
+
+## Email Body
+
+Every `<basename>_email.json` body MUST follow the `grading-shared` Email Body
+Format section exactly: plain ASCII text with code blocks as the only allowed
+Markdown, structured per the homework grading email template, with subtle
+praise per the Praise Guidelines.
+
 ## Constraints
 
 - This skill must NOT be invoked from within a Git repository.
 - This skill must NOT clone student repositories; use `git pull` to update.
 - If uncommitted changes exist in any student repository, STOP IMMEDIATELY.
+- If a date is provided and invalid, STOP IMMEDIATELY.
 - Do not commit changes or modify repository history.
 - All grading content follows `grading-shared` rules (German, second-person,
-  UTF-8 umlauts, email structure, missing email handling).
-- In single-repo mode, stop if no homework source is found from any location.
-- In single-repo mode, never write `INDIVIDUAL.md` or `CLASS.md`.
-- In single-repo mode, never modify shared `EMAIL.json`.
-- In bulk mode, generate `GRADINGS.md` with class-wide overview table after all
-  per-repo grading is complete.
+  UTF-8 umlauts, email structure, email body format, missing email handling).
+- In single-repo mode, stop if no homework source is found.
+- In single-repo mode, never write `INDIVIDUAL.md`, `CLASS.md`, or shared
+  `EMAIL.json`.
+- In bulk mode, generate `GRADINGS.md` after all per-repo grading is complete.
+- In date-filtered bulk mode, also generate `CLASS.md`.
 - In bulk mode, generate shared `EMAIL.json` only after all per-repo outputs
   are complete.
 - Use proper quoting for paths with spaces.
+- Present the plan to the user BEFORE starting any grading work.

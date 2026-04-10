@@ -170,7 +170,9 @@ Additional requirements specific to knowledge-check:
 - Each object must contain exactly these fields (see `grading-shared` for structure):
   - `mailto`: recipient email address
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
-  - `body`: the student's individual assessment text (from `<name>_grading.md`)
+  - `body`: the student's individual assessment text, formatted as plain ASCII
+    text following the `grading-shared` Email Body Format section for
+    knowledge-check emails
 - Ensure every reported score inside the email body is consistent with the
   authoritative total achievable points from the solutions file.
 - Use greeting and closing formulas from `grading-shared` based on class
@@ -180,6 +182,9 @@ Additional requirements specific to knowledge-check:
   note near the end of the body, before the closing formula.
 - If gender cannot be determined, use neutral fallback greeting per
   `grading-shared` protocol and flag in the grading file for manual review.
+- Email bodies MUST follow the `grading-shared` Email Body Format: plain ASCII
+  text, no Markdown formatting except code blocks with backtick fences. Follow
+  the knowledge-check email structure defined there.
 
 ### 5. Constraints
 
@@ -200,7 +205,7 @@ Additional requirements specific to knowledge-check:
   still conveying warmth, respect, and genuine appreciation for the student's
   effort.
 - Follow email constraints from `grading-shared` (greeting, closing, trailing
-  comma, paragraph spacing).
+  comma, paragraph spacing, email body format, praise guidelines).
 - If any point-total consistency error appears between the solutions file,
   grading files, or `EMAIL.json`, stop immediately instead of generating or
   continuing with inconsistent output.

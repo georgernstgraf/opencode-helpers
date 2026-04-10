@@ -44,20 +44,67 @@ When processing student data:
 3. Check if class is in the informal list above
 4. Apply corresponding address style throughout all grading content
 
+### Name Parsing from Repository Basename (CRITICAL)
+
+Repository directory names follow the convention `Lastname Firstname`. The **last
+word** is always the first name; **everything before it** is the last name. This
+applies to compound last names as well.
+
+**Parsing rule:** Split the basename on spaces → `parts[0:-1]` = last name,
+`parts[-1]` = first name.
+
+| Repository Basename | Last Name | First Name |
+|---------------------|-----------|------------|
+| `Umlauf Ellen` | Umlauf | Ellen |
+| `Quintero Castañeda Nicolas` | Quintero Castañeda | Nicolas |
+| `Prodanovic Jovana` | Prodanovic | Jovana |
+| `Wahringer Tobias` | Wahringer | Tobias |
+| `Leeb Samuel` | Leeb | Samuel |
+| `Zore Elsner Marija` | Zore Elsner | Marija |
+
+**Wrong vs Correct — Formal salutation:**
+```
+❌ Sehr geehrte Frau Ellen,        ← used first name as last name
+✅ Sehr geehrte Frau Umlauf,       ← correct last name
+
+❌ Sehr geehrter Herr Nicolas,      ← used first name as last name
+✅ Sehr geehrter Herr Quintero Castañeda,  ← correct compound last name
+
+❌ Sehr geehrter Herr Tobias,       ← used first name as last name
+✅ Sehr geehrter Herr Wahringer,    ← correct last name
+```
+
+**Wrong vs Correct — Informal salutation:**
+```
+❌ Liebe Umlauf,                    ← used last name as first name
+✅ Liebe Ellen,                     ← correct first name
+
+❌ Lieber Quintero Castañeda,       ← used last name as first name
+✅ Lieber Nicolas,                  ← correct first name
+```
+
 ## Email Generation Protocol
 
 ### Greeting Formulas
 
-**Formal Address:**
+**Formal Address** (uses **last name** — see Name Parsing section above):
 - Female: `Sehr geehrte Frau [Last Name],`
 - Male: `Sehr geehrter Herr [Last Name],`
 - Unknown gender: `Guten Tag [First Name] [Last Name],`
 
-**Informal Address:**
+**Informal Address** (uses **first name** — the last word in the basename):
 - Any gender: `Liebe [First Name],` or `Lieber [First Name],`
 - Female preference: `Liebe [First Name],`
 - Male preference: `Lieber [First Name],`
 - Unknown gender: `Guten Tag [First Name] [Last Name],`
+
+**Concrete examples:**
+
+| Basename | Gender | Formal Greeting | Informal Greeting |
+|----------|--------|-----------------|-------------------|
+| `Umlauf Ellen` | F | `Sehr geehrte Frau Umlauf,` | `Liebe Ellen,` |
+| `Quintero Castañeda Nicolas` | M | `Sehr geehrter Herr Quintero Castañeda,` | `Lieber Nicolas,` |
+| `Wahringer Tobias` | M | `Sehr geehrter Herr Wahringer,` | `Lieber Tobias,` |
 
 ### Closing Formulas
 
@@ -77,7 +124,10 @@ Lieben Gruß,
 
 ### Gender Determination
 
-When gender is not clear from first name:
+Gender is determined from the **first name** (the last word in the repository
+basename). Do NOT use the full basename string for gender lookup.
+
+When gender is not clear from the first name:
 1. Use class records or submission wording as additional context
 2. If still uncertain, use neutral fallback: `Guten Tag [First Name] [Last Name],`
 3. Keep class-based closing formula (formal or informal based on class)
@@ -222,6 +272,39 @@ the database, the workflow MUST stop before generating the file.
 - Include closing formula at end
 - UTF-8 encoding with natural German umlauts (ä, ö, ü, ß)
 
+### JSON Escaping Rules (CRITICAL)
+
+The `body` field often contains multi-paragraph German text with newlines, quotes,
+and special characters. **Improper escaping is the most common cause of broken
+email JSON files.** The following rules MUST be followed:
+
+1. **All JSON string values must be valid JSON.** Newlines inside the `body`
+   field must use the escaped sequence `\n` (two characters: backslash, `n`), NOT
+   literal line breaks. Double quotes must be escaped as `\"`, backslashes as `\\`,
+   and tabs as `\t`.
+
+2. **No literal newlines inside JSON string values.** A file like this is INVALID:
+   ```json
+   "body": "Sehr geehrte Frau Huber,
+
+   Sie haben die Aufgabe gut gelöst."
+   ```
+   The correct form is:
+   ```json
+   "body": "Sehr geehrte Frau Huber,\n\nSie haben die Aufgabe gut gelöst."
+   ```
+
+3. **Validate before writing.** Every `*_email.json` file must parse successfully
+   with a standard JSON parser. After writing, verify with:
+   ```bash
+   python3 -c "import json; json.load(open('FILE_email.json'))"
+   ```
+
+4. **Use programmatic JSON writing.** When writing `*_email.json` or `EMAIL.json`,
+   prefer using a proper JSON serializer (e.g., `json.dump()` in Python) over
+   string interpolation or template construction. This guarantees correct escaping
+   of all special characters automatically.
+
 ## Constraints
 
 - All grading content must be written in German
@@ -238,7 +321,7 @@ the database, the workflow MUST stop before generating the file.
 ## Repository Analysis Protocol
 
 Shared pre-grading verification and analysis steps for all repository-based
-grading skills (`repograde`, `repogradesince`, `projectgrade`).
+grading skills (`repograde`, `projectgrade`).
 
 ### Pre-Grading Verification
 
@@ -286,7 +369,7 @@ general programming constructs.
 
 ## Homework Discovery Protocol
 
-Shared homework source discovery for `repograde` and `repogradesince`.
+Shared homework source discovery for `repograde` and `projectgrade`.
 Homework assignments may exist in multiple locations. The grading skill MUST
 discover and merge all sources into a unified homework list before matching
 against student commits.
@@ -391,8 +474,7 @@ symlink.
 
 ## Bulk Grading Protocol
 
-Shared concurrency and directory handling for `repograde` and `repogradesince`
-bulk modes.
+Shared concurrency and directory handling for `repograde` bulk mode.
 
 ### Directory Exclusion
 
@@ -418,11 +500,218 @@ After all subagents finish, the master workflow must:
 1. Read the generated `*_email.json` files.
 2. Create shared `EMAIL.json` following the Email JSON Structure rules above.
 
+## Email Body Format (CRITICAL)
+
+All grading email bodies MUST be clear ASCII text. This section defines the
+exact structure and formatting rules for every email body generated by any
+grading skill.
+
+### Plain-Text Rule
+
+Email bodies are plain ASCII text with **one exception**: code blocks with
+backtick fences (e.g., ```sql ... ```) for short source-code snippets that
+help illustrate a grading point.
+
+**Forbidden in email bodies:**
+- Markdown headers (`##`, `###`, etc.)
+- Bold text (`**...**`)
+- Italic text (`*...*`)
+- Markdown tables
+- Markdown bullet lists (`- item` or `* item`)
+- Horizontal rules (`---`)
+- Any other Markdown formatting
+
+**Allowed in email bodies:**
+- Plain text paragraphs separated by blank lines
+- Code blocks with backtick fences for short source-code snippets
+- Natural German text with UTF-8 umlauts (ä, ö, ü, ß)
+
+### Structure for Homework Grading Emails
+
+Used by `repograde` skill (single-repo and bulk mode). The email body follows
+this exact paragraph order:
+
+1. **Greeting** — per Greeting Formulas section above
+
+2. **Opening sentence** (address style dependent):
+   - Formal: `Ich habe Ihre Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Informal: `Ich habe deine Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Dates in German long format (e.g., "18. Februar 2026", "4. März 2026").
+
+3. **Commit summary** — Two to three sentences summarizing the commits
+   discovered in the student's repository during the grading period.
+   Mention overall activity, approximate number of substantive commits,
+   and any notable patterns (gaps, bursts, consistent work).
+
+4. **Homework overview** — A concise list of all homework assignments,
+   each in one to two sentences. Format:
+
+   ```
+   HÜ1: [Topic/content summary in 1-2 sentences]
+   HÜ2: [Topic/content summary in 1-2 sentences]
+   ```
+
+   Use "HÜ" as abbreviation for "Hausübung". Number sequentially.
+
+5. **Per-homework evaluation** — For each homework assignment, provide
+   a detailed discussion and evaluation on a 0–100% scale. Each evaluation
+   is a separate paragraph covering:
+   - What the student did well
+   - What was missing or could be improved
+   - Specific technical observations (with code snippets where helpful)
+   - A percentage rating for that individual homework
+
+6. **Recommendations and praise** — A warm, genuine paragraph with
+   improvement suggestions and subtle praise. See Praise Guidelines below.
+
+7. **Closing** — per Closing Formulas section above
+
+### Structure for Knowledge-Check Emails
+
+Used by `knowledge-assessment` skill. Same plain-text rule applies.
+
+1. **Greeting** — per Greeting Formulas section above
+
+2. **Opening sentence** (address style dependent):
+   - Formal: `Ich habe Ihre Wissensüberprüfung vom [Datum] durchgesehen.`
+   - Informal: `Ich habe deine Wissensüberprüfung vom [Datum] durchgesehen.`
+
+3. **Score summary** — Total points achieved out of total possible points.
+
+4. **Question-by-question analysis** — Plain text paragraphs discussing
+   strengths and weaknesses in specific questions.
+
+5. **Recommendations and praise** — Same guidelines as homework emails.
+
+6. **Solutions note** — `Ich habe die Datei mit den korrekten Lösungen in das Git-Repository hochgeladen.`
+
+7. **Closing** — per Closing Formulas section above
+
+### Praise Guidelines
+
+Praise must be **subtle and understated**. Never effusive, never over the top.
+
+**Good praise examples:**
+- "Die JOIN-Operationen haben Sie sauber umgesetzt."
+- "Hier ist Ihnen eine klare Struktur gelungen."
+- "Das zeigt ein gutes Verständnis der Konzepte."
+- "An dieser Stelle war Ihre Lösung besonders durchdacht."
+
+**Bad praise examples (DO NOT USE):**
+- "Hervorragende Arbeit! Brillant gelöst!"
+- "Sie sind ein wahrer Meister der Programmierung!"
+- "Phantastisch! Weiter so!"
+- "Ich bin beeindruckt von Ihrer überragenden Leistung!"
+
+The tone should feel like a calm, observant teacher noting genuine strengths
+without exaggeration. Let the facts speak for themselves. When a student did
+something well, state it matter-of-factly.
+
+### Example: Formal Homework Email Body
+
+```
+Sehr geehrte Frau Huber,
+
+Ich habe Ihre Hausübungen, welche im Zeitraum vom 4. März bis zum
+18. März aufgegeben waren, durchgesehen.
+
+In Ihrem Repository habe ich insgesamt 12 Commits in diesem Zeitraum
+gefunden. Die Arbeit war regelmäßig verteilt, mit einem deutlichen
+Schwerpunkt in der ersten Woche. Die meisten Änderungen betrafen
+SQL-Skripte und Datenbank-Schema-Dateien.
+
+HÜ1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
+statements für ein Bibliotheksverwaltungssystem.
+HÜ2: Implementierung von JOIN-Operationen zwischen den Tabellen
+der Bibliotheksdatenbank.
+
+HÜ1 – Bibliotheksdatenbank:
+
+Sie haben die Tabellenstruktur sauber entworfen und die
+Fremdschlüsselbeziehungen korrekt definiert. Die INSERT-Statements
+decken die wesentlichen Daten ab. Bei der Tabelle "Ausleihe" hätte
+das Rückgabedatum als nullable Spalte definiert werden sollen, da
+ein Buch zum Zeitpunkt der Ausleihe noch nicht zurückgegeben sein
+muss. Bewertung: 80%.
+
+HÜ2 – JOIN-Operationen:
+
+```sql
+SELECT b.Titel, a.Name
+FROM Buecher b
+JOIN BuchAutor ba ON b.BuchID = ba.BuchID
+JOIN Autoren a ON ba.AutorID = a.AutorID;
+```
+
+Dieser Dreifach-Join ist korrekt umgesetzt. Die Alias-Namen sind
+sinnvoll gewählt. Bei der LEFT JOIN-Aufgabe fehlt jedoch die
+Berücksichtigung von Büchern ohne Ausleihe – hier wäre ein LEFT
+JOIN statt des INNER JOIN nötig gewesen. Bewertung: 65%.
+
+Insgesamt zeigen Ihre Abgaben ein solides Grundverständnis der
+relationalen Datenbankkonzepte. Es empfiehlt sich, die
+Unterschiede zwischen den JOIN-Typen (INNER, LEFT, RIGHT) noch
+einmal anhand praktischer Beispiele nachzuvollziehen. Die
+Tabellenstruktur der Bibliotheksdatenbank ist Ihnen gut gelungen.
+
+Mit freundlichen Grüßen,
+
+   Georg Graf
+```
+
+### Example: Informal Homework Email Body
+
+```
+Lieber Thomas,
+
+Ich habe deine Hausübungen, welche im Zeitraum vom 4. März bis zum
+18. März aufgegeben waren, durchgesehen.
+
+In deinem Repository habe ich 8 Commits gefunden, die meisten davon
+in der zweiten Woche. Du hast dich intensiv mit den SQL-Themen
+auseinandergesetzt.
+
+HÜ1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
+statements für ein Bibliotheksverwaltungssystem.
+HÜ2: Implementierung von JOIN-Operationen zwischen den Tabellen
+der Bibliotheksdatenbank.
+
+HÜ1 – Bibliotheksdatenbank:
+
+Du hast die Tabellen korrekt erstellt und die Beziehungen sauber
+modelliert. Die Datentypen sind durchgehend passend gewählt.
+Die Index-Definitionen fehlen allerdings vollständig – bei einer
+Bibliotheksdatenbank mit Suchanfragen auf Titel und Autor wären
+Indizes sinnvoll. Bewertung: 75%.
+
+HÜ2 – JOIN-Operationen:
+
+Die einfachen JOINs hast du zuverlässig implementiert. Bei den
+komplexeren Abfragen mit Unterabfragen gibt es noch Unsicherheiten.
+Die Lösung für "Alle Autoren mit mehr als 3 Büchern" verwendet
+einen korrekten Ansatz, die Gruppierung ist aber nicht ganz
+vollständig. Bewertung: 60%.
+
+Insgesamt eine ordentliche Leistung. Es wäre hilfreich, wenn du
+die JOIN-Typen noch einmal wiederholst – besonders die Fälle,
+in denen ein LEFT JOIN nötig ist. Die Grundlagen sitzen, und mit
+etwas mehr Übung bei den komplexeren Abfragen wirst du noch
+sicherer.
+
+Lieben Gruß,
+
+   Georg Graf
+```
+
 ## Reporting Protocol
 
 All grading content must be written in German and address the student directly
 in the second person (Sie or Du based on class). See the Second-Person Address
 section above for pronoun usage and examples.
+
+The `*_grading.md` files may use full Markdown formatting (headers, bold,
+tables, lists). Only the email body in `*_email.json` is restricted to plain
+text per the Email Body Format section above.
 
 Reports should include, where applicable:
 
@@ -435,38 +724,6 @@ Reports should include, where applicable:
 - inactive gaps
 - diligence assessment
 - final evaluation with `Endbewertung: XX/100`
-
-### Second-Person Tone Examples
-
-**Informal (2ahwii, 3ahwii, 5ahwii, 4aaif):**
-
-```
-## Repository-Übersicht
-
-Du hast in diesem Semester durchweg solide Arbeit geleistet. Dein
-Repository zeigt eine klare Struktur und regelmäßige Commits.
-
-## Hausübungen
-
-### HU1: SQL-Grundlagen
-Du hast die JOIN-Operationen korrekt implementiert. Besonders positiv
-ist, dass du die Fremdschlüssel-Beziehung sauber modelliert hast.
-```
-
-**Formal (all other classes):**
-
-```
-## Repository-Übersicht
-
-Sie haben in diesem Semester durchweg solide Arbeit geleistet. Ihr
-Repository zeigt eine klare Struktur und regelmäßige Commits.
-
-## Hausübungen
-
-### HU1: SQL-Grundlagen
-Sie haben die JOIN-Operationen korrekt implementiert. Besonders positiv
-ist, dass Sie die Fremdschlüssel-Beziehung sauber modelliert haben.
-```
 
 ## Output Expectations
 

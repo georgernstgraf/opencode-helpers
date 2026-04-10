@@ -33,7 +33,7 @@ All grading-related skills and commands reference this shared configuration.
 - **Exam generation**: Git history analysis → German exam file → separate solutions file
 - **Assessment**: Student submissions → point-based grading → individual feedback → class patterns → bulk email JSON
 - **Email composition**: Individual assessment → structured paragraphs → solutions note → sign-off → EMAIL.json
-- **Repository grading**: `repograde` skill → explicit single-repo path mode or bulk mode → per-repo `<basename>_grading.md` and `<basename>_email.json` outputs → bulk master aggregation into `EMAIL.json`
+- **Repository grading**: `repograde` skill (invoked directly, no command) → parses user request for mode (single-repo/bulk, filtered/unfiltered) → plan presentation → per-repo `<basename>_grading.md` and `<basename>_email.json` outputs → bulk master aggregation into `EMAIL.json`
 - **Homework generation**: `homework` skill → auto-detect current lesson directory → discover sources → generate `Hausübung.md` inside lesson directory
 
 ## Homework Formats
@@ -58,6 +58,7 @@ Homework assignments exist in two formats; grading skills must support both:
 - `*_solutions.md` files are git-ignored to avoid exposing answers
 - Individual assessments must preserve paragraph spacing when copied to email bodies
 - Email body contains the ENTIRE grading report (long emails expected)
+- Email bodies are plain ASCII text; only code blocks with backtick fences are allowed as Markdown formatting
 
 ## Database
 
