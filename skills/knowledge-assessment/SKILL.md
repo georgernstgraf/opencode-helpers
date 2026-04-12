@@ -16,6 +16,12 @@ This skill assesses student submissions for a knowledge-check exam, produces
 teacher-facing reports in German, and prepares structured email payloads for
 communicating individual results.
 
+## Output Language: MANDATORY GERMAN
+
+All student-facing content (grading reports, individual feedback, email bodies) 
+MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
+Never use English for content intended for students.
+
 ## Dependencies
 
 This skill relies on `grading-shared` for: address style, email formulas,
@@ -35,13 +41,13 @@ alongside knowledge-check solution files.
 
 - Student submission files in the current working directory (local folder,
   NOT a Git repository); each submission filename contains the class
-  identifier that determines whether formal or informal address should be used
+  identifier that determines whether formal or informal address should be used.
 - Matching knowledge-check files with questions and solutions, including a
   solutions file in the same directory that can be used as the reference for
   correct answers and for the total achievable points listed at the bottom of
-  that file
+  that file.
 - `vacuum.db` for student email address lookup; must exist in the current
-  working directory at start; if missing, stop immediately (do not create or copy)
+  working directory at start; if missing, stop immediately (do not create or copy).
 
 ## Protocol
 
@@ -153,11 +159,11 @@ einmal zu üben. Nutzen Sie dazu die hochgeladene Lösungedatei als Referenz.
 ### 4. Create Bulk Email JSON
 
 Follow the `grading-shared` skill protocol for:
-- Database lookup (use `vacuum.db` in current directory)
-- Gender determination and fallback handling
-- Email JSON structure
-- Greeting and closing formulas
-- **Missing email address handling** (STOP if any student has no email)
+- Database lookup (use `vacuum.db` in current directory).
+- Gender determination and fallback handling.
+- Email JSON structure.
+- Greeting and closing formulas.
+- **Missing email address handling** (STOP if any student has no email).
 
 If any student cannot be matched in the database, follow the missing email
 protocol in `grading-shared`: stop, present all unresolved names to the user,
@@ -172,7 +178,7 @@ Additional requirements specific to knowledge-check:
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
   - `body`: the student's individual assessment text, formatted as plain ASCII
     text following the `grading-shared` Email Body Format section for
-    knowledge-check emails
+    knowledge-check emails.
 - Ensure every reported score inside the email body is consistent with the
   authoritative total achievable points from the solutions file.
 - Use greeting and closing formulas from `grading-shared` based on class
@@ -212,7 +218,7 @@ Additional requirements specific to knowledge-check:
 
 ## Output Expectations
 
-- `GRADINGS.md` with class-wide grading overview (mandatory)
-- `CLASS.md` with anonymized class patterns and teacher recommendations (mandatory)
-- `<name>_grading.md` files (one per student) with detailed individual feedback
-- `EMAIL.json` with one personalized email payload per student
+- `GRADINGS.md` with class-wide grading overview (mandatory).
+- `CLASS.md` with anonymized class patterns and teacher recommendations (mandatory).
+- `<name>_grading.md` files (one per student) with detailed individual feedback.
+- `EMAIL.json` with one personalized email payload per student.

@@ -17,6 +17,12 @@ ensuring consistent email formatting, address styles, second-person address
 throughout all grading content, and database access across different
 assessment types.
 
+## Output Language: MANDATORY GERMAN
+
+All student-facing content (grading reports, feedback, email bodies) MUST be 
+written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
+Never use English for content intended for students.
+
 ## Usage
 
 Import this skill at the beginning of any grading-related skill or command.
@@ -39,10 +45,10 @@ Determine formal vs informal address based on class identifier:
 ### Implementation
 
 When processing student data:
-1. Extract class identifier from filename, directory, or database
-2. Normalize to uppercase for comparison: `UPPER(klasse)`
-3. Check if class is in the informal list above
-4. Apply corresponding address style throughout all grading content
+1. Extract class identifier from filename, directory, or database.
+2. Normalize to uppercase for comparison: `UPPER(klasse)`.
+3. Check if class is in the informal list above.
+4. Apply corresponding address style throughout all grading content.
 
 ### Name Parsing from Repository Basename (CRITICAL)
 
@@ -128,10 +134,10 @@ Gender is determined from the **first name** (the last word in the repository
 basename). Do NOT use the full basename string for gender lookup.
 
 When gender is not clear from the first name:
-1. Use class records or submission wording as additional context
+1. Use class records or submission wording as additional context.
 2. If still uncertain, use neutral fallback: `Guten Tag [First Name] [Last Name],`
-3. Keep class-based closing formula (formal or informal based on class)
-4. Flag case for manual review in the output files
+3. Keep class-based closing formula (formal or informal based on class).
+4. Flag case for manual review in the output files.
 
 ## Second-Person Address in Grading Content
 
@@ -174,10 +180,10 @@ Du hast die Aufgabe gut gelöst. Du hast dich bemüht.
 ### Gender-Neutral Handling for Unclear Cases
 
 When student gender cannot be determined:
-1. Use formal "Sie" (works as gender-neutral in written German)
-2. Use gender-neutral adjective forms where possible
+1. Use formal "Sie" (works as gender-neutral in written German).
+2. Use gender-neutral adjective forms where possible.
 3. Use neutral greeting fallback: `Guten Tag [First Name] [Last Name],`
-4. Flag in output files for manual review
+4. Flag in output files for manual review.
 
 ### Consistency Checklist
 
@@ -209,12 +215,12 @@ Table: `users`
 
 ### Lookup Protocol
 
-1. Match student by name (handle variations and partial matches)
-2. Normalize class comparison to uppercase: `WHERE UPPER(klasse) = UPPER(?)`
-3. Retrieve `email` and `klasse` columns
-4. Use `klasse` to determine address style
-5. If `vacuum.db` is missing at start, stop immediately with error
-6. Track all students with missing email addresses
+1. Match student by name (handle variations and partial matches).
+2. Normalize class comparison to uppercase: `WHERE UPPER(klasse) = UPPER(?)`.
+3. Retrieve `email` and `klasse` columns.
+4. Use `klasse` to determine address style.
+5. If `vacuum.db` is missing at start, stop immediately with error.
+6. Track all students with missing email addresses.
 
 ## Missing Email Address Handling (CRITICAL)
 
@@ -223,12 +229,12 @@ the database, the workflow MUST stop before generating the file.
 
 ### Protocol
 
-1. **Collect all lookups**: Perform database lookup for all students first
+1. **Collect all lookups**: Perform database lookup for all students first.
 2. **Check for missing emails**: After all lookups, identify students without
-   valid email addresses
+   valid email addresses.
 3. **If any are missing**:
-   - STOP immediately
-   - Do NOT generate `EMAIL.json`
+   - STOP immediately.
+   - Do NOT generate `EMAIL.json`.
    - Present ALL unresolved names to the user in a clear list:
      ```
      Die folgenden Schüler/innen konnten nicht in der Datenbank gefunden werden:
@@ -238,17 +244,17 @@ the database, the workflow MUST stop before generating the file.
      
      Bitte aktualisieren Sie die Datenbank und starten Sie den Vorgang erneut.
      ```
-   - Wait for user to update the database
-   - User should confirm when database is updated
-   - Retry the entire grading process
+   - Wait for user to update the database.
+   - User should confirm when database is updated.
+   - Retry the entire grading process.
 4. **Only proceed**: Generate `EMAIL.json` when ALL students have valid email
-   addresses
+   addresses.
 
 ### Rationale
 
-- Prevents incomplete or invalid email payloads
-- Ensures all students receive their feedback
-- Forces database maintenance rather than workarounds
+- Prevents incomplete or invalid email payloads.
+- Ensures all students receive their feedback.
+- Forces database maintenance rather than workarounds.
 
 ## Email JSON Structure
 
@@ -307,16 +313,16 @@ email JSON files.** The following rules MUST be followed:
 
 ## Constraints
 
-- All grading content must be written in German
-- All grading content must use second-person address (Sie or Du)
-- Never use third-person to refer to the student being graded
+- All grading content must be written in German.
+- All grading content must use second-person address (Sie or Du).
+- Never use third-person to refer to the student being graded.
 - UTF-8 encoding with natural German umlauts (ä, ö, ü, ß); never replace with
-  transliterations (ae, oe, ue) unless source material requires it
-- Trailing comma required in all salutations
-- Two newlines before signature line
-- Three-space indentation before `Georg Graf`
-- Never guess gender - use neutral fallback when uncertain
-- Flag uncertain cases for manual review
+  transliterations (ae, oe, ue) unless source material requires it.
+- Trailing comma required in all salutations.
+- Two newlines before signature line.
+- Three-space indentation before `Georg Graf`.
+- Never guess gender - use neutral fallback when uncertain.
+- Flag uncertain cases for manual review.
 
 ## Repository Analysis Protocol
 
@@ -327,11 +333,11 @@ grading skills (`repograde`, `projectgrade`).
 
 Before inspecting repository content, verify repository state:
 
-1. Navigate to the student repository directory
-2. Run `git pull` to ensure latest version is checked out
-3. Run `git status` to check for uncommitted changes
-4. If uncommitted changes exist, STOP IMMEDIATELY and report to user
-5. If pull fails or reports errors, STOP IMMEDIATELY and report to user
+1. Navigate to the student repository directory.
+2. Run `git pull` to ensure latest version is checked out.
+3. Run `git status` to check for uncommitted changes.
+4. If uncommitted changes exist, STOP IMMEDIATELY and report to user.
+5. If pull fails or reports errors, STOP IMMEDIATELY and report to user.
 
 ### Discovery
 
@@ -353,9 +359,9 @@ Use diff content, not filenames alone, to identify what the student worked on.
 Detect technical topics from the diffs and distinguish substantive work from
 superficial edits.
 
-- substantive: meaningful implementation, debugging, refactoring, feature work
+- substantive: meaningful implementation, debugging, refactoring, feature work.
 - superficial: formatting-only edits, whitespace changes, trivial renames,
-  auto-generated files without meaningful modification
+  auto-generated files without meaningful modification.
 
 Consider common patterns across JavaScript, Java, C#, SQL, CSS, HTML, and
 general programming constructs.
@@ -416,14 +422,14 @@ Many agents fail at this step because they:
 
 Required steps:
 
-1. **Read the ENTIRE file** — do not stop after the first homework entry
+1. **Read the ENTIRE file** — do not stop after the first homework entry.
 2. **Extract ALL date references** from:
    - Headings: `## Hausübung vom 18. Februar`
    - Inline dates: `Abgabe bis 25. Februar`
    - Date ranges: `Zeitraum: 10.-18. März`
    - Relative dates: `nächste Woche`, `in 2 Wochen` (convert to absolute)
-3. **Normalize ALL dates to ISO format** (YYYY-MM-DD)
-4. **Build a homework list**: `[(iso_date, topic, content), ...]`
+3. **Normalize ALL dates to ISO format** (YYYY-MM-DD).
+4. **Build a homework list**: `[(iso_date, topic, content), ...]`.
 
 Date patterns to recognize:
 
@@ -522,16 +528,16 @@ help illustrate a grading point.
 - Any other Markdown formatting
 
 **Allowed in email bodies:**
-- Plain text paragraphs separated by blank lines
-- Code blocks with backtick fences for short source-code snippets
-- Natural German text with UTF-8 umlauts (ä, ö, ü, ß)
+- Plain text paragraphs separated by blank lines.
+- Code blocks with backtick fences for short source-code snippets.
+- Natural German text with UTF-8 umlauts (ä, ö, ü, ß).
 
 ### Structure for Homework Grading Emails
 
 Used by `repograde` skill (single-repo and bulk mode). The email body follows
 this exact paragraph order:
 
-1. **Greeting** — per Greeting Formulas section above
+1. **Greeting** — per Greeting Formulas section above.
 
 2. **Opening sentence** (address style dependent):
    - Formal: `Ich habe Ihre Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
@@ -556,21 +562,21 @@ this exact paragraph order:
 5. **Per-homework evaluation** — For each homework assignment, provide
    a detailed discussion and evaluation on a 0–100% scale. Each evaluation
    is a separate paragraph covering:
-   - What the student did well
-   - What was missing or could be improved
-   - Specific technical observations (with code snippets where helpful)
-   - A percentage rating for that individual homework
+   - What the student did well.
+   - What was missing or could be improved.
+   - Specific technical observations (with code snippets where helpful).
+   - A percentage rating for that individual homework.
 
 6. **Recommendations and praise** — A warm, genuine paragraph with
    improvement suggestions and subtle praise. See Praise Guidelines below.
 
-7. **Closing** — per Closing Formulas section above
+7. **Closing** — per Closing Formulas section above.
 
 ### Structure for Knowledge-Check Emails
 
 Used by `knowledge-assessment` skill. Same plain-text rule applies.
 
-1. **Greeting** — per Greeting Formulas section above
+1. **Greeting** — per Greeting Formulas section above.
 
 2. **Opening sentence** (address style dependent):
    - Formal: `Ich habe Ihre Wissensüberprüfung vom [Datum] durchgesehen.`
@@ -585,7 +591,7 @@ Used by `knowledge-assessment` skill. Same plain-text rule applies.
 
 6. **Solutions note** — `Ich habe die Datei mit den korrekten Lösungen in das Git-Repository hochgeladen.`
 
-7. **Closing** — per Closing Formulas section above
+7. **Closing** — per Closing Formulas section above.
 
 ### Praise Guidelines
 
@@ -729,7 +735,7 @@ Reports should include, where applicable:
 
 This skill provides configuration and shared protocols. Consuming skills
 produce:
-- Per-student `*_grading.md` files with individual feedback (second-person German)
-- `EMAIL.json` with personalized payloads (second-person body)
-- `GRADINGS.md` class-wide overview (where applicable)
-- `CLASS.md` anonymized class patterns (where applicable)
+- Per-student `*_grading.md` files with individual feedback (second-person German).
+- `EMAIL.json` with personalized payloads (second-person body).
+- `GRADINGS.md` class-wide overview (where applicable).
+- `CLASS.md` anonymized class patterns (where applicable).

@@ -16,16 +16,22 @@ This skill creates a German knowledge-check exam for a specific class folder
 based on recent Git history. Use it when asked to generate a mini-exam from the
 material covered in class.
 
+## Output Language: MANDATORY GERMAN
+
+The generated exam and solution files MUST be written in natural German with 
+proper UTF-8 umlauts (ä, ö, ü, ß). 
+Never use English for the exam questions or solutions.
+
 ## Inputs
 
-- `class`: target class folder name
-- `weeks`: number of weeks of Git history to analyze
+- `class`: target class folder name.
+- `weeks`: number of weeks of Git history to analyze.
 - `exam-date`: (mandatory) the planned exam date, must be either:
-  - An ISO date (YYYY-MM-DD format)
-  - The literal `today`
-  - The literal `tomorrow`
-- `mc-count`: (optional) number of multiple-choice questions, default 10
-- `free-count`: (optional) number of free-text questions, default 3
+  - An ISO date (YYYY-MM-DD format).
+  - The literal `today`.
+  - The literal `tomorrow`.
+- `mc-count`: (optional) number of multiple-choice questions, default 10.
+- `free-count`: (optional) number of free-text questions, default 3.
 
 ## Protocol
 

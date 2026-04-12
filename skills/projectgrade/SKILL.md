@@ -23,19 +23,27 @@ Unlike `repograde`, this skill does NOT use homework assignments or `Hausübunge
 Student identification is derived exclusively from Git commit email addresses,
 then mapped to student names via the uploadthing database.
 
+## Output Language: MANDATORY GERMAN
+
+All student-facing content (grading reports, individual feedback, email bodies) 
+MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
+Never use English for content intended for students.
+
+## Dependencies
+
 This skill relies on `grading-shared` for: address style, email formulas,
 second-person address rules, database lookup, email JSON structure,
 repository analysis protocol, and reporting protocol.
 
 ## Differences from repograde
 
-- Invoked from INSIDE the project Git repository (not from a local folder)
-- No `Hausübungen.md` required (project grading, not homework)
-- Evaluates GitHub Issues participation and Pull Request activity
-- Student identification from Git commit emails only
-- Issue quality, PR reviews, and collaboration factor into grading
-- Single project mode (no bulk grading)
-- Holistic assessment approach (no rigid numeric weights)
+- Invoked from INSIDE the project Git repository (not from a local folder).
+- No `Hausübungen.md` required (project grading, not homework).
+- Evaluates GitHub Issues participation and Pull Request activity.
+- Student identification from Git commit emails only.
+- Issue quality, PR reviews, and collaboration factor into grading.
+- Single project mode (no bulk grading).
+- Holistic assessment approach (no rigid numeric weights).
 
 ## Execution Context
 
@@ -45,21 +53,21 @@ outside a Git repository is an error.
 
 The skill grades a single collaborative project repository where multiple
 students contribute via branches, Pull Requests, and GitHub Issues by:
-1. Verifying we are inside a Git repository (error if not)
-2. Using `git pull` to ensure the latest version is checked out
-3. Inspecting the repository content and Git history for grading
-4. Querying GitHub API for issue and PR metadata (creation, edits, comments, reviews, merges)
-5. Detecting further measurable contributions (wiki, CI/CD, tests, docs, project management)
-6. Mapping contributor email addresses to student names via uploadthing.db
+1. Verifying we are inside a Git repository (error if not).
+2. Using `git pull` to ensure the latest version is checked out.
+3. Inspecting the repository content and Git history for grading.
+4. Querying GitHub API for issue and PR metadata (creation, edits, comments, reviews, merges).
+5. Detecting further measurable contributions (wiki, CI/CD, tests, docs, project management).
+6. Mapping contributor email addresses to student names via uploadthing.db.
 
 ## Input
 
-- `--gh-token`: GitHub token for API access (optional, defaults to environment)
+- `--gh-token`: GitHub token for API access (optional, defaults to environment).
 
 Behavior:
 
-- This skill operates on the current Git repository (CWD must be a Git repo)
-- No repository path argument is needed; we are already inside the project
+- This skill operates on the current Git repository (CWD must be a Git repo).
+- No repository path argument is needed; we are already inside the project.
 
 ## Protocol
 
@@ -75,9 +83,9 @@ Behavior:
 9. Analyze Pull Request activity (see Pull Request Analysis section).
 10. Detect further measurable contributions (see Further Contributions section).
 11. Apply holistic grading philosophy (see Holistic Grading Philosophy section).
-12. Generate `<basename>_grading.md` as the repository grading report.
+12. Generate `<basename>_grading.md` as the repository grading report in German.
 13. Generate `<basename>_email.json` as a JSON array with student entries,
-    following `grading-shared` structure.
+    following `grading-shared` structure and using German body text.
 
 ## Repository Analysis
 
@@ -92,10 +100,10 @@ Before inspecting repository content, verify repository state:
    git rev-parse --is-inside-work-tree
    ```
    If this returns `false` or errors, STOP IMMEDIATELY and report to user.
-2. Run `git pull` to ensure latest version is checked out
-3. Run `git status` to check for uncommitted changes
-4. If uncommitted changes exist, STOP IMMEDIATELY and report to user
-5. If pull fails or reports errors, STOP IMMEDIATELY and report to user
+2. Run `git pull` to ensure latest version is checked out.
+3. Run `git status` to check for uncommitted changes.
+4. If uncommitted changes exist, STOP IMMEDIATELY and report to user.
+5. If pull fails or reports errors, STOP IMMEDIATELY and report to user.
 
 ### Git Commit Analysis
 
@@ -115,9 +123,9 @@ git log --all --author='<email>' --format='' --numstat | awk '{added+=$1; delete
 ### Branch Analysis
 
 - Enumerate all branches: `git branch -a`
-- Count commits per branch per author
-- Identify significant non-main branch contributions
-- Note branch naming patterns and merge activity
+- Count commits per branch per author.
+- Identify significant non-main branch contributions.
+- Note branch naming patterns and merge activity.
 
 #### Deleted Branch Recovery
 
@@ -158,8 +166,8 @@ For significant commits, inspect actual changes:
 - `git show --format=fuller --unified=3 <sha>`
 
 Use diff content to identify substantive vs superficial work:
-- substantive: meaningful implementation, debugging, refactoring, feature work
-- superficial: formatting-only, whitespace, trivial renames, auto-generated files
+- substantive: meaningful implementation, debugging, refactoring, feature work.
+- superficial: formatting-only, whitespace, trivial renames, auto-generated files.
 
 ## Issue Analysis
 
@@ -180,33 +188,33 @@ GET /repos/{owner}/{repo}/issues/{issue_number}/events
 GitHub API returns `user.login` (username), not email. To attribute issues to
 students:
 
-1. Extract all unique email addresses from Git commits
+1. Extract all unique email addresses from Git commits.
 2. For each commit author email, query GitHub API to find their username:
    ```
    GET /search/users?q=<email>+in:email
    ```
-3. Or use commit author name and compare to GitHub usernames cautiously
-   - Names often differ from usernames
-   - Prefer email-based matching for accuracy
-4. Map issue activity to student emails via the username lookup
+3. Or use commit author name and compare to GitHub usernames cautiously:
+   - Names often differ from usernames.
+   - Prefer email-based matching for accuracy.
+4. Map issue activity to student emails via the username lookup.
 
 ### Issue Quality Rubric
 
 Evaluate issue quality based on:
 
-- **Title clarity**: Descriptive, specific, actionable
-- **Description completeness**: Steps to reproduce, expected vs actual behavior
-- **Code examples**: Minimal reproducible examples provided
-- **Screenshots/logs**: Supporting evidence for bug reports
-- **Labels**: Appropriate categorization (bug, enhancement, question)
-- **Response to feedback**: Updates based on maintainer comments
+- **Title clarity**: Descriptive, specific, actionable.
+- **Description completeness**: Steps to reproduce, expected vs actual behavior.
+- **Code examples**: Minimal reproducible examples provided.
+- **Screenshots/logs**: Supporting evidence for bug reports.
+- **Labels**: Appropriate categorization (bug, enhancement, question).
+- **Response to feedback**: Updates based on maintainer comments.
 
 Quality Rating (1-5):
-  5 = Exceptional: Complete, clear, with reproducible examples
-  4 = Good: Well-described with most relevant details
-  3 = Average: Adequate description but missing some context
-  2 = Below Average: Vague, incomplete, or poorly structured
-  1 = Poor: No clear description or incorrectly filed
+  5 = Exceptional: Complete, clear, with reproducible examples.
+  4 = Good: Well-described with most relevant details.
+  3 = Average: Adequate description but missing some context.
+  2 = Below Average: Vague, incomplete, or poorly structured.
+  1 = Poor: No clear description or incorrectly filed.
 
 ## Pull Request Analysis
 
@@ -233,29 +241,29 @@ authors — all resolved to student emails via the GitHub username mapping.
 
 For each contributing student, collect:
 
-- **PRs created**: total count, broken down by state (open / merged / closed without merge)
-- **PRs merged**: successfully integrated contributions
-- **Reviews given**: count by type (approved / changes requested / commented)
-- **PR comments**: inline code review comments on others' PRs
-- **Review responsiveness**: time between review feedback and author's response
-- **Commits per PR**: volume of work per PR (distinguish large features from typo fixes)
+- **PRs created**: total count, broken down by state (open / merged / closed without merge).
+- **PRs merged**: successfully integrated contributions.
+- **Reviews given**: count by type (approved / changes requested / commented).
+- **PR comments**: inline code review comments on others' PRs.
+- **Review responsiveness**: time between review feedback and author's response.
+- **Commits per PR**: volume of work per PR (distinguish large features from typo fixes).
 
 ### PR Quality Rubric
 
 Evaluate PR quality based on:
 
-- **Description completeness**: Context, motivation, linked issues, screenshots for UI changes
-- **Code review quality**: When reviewing others' PRs — constructive, specific, helpful suggestions
-- **Responsiveness to feedback**: Timely and thorough responses to review comments on own PRs
-- **Branch management**: Clean commit history, meaningful commit messages, appropriately scoped changes
-- **Linked issues**: PRs that reference or close related issues
+- **Description completeness**: Context, motivation, linked issues, screenshots for UI changes.
+- **Code review quality**: When reviewing others' PRs — constructive, specific, helpful suggestions.
+- **Responsiveness to feedback**: Timely and thorough responses to review comments on own PRs.
+- **Branch management**: Clean commit history, meaningful commit messages, appropriately scoped changes.
+- **Linked issues**: PRs that reference or close related issues.
 
 ### Merge Status Evaluation
 
-- **Merged PRs**: Successfully integrated — strong indicator of accepted contribution quality
+- **Merged PRs**: Successfully integrated — strong indicator of accepted contribution quality.
 - **Closed (not merged) PRs**: Investigate reason — may indicate learning process, rejected approaches,
   or superseded by other work. Do not automatically penalize; consider context.
-- **Open PRs**: Pending review — note as work in progress
+- **Open PRs**: Pending review — note as work in progress.
 
 ## Further Contributions
 
@@ -267,16 +275,16 @@ grading report — not scored numerically.
 
 | Contribution | Detection Method |
 |---|---|
-| **Wiki edits** | GitHub Wiki is a separate Git repo; check `GET /repos/{owner}/{repo}/contents/docs/` or wiki commit history |
-| **GitHub Discussions** | GraphQL API: `Discussion` and `DiscussionComment` nodes |
-| **Project board management** | `GET /repos/{owner}/{repo}/projects` + cards/columns (or v2 Projects via GraphQL) |
-| **Milestone management** | `GET /repos/{owner}/{repo}/milestones` — creation and due-date setting |
-| **Label taxonomy** | `GET /repos/{owner}/{repo}/labels` — custom labels created; also check issue label assignments |
-| **Releases / tagging** | `GET /repos/{owner}/{repo}/releases` — release notes, version management |
-| **CI/CD setup** | Commits touching `.github/workflows/`, `Makefile`, `Dockerfile`, `docker-compose.yml` |
-| **Testing** | Commits touching test files (`*_test.*`, `*.spec.*`, `tests/`, `__tests__/`) — recognized separately from feature code |
-| **Documentation** | Commits touching `*.md`, `docs/`, `README*` — separate from code contributions |
-| **Merge conflict resolution** | Merge commits with multiple parents; inspect diff for manual resolution effort |
+| **Wiki edits** | GitHub Wiki is a separate Git repo; check `GET /repos/{owner}/{repo}/contents/docs/` or wiki commit history. |
+| **GitHub Discussions** | GraphQL API: `Discussion` and `DiscussionComment` nodes. |
+| **Project board management** | `GET /repos/{owner}/{repo}/projects` + cards/columns (or v2 Projects via GraphQL). |
+| **Milestone management** | `GET /repos/{owner}/{repo}/milestones` — creation and due-date setting. |
+| **Label taxonomy** | `GET /repos/{owner}/{repo}/labels` — custom labels created; also check issue label assignments. |
+| **Releases / tagging** | `GET /repos/{owner}/{repo}/releases` — release notes, version management. |
+| **CI/CD setup** | Commits touching `.github/workflows/`, `Makefile`, `Dockerfile`, `docker-compose.yml`. |
+| **Testing** | Commits touching test files (`*_test.*`, `*.spec.*`, `tests/`, `__tests__/`) — recognized separately from feature code. |
+| **Documentation** | Commits touching `*.md`, `docs/`, `README*` — separate from code contributions. |
+| **Merge conflict resolution** | Merge commits with multiple parents; inspect diff for manual resolution effort. |
 | **Dependency management** | Commits touching `package.json`, `Cargo.toml`, `requirements.txt`, `pom.xml`, etc. |
 | **Configuration / tooling** | Commits touching `.editorconfig`, `.eslintrc*`, `.prettierrc*`, `tsconfig.json`, etc. |
 
@@ -322,10 +330,10 @@ Use `grading-shared` address style mapping based on `klasse`:
 ### Unmatched Students
 
 If an email cannot be matched in the database:
-- Set `mailto` to `null` in the email JSON
-- Add a `note` field for manual review
-- Include the student in grading using the email as identifier
-- Do not invent contact data
+- Set `mailto` to `null` in the email JSON.
+- Add a `note` field for manual review.
+- Include the student in grading using the email as identifier.
+- Do not invent contact data.
 
 ## Holistic Grading Philosophy
 
@@ -346,11 +354,11 @@ individual discussion.
    more through code, others through issues, reviews, documentation, or project
    management. All forms of meaningful contribution are recognized.
 4. **Diligence rating**: Assess as `high`, `medium`, or `low` based on:
-   - Regular commit frequency (not just bursts at deadlines)
-   - Consistent involvement throughout the project duration
-   - Quality of changes (substantive vs. superficial)
-   - Proper branch management and PR workflow
-   - Engagement in reviews and discussions
+   - Regular commit frequency (not just bursts at deadlines).
+   - Consistent involvement throughout the project duration.
+   - Quality of changes (substantive vs. superficial).
+   - Proper branch management and PR workflow.
+   - Engagement in reviews and discussions.
 5. **Not fully objective — and that is acceptable**: This assessment cannot be
    100% objective. Transparency of listed contributions compensates. The
    grading report provides the factual basis for individual conversations.
@@ -362,20 +370,20 @@ individual discussion.
 
 The following are used as qualitative reference points, NOT as numeric score inputs:
 
-- **Substantive vs. superficial work** distinction (from per-commit inspection)
-- **Issue Quality Rubric** (1-5 scale, used descriptively)
-- **PR Quality Rubric** (used descriptively)
-- **Commit message quality** (clear, descriptive messages vs. generic ones)
-- **Contribution spread** (evenly distributed vs. clustered at deadlines)
+- **Substantive vs. superficial work** distinction (from per-commit inspection).
+- **Issue Quality Rubric** (1-5 scale, used descriptively).
+- **PR Quality Rubric** (used descriptively).
+- **Commit message quality** (clear, descriptive messages vs. generic ones).
+- **Contribution spread** (evenly distributed vs. clustered at deadlines).
 
 ## Outputs
 
-- `<basename>_grading.md` in German
-- `<basename>_email.json` as a JSON array following `grading-shared` rules
+- `<basename>_grading.md` in German.
+- `<basename>_email.json` as a JSON array following `grading-shared` rules and using German body text.
 
 ## Grading Report Structure
 
-The `<basename>_grading.md` file should include:
+The `<basename>_grading.md` file MUST be written in German and include:
 
 ```markdown
 # Projekt-Bewertung: [Repository Name]
@@ -434,24 +442,24 @@ Empfehlungen für das weitere Gespräch mit Studierenden.
 
 Always use `grading-shared` for:
 
-- class-to-address-style mapping
-- greeting and closing formulas
-- gender fallback protocol
-- database lookup using `/home/georg/OneDrive/uploadthing.db`
-- email payload structure and paragraph preservation
+- class-to-address-style mapping.
+- greeting and closing formulas.
+- gender fallback protocol.
+- database lookup using `/home/georg/OneDrive/uploadthing.db`.
+- email payload structure and paragraph preservation.
 
 ## Constraints
 
-- This skill MUST be invoked from within a Git repository (the project being evaluated)
-- If not inside a Git repository, STOP IMMEDIATELY with an error
-- If uncommitted changes exist in the repository, STOP IMMEDIATELY
-- Do not commit changes or modify repository history
-- All grading content must use second-person address (Sie or Du)
-- Never use third-person references to the student
-- Student identification comes from Git commit emails only
-- Issue and PR attribution prefers email over username for accuracy
-- Grade all project contributors, not just code authors
-- Account for contributions on branches that have since been deleted
+- This skill MUST be invoked from within a Git repository (the project being evaluated).
+- If not inside a Git repository, STOP IMMEDIATELY with an error.
+- If uncommitted changes exist in the repository, STOP IMMEDIATELY.
+- Do not commit changes or modify repository history.
+- All grading content must use second-person address (Sie or Du) in German.
+- Never use third-person references to the student.
+- Student identification comes from Git commit emails only.
+- Issue and PR attribution prefers email over username for accuracy.
+- Grade all project contributors, not just code authors.
+- Account for contributions on branches that have since been deleted.
 - Pair programming and mentoring contributions are invisible to Git — the
   driver's commit is attributed, not the navigator. Note where such
   contributions are suspected but unmeasurable.

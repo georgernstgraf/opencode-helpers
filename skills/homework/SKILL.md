@@ -17,6 +17,12 @@ current lesson directory of a class folder. The user invokes it from inside the
 class folder (e.g., `~/gitm/2ahwii/`) at the end of a lesson. No arguments
 are needed.
 
+## Output Language: MANDATORY GERMAN
+
+The generated exercises and content inside `Hausübung.md` MUST be written in 
+natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
+Never use English for the exercise descriptions.
+
 ## Invocation Context
 
 - The user sits inside a class folder that is part of a Git repository.
@@ -58,10 +64,10 @@ are needed.
 Before writing, display the following to the user:
 
 - **Lesson directory**: the path identified (e.g., `2026-03-21_promises/`)
-- **Sources found**: list of files read, commits analyzed, and URLs fetched
+- **Sources found**: list of files read, commits analyzed, and URLs fetched.
 - **Topics deduced**: the teaching topics logically inferred from the sources,
-  with a brief explanation of how each topic was derived
-- **Target file**: the full path of the `Hausübung.md` to be created or updated
+  with a brief explanation of how each topic was derived.
+- **Target file**: the full path of the `Hausübung.md` to be created or updated.
 
 Then proceed immediately without waiting for confirmation.
 
@@ -87,12 +93,12 @@ Only create homework entries when repository evidence supports that an
 assignment is appropriate. Concrete examples of valid evidence:
 
 - The lesson README or notes mention "Hausübung", "Übung", "Aufgaben", or
-  "homework"
+  "homework".
 - Exercise files with starter code, TODO comments, or incomplete
-  implementations were created during the lesson
-- The teacher's notes or commit messages reference an assignment
+  implementations were created during the lesson.
+- The teacher's notes or commit messages reference an assignment.
 - The lesson material covers a topic with clear practice exercises that
-  naturally follow from what was taught
+  naturally follow from what was taught.
 
 If the source material reveals the lesson topic but nothing suggests an
 assignment was intended, omit the homework entry and report this to the user.
