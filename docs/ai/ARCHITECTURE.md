@@ -1,14 +1,15 @@
 # Architecture
 
-Living structural map of the system as of 2026-04-10.
+Living structural map of the system as of 2026-04-13.
 Overwritten when structural changes occur during a session.
 
 ## Overview
 
-opencode-helpers is a template repository providing standardized skills
-and knowledge persistence patterns for AI-assisted development workflows
-in opencode. Skills in `skills/` contain all workflow logic; the thin
-command layer in `commands/` delegates to skills. Session context is
+opencode-helpers is a template repository providing standardized skills,
+agents, scripts, and knowledge persistence patterns for AI-assisted development 
+workflows in opencode. Skills in `skills/` contain all workflow logic; the thin
+command layer in `commands/` delegates to skills. Custom agents are managed in
+`agents/`, and utility scripts are in `scripts/`. Session context is
 persisted to a structured set of knowledge files in `docs/ai/`.
 
 ## Commands (`commands/`)
@@ -26,8 +27,19 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `/security` | Generate a project security review report | none |
 | `/tmpissue` | Create a GitHub issue from /tmp/issue.md, then delete it | none (`gh` CLI) |
 
-Note: `/repograde`, `/repogradesince`, and `/projectgrade` commands have been
-removed. The `repograde` and `projectgrade` skills are invoked directly.
+## Agents (`agents/`)
+
+| Agent | Purpose | Varity |
+|-------|---------|--------|
+| `chat` | General-purpose assistant with SearXNG web search; bypasses project context and plan-mode restrictions | Global primary |
+| `build` | Standard build agent with integrated SearXNG web search | Global primary |
+| `plan` | Standard plan agent (read-only) with integrated SearXNG web search | Global primary |
+
+## Scripts (`scripts/`)
+
+| Script | Purpose |
+|--------|---------|
+| `opencode-searxng.py` | MCP server providing `searxng_search` tool for web research |
 
 ## Skills (`skills/`)
 
@@ -61,3 +73,4 @@ removed. The `repograde` and `projectgrade` skills are invoked directly.
 - `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json
+- `opencode-searxng.py` (MCP) → OpenCode: Provides `searxng_searxng_search` tool to all agents via JSON-RPC
