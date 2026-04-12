@@ -1,5 +1,5 @@
 # Handoff
 
-No pending tasks. Last cleared: 2026-04-10.
+No pending tasks. Last cleared: 2026-04-12.
 
-Recent changes: unified `repograde` skill (merged repogradesince), plain-text email body format in `grading-shared`, removed `/repograde` and `/repogradesince` commands.
+Recent changes: overhauled `projectgrade` skill — deleted standalone command, added PR analysis, deleted-branch recovery, further contributions detection, holistic grading philosophy.

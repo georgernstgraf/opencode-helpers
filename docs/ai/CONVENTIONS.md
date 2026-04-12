@@ -21,7 +21,8 @@ Follow these without question. Do not deviate unless explicitly told.
 
 - **All grading skills must output a percentage (0-100%) alongside the score.** This is mandatory for every skill that produces grading outputs.
 - `repograde` is the canonical repository-grading skill; it handles both full-history and date-filtered grading. There is no separate command — invoke the skill directly.
-- Grading operates from a local folder (CWD), NOT from within a Git repository.
+- `projectgrade` is the project-grading skill; it runs from inside the project Git repo. There is no separate command — invoke the skill directly.
+- Grading operates from a local folder (CWD), NOT from within a Git repository — except `projectgrade` which MUST run from inside a Git repo.
 - `Hausübungen.md` (legacy, cumulative) or per-lesson `Hausübung.md` files in `<date>_<topic>` directories provide homework assignments for grading; at least one must exist in the CWD.
 - Student repositories must already exist locally; never clone them as part of grading.
 - Before grading, use `git pull` to verify latest version and `git status` to check for uncommitted changes; if uncommitted changes exist, stop immediately.

@@ -122,3 +122,14 @@ Each entry documents WHAT was decided and WHY.
 - **Removed**: `commands/repograde.md`, `commands/repogradesince.md`, `skills/repogradesince/SKILL.md`
 - **Also added**: Plan presentation before grading starts (homework discovered, repos to grade, output files)
 - **Also added**: Email body format rules in `grading-shared` — plain ASCII text with code blocks as only allowed Markdown; praise guidelines (subtle, understated); structured email templates for homework and knowledge-check emails
+
+## 2026-04-12: Overhaul projectgrade with holistic grading, PR analysis, and deleted-branch recovery
+
+- **Choice**: Remove `/projectgrade` command and absorb its content into the `projectgrade` skill. Replace rigid numeric weight tables with a holistic descriptive assessment. Add Pull Request analysis, deleted-branch recovery, and further-contributions detection (wiki, CI/CD, tests, docs, project management).
+- **Reason**: The command was a thin wrapper delegating entirely to the skill (same pattern as repograde unification). Numeric weights were too rigid for collaborative projects where students contribute in different ways (code, issues, reviews, documentation). Deleted branches were being missed in branch analysis.
+- **Considered**: Adding PR scoring as a separate numeric weight category; keeping rigid weights alongside new contributions; creating a separate PR-analysis skill
+- **Tradeoff**: The holistic approach is more subjective but fairer and more transparent — the grading report lists all contributions factually to support individual student conversations
+- **Removed**: `commands/projectgrade.md`
+- **Added sections**: "Differences from repograde", "Deleted Branch Recovery", "Pull Request Analysis", "Further Contributions", "Holistic Grading Philosophy"
+- **Replaced**: Numeric weight tables → qualitative descriptive assessment with diligence rating (high/medium/low)
+- **Acknowledged limitations**: Pair programming, offline coordination are invisible to Git

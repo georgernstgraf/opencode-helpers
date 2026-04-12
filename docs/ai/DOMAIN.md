@@ -34,6 +34,7 @@ All grading-related skills and commands reference this shared configuration.
 - **Assessment**: Student submissions → point-based grading → individual feedback → class patterns → bulk email JSON
 - **Email composition**: Individual assessment → structured paragraphs → solutions note → sign-off → EMAIL.json
 - **Repository grading**: `repograde` skill (invoked directly, no command) → parses user request for mode (single-repo/bulk, filtered/unfiltered) → plan presentation → per-repo `<basename>_grading.md` and `<basename>_email.json` outputs → bulk master aggregation into `EMAIL.json`
+- **Project grading**: `projectgrade` skill (invoked directly, no command) → runs from inside project Git repo → holistic assessment of commits, PRs, issues, further contributions → qualitative per-student report `<basename>_grading.md` and `<basename>_email.json`
 - **Homework generation**: `homework` skill → auto-detect current lesson directory → discover sources → generate `Hausübung.md` inside lesson directory
 
 ## Homework Formats

@@ -30,6 +30,7 @@ Read this file carefully before making changes in affected areas.
 
 - Never assume grading runs from within a Git repository - it operates from a local folder (CWD)
 - `projectgrade` is the exception: it MUST run from within a Git repository (the project being evaluated)
+- `git branch -a` only shows existing branches; `projectgrade` must also recover contributions from deleted branches via merge commit history and GitHub PR API
 - `Hausübungen.md` (legacy) is always in the CWD, never inside a student repository
 - `Hausübungen.md` (legacy) may be a symbolic link; follow symlinks when reading
 - Per-lesson `Hausübung.md` files live inside `<date>_<topic>` directories; grading skills must discover both formats
@@ -39,6 +40,7 @@ Read this file carefully before making changes in affected areas.
 - `knowledge-assessment` outputs `GRADINGS.md` and `CLASS.md` (both mandatory) plus per-student `<name>_grading.md` files
 - Email bodies must be plain ASCII text — no Markdown headers, bold, tables, or lists in email JSON bodies; only code blocks with backtick fences are allowed
 - The `repograde` skill is invoked directly (no command wrapper); it handles full-history and date-filtered grading in one skill
+- The `projectgrade` skill is invoked directly (no command wrapper); it uses holistic descriptive grading, not numeric weights
 
 ## Project Configuration
 

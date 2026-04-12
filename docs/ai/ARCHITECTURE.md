@@ -23,13 +23,11 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `/knowledge-exam` | Generate a German mini-exam from Git history | `knowledge-exam` |
 | `/knowledge-persist` | Persist session context into docs/ai/ files | `knowledge-persistence` |
 | `/nextprompt` | Run `aitranscribe -q` and treat output as next instruction | none (external tool) |
-| `/projectgrade` | Grade a student project repository | `projectgrade` |
 | `/security` | Generate a project security review report | none |
 | `/tmpissue` | Create a GitHub issue from /tmp/issue.md, then delete it | none (`gh` CLI) |
 
-Note: `/repograde` and `/repogradesince` commands have been removed. The
-`repograde` skill is invoked directly and handles both full-history and
-date-filtered grading.
+Note: `/repograde`, `/repogradesince`, and `/projectgrade` commands have been
+removed. The `repograde` and `projectgrade` skills are invoked directly.
 
 ## Skills (`skills/`)
 
@@ -41,7 +39,7 @@ date-filtered grading.
 | `knowledge-assessment` | Assess German knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` |
-| `projectgrade` | Grade student project repositories based on Git commits and GitHub Issues | `/projectgrade` |
+| `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
 
 ## Knowledge Files (`docs/ai/`)
