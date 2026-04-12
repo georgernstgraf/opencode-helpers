@@ -67,9 +67,9 @@ Each entry documents WHAT was decided and WHY.
 
 ## 2026-03-21: Require second-person address (Du/Sie) in all grading content
 - **Choice**: All grading content (grading reports, INDIVIDUAL.md, email bodies) must address students directly in second person, matching the class-based email salutation style
-- **Reason**: Third-person address ("der Schüler hat...") is inconsistent with email salutations and feels impersonal; students should be addressed directly
+- **Reason**: Third-person address ("the student has...") is inconsistent with email salutations and feels impersonal; students should be addressed directly
 - **Considered**: Mixed third-person in reports with second-person in emails, or only second-person in emails
-- **Tradeoff**: Requires careful grammar (Sie vs Du conjugation), but creates consistent student experience
+- **Tradeoff**: Requires careful grammar (Sie vs Du conjugation in German), but creates consistent student experience
 
 ## 2026-03-23: Replace INDIVIDUAL.md with per-student grading files
 - **Choice**: All grading skills use `<name>_grading.md` pattern instead of a single `INDIVIDUAL.md` file
@@ -114,7 +114,6 @@ Each entry documents WHAT was decided and WHY.
 - **Also fixed**: concurrency default standardized to 5 (was 4 vs 5), `repogradesince` duplicate Source 2 header renamed to Source 3, `knowledge-exam` command missing `exam-date` parameter, `/knowledge` usage examples corrected to `/knowledge-exam`
 
 ## 2026-04-10: Merge repograde and repogradesince into unified repograde skill
-
 - **Choice**: Remove `/repograde` and `/repogradesince` commands and the `repogradesince` skill entirely. Merge all logic into a single `repograde` skill that handles both full-history and date-filtered grading. The skill parses the user's request to determine mode (single-repo/bulk, filtered/unfiltered) instead of relying on separate command wrappers.
 - **Reason**: Two commands with similar but divergent logic, plus a separate skill duplicating ~80% of repograde, created maintenance burden. A single skill with clear mode dispatch is simpler and less error-prone.
 - **Considered**: Keeping two skills with shared base; keeping commands as thin wrappers with unified skill
@@ -122,6 +121,16 @@ Each entry documents WHAT was decided and WHY.
 - **Removed**: `commands/repograde.md`, `commands/repogradesince.md`, `skills/repogradesince/SKILL.md`
 - **Also added**: Plan presentation before grading starts (homework discovered, repos to grade, output files)
 - **Also added**: Email body format rules in `grading-shared` — plain ASCII text with code blocks as only allowed Markdown; praise guidelines (subtle, understated); structured email templates for homework and knowledge-check emails
+
+## 2026-04-12: Overhaul projectgrade with holistic grading, PR analysis, and deleted-branch recovery
+- **Choice**: Remove `/projectgrade` command and absorb its content into the `projectgrade` skill. Replace rigid numeric weight tables with a holistic descriptive assessment. Add Pull Request analysis, deleted-branch recovery, and further-contributions detection (wiki, CI/CD, tests, docs, project management).
+- **Reason**: The command was a thin wrapper delegating entirely to the skill (same pattern as repograde unification). Numeric weights were too rigid for collaborative projects where students contribute in different ways (code, issues, reviews, documentation). Deleted branches were being missed in branch analysis.
+- **Considered**: Adding PR scoring as a separate numeric weight category; keeping rigid weights alongside new contributions; creating a separate PR-analysis skill
+- **Tradeoff**: The holistic approach is more subjective but fairer and more transparent — the grading report lists all contributions factually to support individual student conversations
+- **Removed**: `commands/projectgrade.md`
+- **Added sections**: "Differences from repograde", "Deleted Branch Recovery", "Pull Request Analysis", "Further Contributions", "Holistic Grading Philosophy"
+- **Replaced**: Numeric weight tables → qualitative descriptive assessment with diligence rating (high/medium/low)
+- **Acknowledged limitations**: Pair programming, offline coordination are invisible to Git
 
 ## 2026-04-13: Use dedicated chat agent and SearXNG MCP server
 - **Choice**: Implement a dedicated `chat` agent and a Python-based SearXNG MCP server
@@ -134,4 +143,3 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Centralizes configuration in the `opencode-helpers` repository for version control and easy updates across environments.
 - **Considered**: Copying files manually, using a specialized configuration manager
 - **Tradeoff**: Requires manual setup of symlinks (documented in README), but ensures single source of truth.
-

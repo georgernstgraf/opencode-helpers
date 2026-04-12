@@ -4,7 +4,7 @@ import json
 import requests
 import os
 
-# Konfiguration via Umgebungsvariablen (aus opencode.json)
+# Configuration via environment variables (from opencode.json)
 SEARX_URL = os.environ.get("SEARX_URL", "https://claw.graf.priv.at/search")
 SEARX_TOKEN = os.environ.get("SEARX_TOKEN")
 
@@ -32,7 +32,7 @@ def search(query):
         return [{"title": "Connection Error", "url": "", "content": str(e)}]
 
 def main():
-    # Minimaler MCP-kompatibler JSON-RPC Loop
+    # Minimal MCP-compatible JSON-RPC loop
     for line in sys.stdin:
         if not line.strip():
             continue
@@ -58,9 +58,9 @@ def main():
                 }
                 print(json.dumps(response))
             elif method == "notifications/initialized":
-                # Keine Antwort auf Benachrichtigungen erforderlich
+                # No response required for notifications
                 pass
-            elif method == "tools/list": # MCP verwendet tools/list statt list_tools
+            elif method == "tools/list": # MCP uses tools/list instead of list_tools
                 response = {
                     "jsonrpc": "2.0",
                     "id": req_id,
@@ -68,7 +68,7 @@ def main():
                         "tools": [
                             {
                                 "name": "searxng_search",
-                                "description": "Führt eine Websuche über SearXNG aus, um aktuelle Informationen zu finden.",
+                                "description": "Performs a web search via SearXNG to find up-to-date information.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {"query": {"type": "string"}},
@@ -79,7 +79,7 @@ def main():
                     }
                 }
                 print(json.dumps(response))
-            elif method == "tools/call": # MCP verwendet tools/call statt call_tool
+            elif method == "tools/call": # MCP uses tools/call instead of call_tool
                 args = request.get("params", {}).get("arguments", {})
                 query = args.get("query")
                 results = search(query)

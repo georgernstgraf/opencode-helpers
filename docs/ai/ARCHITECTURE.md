@@ -29,8 +29,8 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 ## Agents (`agents/`)
 
-| Agent | Purpose | Varity |
-|-------|---------|--------|
+| Agent | Purpose | Variety |
+|-------|---------|---------|
 | `chat` | General-purpose assistant with SearXNG web search; bypasses project context and plan-mode restrictions | Global primary |
 | `build` | Standard build agent with integrated SearXNG web search | Global primary |
 | `plan` | Standard plan agent (read-only) with integrated SearXNG web search | Global primary |
@@ -46,7 +46,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | Skill | Purpose | Invocation |
 |-------|---------|------------|
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, homework discovery, bulk concurrency, German/UTF-8 rules, email body format, praise guidelines, reporting | Referenced by `repograde`, `knowledge-assessment`, `projectgrade` |
-| `homework` | Generate per-lesson Hausuebung.md files from Git history | Direct invocation from class folder |
+| `homework` | Generate per-lesson `Hausübung.md` files from Git history | Direct invocation from class folder |
 | `issue-workflow` | Issue lifecycle management (start, checkpoint, finish) with mandatory issue-linked commits | `/issue-start`, `/issue-commit`, `/issue-finish` |
 | `knowledge-assessment` | Assess German knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
@@ -68,9 +68,9 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 ## Data Flows
 
-- `commands/*.md` → `skills/<name>/SKILL.md`: Commands pass user arguments and constraints into skills for execution
-- `grading-shared` → `repograde`/`knowledge-assessment`/`projectgrade`: Shared protocols injected via skill reference at runtime
-- `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files
-- `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task
-- `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json
-- `opencode-searxng.py` (MCP) → OpenCode: Provides `searxng_searxng_search` tool to all agents via JSON-RPC
+- `commands/*.md` → `skills/<name>/SKILL.md`: Commands pass user arguments and constraints into skills for execution.
+- `grading-shared` → `repograde`/`knowledge-assessment`/`projectgrade`: Shared protocols injected via skill reference at runtime.
+- `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files.
+- `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
+- `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
+- `opencode-searxng.py` (MCP) → OpenCode: Provides `searxng_searxng_search` tool to all agents via JSON-RPC.
