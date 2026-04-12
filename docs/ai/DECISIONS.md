@@ -143,3 +143,15 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Centralizes configuration in the `opencode-helpers` repository for version control and easy updates across environments.
 - **Considered**: Copying files manually, using a specialized configuration manager
 - **Tradeoff**: Requires manual setup of symlinks (documented in README), but ensures single source of truth.
+
+## 2026-04-13: Secure configuration via variable substitution and internal store
+- **Choice**: Remove API keys from `opencode.json` in the repository. Use internal provider store (`opencode providers add`) for provider keys and `{file:...}` substitution for custom tokens (like SearXNG).
+- **Reason**: Prevents accidental leakage of secrets in the public repository while maintaining a shared configuration structure.
+- **Considered**: Environment variables (vulnerable to process inspection), cleartext JSON (unsafe).
+- **Tradeoff**: Requires one-time local setup of the internal store and a local secret file, but achieves a "secret-free" repository.
+
+## 2026-04-13: Translate internal logic and documentation to English
+- **Choice**: Translate all `docs/ai/`, `agents/`, `commands/`, and `skills/` files to English, while strictly preserving German for student-facing output.
+- **Reason**: English reasoning improves LLM instruction following for complex logic. Preserving German for students ensures the localized educational experience remains unchanged.
+- **Considered**: Remaining in German, full English (including students).
+- **Tradeoff**: Requires explicit language safety anchors (`MANDATORY GERMAN`) in skills to prevent accidental English output to students.
