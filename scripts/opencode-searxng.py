@@ -8,7 +8,7 @@ import os
 SEARX_URL = os.environ.get("SEARX_URL", "https://claw.graf.priv.at/search")
 SEARX_TOKEN = os.environ.get("SEARX_TOKEN")
 
-def search(query, category="general"):
+def search(query, category="general", time_range=None):
     if not SEARX_TOKEN:
         return [{"title": "Error", "url": "", "content": "SEARX_TOKEN not set in environment."}]
     
@@ -18,6 +18,8 @@ def search(query, category="general"):
         "format": "json",
         "categories": category
     }
+    if time_range:
+        params["time_range"] = time_range
     
     try:
         response = requests.get(SEARX_URL, headers=headers, params=params, timeout=10)
@@ -79,16 +81,24 @@ def main():
                         "tools": [
                             {
                                 "name": "searxng_search",
-                                "description": "Performs a search via SearXNG to find up-to-date information or images.",
+                                "description": "Performs a search via SearXNG. For very recent topics or 'latest' news, always specify a 'time_range'.",
                                 "inputSchema": {
                                     "type": "object",
                                     "properties": {
-                                        "query": {"type": "string"},
+                                        "query": {
+                                            "type": "string",
+                                            "description": "The search query. Use quotes for exact versions (e.g. \"Gemma 4\")."
+                                        },
                                         "category": {
                                             "type": "string",
                                             "description": "The search category.",
                                             "enum": ["general", "images", "news", "it", "science"],
                                             "default": "general"
+                                        },
+                                        "time_range": {
+                                            "type": "string",
+                                            "description": "Filter results by age. Use 'month' or 'week' for brand new technologies to avoid outdated results.",
+                                            "enum": ["day", "week", "month", "year"]
                                         }
                                     },
                                     "required": ["query"]
@@ -102,7 +112,8 @@ def main():
                 args = request.get("params", {}).get("arguments", {})
                 query = args.get("query")
                 category = args.get("category", "general")
-                results = search(query, category)
+                time_range = args.get("time_range")
+                results = search(query, category, time_range)
                 response = {
                     "jsonrpc": "2.0",
                     "id": req_id,

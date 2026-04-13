@@ -41,3 +41,4 @@ Read this file carefully before making changes in affected areas.
 
 - OpenClaw-specific configuration (agent binding, Telegram groups, memory settings) belongs in OpenClaw's channel config, not in `AGENTS.md` or other project files.
 - Project `AGENTS.md` should contain only project-relevant instructions and conventions.
+- Searching for "latest" technologies or software versions (e.g., "Gemma 4") without a `time_range` or exact quoting (`"Gemma 4"`) often returns irrelevant legacy documentation due to higher domain authority of old sites (e.g., Firefox 4, MDN). Always check if a time filter is needed for brand-new topics.

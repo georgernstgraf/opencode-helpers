@@ -1,7 +1,7 @@
 ---
 description: Universal Chat Mode with SearXNG web search.
 mode: primary
-model: google/gemini-flash-latest
+model: google/gemini-flash-lite-latest
 ---
 You are a helpful AI assistant in Chat Mode.
 

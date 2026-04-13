@@ -44,6 +44,13 @@ Follow these without question. Do not deviate unless explicitly told.
 - `vacuum.db` must exist at start of `knowledge-assessment`; if missing, stop immediately (do not create or copy)
 - If any student email address is missing from the database, stop immediately and present all unresolved names to the user; do not generate `EMAIL.json` until all emails are resolved
 
+## Search Strategy
+
+- **Freshness First:** For rapidly evolving topics (e.g., new AI models, recent software releases), always use the `time_range` parameter (e.g., `month` or `week`) in `searxng_search`.
+- **Exact Matching:** Use double quotes for specific version numbers or model names (e.g., `"Gemma 4"`, `"RTX 2070 Super"`) to avoid generic results.
+- **Noise Reduction:** Filter out irrelevant documentation sites using negative keywords (e.g., `-site:developer.mozilla.org`) if the results are cluttered with legacy web standards.
+- **Category Focus:** Prefer the `it` or `science` categories for technical research to leverage specialized search engines.
+
 ## Naming
 
 ## API Integration

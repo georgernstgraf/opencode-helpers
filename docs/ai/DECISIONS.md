@@ -155,3 +155,10 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: English reasoning improves LLM instruction following for complex logic. Preserving German for students ensures the localized educational experience remains unchanged.
 - **Considered**: Remaining in German, full English (including students).
 - **Tradeoff**: Requires explicit language safety anchors (`MANDATORY GERMAN`) in skills to prevent accidental English output to students.
+
+## 2026-04-13: Enhance SearXNG with time filtering and explicit search conventions
+- **Choice**: Add `time_range` parameter to `searxng_search` tool and update its MCP schema and description.
+- **Reason**: Without time filtering, high-authority legacy documentation (like Firefox 4 or MDN articles) can drown out brand-new technology releases (like Gemma 4) in search results.
+- **Considered**: Heuristic-based auto-filtering in the tool-wrapper.
+- **Tradeoff**: Agent must now explicitly decide when to use a time filter, but the behavior is more predictable and less "magical" than a heuristic approach.
+- **Also added**: Explicit "Search Strategy" section to `CONVENTIONS.md` to guide agents.

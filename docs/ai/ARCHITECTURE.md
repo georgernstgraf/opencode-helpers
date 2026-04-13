@@ -39,7 +39,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 | Script | Purpose |
 |--------|---------|
-| `opencode-searxng.py` | MCP server providing `searxng_search` tool for web and image research |
+| `opencode-searxng.py` | MCP server providing `searxng_search` tool with time-filtering and exact-match guidance |
 
 ## Skills (`skills/`)
 
@@ -48,7 +48,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, homework discovery, bulk concurrency, German/UTF-8 rules, email body format, praise guidelines, reporting | Referenced by `repograde`, `knowledge-assessment`, `projectgrade` |
 | `homework` | Generate per-lesson `Hausübung.md` files from Git history | Direct invocation from class folder |
 | `issue-workflow` | Issue lifecycle management (start, checkpoint, finish) with mandatory issue-linked commits | `/issue-start`, `/issue-commit`, `/issue-finish` |
-| `knowledge-assessment` | Assess German knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
+| `knowledge-assessment` | Assess student knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |

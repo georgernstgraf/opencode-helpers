@@ -27,11 +27,8 @@
         "baseURL": "http://localhost:11434/api"
       },
       "models": {
-        "qwen3:30b": {
-          "name": "Qwen3 30B MoE (local)"
-        },
-        "gemma4:26b": {
-          "name": "Gemma 4 26B MoE (local)"
+        "gemma4:e4b": {
+          "name": "Gemma 4 E4B (local)"
         }
       }
     }
