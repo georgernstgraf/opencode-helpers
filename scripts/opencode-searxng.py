@@ -8,12 +8,16 @@ import os
 SEARX_URL = os.environ.get("SEARX_URL", "https://claw.graf.priv.at/search")
 SEARX_TOKEN = os.environ.get("SEARX_TOKEN")
 
-def search(query):
+def search(query, category="general"):
     if not SEARX_TOKEN:
         return [{"title": "Error", "url": "", "content": "SEARX_TOKEN not set in environment."}]
     
     headers = {"Authorization": f"Bearer {SEARX_TOKEN}"}
-    params = {"q": query, "format": "json"}
+    params = {
+        "q": query,
+        "format": "json",
+        "categories": category
+    }
     
     try:
         response = requests.get(SEARX_URL, headers=headers, params=params, timeout=10)
@@ -22,11 +26,18 @@ def search(query):
         
         results = []
         for r in data.get("results", [])[:10]:
-            results.append({
+            result = {
                 "title": r.get("title"),
                 "url": r.get("url"),
                 "content": r.get("content")
-            })
+            }
+            # Add image specific field if present
+            if r.get("img_src"):
+                result["img_src"] = r.get("img_src")
+            if r.get("thumbnail"):
+                result["thumbnail"] = r.get("thumbnail")
+                
+            results.append(result)
         return results
     except Exception as e:
         return [{"title": "Connection Error", "url": "", "content": str(e)}]
@@ -52,7 +63,7 @@ def main():
                         },
                         "serverInfo": {
                             "name": "opencode-searxng",
-                            "version": "0.1.0"
+                            "version": "0.1.1"
                         }
                     }
                 }
@@ -68,10 +79,18 @@ def main():
                         "tools": [
                             {
                                 "name": "searxng_search",
-                                "description": "Performs a web search via SearXNG to find up-to-date information.",
+                                "description": "Performs a search via SearXNG to find up-to-date information or images.",
                                 "inputSchema": {
                                     "type": "object",
-                                    "properties": {"query": {"type": "string"}},
+                                    "properties": {
+                                        "query": {"type": "string"},
+                                        "category": {
+                                            "type": "string",
+                                            "description": "The search category.",
+                                            "enum": ["general", "images", "news", "it", "science"],
+                                            "default": "general"
+                                        }
+                                    },
                                     "required": ["query"]
                                 }
                             }
@@ -82,7 +101,8 @@ def main():
             elif method == "tools/call": # MCP uses tools/call instead of call_tool
                 args = request.get("params", {}).get("arguments", {})
                 query = args.get("query")
-                results = search(query)
+                category = args.get("category", "general")
+                results = search(query, category)
                 response = {
                     "jsonrpc": "2.0",
                     "id": req_id,
