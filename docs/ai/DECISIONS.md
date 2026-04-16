@@ -162,3 +162,9 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Heuristic-based auto-filtering in the tool-wrapper.
 - **Tradeoff**: Agent must now explicitly decide when to use a time filter, but the behavior is more predictable and less "magical" than a heuristic approach.
 - **Also added**: Explicit "Search Strategy" section to `CONVENTIONS.md` to guide agents.
+
+## 2026-04-16: Standardize repograde output structure
+- **Choice**: Add a mandatory `repograde` grading-report template with fixed top-level sections, fixed section responsibilities, and tighter email structure guidance for homework grading outputs.
+- **Reason**: Repograde subagents were producing noticeably inconsistent grading bodies, especially in assessment size and emphasis, which made outputs harder to compare across students.
+- **Considered**: Keeping the current flexible reporting guidance, or moving the full template entirely into `grading-shared`.
+- **Tradeoff**: The skill instructions are more prescriptive and longer, but bulk and single-repo grading outputs are now more consistent and auditable.

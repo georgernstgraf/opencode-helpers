@@ -21,6 +21,9 @@ Follow these without question. Do not deviate unless explicitly told.
 
 - **All grading skills must output a percentage (0-100%) alongside the score.** This is mandatory for every skill that produces grading outputs.
 - `repograde` is the canonical repository-grading skill; it handles both full-history and date-filtered grading. There is no separate command — invoke the skill directly.
+- `repograde` repository grading reports must use one exact top-level section order: `Rahmen`, `Commit-Überblick`, `Pünktlichkeit der Abgaben`, `Hausübungs-Abdeckung`, `Codequalität`, `Konkrete technische Beobachtungen`, `Stärken`, `Verbesserungspotenzial`, `Endbewertung`.
+- `repograde` subagents must not improvise free-form grading bodies; they must keep the required section order, include the required metrics, and stay within the requested section scope.
+- `repograde` homework grading emails must follow one fixed paragraph order: greeting, grading period opening, commit summary, homework overview, per-homework evaluation, coverage/timeliness summary, recommendations, final score, closing.
 - `projectgrade` is the project-grading skill; it runs from inside the project Git repo. There is no separate command — invoke the skill directly.
 - Grading operates from a local folder (CWD), NOT from within a Git repository — except `projectgrade` which MUST run from inside a Git repo.
 - `Hausübungen.md` (legacy, cumulative) or per-lesson `Hausübung.md` files in `<date>_<topic>` directories provide homework assignments for grading; at least one must exist in the CWD.

@@ -567,10 +567,21 @@ this exact paragraph order:
    - Specific technical observations (with code snippets where helpful).
    - A percentage rating for that individual homework.
 
-6. **Recommendations and praise** — A warm, genuine paragraph with
+6. **Coverage / timeliness summary** — One short paragraph summarizing overall
+   homework coverage and whether submissions were on time, late, partial, or
+   missing where relevant.
+
+7. **Recommendations and praise** — A warm, genuine paragraph with
    improvement suggestions and subtle praise. See Praise Guidelines below.
 
-7. **Closing** — per Closing Formulas section above.
+8. **Final score summary** — One short paragraph containing the final weighted
+   result in the form `Endbewertung: XX/100 (XX%)`.
+
+9. **Closing** — per Closing Formulas section above.
+
+Keep email length reasonably consistent across students. Do not omit one of the
+paragraph groups above simply because a repository is weaker or stronger; if
+evidence is limited, say so briefly and continue with the same structure.
 
 ### Structure for Knowledge-Check Emails
 
@@ -660,6 +671,16 @@ Unterschiede zwischen den JOIN-Typen (INNER, LEFT, RIGHT) noch
 einmal anhand praktischer Beispiele nachzuvollziehen. Die
 Tabellenstruktur der Bibliotheksdatenbank ist Ihnen gut gelungen.
 
+Beide Hausübungen waren erkennbar abgegeben. Die erste Aufgabe war
+weitgehend vollständig, bei der zweiten Aufgabe gab es inhaltliche
+Lücken bei einzelnen JOIN-Varianten.
+
+Insgesamt ist eine solide Grundlage erkennbar. Es lohnt sich, die
+Behandlung unvollständiger Ergebniszeilen bei LEFT JOINs noch gezielt
+zu üben.
+
+Endbewertung: 73/100 (73%)
+
 Mit freundlichen Grüßen,
 
    Georg Graf
@@ -704,6 +725,15 @@ in denen ein LEFT JOIN nötig ist. Die Grundlagen sitzen, und mit
 etwas mehr Übung bei den komplexeren Abfragen wirst du noch
 sicherer.
 
+Beide Hausübungen sind erkennbar bearbeitet. Bei der zweiten Aufgabe
+zeigen sich aber noch Lücken bei den komplexeren Abfragen.
+
+Insgesamt ist das eine brauchbare Arbeitsgrundlage. Wenn du die
+Unterschiede der JOIN-Typen noch sicherer anwenden kannst, wird die
+Qualität der Lösungen deutlich steigen.
+
+Endbewertung: 68/100 (68%)
+
 Lieben Gruß,
 
    Georg Graf
@@ -730,6 +760,12 @@ Reports should include, where applicable:
 - inactive gaps
 - diligence assessment
 - final evaluation with `Endbewertung: XX/100`
+
+When a consuming skill defines an exact mandatory report template, that template
+overrides any looser interpretation of this Reporting Protocol. In such cases,
+agents and subagents MUST follow the exact heading names, order, and section
+scope defined by the consuming skill and MUST NOT improvise alternative report
+structures.
 
 ## Output Expectations
 

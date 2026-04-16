@@ -1,19 +1,18 @@
 # Project State
 
-Current status as of 2026-04-13.
+Current status as of 2026-04-16.
 
 ## Current Focus
 
-Finished enhancement of the SearXNG search tool and documentation of search strategies.
+Finished standardization of `repograde` grading and email output structure for more consistent subagent assessments.
 
 ## Completed (this cycle)
 
-- [x] Enhanced `scripts/opencode-searxng.py` to support `time_range` parameter.
-- [x] Updated MCP tool schema and description for `searxng_search` to guide agents on freshness and exact matching.
-- [x] Added "Search Strategy" section to `docs/ai/CONVENTIONS.md`.
-- [x] Verified tool functionality with time-filtered and exact-version queries.
-- [x] Persisted session knowledge and documented the "Gemma 4" search pitfall.
-- [x] Created GitHub issue #43 and committed changes.
+- [x] Added strict `repograde` report-template requirements with fixed section order and section-specific content rules.
+- [x] Added explicit subagent normalization rules to prevent free-form or highly uneven grading bodies.
+- [x] Tightened shared homework email guidance with required coverage/timeliness and final-score summary paragraphs.
+- [x] Updated shared reporting guidance so consuming skills with exact templates override looser defaults.
+- [x] Updated knowledge files with the new repograde consistency rules and shell quoting pitfall.
 
 ## Pending
 
@@ -25,4 +24,4 @@ None
 
 ## Next Session Suggestion
 
-The search tool is now much more robust for current tech research. Continue with the planned refinement of grading skills or expansion of educational tools.
+Apply the same consistency pattern to other grading skills such as `projectgrade` or `knowledge-assessment` if their outputs still vary too much.
