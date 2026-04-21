@@ -1,7 +1,7 @@
 ---
 description: Analyzes images using vision capabilities - screenshots, diagrams, mockups, documents
-model: opencode-go/kimi-k2.5
-mode: subagent
+model: zai-coding-plan/glm-4.6v
+mode: primary
 tools:
   read: true
   glob: true
