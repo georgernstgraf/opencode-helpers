@@ -35,6 +35,7 @@ Use this skill whenever the user invokes an issue-oriented command such as
 - Prefer keeping one clear issue per workstream; do not scatter related changes
   across multiple issues unless the user explicitly requests it.
 - Use `gh` for all GitHub issue operations.
+- **Sub-Issues Rule:** When breaking a task into smaller issues, you **MUST** establish a formal parent-child relationship using the Sub-Issues API. Mentions in the description are secondary to this formal link.
 - Do not close an issue unless the workflow is running in `finish` mode and the
   implementation is actually complete.
 
@@ -105,6 +106,7 @@ When creating an issue:
 
 - Write a short, outcome-oriented title.
 - Include enough body detail for a future agent to understand scope and intent.
+- **Link as Sub-Issue:** If this issue is a component of a larger task, identify the parent issue and link it as a sub-issue immediately after creation.
 - If a plan already exists, use it as the issue body or convert it into a short
   checklist.
 
