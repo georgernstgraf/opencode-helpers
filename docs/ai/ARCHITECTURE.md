@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-04-13.
+Living structural map of the system as of 2026-04-24.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -53,6 +53,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
+| `fork-policy` | Enforce clean-main branch policy on forked repositories | On-demand skill invocation |
 
 ## Knowledge Files (`docs/ai/`)
 

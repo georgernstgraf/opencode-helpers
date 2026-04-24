@@ -168,3 +168,10 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Repograde subagents were producing noticeably inconsistent grading bodies, especially in assessment size and emphasis, which made outputs harder to compare across students.
 - **Considered**: Keeping the current flexible reporting guidance, or moving the full template entirely into `grading-shared`.
 - **Tradeoff**: The skill instructions are more prescriptive and longer, but bulk and single-repo grading outputs are now more consistent and auditable.
+
+## 2026-04-24: Add fork-policy skill for clean-main enforcement on forks
+- **Choice**: Create a standalone `skills/fork-policy/SKILL.md` that forbids commits to `main`/`master` on forked repositories, requiring feature branches with naming pattern `feat/issue-N-short-description`.
+- **Reason**: Forked repositories need a clean main branch for upstream syncing and to support multiple concurrent feature branches. The policy is loaded on demand rather than enforced by default — projects opt in via AGENTS.md reference or skill invocation.
+- **Considered**: Adding the rule to AGENTS.md (always enforced), extending the issue-workflow skill, creating a policy directory
+- **Tradeoff**: The policy only applies when explicitly loaded, but this avoids imposing restrictions on non-fork projects
+- **Fork detection**: A repository is treated as a fork if it has more than one remote (simple heuristic)
