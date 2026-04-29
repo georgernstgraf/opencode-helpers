@@ -68,6 +68,9 @@ alongside knowledge-check solution files.
 - Read the total achievable points from the bottom of the knowledge solutions
   Markdown file and treat that value as the authoritative total.
 - Use the defined point totals instead of an Austrian school grading scheme.
+- Report only points earned and maximum achievable points. Never include
+  grade labels (Sehr gut, Gut, Befriedigend, Genügend, Nicht genügend) or
+  percentage scores in any output file.
 - Grade multiple-choice questions per answer option: award 1 point for each
   option that was handled correctly, whether it was correctly checked or
   correctly left blank.
@@ -114,7 +117,6 @@ alongside knowledge-check solution files.
 # Bewertung: Haas Alexander (2AHWII)
 
 Du hast bei dieser Wissensüberprüfung insgesamt 72 von 80 Punkten erreicht.
-Das ist eine solide Leistung.
 
 ## Stärken
 
@@ -138,7 +140,6 @@ einmal zu üben. Nutze dazu die hochgeladene Lösungedatei als Referenz.
 # Bewertung: Huber Maria (5AHIF)
 
 Sie haben bei dieser Wissensüberprüfung insgesamt 68 von 80 Punkten erreicht.
-Das ist eine gute Leistung.
 
 ## Stärken
 
