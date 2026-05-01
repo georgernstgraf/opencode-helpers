@@ -1,4 +1,58 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": "allow"
+  "tools": {
+    "write": true,
+    "bash": true
+  },
+  "provider": {
+    "openrouter": {
+      "options": {
+        "baseURL": "https://openrouter.ai/api/v1"
+      }
+    },
+    "llama-cpp": {
+      "options": {
+        "baseURL": "http://localhost:8080/v1"
+      },
+      "models": {
+        "gemma-4-26b": {
+          "name": "Gemma 4 26B MoE (local llama-cpp)"
+        }
+      }
+    },
+    "ollama": {
+      "npm": "ollama-ai-provider-v2",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/api"
+      },
+      "models": {
+        "gemma4:e4b": {
+          "name": "Gemma 4 E4B (local)"
+        }
+      }
+    }
+  },
+  "permission": {
+    "bash": "allow",
+    "edit": {
+      "**": "allow"
+    },
+    "external_directory": {
+      "/tmp/**": "allow"
+    },
+    "searxng_searxng_search": "allow"
+  },
+  "mcp": {
+    "searxng": {
+      "type": "local",
+      "command": [
+        "python3",
+        "/home/georg/bin/opencode-searxng"
+      ],
+      "environment": {
+        "SEARX_URL": "https://searxng.claw.graf.priv.at/search"
+      }
+    }
+  }
 }
