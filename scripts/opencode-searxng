@@ -129,6 +129,20 @@ def main():
                     }
                 }
                 print(json.dumps(response))
+            elif method == "resources/list":
+                response = {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {"resources": []}
+                }
+                print(json.dumps(response))
+            elif method == "prompts/list":
+                response = {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {"prompts": []}
+                }
+                print(json.dumps(response))
             elif method == "tools/call":
                 args = request.get("params", {}).get("arguments", {})
                 query = args.get("query")
