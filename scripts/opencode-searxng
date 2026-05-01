@@ -7,40 +7,49 @@ import os
 # Configuration via environment variable (from opencode.json)
 SEARX_URL = os.environ.get("SEARX_URL", "https://searxng.claw.graf.priv.at/search")
 
-def search(query, category="general", time_range=None):
+def search(query, category="general", time_range=None, engines=None, language=None, pageno=1, safesearch=None):
     params = {
         "q": query,
         "format": "json",
-        "categories": category
+        "categories": category,
+        "pageno": pageno
     }
     if time_range:
         params["time_range"] = time_range
-    
+    if engines:
+        params["engines"] = engines
+    if language:
+        params["language"] = language
+    if safesearch is not None:
+        params["safesearch"] = safesearch
+
     try:
         response = requests.get(SEARX_URL, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
-        
+
         results = []
-        for r in data.get("results", [])[:10]:
+        for r in data.get("results", [])[:20]:
             result = {
                 "title": r.get("title"),
                 "url": r.get("url"),
                 "content": r.get("content")
             }
-            # Add image specific field if present
+            if r.get("engine"):
+                result["engine"] = r.get("engine")
+            if r.get("publishedDate"):
+                result["publishedDate"] = r.get("publishedDate")
             if r.get("img_src"):
                 result["img_src"] = r.get("img_src")
             if r.get("thumbnail"):
                 result["thumbnail"] = r.get("thumbnail")
-                
+
             results.append(result)
         return results
     except Exception as e:
         return [{"title": "Connection Error", "url": "", "content": str(e)}]
 
 def main():
-    # Minimal MCP-compatible JSON-RPC loop
     for line in sys.stdin:
         if not line.strip():
             continue
@@ -60,15 +69,14 @@ def main():
                         },
                         "serverInfo": {
                             "name": "opencode-searxng",
-                            "version": "0.1.1"
+                            "version": "0.2.0"
                         }
                     }
                 }
                 print(json.dumps(response))
             elif method == "notifications/initialized":
-                # No response required for notifications
                 pass
-            elif method == "tools/list": # MCP uses tools/list instead of list_tools
+            elif method == "tools/list":
                 response = {
                     "jsonrpc": "2.0",
                     "id": req_id,
@@ -94,6 +102,24 @@ def main():
                                             "type": "string",
                                             "description": "Filter results by age. Use 'month' or 'week' for brand new technologies to avoid outdated results.",
                                             "enum": ["day", "week", "month", "year"]
+                                        },
+                                        "engines": {
+                                            "type": "string",
+                                            "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection."
+                                        },
+                                        "language": {
+                                            "type": "string",
+                                            "description": "Language code for results (e.g. 'en', 'de', 'fr', 'auto'). Filter results by language."
+                                        },
+                                        "pageno": {
+                                            "type": "integer",
+                                            "description": "Page number for paginated results (default: 1). Combine with time_range for older results.",
+                                            "default": 1
+                                        },
+                                        "safesearch": {
+                                            "type": "integer",
+                                            "description": "Safe search filter: 0 (off), 1 (moderate), 2 (strict).",
+                                            "enum": [0, 1, 2]
                                         }
                                     },
                                     "required": ["query"]
@@ -103,12 +129,16 @@ def main():
                     }
                 }
                 print(json.dumps(response))
-            elif method == "tools/call": # MCP uses tools/call instead of call_tool
+            elif method == "tools/call":
                 args = request.get("params", {}).get("arguments", {})
                 query = args.get("query")
                 category = args.get("category", "general")
                 time_range = args.get("time_range")
-                results = search(query, category, time_range)
+                engines = args.get("engines")
+                language = args.get("language")
+                pageno = args.get("pageno", 1)
+                safesearch = args.get("safesearch")
+                results = search(query, category, time_range, engines, language, pageno, safesearch)
                 response = {
                     "jsonrpc": "2.0",
                     "id": req_id,

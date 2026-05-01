@@ -1,62 +1,56 @@
 ---
 name: searxng
-description: "Search the web using local SearXNG instance with automatic fallback to public instances. Use when: user asks to search the web, find information, or look something up. Self-hosted at localhost:8888."
-metadata: { "openclaw": { "emoji": "🔍", "requires": { "bins": ["curl", "jq"] } } }
+description: "Search the web using local SearXNG instance. Use when: user asks to search the web, find information, or look something up. Self-hosted at searxng.claw.graf.priv.at."
+metadata: { "openclaw": { "emoji": "🔍" } }
 ---
 
 # SearXNG Web Search Skill
 
-Search the web using local SearXNG instance (self-hosted) with fallback to public instances.
+Search the web using self-hosted SearXNG at `searxng.claw.graf.priv.at`.
 
 ## Architecture
 
-**Primary:** localhost:8888 (self-hosted SearXNG)
-**Fallback:** Public SearXNG instances
+- **Primary:** `https://searxng.claw.graf.priv.at/search` (nginx → `localhost:8888`)
+- **Wrapper:** `scripts/opencode-searxng` (MCP JSON-RPC server, invoked by OpenCode)
 
-## Usage
+## API Parameters
 
-### Basic Search
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `query` | string (required) | Search query | `"Gemma 4"` |
+| `category` | string | Search category | `general`, `images`, `news`, `it`, `science` |
+| `time_range` | string | Age filter | `day`, `week`, `month`, `year` |
+| `engines` | string | Comma-separated engine list | `"wikipedia,github,braveapi"` |
+| `language` | string | Language code | `"en"`, `"de"`, `"fr"`, `"auto"` |
+| `pageno` | integer | Results page number | `1`, `2`, `3` |
+| `safesearch` | integer | Safe search filter | `0` (off), `1` (moderate), `2` (strict) |
 
-```bash
-{baseDir}/searxng-search.sh "your search query"
-```
+## Available Engines
 
-### Search with Language
+### General Web Search
+- `braveapi` — Brave Search API (best quality)
+- `presearch` — Presearch
+- `yacy` — P2P YaCy network
+- `ask` — Ask.com
+- `quark` — Quark search
+- `searchmysite` — Indie websites
+- `marginalia` — Non-commercial content
 
-```bash
-{baseDir}/searxng-search.sh "Wetter in Berlin" "de"
-```
+### Knowledge
+- `wikipedia` — Wikipedia (with infobox)
+- `arxiv` — Scientific papers
+- `github` — GitHub repositories
+- `github code` — GitHub code search
+- `npm`, `lib.rs` — Package registries
+- `docker hub`, `arch linux wiki`, `gentoo` — Tech resources
 
-### Pagination
-
-```bash
-{baseDir}/searxng-search.sh "python async" "en" 2
-```
+### News
+- `hackernews` — Hacker News
 
 ## SearXNG Instance
 
-Your self-hosted SearXNG is running at:
-
-- **Web UI:** http://localhost:8888
-- **API:** http://localhost:8888/search?q=QUERY&format=json
-
-## Output Format
-
-```json
-{
-  "success": true,
-  "instance": "http://localhost:8888",
-  "query": "search query",
-  "results": [
-    {
-      "title": "Result Title",
-      "url": "https://example.com",
-      "engine": "brave",
-      "snippet": "Description..."
-    }
-  ]
-}
-```
+- **Web UI:** https://searxng.claw.graf.priv.at/
+- **API:** https://searxng.claw.graf.priv.at/search?q=QUERY&format=json
 
 ## Docker Management
 
@@ -70,10 +64,8 @@ docker logs searxng
 # Restart
 cd /opt/searxng && docker compose restart
 
-# Stop
+# Stop / Start
 cd /opt/searxng && docker compose down
-
-# Start
 cd /opt/searxng && docker compose up -d
 ```
 
