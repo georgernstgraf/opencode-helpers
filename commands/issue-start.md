@@ -13,7 +13,8 @@ Pass these inputs into the skill:
 
 Important constraints:
 
-- If the issue already appears complete in the codebase, comment on it, close it,
-  and stop.
+- If the issue already appears complete in the codebase and has no open
+  sub-issues, comment on it, close it, and stop. If open sub-issues exist,
+  report them and keep the issue open.
 - If no issue exists yet, create one before proceeding.
 - Do not commit in this mode unless the user explicitly asks for it.

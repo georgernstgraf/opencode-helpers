@@ -10,6 +10,7 @@ Read this file carefully before making changes in affected areas.
 - OpenCode may show linked skills as `None` when `SKILL.md` files are missing required YAML frontmatter.
 - Do not move runtime-critical skill instructions into adjacent helper Markdown files unless skill loading is known to include them.
 - Do not allow issue workflow commits without a GitHub issue number in the commit message.
+- Never close an issue that has open sub-issues. Always list sub-issues and verify all are closed before closing.
 - When passing Markdown with backticks to `gh issue create` or `gh issue comment` through the shell, quote it safely or the shell may try to execute the backticked fragments before posting the content.
 - OpenCode has no built-in throttling for parallel sub-agent execution - use dynamic concurrency with a maximum limit and ~3 second delays between agent starts to avoid overwhelming API rate limits.
 - When removing or renaming a skill, update every dependent command, agent, README entry, and knowledge file in the same change or stale workflow references remain behind.

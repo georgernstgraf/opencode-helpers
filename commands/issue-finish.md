@@ -16,4 +16,6 @@ Important constraints:
 - No commit is allowed without an associated GitHub issue number.
 - Persist all newly acquired session knowledge by invoking the
   `knowledge-persistence` skill during the finish workflow.
+- Do not close the issue if it has open sub-issues. Verify all sub-issues are
+  closed first.
 - Close the issue only after the final report, commit, and push succeed.

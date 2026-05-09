@@ -36,6 +36,8 @@ Use this skill whenever the user invokes an issue-oriented command such as
   across multiple issues unless the user explicitly requests it.
 - Use `gh` for all GitHub issue operations.
 - **Sub-Issues Rule:** When breaking a task into smaller issues, you **MUST** establish a formal parent-child relationship using the Sub-Issues API. Mentions in the description are secondary to this formal link.
+- **Never close an issue that has open sub-issues.** Before closing any issue,
+  list its sub-issues and verify all are closed first.
 - Do not close an issue unless the workflow is running in `finish` mode and the
   implementation is actually complete.
 
@@ -59,7 +61,9 @@ Use this mode to begin or resume work.
 - If no issue is supplied, infer whether there is already a current issue for
   the work. If not, create one before proceeding.
 - Assess the codebase against the issue. If the requested functionality is
-  already complete, comment with the finding, close the issue, and stop.
+  already complete, comment with the finding. Before closing, check for open
+  sub-issues. If open sub-issues exist, report them and keep the issue open;
+  otherwise close the issue and stop.
 - Resolve any blocking ambiguity with the user only after doing all safe local
   discovery work first.
 - Update the issue description or add a progress comment with the current plan,
@@ -98,6 +102,10 @@ Use this mode when the task is complete and the issue should be closed.
 - Review git status and remaining changes.
 - Create the final commit including the issue number.
 - Push the branch.
+- **Before closing the issue**, list its sub-issues via:
+  `gh api repos/{owner}/{repo}/issues/{NUMBER}/sub_issues --jq '.[].number'`
+  If any sub-issues remain open, the issue **must not** be closed. Report the
+  open sub-issues and keep the parent open.
 - Close the issue with a short closing comment if helpful.
 
 ## Issue Creation Guidance
@@ -155,6 +163,8 @@ gh api --method DELETE /repos/{owner}/{repo}/issues/PARENT_NUMBER/sub_issue \
   (`sub_issues_summary.total` / `completed` / `percent_completed`).
 - Each sub-issue can be assigned, labeled, and closed independently; closing
   all sub-issues does **not** auto-close the parent.
+- **A parent issue must never be closed while it has open sub-issues.**
+  Either close all children first, or re-parent them before closing the parent.
 
 ### Avoiding concurrent-link conflicts
 
@@ -178,6 +188,8 @@ Issue comments should be compact but useful.
 - If there are no local changes in `commit` or `finish` mode, still update the
   issue comment as needed, but report that there was nothing to commit.
 - Do not push or close issues if the relevant step fails.
+- Never close an issue that has open sub-issues. Always check for open
+  sub-issues before closing.
 
 ## Output Expectations
 
