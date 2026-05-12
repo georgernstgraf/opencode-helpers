@@ -35,7 +35,7 @@ Use this skill whenever the user invokes an issue-oriented command such as
 - Prefer keeping one clear issue per workstream; do not scatter related changes
   across multiple issues unless the user explicitly requests it.
 - Use `gh` for all GitHub issue operations.
-- **Sub-Issues Rule:** When breaking a task into smaller issues, you **MUST** establish a formal parent-child relationship using the Sub-Issues API. Mentions in the description are secondary to this formal link.
+- **Sub-Issues Rule:** When breaking a task into smaller issues, or when starting work on a task that belongs to a parent epic, you **MUST** establish a formal parent-child relationship using the Sub-Issues API. Mentions in the description are secondary to this formal link. Always use the `issue-workflow` skill for issue creation to ensure this protocol is followed.
 - **Never close an issue that has open sub-issues.** Before closing any issue,
   list its sub-issues and verify all are closed first.
 - Do not close an issue unless the workflow is running in `finish` mode and the
@@ -55,9 +55,9 @@ Use this skill whenever the user invokes an issue-oriented command such as
 Use this mode to begin or resume work.
 
 - If `issue` is an explicit issue number, fetch it with `gh issue view` and read
-  the description plus comments.
+  the description plus comments. Check if the issue has a parent or should be linked as a sub-issue to an existing epic.
 - If `issue` is `new`, or if no usable issue exists for the current work,
-  create a new issue from the provided context.
+  create a new issue from the provided context. If the new issue is part of a larger epic, link it as a sub-issue immediately.
 - If no issue is supplied, infer whether there is already a current issue for
   the work. If not, create one before proceeding.
 - Assess the codebase against the issue. If the requested functionality is
