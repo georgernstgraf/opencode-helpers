@@ -186,3 +186,9 @@ Each entry documents WHAT was decided and WHY.
 - **Choice**: Always commit and push directly to the `main` branch. Never create feature branches or Pull Requests for development in this repository.
 - **Reason**: Simplifies development, reduces process overhead, and aligns with the repository's direct development style.
 - **Tradeoff**: Bypasses PR code review, but ensures faster integration for this utility template repository.
+
+## 2026-05-21: Enforce pure AI evaluation, prohibit grading scripts
+- **Choice**: Mandate pure AI reasoning for all student grading. Explicitly forbid agents from writing or invoking scripts, programs, test runners, linters, or automated checkers to assess student work.
+- **Reason**: Agents were writing evaluation scripts that produced machine-like, impersonal grades that failed to account for the unique individuality of each student's submission. Direct AI reasoning produces higher-quality, more nuanced assessments.
+- **Considered**: Allowing scripts for partial automation, or relying on agent judgment alone.
+- **Tradeoff**: Pure AI evaluation is slower per-student but produces more thoughtful, individualized results. Sub-agents are used for parallelism instead of scripts.

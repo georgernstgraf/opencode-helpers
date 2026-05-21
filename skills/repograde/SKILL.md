@@ -554,3 +554,6 @@ Do not vary this structure between students.
   are complete.
 - Use proper quoting for paths with spaces.
 - Present the plan to the user BEFORE starting any grading work.
+- Use pure AI evaluation for all grading; never write grading scripts. The
+  sub-agent fan-out in bulk mode handles parallelism — do not write batch
+  processing scripts or evaluation programs.

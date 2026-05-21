@@ -210,6 +210,49 @@ Before finalizing any grading output, verify:
 - [ ] Verb conjugation matches address style
 - [ ] Closing formula matches address style
 
+## Grading Methodology (CRITICAL)
+
+All grading workflows MUST evaluate student work through pure AI reasoning and
+judgment. The following rules apply to every grading skill (`repograde`,
+`knowledge-assessment`, `projectgrade`) and every subagent used within them.
+
+### Pure AI Evaluation
+
+- **Grading is performed through AI reasoning alone.** The agent must read,
+  understand, and evaluate each student submission by directly comparing it
+  against the task instructions and expected solutions. The evaluation must be
+  a direct intellectual act by the AI, not a mechanical or automated process.
+- **No scripts or programs for evaluation.** Under no circumstances may agents
+  write, invoke, or rely on scripts, programs, test runners, linters, or
+  automated checkers to assess student work. Grading must never be reduced to
+  a mechanical operation.
+- **Programmatic output formatting is allowed.** Using `json.dump()` or similar
+  serializers to write `EMAIL.json` or `*_email.json` files is permitted. The
+  prohibition applies only to the act of grading/assessing the student's work
+  itself — not to output formatting helpers.
+
+### Available Inputs Per Evaluation
+
+For every student submission, the agent has access to the following inputs and
+must base its evaluation exclusively on them:
+
+1. **Task instructions** — the homework description, exam questions, or project
+   requirements that define what was asked of the student.
+2. **Expected solutions** — the reference solution or answer key against which
+   student work is compared.
+3. **Student submission** — the individual student's work (repository commits,
+   answer file, code changes) to be evaluated.
+
+### Handling Large Volumes
+
+- **For bulk or multi-student grading, use sub-agents.** Each sub-agent
+  evaluates one student or repository independently, using the same pure AI
+  reasoning approach.
+- Sub-agents MUST follow all rules defined in this skill, including the
+  no-script grading requirement.
+- The orchestrating agent delegates work to sub-agents but must never write
+  evaluation scripts or batch-processing programs.
+
 ## Database Access
 
 ### Databases
@@ -339,6 +382,9 @@ email JSON files.** The following rules MUST be followed:
 - Three-space indentation before `Georg Graf`.
 - Never guess gender - use neutral fallback when uncertain.
 - Flag uncertain cases for manual review.
+- Grading must be performed through pure AI evaluation; never write scripts,
+  programs, or automated checkers to assess student work. For bulk grading,
+  use sub-agents instead (see `## Grading Methodology (CRITICAL)` above).
 
 ## Repository Analysis Protocol
 

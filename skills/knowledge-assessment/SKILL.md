@@ -217,6 +217,8 @@ Additional requirements specific to knowledge-check:
 - If any point-total consistency error appears between the solutions file,
   grading files, or `EMAIL.json`, stop immediately instead of generating or
   continuing with inconsistent output.
+- Use pure AI evaluation; never write scripts to automate the grading of
+  student submissions.
 
 ## Output Expectations
 

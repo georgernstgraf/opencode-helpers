@@ -465,3 +465,4 @@ Always use `grading-shared` for:
   contributions are suspected but unmeasurable.
 - Offline coordination (Slack, verbal discussion, external research) cannot
   be detected. The grading report should acknowledge this limitation.
+- Use pure AI evaluation; never write scripts to automate project assessment.

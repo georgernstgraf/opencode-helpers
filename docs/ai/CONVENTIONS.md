@@ -46,6 +46,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Formal/informal address and email formulas: see `grading-shared` skill for centralized configuration
 - `vacuum.db` must exist at start of `knowledge-assessment`; if missing, stop immediately (do not create or copy)
 - If any student email address is missing from the database, stop immediately and present all unresolved names to the user; do not generate `EMAIL.json` until all emails are resolved
+- Grading must use pure AI evaluation; scripting or automating the evaluation step is forbidden. Use sub-agents for large volumes of student submissions.
 
 ## Search Strategy
 

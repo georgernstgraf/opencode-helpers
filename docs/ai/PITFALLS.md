@@ -37,6 +37,7 @@ Read this file carefully before making changes in affected areas.
 - Email bodies must be plain ASCII text — no Markdown headers, bold, tables, or lists in email JSON bodies; only code blocks with backtick fences are allowed.
 - The `repograde` skill is invoked directly (no command wrapper); it handles full-history and date-filtered grading in one skill.
 - The `projectgrade` skill is invoked directly (no command wrapper); it uses holistic descriptive grading, not numeric weights.
+- **Agents frequently attempt to write Python or bash scripts to automate student evaluation.** This produces machine-like, impersonal grades that fail to capture the unique nuances of individual student submissions. Grading must always be done through direct AI reasoning — never through scripts, test runners, linters, or automated checkers. The agent itself is the evaluator.
 
 ## Project Configuration
 
