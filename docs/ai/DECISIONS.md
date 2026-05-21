@@ -181,3 +181,8 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Transparency for students that the assessment is generated automatically and may contain errors.
 - **Wording**: Tailored to address style (Du vs Sie) and type of assessment (Leistungsfeststellung vs Knowledge-Check).
 - **Tradeoff**: Adds minor boilerplate, but establishes proper expectations and handles potential auto-assessment mistakes gracefully.
+
+## 2026-05-21: Adopt Trunk-Based Development on main
+- **Choice**: Always commit and push directly to the `main` branch. Never create feature branches or Pull Requests for development in this repository.
+- **Reason**: Simplifies development, reduces process overhead, and aligns with the repository's direct development style.
+- **Tradeoff**: Bypasses PR code review, but ensures faster integration for this utility template repository.

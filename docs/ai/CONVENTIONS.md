@@ -54,6 +54,11 @@ Follow these without question. Do not deviate unless explicitly told.
 - **Noise Reduction:** Filter out irrelevant documentation sites using negative keywords (e.g., `-site:developer.mozilla.org`) if the results are cluttered with legacy web standards.
 - **Category Focus:** Prefer the `it` or `science` categories for technical research to leverage specialized search engines.
 
+## Development & Git Workflow
+
+- **Trunk-Based Development (CRITICAL):** Do not create feature branches or pull requests in this repository. All changes must be committed and pushed directly to the `main` branch.
+- **Commit Messages with Issues:** When working on a specific issue, always include the issue number in the commit message (e.g., `feat: ... (#123)`).
+
 ## Naming
 
 ## API Integration

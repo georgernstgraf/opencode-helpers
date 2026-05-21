@@ -13,7 +13,7 @@ This agent operates with ZERO knowledge of the OpenClaw framework.
 - **Using OpenClaw bundled skills** (e.g., github, gh-issues, weather, etc.)
 
 **Allowed:**
-- Standard git/github operations (commit, push, PR)
+- Standard git/github operations (trunk-based development: always commit and push directly to main; no branches or PRs)
 - AGENTS.md for project instructions
 - docs/ai/ knowledge files
 - **ONLY skills from workspace skills/ directory** (this repository's skills)
