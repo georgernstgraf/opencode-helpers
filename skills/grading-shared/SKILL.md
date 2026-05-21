@@ -128,6 +128,22 @@ Lieben Gruß,
    Georg Graf
 ```
 
+### Automatic Assessment Disclaimers
+
+Every grading email body MUST include a disclaimer paragraph directly below the greeting. The wording depends on the class's address style (Formal/Informal) and the assessment type (Homework/Projects vs. Knowledge-Checks):
+
+**Formal Address (Sie):**
+- **Homework / Projects / General (Leistungsfeststellung):**
+  `Im Folgenden finden Sie die automatische Beurteilung Ihrer Leistungsfeststellung. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.`
+- **Knowledge-Checks / Mini-Exams (Knowledge-Check):**
+  `Im Folgenden finden Sie die automatische Beurteilung Ihres Knowledge-Checks. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.`
+
+**Informal Address (Du):**
+- **Homework / Projects / General (Leistungsfeststellung):**
+  `Im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.`
+- **Knowledge-Checks / Mini-Exams (Knowledge-Check):**
+  `Im Folgenden findest du die automatische Beurteilung deines Knowledge-Checks. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.`
+
 ### Gender Determination
 
 Gender is determined from the **first name** (the last word in the repository
@@ -539,7 +555,9 @@ this exact paragraph order:
 
 1. **Greeting** — per Greeting Formulas section above.
 
-2. **Opening sentence** (address style dependent):
+2. **Automatic assessment disclaimer** — per Automatic Assessment Disclaimers section above.
+
+3. **Opening sentence** (address style dependent):
    - Formal: `Ich habe Ihre Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
    - Informal: `Ich habe deine Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
    - Dates in German long format (e.g., "18. Februar 2026", "4. März 2026").
@@ -589,11 +607,13 @@ Used by `knowledge-assessment` skill. Same plain-text rule applies.
 
 1. **Greeting** — per Greeting Formulas section above.
 
-2. **Opening sentence** (address style dependent):
+2. **Automatic assessment disclaimer** — per Automatic Assessment Disclaimers section above.
+
+3. **Opening sentence** (address style dependent):
    - Formal: `Ich habe Ihre Wissensüberprüfung vom [Datum] durchgesehen.`
    - Informal: `Ich habe deine Wissensüberprüfung vom [Datum] durchgesehen.`
 
-3. **Score summary** — Total points achieved out of total possible points.
+4. **Score summary** — Total points achieved out of total possible points.
 
 4. **Question-by-question analysis** — Plain text paragraphs discussing
    strengths and weaknesses in specific questions.
@@ -628,6 +648,8 @@ something well, state it matter-of-factly.
 
 ```
 Sehr geehrte Frau Huber,
+
+im Folgenden finden Sie die automatische Beurteilung Ihrer Leistungsfeststellung. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.
 
 Ich habe Ihre Hausübungen, welche im Zeitraum vom 4. März bis zum
 18. März aufgegeben waren, durchgesehen.
@@ -690,6 +712,8 @@ Mit freundlichen Grüßen,
 
 ```
 Lieber Thomas,
+
+im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.
 
 Ich habe deine Hausübungen, welche im Zeitraum vom 4. März bis zum
 18. März aufgegeben waren, durchgesehen.

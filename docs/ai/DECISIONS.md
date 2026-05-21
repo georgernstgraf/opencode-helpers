@@ -175,3 +175,9 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Adding the rule to AGENTS.md (always enforced), extending the issue-workflow skill, creating a policy directory
 - **Tradeoff**: The policy only applies when explicitly loaded, but this avoids imposing restrictions on non-fork projects
 - **Fork detection**: A repository is treated as a fork if it has more than one remote (simple heuristic)
+
+## 2026-05-21: Add automatic assessment disclaimer to all grading emails
+- **Choice**: Insert an automatic assessment disclaimer paragraph directly below the email greeting in all grading workflows.
+- **Reason**: Transparency for students that the assessment is generated automatically and may contain errors.
+- **Wording**: Tailored to address style (Du vs Sie) and type of assessment (Leistungsfeststellung vs Knowledge-Check).
+- **Tradeoff**: Adds minor boilerplate, but establishes proper expectations and handles potential auto-assessment mistakes gracefully.

@@ -520,14 +520,15 @@ Additionally, every repograde email body MUST summarize the following in the
 same fixed structure for every student:
 
 1. greeting,
-2. grading period opening,
-3. commit activity summary,
-4. homework overview,
-5. per-homework evaluation paragraphs,
-6. homework coverage and timeliness summary,
-7. recommendations,
-8. final weighted score,
-9. closing.
+2. automatic assessment disclaimer paragraph,
+3. grading period opening,
+4. commit activity summary,
+5. homework overview,
+6. per-homework evaluation paragraphs,
+7. homework coverage and timeliness summary,
+8. recommendations,
+9. final weighted score,
+10. closing.
 
 Within that fixed order, ensure that the combined homework evaluation and
 coverage paragraphs clearly communicate code quality, missing work, lateness,
