@@ -179,7 +179,8 @@ Additional requirements specific to knowledge-check:
   - `subject`: `Ergebnis der Wissensüberprüfung am <isodate>`
   - `body`: the student's individual assessment text, formatted as plain ASCII
     text following the `grading-shared` Email Body Format section for
-    knowledge-check emails.
+    knowledge-check emails. Place the automatic assessment disclaimer paragraph
+    immediately after the greeting.
 - Ensure every reported score inside the email body is consistent with the
   authoritative total achievable points from the solutions file.
 - Use greeting and closing formulas from `grading-shared` based on class
