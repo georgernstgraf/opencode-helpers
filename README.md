@@ -34,11 +34,15 @@ opencode-helpers/
 ├── skills/              # Workflow-Skills (die eigentliche Logik)
 ├── docs/ai/             # Knowledge-Persistence-Dateien
 ├── scripts/             # Utility-Skripte (z.B. MCP-Server)
-├── agents/              # Globale Agenten-Definitionen
 ├── AGENTS.md            # Agents-Konfiguration (dieses Projekt)
 ├── AGENTS.template.md   # Vorlage für andere Projekte
+├── IAM.md               # Entwickler-Identität & Präferenzen
 └── opencode.json        # MCP-Server-Konfiguration
 ```
+
+### Identität & Präferenzen (`IAM.md`)
+
+Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technologie-Stack, Lehrfächer) sowie Kommunikationspräferenzen. Sie wird vom opencode-Agenten automatisch beim Start eingelesen und hilft, Antworten konsistent an die Bedürfnisse des Entwicklers anzupassen.
 
 ### Skills im Überblick
 
@@ -54,7 +58,7 @@ opencode-helpers/
 | `repograde` | Benotet Schüler-Repos (einzeln oder Bulk) | Direkter Skill-Aufruf |
 | `fork-policy` | Erzwingt Clean-Main-Branch-Policy auf Forks | On-Demand Skill-Aufruf |
 | `orchestration` | Orchestriert Sub-Agenten zur Aufgabenzerlegung | Direkter Skill-Aufruf |
-| `searxng` | Websuche über lokale SearXNG-Instanz | Teil der System-Prompts (kein Befehl nötig) |
+| `searxng` | Websuche über lokale SearXNG-Instanz | Automatisch via `available_skills` geladen (kein Befehl nötig) |
 
 ### Kommandos
 
@@ -62,7 +66,7 @@ opencode-helpers/
 |----------|-------------|
 | `/improve` | Prüft Kommandos/Skills auf Inkonsistenzen (Read-only) |
 | `/knowledge-assess` | Bewertet Knowledge-Check-Abgaben |
-| `/knowledge-exam <klasse> <wochen>` | Generiert Mini-Schularbeit + Lösungen |
+| `/knowledge-exam <klasse> <wochen> <prüfungsdatum>` | Generiert Mini-Schularbeit + Lösungen |
 | `/knowledge-persist` | Persistiert Session-Wissen in `docs/ai/` |
 | `/nextprompt` | Führt `aitranscribe -q` aus und nutzt Output als nächste Anweisung |
 | `/security <output>` | Erstellt Security-Audit-Report |
@@ -155,11 +159,15 @@ opencode-helpers/
 ├── skills/              # Workflow skills (actual logic)
 ├── docs/ai/             # Knowledge persistence files
 ├── scripts/             # Utility scripts (e.g., MCP server)
-├── agents/              # Global agent definitions
 ├── AGENTS.md            # Agent config (this project)
 ├── AGENTS.template.md   # Template for other projects
+├── IAM.md               # Developer identity & preferences
 └── opencode.json        # MCP server configuration
 ```
+
+### Identity & Preferences (`IAM.md`)
+
+[`IAM.md`](IAM.md) describes the developer's identity (name, tech stack, teaching subjects) and communication preferences. It is read automatically by opencode on startup and helps tailor responses to the developer's needs.
 
 ### Skill Overview
 
@@ -175,7 +183,7 @@ opencode-helpers/
 | `repograde` | Grade student repos (single or bulk) | Direct skill invocation |
 | `fork-policy` | Enforce clean-main branch policy on forks | On-demand skill invocation |
 | `orchestration` | Orchestrate sub-agents for task decomposition | Direct skill invocation |
-| `searxng` | Web search via local SearXNG instance | Part of system prompts (no command needed) |
+| `searxng` | Web search via local SearXNG instance | Loaded automatically via `available_skills` (no command needed) |
 
 ### Commands
 
@@ -183,7 +191,7 @@ opencode-helpers/
 |---------|-------------|
 | `/improve` | Scan commands/skills for inconsistencies (read-only) |
 | `/knowledge-assess` | Grade knowledge-check submissions |
-| `/knowledge-exam <class> <weeks>` | Generate mini-exam + solutions |
+| `/knowledge-exam <class> <weeks> <exam-date>` | Generate mini-exam + solutions |
 | `/knowledge-persist` | Persist session knowledge into `docs/ai/` |
 | `/nextprompt` | Run `aitranscribe -q` and use output as next instruction |
 | `/security <output>` | Generate security audit report |
