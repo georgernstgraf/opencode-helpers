@@ -205,6 +205,19 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Simplifies development, reduces process overhead, and aligns with the repository's direct development style.
 - **Tradeoff**: Bypasses PR code review, but ensures faster integration for this utility template repository.
 
+## 2026-05-22: Orchestrate README improvements via sub-agents across 12 repos
+- **Choice**: Used the `orchestration` skill pattern (epic + sub-issues + Task agents) to improve READMEs across 12 independent repos: zazentimer, opencode-helpers, aitranscribe, aitranscribe-android, GRG-SWP, GRG-WMC, GRG-CS, GRG-POSTHEORIE, GRG-INFI, GRG-JAVA, GRG-NVS, htl
+- **Reason**: Each repo had an outdated or missing README; parallel Task agents improved efficiency while each agent independently analysed the source code for accurate, project-specific documentation
+- **Considered**: Manual per-repo edits, a single scripted approach
+- **Tradeoff**: 12 parallel agents consumed significant context, but all completed successfully with project-specific, non-template READMEs
+- **Languages**: English for zazentimer, aitranscribe, aitranscribe-android; bilingual for opencode-helpers; German for all teaching repos
+
+## 2026-05-22: Restructure GitHub profile README with current projects
+- **Choice**: Rewrote `georgernstgraf/georgernstgraf/README.md` to show current projects (zazentimer, opencode-helpers, aitranscribe) prominently, teaching repos in a table, and past projects condensed
+- **Reason**: The profile was outdated and didn't reflect the three actively developed projects
+- **Considered**: Keeping the old flat list, creating a personal website
+- **Tradeoff**: Profile is now longer but gives a complete picture of active work
+
 ## 2026-05-21: Enforce pure AI evaluation, prohibit grading scripts
 - **Choice**: Mandate pure AI reasoning for all student grading. Explicitly forbid agents from writing or invoking scripts, programs, test runners, linters, or automated checkers to assess student work.
 - **Reason**: Agents were writing evaluation scripts that produced machine-like, impersonal grades that failed to account for the unique individuality of each student's submission. Direct AI reasoning produces higher-quality, more nuanced assessments.
