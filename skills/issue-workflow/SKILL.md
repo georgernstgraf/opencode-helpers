@@ -16,8 +16,8 @@ This skill manages GitHub issue-centered work from start through progress
 checkpoints to final completion. It standardizes how the agent discovers or
 creates an issue, reports progress, commits work, and closes out delivery.
 
-Use this skill whenever the user invokes an issue-oriented command such as
-`/issue-start`, `/issue-commit`, or `/issue-finish`.
+Use this skill whenever the user expresses issue-oriented intent through
+natural language (e.g., "issue start", "issue commit", "issue commit and push").
 
 ## Required Inputs
 

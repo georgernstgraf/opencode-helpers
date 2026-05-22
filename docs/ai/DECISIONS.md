@@ -182,7 +182,25 @@ Each entry documents WHAT was decided and WHY.
 - **Wording**: Tailored to address style (Du vs Sie) and type of assessment (Leistungsfeststellung vs Knowledge-Check).
 - **Tradeoff**: Adds minor boilerplate, but establishes proper expectations and handles potential auto-assessment mistakes gracefully.
 
-## 2026-05-21: Adopt Trunk-Based Development on main
+## 2026-05-22: Replace issue slash commands with natural language triggers
+- **Choice**: Remove `commands/issue-start.md`, `issue-commit.md`, `issue-finish.md` and trigger `issue-workflow` skill via natural language phrases ("issue start", "issue commit", "issue commit and push")
+- **Reason**: The user prefers saying phrases like "issue commit and push" rather than remembering slash commands; NLW is more intuitive and the agent can parse intent reliably
+- **Considered**: Keeping slash commands alongside NLW, training on slash commands only
+- **Tradeoff**: No tab-completable commands, but the workflow is more accessible and matches user's natural communication style
+
+## 2026-05-22: Create AGENTS.template.md for project onboarding
+- **Choice**: Add `AGENTS.template.md` as a generic onboarding template with placeholders, Knowledge Bootstrap, and Skill Triggers blocks
+- **Reason**: New projects need a ready-to-copy AGENTS.md that references knowledge-persistence and issue-workflow skills; the template reduces setup friction
+- **Considered**: Documenting setup only in README, keeping AGENTS.md as the single source
+- **Tradeoff**: Two AGENTS files to maintain (project-specific + template), but onboarding is self-service
+
+## 2026-05-22: Bilingual README with DE priority
+- **Choice**: Rewrite README.md with German section first, English section second; add SearXNG server documentation, symlink instructions, and NLW descriptions
+- **Reason**: Primary audience is German-speaking teachers and students at HTL Spengergasse; English section serves international opencode community
+- **Considered**: German-only README, English-only README, side-by-side translation
+- **Tradeoff**: Longer README, but both audiences are served appropriately
+
+## 2026-05-22: Adopt Trunk-Based Development on main
 - **Choice**: Always commit and push directly to the `main` branch. Never create feature branches or Pull Requests for development in this repository.
 - **Reason**: Simplifies development, reduces process overhead, and aligns with the repository's direct development style.
 - **Tradeoff**: Bypasses PR code review, but ensures faster integration for this utility template repository.

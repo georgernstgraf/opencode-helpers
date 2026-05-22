@@ -87,11 +87,12 @@ fi
 
 When both `fork-policy` and `issue-workflow` are active:
 
-- `issue-start` must create an appropriately named feature branch before
-  beginning any implementation work.
-- `issue-commit` must verify the branch policy is satisfied before committing.
-- `issue-finish` must push the feature branch and create or update a pull
-  request rather than merging to main directly.
+- When the agent recognizes an issue start intent (natural language), it must
+  create an appropriately named feature branch before beginning any implementation work.
+- Before committing (issue commit checkpoint), the agent must verify the branch
+  policy is satisfied.
+- When finishing an issue, the agent must push the feature branch and create or
+  update a pull request rather than merging to main directly.
 
 ## Activation
 

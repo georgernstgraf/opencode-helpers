@@ -58,6 +58,24 @@ knowledge-persistence output is the `docs/ai/` knowledge set:
 Treat this as the contract for the future knowledge-persistence implementation,
 even if the surrounding automation is still being refined.
 
+## Skill Triggers
+
+The following skills have NO slash commands. Invoke them by natural language:
+
+**Knowledge Persistence** — when the user says:
+  "remember", "merke dir", "don't forget", "behalte das im Kopf",
+  "merk dir das", "save context", "persist knowledge"
+  → load and execute the `knowledge-persistence` skill
+
+**Issue Workflow** — when the user says:
+  - start: "issue start", "start issue", "begin issue", "neues issue",
+           "ich arbeite an"
+  - commit: "issue commit", "commit issue", "speichere issue", "checkpoint"
+  - finish: "issue commit and push", "finish issue", "issue done",
+            "issue fertig", "schließe issue"
+  → parse intent (start/commit/finish) and load the `issue-workflow` skill
+    with the corresponding mode.
+
 ## Repository
 
 - GitHub: `georgernstgraf/opencode-helpers`

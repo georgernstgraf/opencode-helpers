@@ -1,10 +1,10 @@
 # Project State
 
-Current status as of 2026-05-21.
+Current status as of 2026-05-22.
 
 ## Current Focus
 
-Enforced pure AI evaluation policy across all grading skills; prohibited scripting and automated grading.
+Modernizing project documentation and onboarding: bilingual README, NLW skill triggers, AGENTS.template.md.
 
 ## Completed (this cycle)
 
@@ -16,6 +16,13 @@ Enforced pure AI evaluation policy across all grading skills; prohibited scripti
 - [x] Added `## Grading Methodology (CRITICAL)` to `grading-shared` mandating pure AI evaluation, forbidding scripts, defining available inputs, and prescribing sub-agents for bulk work
 - [x] Added no-scripting constraints to `repograde`, `knowledge-assessment`, and `projectgrade`
 - [x] Documented scripting pitfall in `PITFALLS.md` and pure-AI evaluation policy in `CONVENTIONS.md` and `DECISIONS.md`
+- [x] Rewrote README.md bilingual (DE + EN) with SearXNG documentation and symlink instructions
+- [x] Added Skill Triggers section to AGENTS.md (knowledge-persistence + issue-workflow via natural language)
+- [x] Created AGENTS.template.md for project onboarding
+- [x] Removed commands/issue-start.md, issue-commit.md, issue-finish.md
+- [x] Updated docs/ai/ARCHITECTURE.md to remove issue commands from tables
+- [x] Updated docs/ai/CONVENTIONS.md to reflect NLW instead of slash commands
+- [x] Updated skills/issue-workflow/SKILL.md and fork-policy/SKILL.md references
 
 ## Pending
 
@@ -27,4 +34,4 @@ None
 
 ## Next Session Suggestion
 
-Verify template compliance across actual grading run output examples with real student submissions.
+Verify downstream projects pick up the AGENTS.template.md and NLW triggers correctly.

@@ -17,9 +17,6 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | Command | Purpose | Delegates to |
 |---------|---------|-------------|
 | `/improve` | Planning-only analysis of commands/skills for inconsistencies | none |
-| `/issue-start` | Start or continue working on a task | `issue-workflow` |
-| `/issue-commit` | Save work-in-progress progress to a GitHub issue | `issue-workflow` |
-| `/issue-finish` | Complete a task: commit, push, close issue | `issue-workflow` |
 | `/knowledge-assess` | Assess student knowledge-check submissions | `knowledge-assessment` |
 | `/knowledge-exam` | Generate a German mini-exam from Git history | `knowledge-exam` |
 | `/knowledge-persist` | Persist session context into docs/ai/ files | `knowledge-persistence` |
@@ -47,10 +44,10 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 |-------|---------|------------|
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, homework discovery, bulk concurrency, German/UTF-8 rules, email body format, praise guidelines, reporting | Referenced by `repograde`, `knowledge-assessment`, `projectgrade` |
 | `homework` | Generate per-lesson `Hausübung.md` files from Git history | Direct invocation from class folder |
-| `issue-workflow` | Issue lifecycle management (start, checkpoint, finish) with mandatory issue-linked commits | `/issue-start`, `/issue-commit`, `/issue-finish` |
+| `issue-workflow` | Issue lifecycle management (start, checkpoint, finish) with mandatory issue-linked commits | Natural language triggers (no slash command) |
 | `knowledge-assessment` | Assess student knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
-| `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` |
+| `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` or natural language triggers |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
 | `fork-policy` | Enforce clean-main branch policy on forked repositories | On-demand skill invocation |

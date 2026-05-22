@@ -10,7 +10,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Prefer thin commands that pass arguments and constraints into a skill.
 - Every `skills/<name>/SKILL.md` must start with OpenCode YAML frontmatter.
 - Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
-- Keep issue-related commands as thin wrappers around the shared `issue-workflow` skill.
+- Issue workflow is triggered by natural language (no slash commands). The agent parses user intent and invokes the `issue-workflow` skill directly.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
 - Lesson directories inside class folders follow the naming pattern `<YYYY-MM-DD>_<topic>` (e.g., `2026-03-21_promises`).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
