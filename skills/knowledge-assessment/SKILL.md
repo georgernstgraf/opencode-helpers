@@ -260,22 +260,28 @@ literal backslash-n instead of actual newlines.**
   replacing any literal `\n` in the body with actual newlines, then
   re-writing with `json.dump(..., ensure_ascii=False)`.
 
-**EMAIL.json aggregator requirements:**
+**EMAIL.json aggregation:**
 
-1. Read every `*_email.json` file using `json.load()` — do NOT read them as
-   raw strings.
-2. For each body, detect and fix double-escaped newlines: if a decoded body
-   contains literal `\n` (backslash followed by n), replace with actual
-   newlines.
-3. Write the shared `EMAIL.json` using `json.dump(..., ensure_ascii=False)`.
-4. Validate the final `EMAIL.json`:
-   ```bash
-   python3 << 'PYEOF'
-   import json
-   json.load(open('EMAIL.json'))
-   print('OK')
-   PYEOF
-   ```
+After all subagents have written their `*_email.json` files, aggregate them
+into the shared `EMAIL.json` using the script bundled with `grading-shared`.
+
+**Stop condition:** Verify the aggregation script exists:
+```bash
+SCRIPT=~/.opencode/skills/grading-shared/aggregate-emails.py
+if [ ! -f "$SCRIPT" ]; then
+    echo "ERROR: $SCRIPT not found" >&2
+    exit 1
+fi
+```
+If the script is missing, **STOP**, report the path to the user, and wait
+for resolution before continuing.
+
+**Execution:** Run the script from the current working directory:
+```bash
+~/.opencode/skills/grading-shared/aggregate-emails.py
+```
+If the script exits with a non-zero status or reports errors on stderr,
+**STOP**, display its output to the user, and do not proceed.
 
 ### 5. Constraints
 

@@ -581,21 +581,26 @@ These excluded directories are NOT student repositories and must never be graded
 
 ### Aggregation
 
-After all subagents finish, the master workflow must:
-1. Read every `*_email.json` file using `json.load()` — do NOT read them as
-   raw strings or concatenate text.
-2. For each body, detect and fix double-escaped newlines: if a decoded body
-   contains literal `\n` (backslash followed by n), replace with actual
-   newlines.
-3. Create shared `EMAIL.json` using `json.dump(..., ensure_ascii=False)`.
-4. Validate the final `EMAIL.json`:
-   ```bash
-   python3 << 'PYEOF'
-   import json
-   json.load(open('EMAIL.json'))
-   print('OK')
-   PYEOF
-   ```
+After all subagents finish, the master workflow aggregates per-student
+`*_email.json` files into a single `EMAIL.json`.
+
+**Stop condition:** Verify the aggregation script exists:
+```bash
+SCRIPT=~/.opencode/skills/grading-shared/aggregate-emails.py
+if [ ! -f "$SCRIPT" ]; then
+    echo "ERROR: $SCRIPT not found" >&2
+    exit 1
+fi
+```
+If the script is missing, **STOP**, report the path to the user, and wait
+for resolution before continuing.
+
+**Execution:** Run the script from the current working directory:
+```bash
+~/.opencode/skills/grading-shared/aggregate-emails.py
+```
+If the script exits with a non-zero status or reports errors on stderr,
+**STOP**, display its output to the user, and do not proceed.
 
 ## Email Body Format (CRITICAL)
 
