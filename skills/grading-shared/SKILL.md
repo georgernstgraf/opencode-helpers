@@ -369,13 +369,13 @@ email JSON files.** The following rules MUST be followed:
    `body` field does not contain literal `\n` (backslash followed by n, which
    indicates the file had `\\n` — double-escaped newlines):
    ```bash
-   python3 -c "
+   python3 << 'PYEOF'
    import json
    d = json.load(open('FILE_email.json'))
    body = d[0]['body']
-   assert '\\n' not in body, 'body contains literal \\\\n — double-escaped newlines'
+   assert '\\n' not in body, 'body contains literal backslash-n — double-escaped newlines'
    print('OK')
-   "
+   PYEOF
    ```
    If validation fails, fix by reading the file with `json.load()`, replacing
    literal `\n` in the body with actual newlines, and re-writing with
@@ -590,7 +590,11 @@ After all subagents finish, the master workflow must:
 3. Create shared `EMAIL.json` using `json.dump(..., ensure_ascii=False)`.
 4. Validate the final `EMAIL.json`:
    ```bash
-   python3 -c "import json; json.load(open('EMAIL.json')); print('OK')"
+   python3 << 'PYEOF'
+   import json
+   json.load(open('EMAIL.json'))
+   print('OK')
+   PYEOF
    ```
 
 ## Email Body Format (CRITICAL)
