@@ -365,10 +365,27 @@ email JSON files.** The following rules MUST be followed:
    python3 -c "import json; json.load(open('FILE_email.json'))"
    ```
 
-4. **Use programmatic JSON writing.** When writing `*_email.json` or `EMAIL.json`,
-   prefer using a proper JSON serializer (e.g., `json.dump()` in Python) over
-   string interpolation or template construction. This guarantees correct escaping
-   of all special characters automatically.
+4. **Detect double-escaped newlines.** After loading the JSON, check that the
+   `body` field does not contain literal `\n` (backslash followed by n, which
+   indicates the file had `\\n` — double-escaped newlines):
+   ```bash
+   python3 -c "
+   import json
+   d = json.load(open('FILE_email.json'))
+   body = d[0]['body']
+   assert '\\n' not in body, 'body contains literal \\\\n — double-escaped newlines'
+   print('OK')
+   "
+   ```
+   If validation fails, fix by reading the file with `json.load()`, replacing
+   literal `\n` in the body with actual newlines, and re-writing with
+   `json.dump(..., ensure_ascii=False)`.
+
+5. **MUST use programmatic JSON writing.** You MUST use `json.dump()` or
+   `json.dumps()` to write `*_email.json` or `EMAIL.json`. Never construct JSON
+   via string interpolation, f-strings, or template languages. Always use
+   `ensure_ascii=False` to preserve UTF-8 umlauts (ä, ö, ü, ß). This guarantees
+   correct escaping of all special characters automatically.
 
 ## Constraints
 
@@ -565,8 +582,16 @@ These excluded directories are NOT student repositories and must never be graded
 ### Aggregation
 
 After all subagents finish, the master workflow must:
-1. Read the generated `*_email.json` files.
-2. Create shared `EMAIL.json` following the Email JSON Structure rules above.
+1. Read every `*_email.json` file using `json.load()` — do NOT read them as
+   raw strings or concatenate text.
+2. For each body, detect and fix double-escaped newlines: if a decoded body
+   contains literal `\n` (backslash followed by n), replace with actual
+   newlines.
+3. Create shared `EMAIL.json` using `json.dump(..., ensure_ascii=False)`.
+4. Validate the final `EMAIL.json`:
+   ```bash
+   python3 -c "import json; json.load(open('EMAIL.json')); print('OK')"
+   ```
 
 ## Email Body Format (CRITICAL)
 
