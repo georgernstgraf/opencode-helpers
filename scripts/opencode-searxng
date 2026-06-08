@@ -24,7 +24,8 @@ def search(query, category="general", time_range=None, engines=None, language=No
         params["safesearch"] = safesearch
 
     try:
-        response = requests.get(SEARX_URL, params=params, timeout=10)
+        headers = {"User-Agent": "opencode-searxng/0.3"}
+        response = requests.get(SEARX_URL, params=params, headers=headers, timeout=25)
         response.raise_for_status()
         data = response.json()
 
@@ -45,6 +46,15 @@ def search(query, category="general", time_range=None, engines=None, language=No
                 result["thumbnail"] = r.get("thumbnail")
 
             results.append(result)
+
+        unresponsive = data.get("unresponsive_engines", [])
+        if unresponsive:
+            results.append({
+                "title": "Unresponsive Engines",
+                "url": "",
+                "content": "; ".join(f"{e[0]}: {e[1]}" for e in unresponsive)
+            })
+
         return results
     except Exception as e:
         return [{"title": "Connection Error", "url": "", "content": str(e)}]
