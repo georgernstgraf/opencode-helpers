@@ -63,9 +63,17 @@ This skill operates from a local folder (current working directory), NOT from
 within a Git repository. Calling this skill from inside a Git repository is
 an error.
 
-The CWD contains student Git repositories as subdirectories. It may also
-contain a `_class` symlink pointing to the corresponding class folder in the
-teaching repository (e.g., `_class -> /home/georg/gitm/GRG-SWP/2ahwii/`).
+The CWD contains student Git repositories as subdirectories. These may be
+structured as `STUDENT_DIR/INNER_PROJECT/.git` (two levels deep). The CWD may
+also contain name-based symlinks (e.g., `Lastname Firstname -> STUDENT_ID`)
+that provide the student's real name.
+
+Follow `grading-shared` Repository Structure Discovery (Inner Git Repository
+Discovery) before running any git commands. Use `grading-shared` Student Name
+Resolution via Symlinks to determine the student's name.
+
+The CWD may also contain a `_class` symlink pointing to the corresponding class
+folder in the teaching repository (e.g., `_class -> /home/georg/gitm/GRG-SWP/2ahwii/`).
 This symlink provides access to homework assignments and lesson materials.
 
 ## Input
@@ -114,8 +122,9 @@ include:
    source location). This requires running the full `grading-shared` Homework
    Discovery Protocol first.
 4. **Repositories to grade**:
-   - Single-repo: show the path and basename.
-   - Bulk: list all discovered student repositories (basename only), with count.
+   - Single-repo: show the path and basename (or resolved symlink name if available).
+   - Bulk: list all discovered student repositories (resolved student name
+     from symlink where available, otherwise basename), with count.
 5. **Output files** that will be generated:
    - Single-repo: `<basename>_grading.md`, `<basename>_email.json`.
    - Bulk: per-repo files + `GRADINGS.md` + shared `EMAIL.json`.
@@ -157,8 +166,10 @@ Use this mode when no repository path is provided (with or without a date).
 
 Protocol:
 
-1. Enumerate student repositories following the `grading-shared` Bulk Grading
-   Protocol directory exclusion rules.
+1. Discover student repositories following `grading-shared` Repository Structure
+   Discovery, Student Name Resolution via Symlinks, and Bulk Grading Protocol
+   directory exclusion rules. Each student repo's git working directory may be
+   one level deeper than the student directory.
 2. Follow the `grading-shared` Bulk Grading Protocol for concurrency (default
    max 5, ~3 second delay between runs).
 3. Each subagent writes only `<basename>_grading.md` plus

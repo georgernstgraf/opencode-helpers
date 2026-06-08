@@ -413,10 +413,14 @@ grading skills (`repograde`, `projectgrade`).
 Before inspecting repository content, verify repository state:
 
 1. Navigate to the student repository directory.
-2. Run `git pull` to ensure latest version is checked out.
-3. Run `git status` to check for uncommitted changes.
-4. If uncommitted changes exist, STOP IMMEDIATELY and report to user.
-5. If pull fails or reports errors, STOP IMMEDIATELY and report to user.
+2. Run the Inner Git Repository Discovery to locate the actual Git working
+   directory inside the student directory.
+3. Run `git pull` inside the Git working directory to ensure latest version is
+   checked out.
+4. Run `git status` inside the Git working directory to check for uncommitted
+   changes.
+5. If uncommitted changes exist, STOP IMMEDIATELY and report to user.
+6. If pull fails or reports errors, STOP IMMEDIATELY and report to user.
 
 ### Discovery
 
@@ -452,6 +456,39 @@ general programming constructs.
 - Detect inactive gaps between first and last relevant commits.
 - Use evidence-based diligence signals such as `high`, `medium`, or `low`.
 
+## Repository Structure Discovery
+
+Student repositories may use a two-level directory structure:
+
+```
+CWD/STUDENT_DIR/INNER_PROJECT/.git
+```
+
+The `.git` directory (or `.git` file) is one level deeper than the student
+directory. This section defines how to locate the actual Git working directory
+before running any git commands.
+
+### Inner Git Repository Discovery
+
+For each student repository, determine the correct Git working directory:
+
+1. **Enter the student directory** (or follow the symlink to its target).
+2. **Search for `.git`** inside the student directory up to 2 levels deep.
+3. The parent directory of the found `.git` is the **Git working directory**.
+4. All `git` commands (`pull`, `log`, `show`, `status`, `diff`) MUST be run
+   inside the Git working directory.
+5. Derive output filenames (`<basename>_grading.md`, `<basename>_email.json`)
+   from the **student directory basename** (the top-level name or the symlink
+   name), NOT from the inner project folder name.
+
+### Example
+
+```
+2ahwii-swp/alw240094/SWP-2025-26/.git
+            ^^^^^^^^^ student dir basename (used for output filenames)
+                       ^^^^^^^^^^ Git working directory (where git commands run)
+```
+
 ## Homework Discovery Protocol
 
 Shared homework source discovery for `repograde` and `projectgrade`.
@@ -474,12 +511,20 @@ If found, parse it using the Semantic Date Extraction rules below.
 #### 1b: Per-Lesson Files inside `_class`
 
 Scan `_class/` for subdirectories matching the pattern `<YYYY-MM-DD>_<topic>`.
-For each matching directory, check if `Hausübung.md` exists inside it.
+For each matching directory, check for homework content in these files
+(in order of preference):
 
-If found:
+1. `Hausübung.md` — dedicated homework file (legacy format)
+2. `Angabe_HÜ.md` — detailed homework specification
+3. `README.md` — lesson plan containing a homework section
+
+When a file is found:
 - Extract the date directly from the directory name (e.g., `2026-03-21_promises`
   → date `2026-03-21`). No German date parsing needed.
 - Extract the topic from the directory name and/or the file content.
+- For `README.md`, locate the homework section under one of these headings:
+  `## 📝 Hausübung`, `## Hausübung`, or `## 📝 Hausübung`.
+  If the section states "Keine Hausübung" (no homework), skip this lesson.
 - Read the file content for assignment details.
 - Add to the homework list: `(iso_date, topic, content)`.
 
@@ -567,8 +612,27 @@ When enumerating student repositories, **exclude**:
 - `_class` (homework symlink)
 - Any directory starting with `_` (underscore prefix)
 - Any directory starting with `.` (dot prefix)
+- Any regular files (not directories and not symlinks)
 
-These excluded directories are NOT student repositories and must never be graded.
+These excluded entries are NOT student repositories and must never be graded.
+
+### Symlink Handling
+
+Student repositories may be accompanied by name-based symlinks:
+
+```
+Alwazeh Sami -> alw240094
+```
+
+These symlinks are aliases to student directories. They serve for name
+resolution (see `Student Name Resolution via Symlinks`) but are NOT
+separate repositories. Only the target directories are graded.
+
+When enumerating:
+1. If a symlink points to another directory inside the CWD, skip it as a
+   candidate for grading — only the target directory is graded.
+2. Use the symlink's name for student identification.
+3. Follow the symlink to find the actual repository for git operations.
 
 ### Concurrency
 
@@ -870,6 +934,33 @@ overrides any looser interpretation of this Reporting Protocol. In such cases,
 agents and subagents MUST follow the exact heading names, order, and section
 scope defined by the consuming skill and MUST NOT improvise alternative report
 structures.
+
+## Student Name Resolution via Symlinks
+
+When the CWD contains name-based symlinks (`Lastname Firstname -> STUDENT_ID`),
+use the symlink name to identify the student.
+
+### Resolution Protocol
+
+1. **Detect symlinks**: For each entry in the CWD, check if it is a symlink
+   (`[ -L "$entry" ]`) and if it points to another student directory within
+   the CWD.
+2. **Parse the symlink name**: Apply the standard Name Parsing from Repository
+   Basename rule (last word = first name, everything before = last name).
+3. **Resolve student identity**:
+   - For grading reports and `GRADINGS.md`: use the symlink name
+     (e.g., "Alwazeh Sami").
+   - For database lookup (email): use the symlink name.
+   - For git operations: follow the symlink to the target directory, then
+     apply Inner Git Repository Discovery.
+   - For output filenames: derive from the symlink basename (e.g.,
+     `Alwazeh Sami_grading.md`).
+
+### When Symlinks Are Missing
+
+If no name-based symlinks exist in the CWD, use the student directory name
+directly as the identifier. Apply the standard Name Parsing from Repository
+Basename rule to extract first and last name.
 
 ## Output Expectations
 
