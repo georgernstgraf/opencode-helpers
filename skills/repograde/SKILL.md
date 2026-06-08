@@ -223,64 +223,87 @@ When a cutoff date is active:
   from a specific date onwards.
 - Base judgments on actual code and text changes, not only on commit messages.
 
-## Homework Completion Weighting (CRITICAL)
+## Per-Homework Scoring (CRITICAL)
 
-This section is essential for fair grading. A student who completes only a
-subset of assigned homework must receive a proportionally reduced score.
+Jede Hausübung zählt 100 Basispunkte. Bei N Hausübungen sind maximal
+N × 100 Prozentpunkte erreichbar. Die Endbewertung in /100 ergibt sich
+aus `erreichte_Punkte / max_Punkte × 100`.
 
-### Completion Ratio Calculation
+### Bewertung pro Hausübung
 
-For each homework assignment in the grading period:
+Für jede Hausübung werden zwei Werte ermittelt:
 
-1. Identify ALL homework assignments from the unified homework list that fall
-   within the grading period (all, or from cutoff date onwards if filtered).
-2. For each assignment, determine if the student has substantive work
-   (not just superficial edits).
-3. Calculate the completion ratio:
-
-```
-completion_ratio = completed_assignments / total_assignments
-```
-
-### Scoring Impact
-
-The final score MUST reflect incomplete homework proportionally:
-
-1. Calculate a base score from quality of completed work (0-100).
-2. Apply completion weighting:
+1. **Quality** (0–100%): Inhaltliche Bewertung — Korrektheit, Struktur,
+   Vollständigkeit, technisches Verständnis. 0% wenn keine Abgabe erkennbar.
+2. **Factor** (Pünktlichkeit): 1.0 (pünktlich) oder 0.5 (verspätet), gemäß
+   `grading-shared` Deadline Calculation.
 
 ```
-weighted_score = base_score * completion_ratio
+effective_score = Quality × Factor
 ```
 
-**Example of correct weighting:**
+### Scoring Table (MANDATORY in every report and every email)
 
-| Assigned | Completed | Base Score | Weighted Score |
-|----------|-----------|------------|----------------|
-| 3 | 3 | 90 | 90 (90 x 1.0) |
-| 3 | 2 | 90 | 60 (90 x 0.67) |
-| 3 | 1 | 95 | 32 (95 x 0.33) |
+Jeder `*_grading.md`-Report und jede `*_email.json` MUSS exakt diese
+Scoring-Tabelle enthalten.
 
-**Anti-Pattern (DO NOT DO THIS):**
-Assigning 90% to a student who only completed 1 of 3 assignments just because
-that one assignment was excellent.
+**Format in `*_grading.md` (Markdown-Tabelle):**
 
-### Missing Assignment Documentation
+```markdown
+| HÜ | Thema | Quality | Factor | Effective |
+|----|-------|---------|--------|-----------|
+| 1  | [Thema] | 80% | 1.0 | 80% |
+| 2  | [Thema] | 70% | 0.5 | 35% |
+| 3  | [Thema] | —  | —  | 0% |
+```
 
-In the grading report (in German), explicitly list:
+**Format in `*_email.json` body (ASCII):**
 
-- All assigned homeworks for the period.
-- Which were completed (with brief summary).
-- Which were missing or incomplete.
-- Abdeckungsquote (completion ratio as percentage).
+```
+HÜ1 [Thema]: 80% (pünktlich) -> 80 Punkte
+HÜ2 [Thema]: 70% (verspätet, daher 50% Abzug) -> 35 Punkte
+HÜ3 [Thema]: nicht abgegeben -> 0 Punkte
+```
+
+### Gesamtbewertung
+
+```
+erreichte_Punkte = sum(effective_score_i)
+max_Punkte = Anzahl_HÜs × 100
+Endbewertung = round(erreichte_Punkte / max_Punkte × 100)
+```
+
+Beispiel: Fünf HÜs, max. 500 Punkte:
+
+| HÜ | Thema | Quality | Factor | Effective |
+|----|-------|---------|--------|-----------|
+| 1  | Hono REST-API | 80% | 1.0 | 80% |
+| 2  | Fetch Response | 70% | 0.5 | 35% |
+| 3  | Promises | 90% | 1.0 | 90% |
+| 4  | Transpile | —  | —  | 0% |
+| 5  | KI-Provider | 60% | 1.0 | 60% |
+
+Erreichte Punkte: 80 + 35 + 90 + 0 + 60 = 265 / 500
+Endbewertung: 53/100 (53%)
+
+### Abdeckungsquote (informativ)
+
+```
+Abdeckungsquote = (Anzahl HÜs mit Quality > 0%) / Anzahl_HÜs × 100
+```
+
+Nicht abgegeben = 0%, abgegeben (auch verspätet) zählt für die Quote.
+Die Abdeckungsquote ist rein informativ; sie geht NICHT zusätzlich in
+die Endbewertung ein (fehlende HÜs sind bereits mit 0% eingerechnet).
 
 ### Edge Cases
 
 - **No homeworks in period**: Report clearly, grade based on available work only.
-- **Empty repository**: Assign 0 with clear explanation.
-- **Late submissions**: Note separately; may count at reduced weight per
-  instructor policy. Students have one week to complete homework from the
-  assignment date.
+- **Empty repository**: Alle HÜs 0% → Endbewertung 0/100.
+- **Late submissions**: Automatic 0.5 factor applied; noted explicitly in every
+  relevant row of the scoring table.
+- **Students have one week** from the assignment date to submit. The deadline
+  is calculated per `grading-shared` Deadline Calculation.
 
 ## Outputs
 
@@ -426,16 +449,18 @@ so explicitly and provide the best evidence-based approximation.
 
 #### `## Pünktlichkeit der Abgaben`
 
-This section MUST cover every homework assignment in the grading period and
-classify it as one of:
+This section MUST cover every homework assignment in the grading period.
+For each homework, state the concrete deadline date (calculated per
+`grading-shared` Deadline Calculation) and classify as one of:
 
-- `pünktlich`,
-- `verspätet`,
-- `nicht erkennbar abgegeben`,
-- `nur teilweise erkennbar`.
+- `pünktlich` — latest relevant commit ≤ deadline (YYYY-MM-DDT00:00:00)
+- `verspätet` — latest relevant commit > deadline
+- `nicht erkennbar abgegeben` — no relevant commits found
 
-Use one bullet per homework. Keep each bullet to 1-2 sentences and mention the
-timing evidence briefly.
+Use one bullet per homework. Include the deadline timestamp and the date of
+the latest relevant commit as evidence. Keep each bullet to 1-2 sentences.
+
+Example: `HÜ1 (23.2.): pünktlich — letzter Commit am 1.3. ≤ Deadline 2.3. 00:00`
 
 #### `## Hausübungs-Abdeckung`
 
@@ -498,15 +523,22 @@ from the observed repository evidence.
 
 #### `## Endbewertung`
 
-This section MUST contain:
+This section MUST contain the Scoring Table as defined in Per-Homework
+Scoring (see above), followed by:
 
-- `Grundbewertung: XX/100`
-- `Abdeckungsquote: XX%`
-- `Gewichtete Endbewertung: XX/100`
-- `Endbewertung: XX/100 (XX%)`
+```
+Erreichte Punkte: [sum] / [N × 100]
+Endbewertung: [XX]/100 ([XX]%)
+```
 
-It MUST also include one short concluding paragraph that explains why the final
-weighted result is appropriate.
+The scoring table MUST list ALL homework assignments in the grading period
+with their individual Quality, Factor, and Effective score. Use `—` for
+missing homeworks (Quality and Effective = 0%).
+
+The Endbewertung is calculated as `round(sum(effective_scores) / (N × 100) × 100)`.
+
+This section MUST also include one short concluding paragraph that explains
+why the final result is appropriate.
 
 ### Standardization Rules for Subagents
 
@@ -535,15 +567,16 @@ same fixed structure for every student:
 3. grading period opening,
 4. commit activity summary,
 5. homework overview,
-6. per-homework evaluation paragraphs,
-7. homework coverage and timeliness summary,
-8. recommendations,
-9. final weighted score,
-10. closing.
+6. per-homework evaluation paragraphs — each ending with `Bewertung: XX%`
+   and, if late, `(verspätet, daher 50% Abzug auf den erreichten Wert)`,
+7. scoring table (ASCII format per Per-Homework Scoring),
+8. Erreichte Punkte and Endbewertung summary,
+9. closing.
 
 Within that fixed order, ensure that the combined homework evaluation and
-coverage paragraphs clearly communicate code quality, missing work, lateness,
-and the weighted final result.
+scoring paragraphs clearly communicate code quality, missing work, lateness,
+and the final result. The per-homework Quality%, Factor, and Effective score
+MUST all be visible per the Scoring Table format.
 
 Do not vary this structure between students.
 

@@ -528,6 +528,18 @@ When a file is found:
 - Read the file content for assignment details.
 - Add to the homework list: `(iso_date, topic, content)`.
 
+#### 1c: Future Lesson Exclusion
+
+Per-lesson directories with a date in the future represent prepared but
+not-yet-held lessons. Their homework assignments MUST NOT be included in
+the unified homework list.
+
+1. Determine today's date: `date +%Y-%m-%d`
+2. For each per-lesson directory, extract `<YYYY-MM-DD>` from the name.
+3. If `lesson_date > today`, skip this directory entirely.
+4. Do NOT include its homework, regardless of whether a homework section
+   exists in the file.
+
 ### Source 2: Legacy File in CWD
 
 Check for a `Hausübungen.md` file directly in the CWD (may be a symbolic link;
@@ -590,8 +602,8 @@ with commit dates.
 ### Source 3: Per-Lesson Files in CWD
 
 Scan the CWD itself for subdirectories matching `<YYYY-MM-DD>_<topic>` that
-contain `Hausübung.md`. This covers per-lesson homework without a `_class`
-symlink.
+contain homework content (same file search order as Source 1b: `Hausübung.md`,
+`Angabe_HÜ.md`, `README.md`). Apply Future Lesson Exclusion (1c) identically.
 
 ### Merging All Sources
 
@@ -601,6 +613,48 @@ symlink.
 3. Sort the unified list by date.
 4. If no source provides any homework entries, report this to the user and grade
    based on available work only.
+
+## Deadline Calculation
+
+### Determining the Deadline
+
+Homework is due at 00:00 on the same weekday one week after the lesson.
+Since all lessons in a given course fall on the same weekday, the deadline is
+always:
+
+```
+deadline = lesson_date + 7 days, at 00:00:00
+```
+
+Subagents MUST use shell date arithmetic for reliable calculation:
+
+```bash
+DEADLINE=$(date -d "2026-02-23 +7 days" +%Y-%m-%dT00:00:00)
+```
+
+### Commit Filtering by Deadline
+
+```bash
+# On-time commits (assignment ≤ commit ≤ deadline):
+git log --after="2026-02-10" --before="$DEADLINE" --oneline
+
+# Late commits (commit after deadline):
+git log --after="$DEADLINE" --oneline
+```
+
+### Punctuality Classification
+
+| Latest relevant commit | Classification | Factor | Meaning |
+|------------------------|----------------|--------|---------|
+| ≤ DEADLINE             | pünktlich      | 1.0    | Full points possible |
+| > DEADLINE             | verspätet      | 0.5    | 50% penalty on achieved quality |
+| No commits             | fehlend        | —      | 0 points for this homework |
+
+### Deadline in Reports
+
+Reports MUST mention the concrete deadline for each homework, including the
+exact `YYYY-MM-DDT00:00:00` timestamp and whether the student's latest
+relevant commit fell before or after it.
 
 ## Bulk Grading Protocol
 
