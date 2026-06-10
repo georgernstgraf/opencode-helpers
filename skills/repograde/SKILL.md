@@ -235,7 +235,7 @@ Für jede Hausübung werden zwei Werte ermittelt:
 
 1. **Quality** (0–100%): Inhaltliche Bewertung — Korrektheit, Struktur,
    Vollständigkeit, technisches Verständnis. 0% wenn keine Abgabe erkennbar.
-2. **Factor** (Pünktlichkeit): 1.0 (pünktlich) oder 0.5 (verspätet), gemäß
+2. **Factor** (Pünktlichkeit): 1.0 (pünktlich) oder 0.75 (verspätet), gemäß
    `grading-shared` Deadline Calculation.
 
 ```
@@ -253,7 +253,7 @@ Scoring-Tabelle enthalten.
 | HÜ | Thema | Quality | Factor | Effective |
 |----|-------|---------|--------|-----------|
 | 1  | [Thema] | 80% | 1.0 | 80% |
-| 2  | [Thema] | 70% | 0.5 | 35% |
+| 2  | [Thema] | 70% | 0.75 | 52.5% |
 | 3  | [Thema] | —  | —  | 0% |
 ```
 
@@ -261,7 +261,7 @@ Scoring-Tabelle enthalten.
 
 ```
 HÜ1 [Thema]: 80% (pünktlich) -> 80 Punkte
-HÜ2 [Thema]: 70% (verspätet, daher 50% Abzug) -> 35 Punkte
+HÜ2 [Thema]: 70% (verspätet, daher 25% Abzug) -> 52.5 Punkte
 HÜ3 [Thema]: nicht abgegeben -> 0 Punkte
 ```
 
@@ -278,13 +278,13 @@ Beispiel: Fünf HÜs, max. 500 Punkte:
 | HÜ | Thema | Quality | Factor | Effective |
 |----|-------|---------|--------|-----------|
 | 1  | Hono REST-API | 80% | 1.0 | 80% |
-| 2  | Fetch Response | 70% | 0.5 | 35% |
+| 2  | Fetch Response | 70% | 0.75 | 52.5% |
 | 3  | Promises | 90% | 1.0 | 90% |
 | 4  | Transpile | —  | —  | 0% |
 | 5  | KI-Provider | 60% | 1.0 | 60% |
 
-Erreichte Punkte: 80 + 35 + 90 + 0 + 60 = 265 / 500
-Endbewertung: 53/100 (53%)
+Erreichte Punkte: 80 + 52.5 + 90 + 0 + 60 = 282.5 / 500
+Endbewertung: 57/100 (57%)
 
 ### Abdeckungsquote (informativ)
 
@@ -300,7 +300,7 @@ die Endbewertung ein (fehlende HÜs sind bereits mit 0% eingerechnet).
 
 - **No homeworks in period**: Report clearly, grade based on available work only.
 - **Empty repository**: Alle HÜs 0% → Endbewertung 0/100.
-- **Late submissions**: Automatic 0.5 factor applied; noted explicitly in every
+- **Late submissions**: Automatic 0.75 factor applied; noted explicitly in every
   relevant row of the scoring table.
 - **Students have one week** from the assignment date to submit. The deadline
   is calculated per `grading-shared` Deadline Calculation.
@@ -568,7 +568,7 @@ same fixed structure for every student:
 4. commit activity summary,
 5. homework overview,
 6. per-homework evaluation paragraphs — each ending with `Bewertung: XX%`
-   and, if late, `(verspätet, daher 50% Abzug auf den erreichten Wert)`,
+   and, if late, `(verspätet, daher 25% Abzug auf den erreichten Wert)`,
 7. scoring table (ASCII format per Per-Homework Scoring),
 8. Erreichte Punkte and Endbewertung summary,
 9. closing.

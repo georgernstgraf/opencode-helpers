@@ -647,7 +647,7 @@ git log --after="$DEADLINE" --oneline
 | Latest relevant commit | Classification | Factor | Meaning |
 |------------------------|----------------|--------|---------|
 | ≤ DEADLINE             | pünktlich      | 1.0    | Full points possible |
-| > DEADLINE             | verspätet      | 0.5    | 50% penalty on achieved quality |
+| > DEADLINE             | verspätet      | 0.75   | 25% penalty on achieved quality |
 | No commits             | fehlend        | —      | 0 points for this homework |
 
 ### Deadline in Reports
