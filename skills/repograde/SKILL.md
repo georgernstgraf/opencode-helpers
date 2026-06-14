@@ -73,7 +73,7 @@ Discovery) before running any git commands. Use `grading-shared` Student Name
 Resolution via Symlinks to determine the student's name.
 
 The CWD may also contain a `_class` symlink pointing to the corresponding class
-folder in the teaching repository (e.g., `_class -> /home/georg/gitm/GRG-SWP/2ahwii/`).
+folder in the teaching repository (e.g., `_class -> /home/georg/repos/GRG-SWP/2ahwii/`).
 This symlink provides access to homework assignments and lesson materials.
 
 ## Input

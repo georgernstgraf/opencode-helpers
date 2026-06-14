@@ -67,6 +67,11 @@ The following skills have NO slash commands. Invoke them by natural language:
 
 - Owner: <NAME> <<EMAIL>>
 
+## gh CLI Conventions
+
+- Always use `gh issue view <N> --json title,body,comments` — never bare `gh issue view`. The bare form triggers a deprecation warning and may break in future `gh` versions.
+- Prefer `--json` with explicit field selection for all `gh` read commands to avoid deprecation warnings and reduce output noise.
+
 ## Development Environment
 
 - <DETAILS>

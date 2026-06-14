@@ -14,7 +14,7 @@ metadata:
 
 This skill generates a per-lesson `Hausübung.md` homework file inside the
 current lesson directory of a class folder. The user invokes it from inside the
-class folder (e.g., `~/gitm/2ahwii/`) at the end of a lesson. No arguments
+class folder (e.g., `~/repos/2ahwii/`) at the end of a lesson. No arguments
 are needed.
 
 ## Output Language: MANDATORY GERMAN

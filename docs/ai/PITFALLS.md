@@ -14,7 +14,7 @@ Read this file carefully before making changes in affected areas.
 - When passing Markdown with backticks to `gh issue create` or `gh issue comment` through the shell, quote it safely or the shell may try to execute the backticked fragments before posting the content.
 - OpenCode has no built-in throttling for parallel sub-agent execution - use dynamic concurrency with a maximum limit and ~3 second delays between agent starts to avoid overwhelming API rate limits.
 - When removing or renaming a skill, update every dependent command, agent, README entry, and knowledge file in the same change or stale workflow references remain behind.
-- `~/.opencode/skills` is a symlink to the repo's `skills/` directory; editing one location updates both automatically.
+- `~/.config/opencode/skills` is a symlink to the repo's `skills/` directory; editing one location updates both automatically. Full chain: `~/.config/opencode/skills` → `~/repos/georgernstgraf/opencode-helpers/skills`.
 - When refactoring shared content into `grading-shared`, keep grading-specific logic (date filtering, homework weighting) in the consuming skill — only truly shared protocols belong in `grading-shared`.
 - The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command.
 

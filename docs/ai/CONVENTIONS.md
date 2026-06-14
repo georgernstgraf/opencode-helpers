@@ -14,7 +14,6 @@ Follow these without question. Do not deviate unless explicitly told.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
 - Lesson directories inside class folders follow the naming pattern `<YYYY-MM-DD>_<topic>` (e.g., `2026-03-21_promises`).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
-- Global OpenCode agents (e.g., `chat`, `build`, `plan` overrides) are managed in `agents/` and symlinked to `~/.config/opencode/agents/`.
 - Custom MCP servers are stored in `scripts/` and symlinked to `~/bin/`.
 
 ## Grading Workflow

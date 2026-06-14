@@ -54,8 +54,9 @@ natural language (e.g., "issue start", "issue commit", "issue commit and push").
 
 Use this mode to begin or resume work.
 
-- If `issue` is an explicit issue number, fetch it with `gh issue view` and read
-  the description plus comments. Check if the issue has a parent or should be linked as a sub-issue to an existing epic.
+- If `issue` is an explicit issue number, fetch it with
+  `gh issue view <N> --json title,body,comments` and read the description plus comments.
+  Check if the issue has a parent or should be linked as a sub-issue to an existing epic.
 - If `issue` is `new`, or if no usable issue exists for the current work,
   create a new issue from the provided context. If the new issue is part of a larger epic, link it as a sub-issue immediately.
 - If no issue is supplied, infer whether there is already a current issue for
