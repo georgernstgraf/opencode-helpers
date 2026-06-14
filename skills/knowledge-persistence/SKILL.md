@@ -21,8 +21,9 @@ or "update knowledge file".
 ## Target Structure
 
 Ensure the following directory and files exist relative to the project root.
-Create any missing files. Never delete existing content unless it is
-explicitly outdated or contradicted by newer information.
+Create any missing files. Never delete entries from HISTORY.md (it is
+an append-only archive). Do delete superseded entries from active files
+by relocating them to HISTORY.md.
 
 ```text
 docs/ai/
@@ -32,8 +33,16 @@ docs/ai/
 ├── CONVENTIONS.md
 ├── PITFALLS.md
 ├── DOMAIN.md
-└── STATE.md
+├── STATE.md
+└── HISTORY.md
 ```
+
+**Active files** (must match current HEAD; no superseded entries):
+HANDOFF.md, DECISIONS.md, ARCHITECTURE.md, CONVENTIONS.md, PITFALLS.md,
+DOMAIN.md, STATE.md.
+
+**Historical file** (chronological sink; superseded entries EXPECTED here):
+HISTORY.md.
 
 ## Protocol
 
@@ -55,11 +64,44 @@ docs/ai/
 ### 3. Write Updates
 
 - Append new entries to the appropriate file.
-- If an existing entry is now outdated, replace it in-place and prepend
-  the date of the change.
+- If an existing entry is now outdated, MOVE it to HISTORY.md (do not
+  leave superseded content in active files).
 - Never duplicate an entry that already exists.
 - Write only facts. One item per bullet. No preamble, no commentary,
   no summaries at the top of the file.
+
+### 3b. Prune Superseded Entries
+
+For each active file being updated, scan for entries that no longer
+match current reality:
+
+- Entries contradicted by current code or configuration.
+- Entries superseded by a later decision or implementation.
+- Entries describing a reverted or removed change.
+
+For each superseded entry found:
+
+1. **Remove** it from the active file.
+2. **Append** it to `HISTORY.md` with a header:
+   `## YYYY-MM-DD (SUPERSEDED YYYY-MM-DD, origin: <FILE>, reason: <why or #NNN>): <Title>`
+3. Include the original entry text below the header, plus one line
+   noting the origin file and the reason it was superseded.
+4. Leave a ONE-LINE pointer in the active file ONLY if a future reader
+   would otherwise re-discover the same pitfall; otherwise delete
+   cleanly.
+
+**PITFALLS.md special case**: Distinguish between:
+- **(a) Permanent non-obvious constraints** (e.g., "Room validates
+  PRAGMA table_info, PK must be NOT NULL") — these stay in active
+  PITFALLS.md.
+- **(b) Bugs that were fixed** (e.g., "clearText+typeText race, fixed
+  in #254") — these MOVE to HISTORY.md once the fix ships. Their value
+  is historical, not advisory.
+
+**Status-tag convention**: For active-file entries with a known
+lifecycle (e.g., a workaround slated for removal), append an optional
+trailing tag `[ACTIVE until #NNN]` so a future pruner knows to
+relocate it.
 
 ### 4. Rewrite `ARCHITECTURE.md` (if structural changes occurred)
 
@@ -118,14 +160,21 @@ docs/ai/
 
 ### DECISIONS.md
 
-Records architectural and technical decisions with rationale.
-Each entry must have a date, a title, and a reason.
+Records ACTIVE architectural and technical decisions — one-time
+choices still in force. Superseded decisions are relocated to
+HISTORY.md. Each entry must have a date, a title, and a reason.
+
+> **Option B (alternative)**: Fold DECISIONS.md into HISTORY.md
+> entirely (single historical file). Simpler but loses the
+> "active decisions" vs "historical record" distinction. To adopt
+> Option B, remove this template and route all decisions to
+> HISTORY.md instead.
 
 ```markdown
 # Decisions
 
-Architectural and technical decisions made in this project.
-Each entry documents WHAT was decided and WHY.
+Active architectural and technical decisions still in force.
+Superseded decisions are relocated to HISTORY.md.
 
 ## YYYY-MM-DD: <Short Title>
 - **Choice**: What was chosen
@@ -168,6 +217,12 @@ Records hard-won knowledge: things that failed, subtle bugs,
 ordering issues, and non-obvious constraints. The purpose is to
 prevent a new agent from repeating mistakes.
 
+**What stays vs what moves to HISTORY.md:**
+- Permanent non-obvious constraints (invariants, platform quirks,
+  validation rules) → stays here.
+- Bugs that were fixed, workarounds since removed, regressions
+  since patched → moves to HISTORY.md once the fix ships.
+
 ```markdown
 # Pitfalls
 
@@ -175,6 +230,24 @@ Things that do not work, subtle bugs, and non-obvious constraints.
 Read this file carefully before making changes in affected areas.
 
 - <pitfall description, one line, actionable>
+```
+
+### HISTORY.md
+
+Chronological archive of superseded decisions and entries pruned
+from active files. This file is append-only; never delete entries.
+Superseded entries are EXPECTED here — this is the full audit trail.
+
+```markdown
+# History
+
+Chronological archive of superseded decisions and pruned entries.
+Entries here are no longer active truth. Never delete from this file.
+
+## YYYY-MM-DD (SUPERSEDED YYYY-MM-DD, origin: <FILE>, reason: <why or #NNN>): <Title>
+- <original entry text>
+- **Origin**: <source file>
+- **Reason**: <why it was superseded or pruned>
 ```
 
 ### DOMAIN.md
@@ -250,12 +323,13 @@ Overwritten when structural changes occur during a session.
 | File | Purpose | Update mode |
 |------|---------|------------|
 | HANDOFF.md | Open tasks for next session | Overwrite |
-| DECISIONS.md | Chronological record of choices | Append |
+| DECISIONS.md | Active decisions still in force | Append; prune superseded → HISTORY.md |
 | ARCHITECTURE.md | Living structural map | Overwrite |
 | CONVENTIONS.md | Ongoing rules to follow | Append |
 | PITFALLS.md | Hard-won failure knowledge | Append |
 | DOMAIN.md | Business/domain rules | Append |
 | STATE.md | Current project status | Overwrite |
+| HISTORY.md | Superseded entries archive | Append-only |
 
 ## Data Flows
 - <source> → <target>: <what flows and when>
@@ -277,6 +351,7 @@ Before starting any task, read the following files in order:
 5. `docs/ai/PITFALLS.md`
 6. `docs/ai/STATE.md`
 7. `docs/ai/DOMAIN.md` (if task involves business logic)
+8. `docs/ai/HISTORY.md` (reference only — read last, as needed)
 
 If `HANDOFF.md` contains open tasks, complete them before starting
 any new work unless the user explicitly says otherwise.
@@ -286,8 +361,12 @@ any new work unless the user explicitly says otherwise.
 
 - Write only verified facts from the session. Do not speculate.
 - Keep entries atomic: one fact, one bullet.
-- Respect existing content. Merge, do not overwrite (except STATE.md and
-  ARCHITECTURE.md, which are overwrite-on-change).
+- Active files: merge new entries, but DELETE superseded entries by
+  relocating them to HISTORY.md. Never leave stale content in active
+  files.
+- HISTORY.md: append-only. Never delete or modify existing entries.
+- Overwrite files: STATE.md, ARCHITECTURE.md, and HANDOFF.md are
+  overwritten on each persistence run (not appended).
 - If unsure whether something belongs in DECISIONS vs CONVENTIONS,
   apply this test: "Is this a one-time choice (DECISIONS) or an
   ongoing rule to follow (CONVENTIONS)?"
@@ -295,6 +374,9 @@ any new work unless the user explicitly says otherwise.
   apply this test: "Is this a chronological record of a choice
   (DECISIONS) or a structural description of the current system
   (ARCHITECTURE)?"
+- If unsure whether an entry is still valid, apply this test:
+  "Is this still true in the current codebase? If not, it belongs
+  in HISTORY.md, not the active file."
 - Total content per file should stay under 200 lines. If a file
   grows beyond that, split it by topic into sub-files within the
   same directory (e.g., `CONVENTIONS-api.md`, `CONVENTIONS-db.md`).
