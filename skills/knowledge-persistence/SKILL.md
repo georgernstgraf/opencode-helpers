@@ -377,9 +377,11 @@ any new work unless the user explicitly says otherwise.
 - If unsure whether an entry is still valid, apply this test:
   "Is this still true in the current codebase? If not, it belongs
   in HISTORY.md, not the active file."
-- Total content per file should stay under 200 lines. If a file
-  grows beyond that, split it by topic into sub-files within the
-  same directory (e.g., `CONVENTIONS-api.md`, `CONVENTIONS-db.md`).
+- Active files stay lean through the prune protocol (step 3b); no
+  hard line limit is needed.
+- HISTORY.md is append-only and will grow over time. If it exceeds
+  ~500 lines, archive entries older than 6 months into
+  `HISTORY-archive.md` (also append-only, same header format).
 - **Issue Safety**: This skill is a documentation-only operation. It
   must NEVER close, reopen, or change the state of any GitHub issue.
   Issue lifecycle management is the exclusive responsibility of the
