@@ -76,6 +76,16 @@ The following skills have NO slash commands. Invoke them by natural language:
   → parse intent (start/commit/finish) and load the `issue-workflow` skill
     with the corresponding mode.
 
+**Grilling** — when the user says:
+  "grill me", "grill this plan", "stress-test this", "grill", "grill that idea",
+  "challenge this", "sharpen a plan", "sharpen this design"
+  → load and execute the `grilling` skill
+
+**Teach** — when the user says:
+  "teach me", "teach me about", "I want to learn", "can you teach me",
+  "teach me something"
+  → load and execute the `teach` skill
+
 ## Repository
 
 - GitHub: `georgernstgraf/opencode-helpers`
