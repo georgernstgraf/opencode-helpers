@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""Sync Ollama models from gregor into opencode.json.
+
+Queries the Ollama API for available models and updates the
+'provider.ollama.models' section of the opencode config, preserving
+all other settings. Run manually after adding/removing models on gregor.
+"""
+import json
+import os
+import re
+import sys
+import tempfile
+import urllib.request
+
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://10.8.0.18:11434")
+OPENCODE_CONFIG = os.environ.get(
+    "OPENCODE_CONFIG",
+    os.path.expanduser("~/.config/opencode/opencode.json"),
+)
+PROVIDER_KEY = os.environ.get("OLLAMA_PROVIDER_KEY", "ollama")
+HOST_LABEL = os.environ.get("OLLAMA_HOST_LABEL", "gregor")
+
+FORCE_UPPER = {"it", "qat", "mlx", "ecc", "mxfp", "nvfp", "mtp"}
+
+
+def fmt_token(tok):
+    tl = tok.lower()
+    if tl in FORCE_UPPER:
+        return tok.upper()
+    m = re.match(r"^([A-Za-z]*)(\d+)([A-Za-z]*)$", tok)
+    if m:
+        prefix, digits, suffix = m.groups()
+        return prefix.upper() + digits + suffix.upper()
+    if tok.isdigit():
+        return tok
+    if len(tok) <= 5:
+        return tok.upper()
+    return tok.capitalize()
+
+
+def make_display_name(model_id):
+    """'gemma4:12b-it-qat' -> 'Gemma 4 12B IT QAT (gregor)'."""
+    parts = model_id.split(":", 1)
+    base = parts[0]
+    tag = parts[1] if len(parts) > 1 else ""
+    base = re.sub(r"(?<=[A-Za-z])(\d+)", r" \1", base)
+    base = base[0].upper() + base[1:] if base else base
+    tokens = [fmt_token(t) for t in re.split(r"[-_]", tag) if t]
+    name = base + (" " + " ".join(tokens) if tokens else "")
+    return f"{name} ({HOST_LABEL})"
+
+
+def fetch_models():
+    url = f"{OLLAMA_URL}/api/tags"
+    req = urllib.request.Request(url, headers={"User-Agent": "opencode-ollama-sync"})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        data = json.loads(resp.read())
+    return [m["name"] for m in data.get("models", [])]
+
+
+def sync():
+    try:
+        model_ids = fetch_models()
+    except Exception as e:
+        print(f"Error: cannot reach Ollama at {OLLAMA_URL}: {e}", file=sys.stderr)
+        print("Config left unchanged.", file=sys.stderr)
+        return 1
+
+    if not model_ids:
+        print("Warning: no models returned by Ollama. Config left unchanged.", file=sys.stderr)
+        return 1
+
+    try:
+        with open(OPENCODE_CONFIG) as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: {OPENCODE_CONFIG} not found.", file=sys.stderr)
+        return 1
+    except json.JSONDecodeError as e:
+        print(f"Error: cannot parse {OPENCODE_CONFIG}: {e}", file=sys.stderr)
+        return 1
+
+    provider = config.get("provider", {}).get(PROVIDER_KEY)
+    if provider is None:
+        print(f"Error: provider '{PROVIDER_KEY}' not found in {OPENCODE_CONFIG}.", file=sys.stderr)
+        return 1
+
+    old_models = provider.get("models", {})
+    old_ids = set(old_models.keys())
+
+    new_models = {}
+    for mid in model_ids:
+        new_models[mid] = {"name": make_display_name(mid)}
+
+    new_ids = set(new_models.keys())
+
+    if new_models == old_models:
+        print(f"Already in sync ({len(new_ids)} models). No changes.")
+        return 0
+
+    provider["models"] = new_models
+    config["provider"][PROVIDER_KEY] = provider
+
+    config_dir = os.path.dirname(OPENCODE_CONFIG)
+    fd, tmp = tempfile.mkstemp(dir=config_dir, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(config, f, indent=2)
+            f.write("\n")
+        os.replace(tmp, OPENCODE_CONFIG)
+    except Exception:
+        os.unlink(tmp)
+        raise
+
+    added = sorted(new_ids - old_ids)
+    removed = sorted(old_ids - new_ids)
+    for m in added:
+        print(f"  + {m}  ({new_models[m]['name']})")
+    for m in removed:
+        print(f"  - {m}")
+    print(f"Synced {len(new_ids)} models to {OPENCODE_CONFIG}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(sync())
