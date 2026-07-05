@@ -3,7 +3,8 @@
 
 Queries the Ollama API for available models and updates the
 'provider.ollama.models' section of the opencode config, preserving
-all other settings. Run manually after adding/removing models on gregor.
+all other settings. Creates the provider.ollama block (baseURL derived
+from OLLAMA_URL) if absent. Run manually after adding/removing models on gregor.
 """
 import json
 import os
@@ -82,8 +83,13 @@ def sync():
 
     provider = config.get("provider", {}).get(PROVIDER_KEY)
     if provider is None:
-        print(f"Error: provider '{PROVIDER_KEY}' not found in {OPENCODE_CONFIG}.", file=sys.stderr)
-        return 1
+        provider = {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": f"Ollama ({HOST_LABEL})",
+            "options": {"baseURL": OLLAMA_URL.rstrip("/") + "/v1"},
+        }
+        config.setdefault("provider", {})[PROVIDER_KEY] = provider
+        print(f"Auto-created provider '{PROVIDER_KEY}' (baseURL={provider['options']['baseURL']}).")
 
     old_models = provider.get("models", {})
     old_ids = set(old_models.keys())

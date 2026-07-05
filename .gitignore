@@ -1,5 +1,6 @@
 # Solution files (teacher-only, not for students)
 *_solutions.md
+**/__pycache__/
 
 # OS files
 .DS_Store
