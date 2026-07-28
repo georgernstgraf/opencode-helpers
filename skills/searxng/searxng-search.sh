@@ -7,7 +7,7 @@ set -e
 
 # Configuration - Local instance first, then public fallbacks
 INSTANCES=(
-    "http://localhost:8888"
+    "https://searxng.claw.graf.priv.at"
     "https://etsi.me"
     "https://baresearch.org"
 )

@@ -1,0 +1,197 @@
+#!/usr/bin/env python3
+"""SearXNG MCP stdio server.
+
+Thin JSON-RPC 2.0 wrapper over searxng-search.sh (the canonical search logic).
+Exposes one tool, `search`, so OpenCode registers it as `searxng_search`.
+
+Protocol: MCP (https://modelcontextprotocol.io), version 2024-11-05.
+Transport: newline-delimited JSON-RPC over stdin/stdout (stdio).
+Zero external dependencies (Python 3 stdlib only).
+"""
+
+import json
+import os
+import subprocess
+import sys
+
+PROTOCOL_VERSION = "2024-11-05"
+SERVER_NAME = "searxng"
+SERVER_VERSION = "1.0.0"
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SEARCH_SCRIPT = os.path.join(os.path.dirname(SCRIPT_DIR), "searxng-search.sh")
+
+SEARCH_TOOL = {
+    "name": "search",
+    "description": (
+        "Search the web via the self-hosted SearXNG instance "
+        "(searxng.claw.graf.priv.at) with public fallbacks. "
+        "Returns JSON with title, url, engine and snippet for each result."
+    ),
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "The search query (required).",
+            },
+            "language": {
+                "type": "string",
+                "description": "Language code, e.g. 'en', 'de', 'auto'.",
+                "default": "en",
+            },
+            "pageno": {
+                "type": "integer",
+                "description": "Results page number (1-indexed).",
+                "default": 1,
+                "minimum": 1,
+            },
+        },
+        "required": ["query"],
+    },
+}
+
+
+def send(message):
+    """Write one JSON-RPC message to stdout as a single line."""
+    sys.stdout.write(json.dumps(message))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
+def result(msg_id, result):
+    send({"jsonrpc": "2.0", "id": msg_id, "result": result})
+
+
+def error(msg_id, code, message, data=None):
+    err = {"code": code, "message": message}
+    if data is not None:
+        err["data"] = data
+    send({"jsonrpc": "2.0", "id": msg_id, "error": err})
+
+
+def handle_initialize(msg_id, params):
+    result(
+        msg_id,
+        {
+            "protocolVersion": PROTOCOL_VERSION,
+            "capabilities": {"tools": {}},
+            "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
+        },
+    )
+
+
+def handle_tools_list(msg_id, params):
+    result(msg_id, {"tools": [SEARCH_TOOL]})
+
+
+def handle_tools_call(msg_id, params):
+    name = params.get("name")
+    args = params.get("arguments") or {}
+
+    if name != "search":
+        error(
+            msg_id,
+            -32601,
+            "Unknown tool: {}".format(name),
+        )
+        return
+
+    query = args.get("query")
+    if not query or not str(query).strip():
+        error(msg_id, -32602, "Missing required argument 'query'.")
+        return
+
+    language = str(args.get("language") or "en")
+    try:
+        pageno = int(args.get("pageno") or 1)
+        if pageno < 1:
+            pageno = 1
+    except (TypeError, ValueError):
+        pageno = 1
+
+    try:
+        proc = subprocess.run(
+            [SEARCH_SCRIPT, str(query), language, str(pageno)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        error(msg_id, -32603, "SearXNG search timed out.")
+        return
+    except FileNotFoundError:
+        error(
+            msg_id,
+            -32603,
+            "Search script not found: {}".format(SEARCH_SCRIPT),
+        )
+        return
+
+    output = proc.stdout.strip()
+    if proc.returncode != 0 or not output:
+        error(
+            msg_id,
+            -32603,
+            "Search failed (exit {}). stderr: {}".format(
+                proc.returncode, proc.stderr.strip()
+            ),
+        )
+        return
+
+    try:
+        parsed = json.loads(output)
+    except json.JSONDecodeError:
+        text = output
+    else:
+        text = json.dumps(parsed, ensure_ascii=False)
+
+    result(
+        msg_id,
+        {"content": [{"type": "text", "text": text}]},
+    )
+
+
+METHODS = {
+    "initialize": handle_initialize,
+    "tools/list": handle_tools_list,
+    "tools/call": handle_tools_call,
+}
+
+
+def dispatch(line):
+    try:
+        msg = json.loads(line)
+    except json.JSONDecodeError:
+        return
+
+    if not isinstance(msg, dict):
+        return
+
+    msg_id = msg.get("id")
+    method = msg.get("method")
+
+    # Notifications (no id) get no response.
+    if msg_id is None:
+        return
+
+    if method not in METHODS:
+        error(msg_id, -32601, "Method not found: {}".format(method))
+        return
+
+    try:
+        METHODS[method](msg_id, msg.get("params") or {})
+    except Exception as exc:  # noqa: BLE001 - last-resort guard on the wire
+        error(msg_id, -32603, "Internal error: {}".format(exc))
+
+
+def main():
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        dispatch(line)
+
+
+if __name__ == "__main__":
+    main()
