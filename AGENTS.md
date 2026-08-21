@@ -79,12 +79,23 @@ The following skills have NO slash commands. Invoke them by natural language:
 **Grilling** — when the user says:
   "grill me", "grill this plan", "stress-test this", "grill", "grill that idea",
   "challenge this", "sharpen a plan", "sharpen this design"
-  → load and execute the `grilling` skill
+  → load and execute the `grilling` skill. If the user wants the session to also
+  build `CONTEXT.md` and ADRs (i.e. they have a codebase), load and execute
+  `grill-with-docs` instead, which drives `grilling` + `domain-modeling`.
 
 **Teach** — when the user says:
   "teach me", "teach me about", "I want to learn", "can you teach me",
   "teach me something"
   → load and execute the `teach` skill
+
+**Sync Upstream Skills** — when the user says:
+  "sync skills", "refresh from upstream", "pull matt's skills",
+  "sync upstream", "bring transplanted skills up to date"
+  → load and execute the `sync-upstream-skills` skill
+
+## Skill Source Rule
+
+This repo is the **single global skill source** (linked via `~/.config/opencode/skills`). The mattpocock upstream at `~/repos/mattpocock/skills` is **pull-only** — never linked live, never listed in an opencode `skills` array, no `~/.opencode/skills` symlink (that path is cwd-dependent and not v2-stable). One source per skill name; collisions are structurally impossible. Six skills are transplanted with opencode-native frontmatter (see `skills/sync-upstream-skills/mapping.json` for provenance). Use the `sync-upstream-skills` skill to re-apply upstream content changes while preserving the opencode frontmatter.
 
 ## Repository
 

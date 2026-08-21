@@ -59,6 +59,21 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `fork-policy` | Erzwingt Clean-Main-Branch-Policy auf Forks | On-Demand Skill-Aufruf |
 | `orchestration` | Orchestriert Sub-Agenten zur Aufgabenzerlegung | Direkter Skill-Aufruf |
 | `searxng` | Websuche über lokale SearXNG-Instanz | Automatisch via `available_skills` geladen (kein Befehl nötig) |
+| `grill-me` | Relentlesses Interview zum Schärfen eines Plans/Designs (stateless) | Sprachsteuerung: "grill me", "grill this plan" |
+| `grilling` | Die wiederverwendbare Interview-Schleife hinter grill-me/grill-with-docs | Automatisch (model-invoked) |
+| `grill-with-docs` | Wie grill-me, baut zusätzlich `CONTEXT.md` und ADRs auf | Sprachsteuerung |
+| `domain-modeling` | Aktive Domänenmodell-Disziplin: Glossar schärfen, ADRs erfassen | Automatisch (model-invoked) |
+| `teach` | Mehrsession-Lern-Workspace mit Lessons, Referenzen, Lernjournal | Sprachsteuerung: "teach me …" |
+| `code-review` | Zweiachsige Review (Standards + Spec) per paralleler Sub-Agenten | Automatisch (model-invoked) |
+| `sync-upstream-skills` | Bringt transplantierte Skills auf den Stand des mattpocock-Upstreams | Sprachsteuerung: "sync skills" |
+
+### Transplantierte Skills & Single-Source-Regel
+
+Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) wurden aus [mattpocock/skills](https://github.com/mattpocock/skills) transplantiert und mit opencode-nativem Frontmatter versehen (Claude-spezifische Felder wie `disable-model-invocation` werden zu `slash: true` oder weggelassen; `license: MIT` für Attribution). Upstream-Provenienz steht in `skills/sync-upstream-skills/mapping.json`.
+
+**Single-Source-Regel:** Dieses Repo ist die einzige globale Skill-Quelle (verlinkt via `~/.config/opencode/skills`). Matts Repo (`~/repos/mattpocock/skills`) ist **pull-only** — nie live verlinkt, nie in der opencode-`skills`-Array-Konfiguration. Kein `~/.opencode/skills`-Symlink (cwd-abhängig und nicht v2-stabil). So gibt es pro Skill-Namen genau eine Quelle, Kollisionen sind strukturell ausgeschlossen.
+
+**Sync-Ritual:** `git -C ~/repos/mattpocock/skills pull`, dann den `sync-upstream-skills`-Skill ausführen. Er übernimmt upstream Content-Änderungen, erhält das opencode-Frontmatter, prüft auf Duplikatnamen und dangling Cross-References.
 
 ### Kommandos
 
@@ -184,6 +199,21 @@ opencode-helpers/
 | `fork-policy` | Enforce clean-main branch policy on forks | On-demand skill invocation |
 | `orchestration` | Orchestrate sub-agents for task decomposition | Direct skill invocation |
 | `searxng` | Web search via local SearXNG instance | Loaded automatically via `available_skills` (no command needed) |
+| `grill-me` | Relentless interview to sharpen a plan/design (stateless) | Natural language: "grill me", "grill this plan" |
+| `grilling` | The reusable interview loop behind grill-me/grill-with-docs | Automatic (model-invoked) |
+| `grill-with-docs` | Like grill-me, additionally builds `CONTEXT.md` and ADRs | Natural language |
+| `domain-modeling` | Active domain-model discipline: sharpen glossary, capture ADRs | Automatic (model-invoked) |
+| `teach` | Multi-session learning workspace with lessons, references, learning journal | Natural language: "teach me …" |
+| `code-review` | Two-axis review (Standards + Spec) via parallel sub-agents | Automatic (model-invoked) |
+| `sync-upstream-skills` | Bring transplanted skills up to date from the mattpocock upstream | Natural language: "sync skills" |
+
+### Transplanted Skills & Single-Source Rule
+
+Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) are transplanted from [mattpocock/skills](https://github.com/mattpocock/skills) and given opencode-native frontmatter (Claude-specific fields like `disable-model-invocation` become `slash: true` or are dropped; `license: MIT` for attribution). Upstream provenance is recorded in `skills/sync-upstream-skills/mapping.json`.
+
+**Single-source rule:** This repo is the only global skill source (linked via `~/.config/opencode/skills`). Matt's repo (`~/repos/mattpocock/skills`) is **pull-only** — never linked live, never listed in an opencode `skills` array. No `~/.opencode/skills` symlink (cwd-dependent and not v2-stable). One source per skill name means collisions are structurally impossible.
+
+**Sync ritual:** `git -C ~/repos/mattpocock/skills pull`, then run the `sync-upstream-skills` skill. It applies upstream content changes while preserving opencode frontmatter, and checks for duplicate names and dangling cross-references.
 
 ### Commands
 
