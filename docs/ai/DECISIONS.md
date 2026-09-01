@@ -212,6 +212,12 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: 12 parallel agents consumed significant context, but all completed successfully with project-specific, non-template READMEs
 - **Languages**: English for zazentimer, aitranscribe, aitranscribe-android; bilingual for opencode-helpers; German for all teaching repos
 
+## 2026-09-01: Send Telegram files via raw Bot API instead of a plugin
+- **Choice**: New `telegram-send` skill sends files with `curl` against the Telegram Bot API, reusing the running bot's token from `~/.config/oc-tg-bot*/.env`
+- **Reason**: Works immediately in any session without config changes or opencode restarts; the plugin alternative (`opencode-telegram-send-file`) requires a plugin entry plus restart
+- **Considered**: Installing the `opencode-telegram-send-file` plugin, telling the user to download via the bot's `/ls` file browser
+- **Tradeoff**: Skill duplicates a small amount of delivery logic that a plugin would centralize; token handling is restricted to shell variables to avoid leaking secrets
+
 ## 2026-05-22: Restructure GitHub profile README with current projects
 - **Choice**: Rewrote `georgernstgraf/georgernstgraf/README.md` to show current projects (zazentimer, opencode-helpers, aitranscribe) prominently, teaching repos in a table, and past projects condensed
 - **Reason**: The profile was outdated and didn't reflect the three actively developed projects

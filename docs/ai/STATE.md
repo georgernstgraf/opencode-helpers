@@ -1,27 +1,19 @@
 # Project State
 
-Current status as of 2026-05-22.
+Current status as of 2026-09-01.
 
 ## Current Focus
 
-Completed README improvements across 12 repos via orchestrated sub-agents.
+Session-deliverable tooling: files can now be pushed into the user's Telegram
+chat from any opencode session.
 
 ## Completed (this cycle)
 
-- [x] Restructured GitHub profile README (georgernstgraf/georgernstgraf)
-- [x] Created epic #54 with 12 linked sub-issues (#55-#66)
-- [x] Improved zazentimer README (EN, commit 48c7efd)
-- [x] Polished opencode-helpers README (DE+EN, commit 618d364)
-- [x] Improved aitranscribe README (EN, commit bb7df39)
-- [x] Improved aitranscribe-android README (EN, commit bc6b7e1)
-- [x] Improved GRG-SWP README (DE, commit fd99d15)
-- [x] Improved GRG-WMC README (DE, commit 9fc201a)
-- [x] Improved GRG-CS README (DE, commit 8a09144)
-- [x] Improved GRG-POSTHEORIE README (DE, commit 4dedea3)
-- [x] Improved GRG-INFI README (DE, commit 39ebf08)
-- [x] Improved GRG-JAVA README (DE, commit 01bf874)
-- [x] Improved GRG-NVS README (DE, commit 9aefea2)
-- [x] Improved htl README (DE, commit 1705c0d)
+- [x] Added `skills/telegram-send/SKILL.md` — sends documents/photos to the user's
+      private Telegram chat via the Bot API, reusing the local bot's credentials
+      (`~/.config/oc-tg-bot*/.env`); skill is hardlinked into `~/.config/opencode/skills/`
+- [x] Documented bot topology (4 systemd user services `oc-tg-bot*`, all attached to
+      `opencode.service` on 127.0.0.1:62764) and secret-handling rules in the skill
 
 ## Pending
 
@@ -33,4 +25,5 @@ None
 
 ## Next Session Suggestion
 
-Verify the profile README renders correctly on github.com.
+Verify `telegram-send` appears in the available skills after the next opencode
+restart and works end-to-end from a fresh session.

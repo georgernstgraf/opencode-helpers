@@ -50,6 +50,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` or natural language triggers |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
+| `telegram-send` | Send files/documents/photos to the user's Telegram chat via the local Bot API, using the running bot's credentials from `~/.config/oc-tg-bot*/.env` | Natural language triggers ("schick mir X ins Telegram", "send file to Telegram") |
 | `fork-policy` | Enforce clean-main branch policy on forked repositories | On-demand skill invocation |
 
 ## Knowledge Files (`docs/ai/`)
