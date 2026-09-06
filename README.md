@@ -66,6 +66,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `teach` | Mehrsession-Lern-Workspace mit Lessons, Referenzen, Lernjournal | Sprachsteuerung: "teach me …" |
 | `code-review` | Zweiachsige Review (Standards + Spec) per paralleler Sub-Agenten | Automatisch (model-invoked) |
 | `sync-upstream-skills` | Bringt transplantierte Skills auf den Stand des mattpocock-Upstreams | Sprachsteuerung: "sync skills" |
+| `unterricht` | Unterrichts-Repo nach `lehrplan/`-Konvention einrichten: Gegenstand identifizieren, RIS-Sync mit Novellen-Check, Lehrplan jahresweise extrahieren | Sprachsteuerung: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 
 ### Transplantierte Skills & Single-Source-Regel
 
@@ -99,6 +100,11 @@ Diese Workflows haben **keine eigenen Slash-Kommandos**. Der Agent erkennt sie a
 **Knowledge Persistence:**
 - *"remember"*, *"merke dir"*, *"don't forget"*, *"behalte das im Kopf"*, *"merk dir das"* → persistieren
 - *"save context"*, *"persist knowledge"* → persistieren
+
+**Unterricht:**
+- *"Unterricht"*, *"Vorbereitung prüfen"* → Task A: Gegenstand identifizieren
+- *"Lehrplan auf Novellen prüfen"*, *"RIS sync"*, *"Gesetzesstand prüfen"* → Task B: RIS-Sync
+- *"Lehrplan extrahieren"*, *"Jahrespläne neu ziehen"* → Task C: Extraktion
 
 ### Einbindung in eigene Projekte
 
@@ -206,6 +212,7 @@ opencode-helpers/
 | `teach` | Multi-session learning workspace with lessons, references, learning journal | Natural language: "teach me …" |
 | `code-review` | Two-axis review (Standards + Spec) via parallel sub-agents | Automatic (model-invoked) |
 | `sync-upstream-skills` | Bring transplanted skills up to date from the mattpocock upstream | Natural language: "sync skills" |
+| `unterricht` | Set up and maintain a teaching repo following the `lehrplan/` convention: identify the subject, RIS sync with amendment check, year-wise curriculum extraction | Natural language: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 
 ### Transplanted Skills & Single-Source Rule
 
@@ -239,6 +246,11 @@ These workflows have **no dedicated slash commands**. The agent recognizes them 
 **Knowledge Persistence:**
 - *"remember"*, *"merke dir"*, *"don't forget"*, *"behalte das im Kopf"*, *"merk dir das"* → persist
 - *"save context"*, *"persist knowledge"* → persist
+
+**Unterricht:**
+- *"Unterricht"*, *"Vorbereitung prüfen"* → Task A: identify subject
+- *"Lehrplan auf Novellen prüfen"*, *"RIS sync"*, *"Gesetzesstand prüfen"* → Task B: RIS sync
+- *"Lehrplan extrahieren"*, *"Jahrespläne neu ziehen"* → Task C: extraction
 
 ### Integration into Your Project
 

@@ -1,35 +1,36 @@
 # Project State
 
-Current status as of 2026-09-06.
+Current status as of 2026-09-06 (evening).
 
 ## Current Focus
 
-Single-source search stack: the SearXNG skill owns the MCP server and uses
-the public service URL as primary instance on every host.
+`unterricht` skill: first real cross-repo run (GRG-PMM) completed and its
+learnings persisted back into the skill. Skill registered in README and
+committed as first version.
 
 ## Completed (this cycle)
 
-- [x] Consolidated the searxng MCP server: `skills/searxng/scripts/opencode-searxng`
-      (stdlib-only) is the single implementation; legacy `scripts/opencode-searxng`
-      moved to `scripts/archive/`. MCP config (`opencode.json`, repo + live) points
-      to the skill path; `SEARX_URL` env dropped. Verified live after an opencode
-      restart: tool appears as `searxng_search` with the full 7-parameter schema
-- [x] Ported the richer tool schema into the stdlib server (`category`, `engines`,
-      `time_range`, `safesearch` alongside `query`/`language`/`pageno`) and extended
-      `searxng-search.sh` accordingly (URL-encoded params, honest empty results,
-      `img_src`/`thumbnail`/`publishedDate` in output)
-- [x] Primary search instance switched to `https://searxng.claw.graf.priv.at` —
-      no localhost entry, because the skill runs on multiple hosts (verified:
-      script and live tool report the public instance)
-- [x] `~/bin` on claw now symlinks to the SVN toolset (`~/svn/georg/EDV/Toolset`,
-      r7386); opencode/telegram-bot restart scripts live there
-- [x] `searxng` is THE single search skill — no other search skill exists in
-      `skills/`, upstream (mattpocock) has none, duplicate names are checked by
-      `sync-upstream-skills`
+- [x] `unterricht` skill created (`skills/unterricht/SKILL.md`) and
+      first-run-hardened during a live session on GRG-PMM:
+      - Task A now carries a **Konformitäts-Check** (checklist answering
+        "is the repo fully set up, does the skill still need to run?")
+      - Gegenstand is read from repo docs, no hardcoded expansions
+      - Task B fetch chain replaced: NOR-Kopf one-line amendment check
+        instead of `GeltendeFassung.wxe` (>5 MB, webfetch fails)
+      - New section **"RIS-Praxiswissen"** with subject-independent RIS
+        patterns (ELI pages, BgblAuth PDFs, pdftotext+rg, Novelle §-numbering,
+        Inkrafttreten pattern, PDF naming, evidence line for METADATA.md)
+        plus a persist-back rule for future generic findings
+- [x] README.md: `unterricht` registered in skill tables + trigger phrases
+- [x] ARCHITECTURE.md: `unterricht` added to skills table
+- [x] `~/AGENTS.md`: new section "OpenCode Skills & Agents-Files" — skills
+      are symlinked (`~/.config/opencode/skills` → opencode-helpers/skills),
+      walk the chain before edits, commit skills in this repo, generic
+      knowledge persists into skills not project docs
 
 ## Pending
 
-None
+- [ ] dell (offline) replication — see HANDOFF.md
 
 ## Blockers
 
@@ -37,5 +38,4 @@ None
 
 ## Next Session Suggestion
 
-None — consolidation and public-URL switch verified live in a fresh session
-on 2026-09-06.
+None — skill updated, committed, and live via symlink.

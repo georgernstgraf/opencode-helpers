@@ -57,6 +57,7 @@ directory — global agents are not repo-managed.
 | `sync-upstream-skills` | Re-transplant owned skills from the mattpocock upstream after a git pull; checks duplicate names and dangling references | Natural language ("sync skills") |
 | `teach` | Teach the user a new skill or concept | Direct invocation |
 | `telegram-send` | Send files/documents/photos to the user's Telegram chat via the local Bot API, using the running bot's credentials from `~/.config/oc-tg-bot*/.env` | Natural language triggers ("schick mir X ins Telegram", "send file to Telegram") |
+| `unterricht` | Austrian HTL teaching repos: Gegenstand identification incl. conformity check, RIS sync with Novellen-Check (NOR-Kopf method), year-wise curriculum extraction into `lehrplan/` | Natural language ("Unterricht", "RIS sync", "Lehrplan extrahieren") |
 
 ## Knowledge Files (`docs/ai/`)
 
