@@ -15,6 +15,7 @@ Read this file carefully before making changes in affected areas.
 - OpenCode has no built-in throttling for parallel sub-agent execution - use dynamic concurrency with a maximum limit and ~3 second delays between agent starts to avoid overwhelming API rate limits.
 - When removing or renaming a skill, update every dependent command, agent, README entry, and knowledge file in the same change or stale workflow references remain behind.
 - `~/.config/opencode/skills` is a symlink to the repo's `skills/` directory; editing one location updates both automatically. Full chain: `~/.config/opencode/skills` → `~/repos/georgernstgraf/opencode-helpers/skills`.
+- Host-local endpoints in shared skills break off-host: `localhost:8888` only resolves on the SearXNG host (claw). The searxng skill therefore uses `https://searxng.claw.graf.priv.at` as primary instance — never add localhost entries to shared tooling.
 - When refactoring shared content into `grading-shared`, keep grading-specific logic (date filtering, homework weighting) in the consuming skill — only truly shared protocols belong in `grading-shared`.
 - The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command.
 

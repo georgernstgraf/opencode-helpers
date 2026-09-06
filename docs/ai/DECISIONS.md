@@ -27,13 +27,6 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Keeping separate embedded instructions in each command file
 - **Tradeoff**: The skill becomes broader, but maintenance is simpler and behavior stays aligned
 
-## 2026-03-16: Add homework-improve as a standalone education skill
-- **Choice**: Implement `/homework-improve` as a thin command wrapper around a dedicated `homework-improve` skill that writes `Hausübungen.md`
-- **Reason**: The workflow needs reusable rules for class-folder history analysis, German homework expansion, newest-first ordering, and re-entrant updates
-- **Considered**: Embedding the workflow directly in the command file, or overloading `knowledge-exam` with homework behavior
-- **Tradeoff**: One more standalone skill to maintain, but the homework workflow stays explicit and reusable
-- **Superseded by**: 2026-04-01 unified homework decision
-
 ## 2026-03-18: Consolidate repo-report into repograde
 - **Choice**: Absorb the former `repo-report` analysis workflow into `skills/repograde/SKILL.md`
 - **Reason**: Repository grading should have one authoritative skill, while `/repograde` stays a thin command wrapper and both single-repo and bulk mode share the same logic
@@ -51,13 +44,6 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Maintains maximum throughput while keeping concurrent agents at a safe limit; OpenCode has no built-in throttling
 - **Considered**: Batched execution (wait for all to complete before next batch), fully parallel or fully sequential execution
 - **Tradeoff**: More complex than simple batching, but maximizes throughput without overwhelming API limits
-
-## 2026-03-18: Add /homework command as read-only homework suggestion generator
-- **Choice**: Implement `/homework` as a thin command wrapper around a dedicated `homework` skill that outputs suggestions without modifying files
-- **Reason**: Teachers need quick homework ideas from recent lesson commits; unlike `/homework-improve`, this should be read-only for easy copy-paste
-- **Considered**: Combining with `/homework-improve`, or extending `/knowledge-exam`
-- **Tradeoff**: Another standalone skill, but keeps the read-only output pattern explicit and separate from file-modifying workflows
-- **Superseded by**: 2026-04-01 unified homework decision
 
 ## 2026-03-18: Centralize grading configuration in grading-shared skill
 - **Choice**: Create `skills/grading-shared/SKILL.md` as single source of truth for class-to-address-style mapping, email formulas, and database patterns
@@ -131,18 +117,6 @@ Each entry documents WHAT was decided and WHY.
 - **Added sections**: "Differences from repograde", "Deleted Branch Recovery", "Pull Request Analysis", "Further Contributions", "Holistic Grading Philosophy"
 - **Replaced**: Numeric weight tables → qualitative descriptive assessment with diligence rating (high/medium/low)
 - **Acknowledged limitations**: Pair programming, offline coordination are invisible to Git
-
-## 2026-04-13: Use dedicated chat agent and SearXNG MCP server
-- **Choice**: Implement a dedicated `chat` agent and a Python-based SearXNG MCP server
-- **Reason**: Users often ask non-project related questions; a dedicated agent avoids "context watering" from plan-mode restrictions. SearXNG provides up-to-date web research capabilities.
-- **Considered**: Using the plan agent for chat, using built-in websearch tools
-- **Tradeoff**: Requires a local SearXNG instance and a custom MCP wrapper, but provides superior search quality and privacy.
-
-## 2026-04-13: Manage global OpenCode agents via repository symlinks
-- **Choice**: Store global agent definitions in `agents/` and link them to `~/.config/opencode/agents/`
-- **Reason**: Centralizes configuration in the `opencode-helpers` repository for version control and easy updates across environments.
-- **Considered**: Copying files manually, using a specialized configuration manager
-- **Tradeoff**: Requires manual setup of symlinks (documented in README), but ensures single source of truth.
 
 ## 2026-04-13: Secure configuration via variable substitution and internal store
 - **Choice**: Remove API keys from `opencode.json` in the repository. Use internal provider store (`opencode providers add`) for provider keys and `{file:...}` substitution for custom tokens (like SearXNG).
@@ -229,3 +203,10 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Agents were writing evaluation scripts that produced machine-like, impersonal grades that failed to account for the unique individuality of each student's submission. Direct AI reasoning produces higher-quality, more nuanced assessments.
 - **Considered**: Allowing scripts for partial automation, or relying on agent judgment alone.
 - **Tradeoff**: Pure AI evaluation is slower per-student but produces more thoughtful, individualized results. Sub-agents are used for parallelism instead of scripts.
+
+## 2026-09-06: Single-source SearXNG stack with public service URL
+- **Choice**: The stdlib-only MCP server in `skills/searxng/scripts/opencode-searxng` is the single search implementation; the legacy requests-based server moved to `scripts/archive/`. The primary search instance is `https://searxng.claw.graf.priv.at` (no localhost entry in the fallback chain).
+- **Reason**: The skill runs on multiple hosts — a localhost endpoint only resolves on the SearXNG host itself; the public URL works everywhere (on the SearXNG host it goes through the local nginx). One skill owning its MCP server also guarantees exactly one search skill.
+- **Considered**: Keeping the requests-based server in `scripts/`, keeping `localhost:8888` first with public fallback
+- **Tradeoff**: Requests from the SearXNG host take the nginx/TLS hop; the archived legacy copy remains in the repo (inert, unregistered).
+- **Also added**: Richer tool schema (`category`, `engines`, `time_range`, `safesearch`) ported into the stdlib server; empty result sets are valid answers instead of triggering instance fallbacks.
