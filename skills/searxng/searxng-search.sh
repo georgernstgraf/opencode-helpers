@@ -5,9 +5,10 @@
 
 set -e
 
-# Configuration - Local instance first, then public fallbacks
+# Configuration - Public primary, then public fallbacks.
+# No localhost entry: the skill runs on multiple hosts; only the SearXNG
+# host itself would resolve localhost:8888.
 INSTANCES=(
-    "http://localhost:8888"
     "https://searxng.claw.graf.priv.at"
     "https://etsi.me"
     "https://baresearch.org"

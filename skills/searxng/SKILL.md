@@ -13,7 +13,7 @@ Search the web using self-hosted SearXNG at `searxng.claw.graf.priv.at`.
 Three layers, bottom-up:
 
 1. **SearXNG instance** — self-hosted at `https://searxng.claw.graf.priv.at/search` (nginx → `localhost:8888` on the SearXNG host). JSON API: `?q=QUERY&format=json`.
-2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API with fallback across instances (`localhost:8888` → `searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org`), returns JSON on stdout. Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
+2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API with fallback across instances (`searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org`; the public URL is primary so the script works on every host — only the SearXNG host itself would resolve `localhost:8888`), returns JSON on stdout. Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
 3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
 
 ## MCP Tool: `searxng_search`
