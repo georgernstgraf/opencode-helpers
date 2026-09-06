@@ -22,7 +22,7 @@ Alle Skills und Kommandos werden von anderen Projekten mittels **symbolischer Li
 Wir betreiben einen selbstgehosteten [SearXNG](https://searxng.claw.graf.priv.at/)-Metasuchserver:
 - **Metasearch** über Brave, Wikipedia, GitHub, Hacker News, ArXiv u.v.m.
 - **Datenschutzfreundlich** — keine Weitergabe an Google/Bing
-- **MCP-Server** in `scripts/opencode-searxng` — ein JSON-RPC-Wrapper, der SearXNG als opencode-Tool verfügbar macht
+- **MCP-Server** in `skills/searxng/scripts/opencode-searxng` — ein JSON-RPC-Wrapper, der SearXNG als opencode-Tool verfügbar macht
 - **Konfiguriert in `opencode.json`** — alle Agenten (chat, build, plan) haben Zugriff auf das `searxng_search`-Tool
 - **Parameter**: Kategorie (general/images/news/it/science), Zeitfilter (day/week/month/year), Engine-Auswahl, Sprachfilter, Safe Search
 
@@ -162,7 +162,7 @@ All skills and commands are consumed by other projects via **symbolic links** �
 We run a self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch instance:
 - **Metasearch** across Brave, Wikipedia, GitHub, Hacker News, ArXiv, and more
 - **Privacy-friendly** — no data sent to Google/Bing
-- **MCP server** in `scripts/opencode-searxng` — a JSON-RPC wrapper exposing SearXNG as an opencode tool
+- **MCP server** in `skills/searxng/scripts/opencode-searxng` — a JSON-RPC wrapper exposing SearXNG as an opencode tool
 - **Configured in `opencode.json`** — all agents (chat, build, plan) have access to the `searxng_search` tool
 - **Parameters**: category (general/images/news/it/science), time filter (day/week/month/year), engine selection, language filter, safe search
 

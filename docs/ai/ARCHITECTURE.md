@@ -36,7 +36,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 | Script | Purpose |
 |--------|---------|
-| `opencode-searxng.py` | MCP server providing `searxng_search` tool with time-filtering and exact-match guidance |
+| `skills/searxng/scripts/opencode-searxng` | MCP server providing `searxng_search` tool with category/time-range/engine/safesearch filtering |
 
 ## Skills (`skills/`)
 
@@ -72,4 +72,4 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 - `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files.
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
-- `opencode-searxng.py` (MCP) → OpenCode: Provides `searxng_searxng_search` tool to all agents for text and image search via JSON-RPC.
+- `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: Provides `searxng_search` tool to all agents for text and image search via JSON-RPC.

@@ -6,11 +6,8 @@
       "type": "local",
       "command": [
         "python3",
-        "/home/georg/repos/georgernstgraf/opencode-helpers/scripts/opencode-searxng"
-      ],
-      "environment": {
-        "SEARX_URL": "https://searxng.claw.graf.priv.at/search"
-      }
+        "/home/georg/repos/georgernstgraf/opencode-helpers/skills/searxng/scripts/opencode-searxng"
+      ]
     }
   }
 }

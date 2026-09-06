@@ -16,7 +16,11 @@ import sys
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "searxng"
-SERVER_VERSION = "1.0.0"
+SERVER_VERSION = "1.1.0"
+
+VALID_CATEGORIES = ("general", "images", "news", "it", "science")
+VALID_TIME_RANGES = ("day", "week", "month", "year")
+VALID_SAFESEARCH = (0, 1, 2)
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SEARCH_SCRIPT = os.path.join(os.path.dirname(SCRIPT_DIR), "searxng-search.sh")
@@ -26,25 +30,46 @@ SEARCH_TOOL = {
     "description": (
         "Search the web via the self-hosted SearXNG instance "
         "(searxng.claw.graf.priv.at) with public fallbacks. "
-        "Returns JSON with title, url, engine and snippet for each result."
+        "Returns JSON with title, url, engine and snippet for each result. "
+        "For very recent topics or 'latest' news, always specify a 'time_range'."
     ),
     "inputSchema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "The search query (required).",
+                "description": "The search query (required). Use quotes for exact versions (e.g. \"Gemma 4\").",
+            },
+            "category": {
+                "type": "string",
+                "description": "The search category.",
+                "enum": list(VALID_CATEGORIES),
+                "default": "general",
+            },
+            "time_range": {
+                "type": "string",
+                "description": "Filter results by age. Use 'month' or 'week' for brand new technologies to avoid outdated results.",
+                "enum": list(VALID_TIME_RANGES),
+            },
+            "engines": {
+                "type": "string",
+                "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection.",
             },
             "language": {
                 "type": "string",
-                "description": "Language code, e.g. 'en', 'de', 'auto'.",
+                "description": "Language code, e.g. 'en', 'de', 'fr', 'auto'. Filter results by language.",
                 "default": "en",
             },
             "pageno": {
                 "type": "integer",
-                "description": "Results page number (1-indexed).",
+                "description": "Results page number (1-indexed). Combine with time_range for older results.",
                 "default": 1,
                 "minimum": 1,
+            },
+            "safesearch": {
+                "type": "integer",
+                "description": "Safe search filter: 0 (off), 1 (moderate), 2 (strict).",
+                "enum": list(VALID_SAFESEARCH),
             },
         },
         "required": ["query"],
@@ -110,9 +135,30 @@ def handle_tools_call(msg_id, params):
     except (TypeError, ValueError):
         pageno = 1
 
+    category = str(args.get("category") or "general").strip().lower()
+    if category not in VALID_CATEGORIES:
+        category = "general"
+
+    engines = str(args.get("engines") or "").strip()
+
+    time_range = str(args.get("time_range") or "").strip().lower()
+    if time_range not in VALID_TIME_RANGES:
+        time_range = ""
+
+    safesearch = ""
+    raw_safesearch = args.get("safesearch")
+    if raw_safesearch is not None:
+        try:
+            value = int(raw_safesearch)
+        except (TypeError, ValueError):
+            value = None
+        if value in VALID_SAFESEARCH:
+            safesearch = str(value)
+
     try:
         proc = subprocess.run(
-            [SEARCH_SCRIPT, str(query), language, str(pageno)],
+            [SEARCH_SCRIPT, str(query), language, str(pageno),
+             category, engines, time_range, safesearch],
             capture_output=True,
             text=True,
             timeout=60,
