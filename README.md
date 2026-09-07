@@ -66,7 +66,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `teach` | Mehrsession-Lern-Workspace mit Lessons, Referenzen, Lernjournal | Sprachsteuerung: "teach me …" |
 | `code-review` | Zweiachsige Review (Standards + Spec) per paralleler Sub-Agenten | Automatisch (model-invoked) |
 | `sync-upstream-skills` | Bringt transplantierte Skills auf den Stand des mattpocock-Upstreams | Sprachsteuerung: "sync skills" |
-| `unterricht` | Unterrichts-Repo nach `lehrplan/`-Konvention einrichten: Gegenstand identifizieren, RIS-Sync mit Novellen-Check, Lehrplan jahresweise extrahieren | Sprachsteuerung: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
+| `lehrplan` | Unterrichts-Repo nach `lehrplan/`-Konvention einrichten: Gegenstand identifizieren, RIS-Sync mit Novellen-Check, Lehrplan jahresweise extrahieren | Sprachsteuerung: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 
 ### Transplantierte Skills & Single-Source-Regel
 
@@ -212,7 +212,7 @@ opencode-helpers/
 | `teach` | Multi-session learning workspace with lessons, references, learning journal | Natural language: "teach me …" |
 | `code-review` | Two-axis review (Standards + Spec) via parallel sub-agents | Automatic (model-invoked) |
 | `sync-upstream-skills` | Bring transplanted skills up to date from the mattpocock upstream | Natural language: "sync skills" |
-| `unterricht` | Set up and maintain a teaching repo following the `lehrplan/` convention: identify the subject, RIS sync with amendment check, year-wise curriculum extraction | Natural language: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
+| `lehrplan` | Set up and maintain a teaching repo following the `lehrplan/` convention: identify the subject, RIS sync with amendment check, year-wise curriculum extraction | Natural language: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 
 ### Transplanted Skills & Single-Source Rule
 

@@ -4,13 +4,13 @@ Current status as of 2026-09-06 (evening).
 
 ## Current Focus
 
-`unterricht` skill: first real cross-repo run (GRG-PMM) completed and its
+`lehrplan` skill (bis 2026-09-06: `unterricht`): first real cross-repo run (GRG-PMM) completed and its
 learnings persisted back into the skill. Skill registered in README and
 committed as first version.
 
 ## Completed (this cycle)
 
-- [x] `unterricht` skill created (`skills/unterricht/SKILL.md`) and
+- [x] `lehrplan` skill created (2026-07: `skills/unterricht/SKILL.md`; 2026-09-06 renamed to `skills/lehrplan/SKILL.md`) and
       first-run-hardened during a live session on GRG-PMM:
       - Task A now carries a **Konformitäts-Check** (checklist answering
         "is the repo fully set up, does the skill still need to run?")
@@ -21,8 +21,8 @@ committed as first version.
         patterns (ELI pages, BgblAuth PDFs, pdftotext+rg, Novelle §-numbering,
         Inkrafttreten pattern, PDF naming, evidence line for METADATA.md)
         plus a persist-back rule for future generic findings
-- [x] README.md: `unterricht` registered in skill tables + trigger phrases
-- [x] ARCHITECTURE.md: `unterricht` added to skills table
+- [x] README.md: `lehrplan` registered in skill tables + trigger phrases (2026-09-06: nach Rename aktualisiert)
+- [x] ARCHITECTURE.md: `lehrplan` in skills table (2026-09-06: nach Rename aktualisiert)
 - [x] `~/AGENTS.md`: new section "OpenCode Skills & Agents-Files" — skills
       are symlinked (`~/.config/opencode/skills` → opencode-helpers/skills),
       walk the chain before edits, commit skills in this repo, generic
