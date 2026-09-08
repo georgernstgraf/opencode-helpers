@@ -44,25 +44,32 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 
 ## Available Engines
 
-### General Web Search
-- `braveapi` — Brave Search API (best quality)
-- `presearch` — Presearch
-- `yacy` — P2P YaCy network
-- `ask` — Ask.com
-- `quark` — Quark search
-- `searchmysite` — Indie websites
-- `marginalia` — Non-commercial content
+Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.yml`).
+Tested 2026-09-08 against SearXNG 2026.9.8.
 
-### Knowledge
+### General Web Search
+- `braveapi` — Brave Search API (best quality, API key, supports `time_range`)
+- `bing` — Bing web
+- `mwmbl` — Mwmbl
+- `searchmysite` — Indie websites
+
+### Knowledge / IT
 - `wikipedia` — Wikipedia (with infobox)
 - `arxiv` — Scientific papers
-- `github` — GitHub repositories
-- `github code` — GitHub code search
+- `github`, `github code` — GitHub repos and code search
 - `npm`, `lib.rs` — Package registries
 - `docker hub`, `arch linux wiki`, `gentoo` — Tech resources
 
 ### News
+- `bing news` — Bing News
+- `duckduckgo news` — DuckDuckGo News
 - `hackernews` — Hacker News
+
+> **Do not re-enable without testing:** `duckduckgo`, `startpage`, `google news`
+> and `mojeek` answer with CAPTCHA/access denied from this VPS IP, and
+> `brave.news` is the HTML scraper of brave.com (no API-key support, blocked).
+> Public fallback instances (etsi.me, baresearch.org) no longer serve
+> `format=json` to anonymous clients (429 / anti-bot challenge).
 
 ## SearXNG Instance
 
