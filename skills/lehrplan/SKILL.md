@@ -74,6 +74,37 @@ AGENTS.md                        # repo-level agent guidelines
 GLOSSAR.md                       # domain abbreviations and terms
 ```
 
+### Fachgruppen-Variante (multi-subject repos)
+
+For Fachgruppe repos covering several Fächer/Zweige (example:
+WI-Fachgruppe-Informatik — master repo for the Informatik subjects of BOTH
+Wirtschaftsingenieure branches, WII = Anlage 1.24 and WIT = Anlage 1.28):
+
+```
+lehrplan/
+  METADATA.md                    # covers ALL Anlagen: legal basis, RIS refs, amendment
+                                 # history + NOR-Kopf evidence lines, class mapping,
+                                 # file inventory
+  RIS/                           # law-text PDFs (shared across ALL Fächer)
+    YYYY-MM-DD_<name>.pdf        # Anlagen/Novellen, ISO-date (Kundmachungsdatum)
+  <fach>-<zweig>/                # self-contained per subject: swp-wii, infi-wii, infi-wit
+    LEHRPLAN.md                  # ① extract (or three-layer ①②③) for THIS subject
+    RIS.md                       # Rechtsstand, Novellen-Historie, Schichten-Vergleich
+    <FACH>_②.pdf                 # Schuladaption PDF, if available
+    kompetenzmodule/             # km<N>.md + README matrix — per Fach, because KM
+                                 #   numbering (KM3–KM9) collides across subjects
+    jahr_<N>_semesterplan_ws.md  # flat files per Jahrgang (N = 1–5), underscores
+    jahr_<N>_semesterplan_ss.md  #   deliberate; NO class folders in this variant
+```
+
+- Each Fach folder is self-contained: LEHRPLAN, RIS, ②-PDF, KM-Steckbriefe
+  and semester-plan files live side by side; links between them stay shallow.
+- The planning layer is flat `jahr_<N>_semesterplan_{ws,ss}.md` files inside
+  the Fach folder; the Jahrgang ↔ KM ↔ generic-class-label mapping lives in
+  `lehrplan/METADATA.md`.
+- UPPERCASE class folders (`<Stufe><Postfix>`) remain the valid
+  single-Gegenstand variant (e.g. GRG-PMM).
+
 Folder naming rules:
 
 - Class folders: `<Stufe><Postfix>` in **UPPERCASE** (e.g. `4HWIT`).
@@ -84,6 +115,8 @@ Folder naming rules:
   class labels); holds ONLY RIS law-text PDFs.
 - PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO 8601 date prefix).
 - Lowercase with hyphens for all multi-word file and folder names.
+- Deliberate exception (repo-owner decision): the underscores in the flat
+  `jahr_<N>_semesterplan_{ws,ss}.md` files (Fachgruppen variant).
 
 ## Class Mapping (MANUALLY MAINTAINED)
 
@@ -95,7 +128,9 @@ skill file themselves.
 | Gegenstand | Klassen-Postfix(e) |
 |------------|--------------------|
 | PMM        | HWIT               |
-| INFI       | HWII               |
+| INFI (Anlage 1.24) | HWII       |
+| SWP (Anlage 1.24)  | HWII       |
+| INFI (Anlage 1.28) | HWIT       |
 | WMC        | AIF, KIF, CIF      |
 
 How the mapping works:
@@ -217,7 +252,7 @@ recurring question "ist alles eingerichtet, muss der Skill noch laufen?":
 | Check | Conform if |
 |-------|-----------|
 | METADATA.md vollständig | All skeleton sections present and filled (Rechtsgrundlage, RIS-Verweise, Änderungshistorie, Klassen-Zuordnung, Datei-Inventar) |
-| Komplett-Extrakt | `lehrplan/<gegenstand>-lehrplan-text.md` exists, covers all Jahrgänge of the subject |
+| Komplett-Extrakt | `lehrplan/<gegenstand>-lehrplan-text.md` exists, covers all Jahrgänge of the subject; in the Fachgruppen variant one complete extract per Fach folder (`lehrplan/<fach>-<zweig>/LEHRPLAN.md`) |
 | Klassen-Extrakte | `lehrplan/<KLASSE>/<KLASSE>.lehrplan.md` exists for every class folder |
 | Klassen-Zuordnung | METADATA.md maps every taught Jahrgang ↔ KM ↔ UPPERCASE Klassenname |
 | Novellen-Check-Datum | METADATA.md records when RIS was last queried ("RIS-Status abgefragt am …") and what it said |
