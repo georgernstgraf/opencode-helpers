@@ -205,7 +205,7 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: Pure AI evaluation is slower per-student but produces more thoughtful, individualized results. Sub-agents are used for parallelism instead of scripts.
 
 ## 2026-09-10: Repo-managed global agents via `agents/` directory
-- **Choice**: Add a top-level `agents/` directory as the single global agent source, linked via `~/.config/opencode/agents` (mirror of the skills symlink pattern). Agent definitions are flat `agents/<name>.md` files; the filename becomes the agent name. First agent: `lehrplan-writer` (ported from WI-Fachgruppe-Informatik's `.opencode/agent/`, where the repo-local copy was removed afterwards).
+- **Choice**: Add a top-level `agents/` directory as the single global agent source, linked via `~/.config/opencode/agents` (mirror of the skills symlink pattern). Agent definitions are flat `agents/<name>.md` files; the filename becomes the agent name. First agent: `lehrplan-annotator` (ported from WI-Fachgruppe-Informatik's `.opencode/agent/`, where the repo-local copy was removed afterwards).
 - **Reason**: Keep `~/.config/opencode` portable — agents are versioned in this repo exactly like skills, available on all hosts, and trunk-based. Explanation authoring (Erläuterungs-Ebene) deliberately uses the non-flash model `opencode-go/glm-5.3`.
 - **Considered**: Global agents directly in `~/.config/opencode/agent/` (not portable), per-agent subdirectories like `skills/<name>/SKILL.md` (unnecessary — loader scans `**/*.md`)
 - **Tradeoff**: Every `.md` in the `agents/` tree becomes an agent (loader glob `{agent,agents}/**/*.md`, `symlink: true`), so no auxiliary Markdown files are allowed inside `agents/`.

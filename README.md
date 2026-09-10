@@ -49,7 +49,7 @@ Definition ist eine flache `agents/<name>.md` (Dateiname = Agent-Name).
 
 | Agent | Beschreibung | Modell |
 |-------|-------------|--------|
-| `lehrplan-writer` | Autorenschaft der Erläuterungs-Ebene (KM-Überblicke, Lernziel-/Lehrstoff-Erläuterungen als Blockquote-Annotationen) für HTL-Lehrplan-Extrakte nach den Qualitätskriterien des `lehrplan`-Skills | `glm-5.3` (non-flash) |
+| `lehrplan-annotator` | Autorenschaft der Erläuterungs-Ebene (KM-Überblicke, Lernziel-/Lehrstoff-Erläuterungen als Blockquote-Annotationen) für HTL-Lehrplan-Extrakte nach den Qualitätskriterien des `lehrplan`-Skills | `glm-5.3` (non-flash) |
 
 ### Identität & Präferenzen (`IAM.md`)
 
@@ -206,7 +206,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 
 | Agent | Description | Model |
 |-------|-------------|-------|
-| `lehrplan-writer` | Authors the Erläuterungs-Ebene (KM overviews, learning-objective and curriculum-text explanations as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria | `glm-5.3` (non-flash) |
+| `lehrplan-annotator` | Authors the Erläuterungs-Ebene (KM overviews, learning-objective and curriculum-text explanations as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria | `glm-5.3` (non-flash) |
 
 ### Identity & Preferences (`IAM.md`)
 

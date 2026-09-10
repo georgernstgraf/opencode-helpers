@@ -18,7 +18,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 | Agent | Purpose | Model |
 |-------|---------|-------|
-| `lehrplan-writer` | Authors the Erläuterungs-Ebene (KM-Überblicke, Lernziel- und Lehrstoff-Erläuterungen as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria; law text stays untouched | `opencode-go/glm-5.3` (non-flash — explanation authoring needs the strongest language model) |
+| `lehrplan-annotator` | Authors the Erläuterungs-Ebene (KM-Überblicke, Lernziel- und Lehrstoff-Erläuterungen as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria; law text stays untouched | `opencode-go/glm-5.3` (non-flash — explanation authoring needs the strongest language model) |
 
 ## Commands (`commands/`)
 
