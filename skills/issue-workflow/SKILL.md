@@ -19,6 +19,19 @@ creates an issue, reports progress, commits work, and closes out delivery.
 Use this skill whenever the user expresses issue-oriented intent through
 natural language (e.g., "issue start", "issue commit", "issue commit and push").
 
+## Trunk-Based Pull-Prinzip (universell)
+
+- Vor JEDER Arbeitsaufnahme (start-Modus und generell vor jeder Session-Arbeit
+  an einem Repo oder Deployed-Tree): zuerst das Working Copy auf den Trunk heben.
+  - Git (trunk-based, clean-main): `git pull`
+  - SVN: `svn up` im relevanten Working Copy (z. B. `~/svn/georg` auf think,
+    `/` auf murl/claw im Deployed-Tree)
+- Fehlschlag des Pulls oder Konflikte: SOFORT stoppen und dem Nutzer melden,
+  nicht fortfahren.
+- Begründung: trunk-basierte Workflows leben davon, dass immer vom aktuellen
+  Stand aus gearbeitet wird — sonst entstehen vermeidbare Conflicts und
+  re-discovery von fremden Commits.
+
 ## Required Inputs
 
 - `mode`: one of `start`, `commit`, or `finish`
@@ -27,6 +40,12 @@ natural language (e.g., "issue start", "issue commit", "issue commit and push").
 
 ## Core Rules
 
+- **VCS-Scope:** Dieses Skill ist primär für Git/GitHub-Projekte entworfen
+  (`gh`-CLI). In reinen SVN-Projekten (z. B. `~/svn/georg`, Deployed-Trees auf
+  murl/claw) existiert **kein Issue-System** — dort entfallen Issue-Nummern und
+  `gh issue`-Befehle vollständig; die Commit-Regel reduziert sich auf eine
+  klare, deutsche Commit-Message (SVN-Stil), und der Pull-Schritt oben ist
+  `svn up`.
 - Every commit created by this workflow must reference a GitHub issue number.
 - Never create a commit without first identifying an existing issue or creating
   a new one.
