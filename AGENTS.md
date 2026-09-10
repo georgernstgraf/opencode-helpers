@@ -95,7 +95,16 @@ The following skills have NO slash commands. Invoke them by natural language:
 
 ## Skill Source Rule
 
-This repo is the **single global skill source** (linked via `~/.config/opencode/skills`). The mattpocock upstream at `~/repos/mattpocock/skills` is **pull-only** — never linked live, never listed in an opencode `skills` array, no `~/.opencode/skills` symlink (that path is cwd-dependent and not v2-stable). One source per skill name; collisions are structurally impossible. Six skills are transplanted with opencode-native frontmatter (see `skills/sync-upstream-skills/mapping.json` for provenance). Use the `sync-upstream-skills` skill to re-apply upstream content changes while preserving the opencode frontmatter.
+This repo is the **single global skill source** (linked via `~/.config/opencode/skills`).
+
+## Agent Source Rule
+
+This repo is also the **single global agent source** (linked via
+`~/.config/opencode/agents` → `agents/`). Agent definitions are flat
+`agents/<name>.md` files — the filename becomes the agent name. opencode's
+agent loader scans `{agent,agents}/**/*.md` recursively with `symlink: true`,
+so exactly **one `.md` file per agent** (any additional `.md` in the tree
+would become a phantom agent — no README.md inside `agents/`). The mattpocock upstream at `~/repos/mattpocock/skills` is **pull-only** — never linked live, never listed in an opencode `skills` array, no `~/.opencode/skills` symlink (that path is cwd-dependent and not v2-stable). One source per skill name; collisions are structurally impossible. Six skills are transplanted with opencode-native frontmatter (see `skills/sync-upstream-skills/mapping.json` for provenance). Use the `sync-upstream-skills` skill to re-apply upstream content changes while preserving the opencode frontmatter.
 
 ## Repository
 

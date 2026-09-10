@@ -30,6 +30,7 @@ Wir betreiben einen selbstgehosteten [SearXNG](https://searxng.claw.graf.priv.at
 
 ```
 opencode-helpers/
+├── agents/              # Globale OpenCode-Agents (flache <name>.md)
 ├── commands/            # Slash-Kommandos (thin wrappers)
 ├── skills/              # Workflow-Skills (die eigentliche Logik)
 ├── docs/ai/             # Knowledge-Persistence-Dateien
@@ -39,6 +40,16 @@ opencode-helpers/
 ├── IAM.md               # Entwickler-Identität & Präferenzen
 └── opencode.json        # MCP-Server-Konfiguration
 ```
+
+### Agents
+
+Globale Agents sind ebenfalls hier versioniert (`agents/`), verlinkt via
+`~/.config/opencode/agents` — analog zur Skills-Symlink-Kette. Jede Agent-
+Definition ist eine flache `agents/<name>.md` (Dateiname = Agent-Name).
+
+| Agent | Beschreibung | Modell |
+|-------|-------------|--------|
+| `lehrplan-writer` | Autorenschaft der Erläuterungs-Ebene (KM-Überblicke, Lernziel-/Lehrstoff-Erläuterungen als Blockquote-Annotationen) für HTL-Lehrplan-Extrakte nach den Qualitätskriterien des `lehrplan`-Skills | `glm-5.3` (non-flash) |
 
 ### Identität & Präferenzen (`IAM.md`)
 
@@ -176,6 +187,7 @@ We run a self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch in
 
 ```
 opencode-helpers/
+├── agents/              # Global opencode agents (flat <name>.md)
 ├── commands/            # Slash commands (thin wrappers)
 ├── skills/              # Workflow skills (actual logic)
 ├── docs/ai/             # Knowledge persistence files
@@ -185,6 +197,16 @@ opencode-helpers/
 ├── IAM.md               # Developer identity & preferences
 └── opencode.json        # MCP server configuration
 ```
+
+### Agents
+
+Global agents are versioned here (`agents/`), linked via
+`~/.config/opencode/agents` — mirroring the skills symlink chain. Each agent
+is a flat `agents/<name>.md` file (filename = agent name).
+
+| Agent | Description | Model |
+|-------|-------------|-------|
+| `lehrplan-writer` | Authors the Erläuterungs-Ebene (KM overviews, learning-objective and curriculum-text explanations as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria | `glm-5.3` (non-flash) |
 
 ### Identity & Preferences (`IAM.md`)
 

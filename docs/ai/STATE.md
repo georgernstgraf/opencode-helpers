@@ -1,41 +1,32 @@
 # Project State
 
-Current status as of 2026-09-06 (evening).
+Current status as of 2026-09-10.
 
 ## Current Focus
 
-`lehrplan` skill (bis 2026-09-06: `unterricht`): first real cross-repo run (GRG-PMM) completed and its
-learnings persisted back into the skill. Skill registered in README and
-committed as first version.
+Global agents are now repo-managed: new top-level `agents/` directory as
+single global agent source, linked via `~/.config/opencode/agents`
+(mirror of the skills symlink pattern). First agent: `lehrplan-writer`
+(ported from WI-Fachgruppe-Informatik; repo-local copy removed there).
 
 ## Completed (this cycle)
 
-- [x] `lehrplan` skill created (2026-07: `skills/unterricht/SKILL.md`; 2026-09-06 renamed to `skills/lehrplan/SKILL.md`) and
-      first-run-hardened during a live session on GRG-PMM:
-      - Task A now carries a **Konformitäts-Check** (checklist answering
-        "is the repo fully set up, does the skill still need to run?")
-      - Gegenstand is read from repo docs, no hardcoded expansions
-      - Task B fetch chain replaced: NOR-Kopf one-line amendment check
-        instead of `GeltendeFassung.wxe` (>5 MB, webfetch fails)
-      - New section **"RIS-Praxiswissen"** with subject-independent RIS
-        patterns (ELI pages, BgblAuth PDFs, pdftotext+rg, Novelle §-numbering,
-        Inkrafttreten pattern, PDF naming, evidence line for METADATA.md)
-        plus a persist-back rule for future generic findings
-- [x] README.md: `lehrplan` registered in skill tables + trigger phrases (2026-09-06: nach Rename aktualisiert)
-- [x] ARCHITECTURE.md: `lehrplan` in skills table (2026-09-06: nach Rename aktualisiert)
-- [x] `~/AGENTS.md`: new section "OpenCode Skills & Agents-Files" — skills
-      are symlinked (`~/.config/opencode/skills` → opencode-helpers/skills),
-      walk the chain before edits, commit skills in this repo, generic
-      knowledge persists into skills not project docs
+- [x] `agents/lehrplan-writer.md` created (subagent, `opencode-go/glm-5.3`
+      non-flash — explanation authoring needs the strongest language model);
+      improved repo-agnostic prompt based on the Fachgruppe original
+- [x] Symlink `~/.config/opencode/agents` → `agents/` set
+- [x] AGENTS.md: new "Agent Source Rule" (flat `<name>.md`, one .md per
+      agent — loader glob `{agent,agents}/**/*.md` makes every .md an agent)
+- [x] ARCHITECTURE.md: agents section added, "no agents/ dir" statement removed
+- [x] DECISIONS.md / PITFALLS.md: agent-source decision + symlink chain documented
+- [x] WI-Fachgruppe-Informatik: `.opencode/agent/lehrplan-writer.md` removed,
+      knowledge files re-pointed to global source
 
 ## Pending
 
-- [ ] dell (offline) replication — see HANDOFF.md
+- [ ] dell (offline) replication — see HANDOFF.md (also replicate the new
+      `agents/` directory + symlink there)
 
 ## Blockers
 
 None
-
-## Next Session Suggestion
-
-None — skill updated, committed, and live via symlink.

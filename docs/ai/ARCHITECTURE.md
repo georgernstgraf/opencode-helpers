@@ -1,18 +1,24 @@
 # Architecture
 
-Living structural map of the system as of 2026-09-06.
+Living structural map of the system as of 2026-09-10.
 Overwritten when structural changes occur during a session.
 
 ## Overview
 
 opencode-helpers is a template repository providing standardized skills,
-commands, scripts, and knowledge persistence patterns for AI-assisted
+agents, commands, scripts, and knowledge persistence patterns for AI-assisted
 development workflows in opencode. Skills in `skills/` contain all workflow
 logic (and, for `searxng`, their own MCP server); the thin command layer in
-`commands/` delegates to skills. Utility scripts live in `scripts/`
-(retired ones in `scripts/archive/`). Session context is persisted to a
-structured set of knowledge files in `docs/ai/`. There is no `agents/`
-directory — global agents are not repo-managed.
+`commands/` delegates to skills. Global agents live in `agents/` as flat
+`<name>.md` files (linked via `~/.config/opencode/agents`). Utility scripts
+live in `scripts/` (retired ones in `scripts/archive/`). Session context is
+persisted to a structured set of knowledge files in `docs/ai/`.
+
+## Agents (`agents/`)
+
+| Agent | Purpose | Model |
+|-------|---------|-------|
+| `lehrplan-writer` | Authors the Erläuterungs-Ebene (KM-Überblicke, Lernziel- und Lehrstoff-Erläuterungen as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria; law text stays untouched | `opencode-go/glm-5.3` (non-flash — explanation authoring needs the strongest language model) |
 
 ## Commands (`commands/`)
 

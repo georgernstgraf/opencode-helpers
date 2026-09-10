@@ -204,6 +204,12 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Allowing scripts for partial automation, or relying on agent judgment alone.
 - **Tradeoff**: Pure AI evaluation is slower per-student but produces more thoughtful, individualized results. Sub-agents are used for parallelism instead of scripts.
 
+## 2026-09-10: Repo-managed global agents via `agents/` directory
+- **Choice**: Add a top-level `agents/` directory as the single global agent source, linked via `~/.config/opencode/agents` (mirror of the skills symlink pattern). Agent definitions are flat `agents/<name>.md` files; the filename becomes the agent name. First agent: `lehrplan-writer` (ported from WI-Fachgruppe-Informatik's `.opencode/agent/`, where the repo-local copy was removed afterwards).
+- **Reason**: Keep `~/.config/opencode` portable — agents are versioned in this repo exactly like skills, available on all hosts, and trunk-based. Explanation authoring (Erläuterungs-Ebene) deliberately uses the non-flash model `opencode-go/glm-5.3`.
+- **Considered**: Global agents directly in `~/.config/opencode/agent/` (not portable), per-agent subdirectories like `skills/<name>/SKILL.md` (unnecessary — loader scans `**/*.md`)
+- **Tradeoff**: Every `.md` in the `agents/` tree becomes an agent (loader glob `{agent,agents}/**/*.md`, `symlink: true`), so no auxiliary Markdown files are allowed inside `agents/`.
+
 ## 2026-09-06: Single-source SearXNG stack with public service URL
 - **Choice**: The stdlib-only MCP server in `skills/searxng/scripts/opencode-searxng` is the single search implementation; the legacy requests-based server moved to `scripts/archive/`. The primary search instance is `https://searxng.claw.graf.priv.at` (no localhost entry in the fallback chain).
 - **Reason**: The skill runs on multiple hosts — a localhost endpoint only resolves on the SearXNG host itself; the public URL works everywhere (on the SearXNG host it goes through the local nginx). One skill owning its MCP server also guarantees exactly one search skill.
