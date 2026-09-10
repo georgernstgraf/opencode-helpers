@@ -96,6 +96,12 @@ unterricht/
   Klassen-Zuordnung): `HWII`, `HWIT`, `AIF`, `KIF`, `CIF` usw.
 - Klein geschriebenes `jg<N>`-Präfix für alle Einheiten- und
   Semesterplan-Dateien — **einheitliches Schema, keine Ausnahmen**.
+- **Dokumentierte Ausnahme (GRG-WMC):** form-übergreifender Ordner
+  `unterricht/WMC/` statt `unterricht/<FORM>-WMC/` — WMC unterrichtet die
+  Formen AIF/KIF/CIF **gemeinsam** (dieselbe Anlage 1.9, gemischte Kohorten),
+  die Einheiten-Dateien (`jg1`/`jg2`) decken bewusst alle Formen eines
+  Jahrgangs ab. Die Abweichung wird per DECISIONS-Eintrag im Repo
+  gerechtfertigt und ist vom Konformitäts-Check nicht als Befund zu melden.
 - Das detaillierte Unterrichts-Layout (Stunden-Ordner-Inhalte, Materialien,
   Hausübungen) gehört zum **zukünftigen Unterricht-Skill**; dieser Skill
   legt hier nur die Lehrstoffverteilungen und Semesterpläne ab (Aufgabe 3)
@@ -167,6 +173,14 @@ GLOSSAR.md
 - Jedes `<fach>-<zweig>`-Verzeichnis ist in sich geschlossen: LEHRPLAN,
   RIS, ②-PDF, KM-Steckbriefe und Klassen-Extrakte liegen beieinander;
   Querverweise bleiben flach.
+- **Dokumentierte Ausnahme (GRG-WMC):** wenn ein Fach mehrere Zweige/Formen
+  mit **identischem** Lehrplanunterbau bedient (WMC: AIF/KIF/CIF, alle aus
+  Anlage 1.9), dürfen `LEHRPLAN.md`, `RIS.md` und `kompetenzmodule/`
+  **form-übergreifend im `lehrplan/`-Root** bleiben — pro-Form-Duplikate
+  wären drift-gefährdete Kopien. Voraussetzung: DECISIONS-Eintrag im Repo;
+  der Konformitäts-Check meldet die Root-Lage dieser drei Dateien dann
+  nicht als Befund. Die Block-/Klassen-Ordner selbst wandern in die
+  `wmc-<form>/`-Ordner (`34AIF` → `wmc-aif/34AIF` usw.).
 - Die Planungs-Dateien (Einheiten, Semesterpläne) liegen **flach** als
   `jg<N>-einheiten.md` bzw. `jg<N>-semesterplan_{ws,ss}.md` unter
   `unterricht/<ZWEIG>-<FACH>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
