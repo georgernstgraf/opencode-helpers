@@ -211,6 +211,16 @@ GLOSSAR.md
   Klassen-Labels); enthält **nur** RIS-Gesetzestext-PDFs.
 - PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO-8601-Datumspräfix).
 - Klein mit Bindestrichen für alle mehrteiligen Datei- und Ordnernamen.
+- **Root-Klassenordner (Kohorten-Ablage, konform):** Klein geschriebene
+  Klassenordner **direkt am Repo-Root** (z. B. `5ahwit/`) sind kein Befund,
+  sondern bewusste Konvention: Unterrichts-Repos werden allen Kohorten
+  bereitgestellt; jeder Root-Klassenordner ist der **Kohorten-Einstiegspunkt**
+  und hält den aktuell relevanten Inhalt (Arbeitsblätter, Abgaben,
+  klassenbezogene Kommunikation) für genau diese Kohorte — archiviert wird
+  am Schuljahresende. Nicht verwechseln mit den GROSSBUCHSTABEN-
+  Klassenordnern unter `lehrplan/<fach>-<zweig>/` (dort liegen die
+  Lehrplan-Extrakte, Klein- vs. Großschreibung markiert die Ebene:
+  Root = Ablage/Kohorte, lehrplan/ = Gesetz/Extrakt).
 
 ## Klassen-Zuordnung (MANUELL GEPFLEGT)
 
@@ -371,6 +381,7 @@ laufen?":
 | Erläuterungen | KM-Überblicke und Lernziel-Erläuterungen in allen Extrakten vorhanden (siehe Aufgabe 2) |
 | Unterrichts-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Migrationsbefund (Retrofit-Klausel) |
 | Stunden-Ordner | `NN-slug/` und `YYYY-MM-DD_thema/` liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Befund (zuständig: Unterricht-Skill) |
+| Root-Klassenordner | Klein geschriebene Klassenordner am Repo-Root (z. B. `5ahwit/`) sind **konforme Kohorten-Einstiegspunkte** (Ablage pro Kohorte, Archivierung am Schuljahresende) — kein Befund; GROSSBUCHSTABEN-Klassenordner mit Lehrplan-Extrakten liegen unverändert unter `lehrplan/<fach>-<zweig>/` |
 
 Anschließend ausdrücklich feststellen: **„Der Skill muss noch ausgeführt
 werden"** (Auflistung, welche Aufgaben 1/2/3 ausstehen) **oder „Der Skill
