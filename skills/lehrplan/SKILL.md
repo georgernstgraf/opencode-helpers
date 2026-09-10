@@ -1,6 +1,6 @@
 ---
 name: lehrplan
-description: "Set up and maintain an Austrian HTL teaching repository around three main tasks: fetch the legal curriculum for an Ausbildungszweig (e.g. WII, WIT, KIF) from RIS including a yearly Novellen-Check, extract the Lehrplan for one concrete Gegenstand from that law (with per-Lernziel Erläuterungen explaining what each topic IS plus its practical applications), and draft semester plans interactively. Use when: user mentions 'lehrplan', asks to 'prepare a teaching repo', 'check the Lehrplan for new Novellen', 'RIS sync', 'Lehrplan extrahieren', 'Jahrespläne neu ziehen', 'Semesterplan erstellen/überarbeiten', 'Erläuterungen ergänzen', or mentions Unterrichtsvorbereitung on a repo following the lehrplan/ convention."
+description: "Richtet österreichische HTL-Unterrichts-Repositorien ein und pflegt sie — drei Kernaufgaben: das gesetzliche Lehrplan-Material eines Ausbildungszweigs (z. B. WII, WIT, KIF) aus dem RIS beschaffen inklusive jährlichem Novellen-Check, den Lehrplan eines konkreten Gegenstands aus dem Gesetz extrahieren (mit Erläuterung pro Lernziel: was der Inhalt tatsächlich IST, plus praktische Anwendungen), und Semesterpläne interaktiv entwerfen. Aufrufen, wenn der Nutzer 'Lehrplan', 'Unterrichtsvorbereitung prüfen', 'Lehrplan auf Novellen prüfen', 'RIS sync', 'Lehrplan extrahieren', 'Jahrespläne neu ziehen', 'Semesterplan erstellen/überarbeiten', 'Erläuterungen ergänzen', 'Gesetzesmaterial holen' sagt oder in einem Repo arbeitet, das der lehrplan/-Konvention folgt."
 license: MIT
 compatibility: opencode
 metadata:
@@ -9,147 +9,234 @@ metadata:
   output: lehrplan-extracts
 ---
 
-# Lehrplan Skill
+# Lehrplan-Skill
 
-Reverse-engineered from the GRG-PMM teaching repository (HTL Spengergasse).
-This skill is **convention-based, not project-hardwired**: it works in any
-teaching repo that follows the `lehrplan/` convention described below.
+Reverse-engineered aus dem GRG-PMM-Unterrichtsrepo (HTL Spengergasse).
+Dieser Skill ist **konventionsbasiert, nicht auf ein Projekt verdrahtet**:
+Er funktioniert in jedem Unterrichtsrepo, das der unten beschriebenen
+`lehrplan/`-Konvention folgt.
 
-The skill has three main tasks plus an identification preamble:
+Der Skill hat drei Kernaufgaben plus ein identifizierendes Präludium:
 
-| Task | Purpose |
-|------|---------|
-| **A** — Gegenstand & Ausbildungszweig identifizieren | Always-on preamble: read the repo, report legal basis, check conformity |
-| **1** — Gesetzesmaterial beschaffen | Fetch the legal curriculum for an Ausbildungszweig from RIS, Novellen-Check |
-| **2** — Fach-Extraktion | Extract one subject's Lehrplan from the law, with Erläuterungen |
-| **3** — Semesterplan | Interactively draft a semester plan from the extracted Lehrpläne |
+| Aufgabe | Zweck |
+|---------|-------|
+| **A** — Gegenstand & Ausbildungszweig identifizieren | Immer aktives Präludium: Repo lesen, Rechtsgrundlage berichten, Konformität prüfen |
+| **1** — Gesetzesmaterial beschaffen | Gesetzlichen Lehrplan eines Ausbildungszweigs aus dem RIS holen, Novellen-Check |
+| **2** — Fach-Extraktion | Lehrplan eines Gegenstands aus dem Gesetz extrahieren, mit Erläuterungen |
+| **3** — Semesterplan | Interaktiv einen Semesterplan (Lehrstoffverteilung) aus den extrahierten Lehrplänen entwerfen |
 
-The signature extension of this skill is the **Erläuterungs-Ebene**: for every
-Lernziel (and especially in semester plans), a substantive German explanation
-of what the topic actually **is** — Begriffserklärung first, integrated
-Anwendungs- und Berufsbezug second. See "Qualitätskriterien für
-Erläuterungen" below.
+Die Signatur-Erweiterung dieses Skills ist die **Erläuterungs-Ebene**: Für
+jedes Lernziel (und besonders in den Lehrstoffverteilungen) eine
+substantielle deutsche Erläuterung, was das Thema inhaltlich **ist** —
+Begriffserklärung zuerst, integrierter Anwendungs- und Berufsbezug
+zweitens. Siehe „Qualitätskriterien für Erläuterungen" unten.
 
-## Output Language: MANDATORY GERMAN
+## Ausgabesprache: DEUTSCH ZWINGEND
 
-All generated files (extracts, METADATA.md sections, semester plans, reports)
-MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß).
-Never use English for file content. Legal quotations must be copied verbatim
-from RIS content.
+Alle erzeugten Dateien (Extrakte, METADATA.md-Abschnitte, Lehrstoff­
+verteilungen, Berichte) MÜSSEN in natürlichem Deutsch mit korrekten
+UTF-8-Umlauten (ä, ö, ü, ß) geschrieben sein. Niemals Englisch für
+Dateiinhalte verwenden. Gesetzeszitate sind wortwörtlich aus dem
+RIS-Inhalt zu übernehmen.
 
-## Repo Conventions
+## Ziel-Repositorien
 
-> **⛔ VERBINDLICHES ZIEL-AYOUT — NICHT NUR EMPFEHLSAM.**
-> Das oben gezeigte Standard-Layout ist der **verbindliche Zielzustand** jedes
-> Teaching-Repos. Wann immer eine Session auf ein Repo trifft, das davon abweicht
-> (z. B. Lehrplan-Dateien unter `docs/lehrplan/`, Klassenordner oder
-> `kompetenzmodule/` im Repo-Root, `jgN-einheiten.md`-Sammeldateien), gilt:
-> **migrieren, nicht dulden.** Der Konformitäts-Check (Task A) behandelt jede
-> solche Abweichung als Befund mit Migrationspflicht; nur eine explizite,
-> dokumentierte Nutzer-Entscheidung (DECISIONS-Eintrag) kann eine Ausnahme
-> rechtfertigen. **Einzige erlaubte Abweichung** bleibt das dreischichtige
-> `<gegenstand>-lehrplan-text.md` als *Dateiformat* (② Schuladaption und ③
-> Didaktik mitlegen) — die **Ablage** unter `lehrplan/` ist davon nicht
-> berührt und bleibt Pflicht.
+Dieser Skill ist für folgende Repositorien konzipiert (Stand 2026-09-10):
 
-A teaching repo following this convention looks like:
+**Fach-Repos** (je ein Gegenstand, unter `~/repos/georgernstgraf/`):
+
+`GRG-CS`, `GRG-CYBER`, `GRG-ETH`, `GRG-INFI`, `GRG-JAVA`, `GRG-NVS`,
+`GRG-PMM`, `GRG-POSTHEORIE`, `GRG-SWP`, `GRG-WMC`
+
+**Fachgruppen-Repos** (mehrere Gegenstände/Zweige):
+
+- `~/repos/Die-Spengergasse/WI-Fachgruppe-Informatik`
+- `~/repos/hoa-spg/pos-wmc-fachgruppe-inf-erw`
+
+Wichtige Regeln dazu:
+
+- **Fach-Repos können mehrere Zweige bedienen.** Ein Gegenstand kann in
+  verschiedenen Ausbildungszweigen unterrichtet werden, in unterschiedlicher
+  Tiefe — Beispiel GRG-INFI: Informatik im Zweig HWII (Anlage 1.24) und im
+  Zweig HWIT (Anlage 1.28). Deshalb bildet die Verzeichnisstruktur **immer
+  den Zweig mit ab**, auch in Fach-Repos (siehe Repo-Konventionen).
+- **Der Skill wurde bei weitem nicht in allen Ziel-Repos ausgeführt, und
+  das ist auch nicht vorgesehen.** Ein Repo ohne `lehrplan/`-Struktur ist
+  daher **kein Fehler, sondern ein Zustand**: Aufgabe A berichtet den
+  Zustand und listet, welche Aufgaben 1/2/3 noch ausstehen — und unternimmt
+  **nichts** davon ohne ausdrückliche Nutzer-Anweisung. Kein
+  Auto-Scaffolding, keine Auto-Migration, kein Nörgeln.
+
+## Abgrenzung zum Unterricht (thematischer Schnitt)
+
+Die Welt ist zweigeteilt in zwei Ebenen mit eigenen Wurzeln im Repo-Root:
+
+| Ebene | Wurzel | Inhalt | Zuständig |
+|-------|--------|--------|-----------|
+| **Lehrplan-Ebene** (Gesetz + Planung) | `lehrplan/` | Gesetzesmaterial, Extrakte, METADATA, KM-Steckbriefe | **dieser Skill** |
+| **Unterrichtsebene** (Vorbereitung + Durchführung) | `unterricht/` | Lehrstoffverteilungen, Semesterpläne, Stunden-Ordner | **Unterricht-Skill (noch zu erstellen)** |
+
+Der `/unterricht/`-Ordner am Repo-Root ist **flach** aufgebaut — ein
+Ordner pro Zweig-Fach-Kombination, darin die Dateien direkt, **ohne**
+Jahrgangs-Unterordner und **ohne** Klassen-Unterordner:
+
+```
+unterricht/
+  <ZWEIG>-<FACH>/                 # GROSSBUCHSTABEN, z. B. HWII-INFI, WIT-INFI
+    jg2-einheiten.md              # Lehrstoffverteilung ("Einheiten") Jahrgang 2
+    jg3-einheiten.md
+    jg4-einheiten.md
+    jg4-semesterplan-ws.md        # Semesterplan Wintersemester
+    jg4-semesterplan-ss.md        # Semesterplan Sommersemester
+    NN-slug/                      # Stunden-Ordner während der Vorbereitung
+    YYYY-MM-DD_thema/             # Stunden-Ordner, sobald der Termin fixiert ist
+```
+
+- Das `<ZWEIG>`-Kürzel folgt der Klassen-Postfix-Tabelle (siehe
+  Klassen-Zuordnung): `HWII`, `HWIT`, `AIF`, `KIF`, `CIF` usw.
+- Klein geschriebenes `jg<N>`-Präfix für alle Einheiten- und
+  Semesterplan-Dateien — **einheitliches Schema, keine Ausnahmen**.
+- Das detaillierte Unterrichts-Layout (Stunden-Ordner-Inhalte, Materialien,
+  Hausübungen) gehört zum **zukünftigen Unterricht-Skill**; dieser Skill
+  legt hier nur die Lehrstoffverteilungen und Semesterpläne ab (Aufgabe 3)
+  und meldet Altbestände als Befund (siehe Retrofit-Klausel).
+
+## Repo-Konventionen
+
+> **⛔ VERBINDLICHES ZIEL-LAYOUT — NICHT NUR EMPFEHLENSAM.**
+> Das unten gezeigte Layout ist der **verbindliche Zielzustand** jedes
+> Unterrichts-Repos. Wann immer eine Session auf ein Repo trifft, das
+> davon abweicht (z. B. Lehrplan-Dateien unter `docs/lehrplan/`,
+> Klassenordner oder `kompetenzmodule/` im `lehrplan/`-Root ohne
+> Zweig-Ebene, `jgN-einheiten.md`-Sammeldateien unter `lehrplan/`,
+> Semesterpläne oder Stunden-Ordner unter `lehrplan/`), gilt: **melden als
+> Befund mit Migrationspflicht; Migration selbst nur auf ausdrücklichen
+> Nutzer-Wunsch.** Nur eine explizite, dokumentierte Nutzer-Entscheidung
+> (DECISIONS-Eintrag) kann eine Ausnahme rechtfertigen. **Einzige erlaubte
+> Abweichung** bleibt das dreischichtige `LEHRPLAN.md` als *Dateiformat*
+> (② Schuladaption und ③ Didaktik mitlegen) — die **Ablage** unter
+> `lehrplan/<fach>-<zweig>/` ist davon nicht berührt und bleibt Pflicht.
+
+### Fach-Repo (z. B. GRG-INFI)
 
 ```
 lehrplan/
-  <KLASSE>/                      # generic class label, UPPERCASE (e.g. 4HWIT, 5HWIT)
-    <KLASSE>.lehrplan.md         # class-relevant curriculum extract (year-wise)
-    README.md                    # class folder overview
-    semesterplan-ws.md           # winter semester plan (interactively drafted, Task 3)
-    semesterplan-ss.md           # summer semester plan (interactively drafted, Task 3)
-    NN-slug/                     # lesson folder during preparation
-    YYYY-MM-DD_thema/            # lesson folder once the teaching date is fixed
-    assets/                      # shared styles, images
-  kompetenzmodule/               # didactic KM-Steckbriefe: km<N>.md + README.md
-  METADATA.md                    # legal basis, RIS references, amendment history,
-                                  # school-autonomy notes, class mapping, file inventory
-  <gegenstand>-lehrplan-text.md  # COMPLETE curriculum extract, all Jahrgänge
-  RIS/                           # law-text PDFs ONLY (Rechtsinformationssystem)
-    YYYY-MM-DD_<name>.pdf        # RIS PDFs, ISO-date prefixed
-AGENTS.md                        # repo-level agent guidelines
-GLOSSAR.md                       # domain abbreviations and terms
-```
-
-### Fachgruppen-Variante (multi-subject repos)
-
-For Fachgruppe repos covering several Fächer/Zweige (example:
-WI-Fachgruppe-Informatik — master repo for the Informatik subjects of BOTH
-Wirtschaftsingenieure branches, WII = Anlage 1.24 and WIT = Anlage 1.28):
-
-```
-lehrplan/
-  METADATA.md                    # covers ALL Anlagen: legal basis, RIS refs, amendment
-                                 # history + NOR-Kopf evidence lines, class mapping,
-                                 # file inventory
-  RIS/                           # law-text PDFs (shared across ALL Fächer)
-    YYYY-MM-DD_<name>.pdf        # Anlagen/Novellen, ISO-date (Kundmachungsdatum)
-  <fach>-<zweig>/                # self-contained per subject: swp-wii, infi-wii, infi-wit
-    LEHRPLAN.md                  # ① extract (or three-layer ①②③) for THIS subject
+  METADATA.md                    # deckt ALLE Zweige des Fachs ab: Rechtsgrundlage,
+                                 #   RIS-Verweise + NOR-Kopf-Belege, Änderungshistorie,
+                                 #   Klassen-Zuordnung, Datei-Inventar
+  RIS/                           # NUR Gesetzestext-PDFs (Rechtsinformationssystem)
+    YYYY-MM-DD_<name>.pdf        # Anlagen/Novellen, ISO-Datum (Kundmachungsdatum)
+  <fach>-<zweig>/                # pro Zweig ein Ordner, klein: infi-hwii, infi-hwit
+    LEHRPLAN.md                  # ① Komplett-Extrakt (oder dreischichtig ①②③) DIESES Zweigs
     RIS.md                       # Rechtsstand, Novellen-Historie, Schichten-Vergleich
-    <FACH>_②.pdf                 # Schuladaption PDF, if available
-    kompetenzmodule/             # km<N>.md + README matrix — per Fach, because KM
-                                 #   numbering (KM3–KM9) collides across subjects
-    jahr_<N>_semesterplan_ws.md  # flat files per Jahrgang (N = 1–5), underscores
-    jahr_<N>_semesterplan_ss.md  #   deliberate; NO class folders in this variant
+    <FACH>_②.pdf                 # Schuladaption-PDF, falls vorhanden
+    kompetenzmodule/             # km<N>.md + README-Matrix — pro Zweig, weil die
+                                 #   KM-Nummerierung (KM3–KM9) zwischen Zweigen kollidiert
+    <KLASSE>/                    # GROSSBUCHSTABEN, z. B. 4HWII
+      <KLASSE>.lehrplan.md       # Klassen-relevanter Extrakt (jahrgangsweise)
+unterricht/                      # siehe "Abgrenzung zum Unterricht"
+  <ZWEIG>-<FACH>/                # z. B. HWII-INFI
+    jg<N>-einheiten.md
+    jg<N>-semesterplan-ws.md
+    jg<N>-semesterplan-ss.md
+    NN-slug/                     # Stunden-Ordner (Vorbereitung)
+    YYYY-MM-DD_thema/            # Stunden-Ordner (Termin fixiert)
+AGENTS.md                        # Repo-weite Agent-Regeln
+GLOSSAR.md                       # Domänen-Abkürzungen und Begriffe
 ```
 
-- Each Fach folder is self-contained: LEHRPLAN, RIS, ②-PDF, KM-Steckbriefe
-  and semester-plan files live side by side; links between them stay shallow.
-- The planning layer is flat `jahr_<N>_semesterplan_{ws,ss}.md` files inside
-  the Fach folder; the Jahrgang ↔ KM ↔ generic-class-label mapping lives in
-  `lehrplan/METADATA.md`.
-- UPPERCASE class folders (`<Stufe><Postfix>`) remain the valid
-  single-Gegenstand variant (e.g. GRG-PMM).
+### Fachgruppen-Repo (z. B. WI-Fachgruppe-Informatik)
 
-Folder naming rules:
+Identisches Muster, nur mit mehreren Fächern/Zweigen nebeneinander:
 
-- Class folders: `<Stufe><Postfix>` in **UPPERCASE** (e.g. `4HWIT`).
-  Generic labels cover parallel classes (`4HWIT` covers 4AHWIT/4BHWIT).
-- Lesson folders: `NN-slug/` during preparation, renamed to
-  `YYYY-MM-DD_slug/` when the teaching date is fixed.
-- RIS folder: `lehrplan/RIS/` — uppercase exception (abbreviation, like
-  class labels); holds ONLY RIS law-text PDFs.
-- PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO 8601 date prefix).
-- Lowercase with hyphens for all multi-word file and folder names.
-- Deliberate exception (repo-owner decision): the underscores in the flat
-  `jahr_<N>_semesterplan_{ws,ss}.md` files (Fachgruppen variant).
+```
+lehrplan/
+  METADATA.md                    # deckt ALLE Anlagen/Fächer des Repos ab
+  RIS/                           # Gesetzestext-PDFs (über alle Fächer geteilt)
+  infi-hwii/                     # jedes Fach-Zweig-Verzeichnis in sich geschlossen
+  infi-hwit/
+  swp-hwii/
+unterricht/
+  HWII-INFI/
+  HWIT-INFI/
+  HWII-SWP/
+AGENTS.md
+GLOSSAR.md
+```
 
-## Class Mapping (MANUALLY MAINTAINED)
+- Jedes `<fach>-<zweig>`-Verzeichnis ist in sich geschlossen: LEHRPLAN,
+  RIS, ②-PDF, KM-Steckbriefe und Klassen-Extrakte liegen beieinander;
+  Querverweise bleiben flach.
+- Die Planungs-Dateien (Einheiten, Semesterpläne) liegen **flach** als
+  `jg<N>-einheiten.md` bzw. `jg<N>-semesterplan_{ws,ss}.md` unter
+  `unterricht/<ZWEIG>-<FACH>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
+  Klassen-Label steht in `lehrplan/METADATA.md`.
 
-The skill carries this subject → class-postfix table. **Never extend or
-modify it on your own.** If a repo uses a subject that is missing here,
-report it to the user and propose an entry — but let the user edit this
-skill file themselves.
+### Ordner- und Datei-Benennung
+
+- `lehrplan/<fach>-<zweig>/`: **klein** geschrieben, Bindestrich
+  (z. B. `infi-hwii`). Das Zweig-Kürzel folgt der Klassen-Postfix-Tabelle
+  (`hwii`, `hwit`, `aif`, `kif`, `cif`). In Fachgruppen-Repos vorhandene
+  Alt-Ordner mit ausgeschriebenem Zweig-Kürzel (z. B. `infi-wii`,
+  `infi-wit`) sind ein Befund mit Umbenennungsempfehlung
+  (`infi-wii` → `infi-hwii`) — Umbenennung nur auf Nutzer-Wunsch.
+- `unterricht/<ZWEIG>-<FACH>/`: **GROSSBUCHSTABEN**, Bindestrich
+  (z. B. `HWII-INFI`). Reihenfolge bewusst anders als bei `lehrplan/`
+  (dort Fach-Zweig, hier Zweig-Fach) — beide Formen sind verbindlich.
+- Klassenordner: `<Stufe><Postfix>` in **GROSSBUCHSTABEN** (z. B.
+  `4HWII`, `4HWIT`), **innerhalb** des `<fach>-<zweig>`-Ordners.
+  Generische Labels decken Parallellklassen ab (`4HWIT` deckt
+  4AHWIT/4BHWIT ab).
+- Stunden-Ordner: `NN-slug/` während der Vorbereitung, umbenannt zu
+  `YYYY-MM-DD_slug/`, sobald der Unterrichtstermin fixiert ist —
+  **ausschließlich** unter `unterricht/<ZWEIG>-<FACH>/`.
+- Einheiten/Semesterpläne: `jg<N>-einheiten.md` und
+  `jg<N>-semesterplan-{ws,ss}.md`, kleines `jg`, Unterstrich, flach unter
+  `unterricht/<ZWEIG>-<FACH>/`.
+- RIS-Ordner: `lehrplan/RIS/` — Großbuchstaben-Ausnahme (Abkürzung, wie
+  Klassen-Labels); enthält **nur** RIS-Gesetzestext-PDFs.
+- PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO-8601-Datumspräfix).
+- Klein mit Bindestrichen für alle mehrteiligen Datei- und Ordnernamen.
+
+## Klassen-Zuordnung (MANUELL GEPFLEGT)
+
+Der Skill führt diese Gegenstand → Klassen-Postfix-Tabelle mit. **Nie
+selbst erweitern oder ändern.** Nutzt ein Repo einen Gegenstand, der hier
+fehlt, das dem Nutzer melden und einen Eintrag vorschlagen — aber der
+Nutzer editiert diese Skill-Datei selbst.
 
 | Gegenstand | Klassen-Postfix(e) |
 |------------|--------------------|
 | PMM        | HWIT               |
 | INFI (Anlage 1.24) | HWII       |
-| SWP (Anlage 1.24)  | HWII       |
 | INFI (Anlage 1.28) | HWIT       |
+| SWP (Anlage 1.24)  | HWII       |
 | WMC        | AIF, KIF, CIF      |
 
-How the mapping works:
+So funktioniert die Zuordnung:
 
-- Class folders are `<Stufe><Postfix>` (e.g. `4HWIT`, `5HWIT`; for WMC e.g.
-  `4KIF`, `5KIF`).
-- The `Stufe` (digit) comes from the Jahrgang in which the subject is taught
-  per the legal curriculum (see METADATA.md / Fachgegenstände table).
-- **Identify class folders generically**: any directory under `lehrplan/`
-  matching `<digit><known-postfix>` is a class folder. Do not rely on a
-  hardcoded list of full class names.
+- Klassenordner sind `<Stufe><Postfix>` (z. B. `4HWII`, `5HWIT`; für WMC
+  z. B. `4KIF`, `5KIF`) — jeweils **innerhalb** des
+  `lehrplan/<fach>-<zweig>/`-Ordners.
+- Die `Stufe` (Ziffer) kommt aus dem Jahrgang, in dem der Gegenstand laut
+  Lehrplan unterrichtet wird (siehe METADATA.md / Fachgegenstände-Tabelle).
+- **Klassenordner generisch erkennen:** Jedes Verzeichnis unter
+  `lehrplan/<fach>-<zweig>/`, das `<Ziffer><bekannter-Postfix>`
+  entspricht, ist ein Klassenordner. Keine hardcodierte Liste voller
+  Klassennamen verwenden.
+- Ein Gegenstand in mehreren Zweigen (z. B. INFI in HWII und HWIT)
+  bedeutet: mehrere `<fach>-<zweig>`-Ordner, jeweils mit eigenen
+  Klassenordnern — die Tiefe kann je Zweig verschieden sein.
 
 ## Spengergasse-Klassen-Decoder (Abendform, Berufstätige-Formen)
 
-Verifiziertes Wissen zu den Klassenkürzeln der HTL Spengergasse (Erwachsenenbildung,
-stand 2026-09-06, Quelle: Schul-Website „Informatik – Abendform" + Lehrer-Angabe):
+Verifiziertes Wissen zu den Klassenkürzeln der HTL Spengergasse
+(Erwachsenenbildung, Stand 2026-09-06, Quelle: Schul-Website „Informatik –
+Abendform" + Lehrer-Angabe):
 
 **Code-Schema:** `<Semester><Form-Serie>IF` — die Ziffer ist das Semester,
-**ungerade = WS, gerade = SS** (z. B. `3AIF` WS → `4AIF` SS; `5KIF` WS → `6KIF` SS).
+**ungerade = WS, gerade = SS** (z. B. `3AIF` WS → `4AIF` SS; `5KIF` WS →
+`6KIF` SS).
 
 | Form-Serie | Form | Dauer | Einstieg | Abschluss |
 |------------|------|-------|----------|-----------|
@@ -157,113 +244,127 @@ stand 2026-09-06, Quelle: Schul-Website „Informatik – Abendform" + Lehrer-An
 | `KIF` | Kolleg | 6 Semester | Reifeprüfung / Berufsreifeprüfung / Studienberechtigungsprüfung → Matura bereits vorhanden | **Diplomprüfung** (nur Diplom) |
 | `CIF` | zweite Kolleg-Variante | 6 Semester | Matura bereits vorhanden | Diplomprüfung (nur Diplom); **C = Zweig, dessen Unterricht erst ab 17:10 beginnt** |
 
-- Praxiscodes der Kohorten tragen ein **Zug-Präfix** (A/B/C) auf dem Form-Code:
-  `4AAIF` (Zug A, AIF), `4AKIF` (Zug A, KIF), `4BKIF` (Zug B, KIF), `4CAIF` (CIF).
-- Ein Schuljahrgang kann mehrere Form-Serien parallel bedienen (z. B. Jahr 1 in
-  `34AIF` + `34KIF` + `34CIF`); die Klassenordner sind dann **Block-Ordner** für
-  semestrierte Berufstätigen-Formen: `<Sem3Sem4><Form>` (`34AIF`, `34KIF`,
-  `34CIF`, `56KIF`) statt Stufen-Notation — die PMM-Stufen-Notation (`4HWIT`)
-  bleibt für Tagesschul-Formen das Gegenmodell.
+- Praxiscodes der Kohorten tragen ein **Zug-Präfix** (A/B/C) auf dem
+  Form-Code: `4AAIF` (Zug A, AIF), `4AKIF` (Zug A, KIF), `4BKIF` (Zug B,
+  KIF), `4CAIF` (CIF).
+- Ein Schuljahrgang kann mehrere Form-Serien parallel bedienen (z. B.
+  Jahr 1 in `34AIF` + `34KIF` + `34CIF`); die Klassenordner sind dann
+  **Block-Ordner** für semestrierte Berufstätigen-Formen:
+  `<Sem3Sem4><Form>` (`34AIF`, `34KIF`, `34CIF`, `56KIF`) statt
+  Stufen-Notation — die PMM-Stufen-Notation (`4HWIT`) bleibt für
+  Tagesschul-Formen das Gegenmodell.
 - WMC/Informatik-Sonderformen: Rechtsgrundlage BGBl. II Nr. 368/2022
   (Anlagen 1 + 1.9, Varianten I.3/I.4); Referenz-Raster Anlage 1.10
-  (262/2015 idF 383/2021). **Achtung:** der signed 383/2021-PDF enthält nur den
-  VO-Text — der Anlagen-Wortlaut steht im BgblAuth-**COO-HTML** (konsolidierte
-  Einzel-Anlage, fetchbar).
-- Erlaubte Konventions-Abweichung: ein **dreischichtiges `LEHRPLAN.md`** statt
-  `<gegenstand>-lehrplan-text.md`, wenn ② Schuladaption und ③ Didaktik mitlegen.
+  (262/2015 idF 383/2021). **Achtung:** Das signierte 383/2021-PDF enthält
+  nur den VO-Text — der Anlagen-Wortlaut steht im BgblAuth-**COO-HTML**
+  (konsolidierte Einzel-Anlage, fetchbar).
+- Erlaubte Konventions-Abweichung: ein **dreischichtiges `LEHRPLAN.md`**
+  statt eines reinen ①-Extrakts, wenn ② Schuladaption und ③ Didaktik
+  mitlegen.
 - Schul-Websites schreiben pauschal „Abschluss: Diplomprüfung" — die
-  Matura-Logik der Formen steht in der **Einstiegsvarianten-Tabelle**, nicht in
-  der Abschlusszeile.
+  Matura-Logik der Formen steht in der **Einstiegsvarianten-Tabelle**,
+  nicht in der Abschlusszeile.
 
 ## Ausbildungszweig-Konzept
 
-Task 1 operates at the **Ausbildungszweig** level (e.g. WII, WIT, KIF), not at
-the subject level. The legal hierarchy is:
+Aufgabe 1 arbeitet auf **Ausbildungszweig**-Ebene (z. B. WII, WIT, KIF),
+nicht auf Gegenstands-Ebene. Die rechtliche Hierarchie:
 
 ```
 Ausbildungszweig (z. B. WII, WIT, KIF)
   → Rechtsgrundlage: BGBl.-Verordnung mit Anlagen (z. B. BGBl. II Nr. 262/2015)
     → Anlage(n): das Gesetz publiziert die Unterrichtsfächer eines
-      Ausbildungszweigs MEIST GEMEINSAM in EINEM Dokument (e.g. Anlage 1.28
-      covers ALL subjects of the WIT Zweig)
-    → Variiert: manche Zweige/Fächer haben eigene Anlagen (e.g. WMC:
+      Ausbildungszweigs MEIST GEMEINSAM in EINEM Dokument (z. B. deckt
+      Anlage 1.28 ALLE Gegenstände des Zweigs WIT ab)
+    → Variiert: manche Zweige/Fächer haben eigene Anlagen (z. B. WMC:
       Anlage 1.9 aus BGBl. II Nr. 368/2022 statt der WIT-Sammelanlage)
       → einzelne Fächer (Abschnitte der Anlage)
 ```
 
-Consequences for the skill:
+Konsequenzen für den Skill:
 
-- **Task 1 (Beschaffung)** targets the Zweig's document(s). Expect one shared
-  Anlage per Zweig as the normal case; detect and report separate Anlagen
-  when they exist. The METADATA.md of a repo stores which Anlage covers the
-  repo's subject.
-- **Task 2 (Extraktion)** always extracts ONE subject (one Abschnitt) from
-  the Zweig document — never the whole Zweig.
-- The fetch strategy remains Anlage-based (NOR document per Anlage, see
-  RIS-Praxiswissen) — a Zweig document is fetched once and serves all its
-  subjects.
+- **Aufgabe 1 (Beschaffung)** zielt auf die Dokumente des Zweigs. Eine
+  gemeinsame Anlage pro Zweig ist der Normalfall; eigene Anlagen werden
+  erkannt und berichtet, wenn sie existieren. Die METADATA.md des Repos
+  speichert, welche Anlage welchen Gegenstand deckt.
+- **Aufgabe 2 (Extraktion)** extrahiert immer EINEN Gegenstand (einen
+  Abschnitt) aus dem Zweig-Dokument — nie den ganzen Zweig. Bei einem
+  Gegenstand in mehreren Zweigen (z. B. INFI) wird pro Zweig ein eigener
+  Extrakt im jeweiligen `lehrplan/<fach>-<zweig>/`-Ordner angelegt.
+- Die Fetch-Strategie bleibt anlagen-basiert (NOR-Dokument pro Anlage,
+  siehe RIS-Praxiswissen) — ein Zweig-Dokument wird einmal gefetcht und
+  dient allen seinen Gegenständen.
 
-## Workflow Overview
+## Ablaufübersicht
 
-| Task | Mode | Trigger examples |
-|------|------|------------------|
-| A — Gegenstand & Ausbildungszweig identifizieren | Standard (always on invocation) | "Unterricht", "Vorbereitung prüfen" |
-| 1 — Gesetzesmaterial beschaffen (Zweig) | On-demand | "Lehrplan auf Novellen prüfen", "RIS sync", "Gesetzesmaterial holen" |
-| 2 — Fach-Extraktion mit Erläuterungen | On-demand | "Lehrplan extrahieren", "Jahrespläne neu ziehen", "Erläuterungen ergänzen" |
-| 3 — Semesterplan (interaktiv) | On-demand | "Semesterplan erstellen", "Semesterplan überarbeiten" |
+| Aufgabe | Modus | Trigger-Beispiele |
+|---------|-------|-------------------|
+| A — Gegenstand & Ausbildungszweig identifizieren | Standard (bei jedem Aufruf) | „Unterricht", „Vorbereitung prüfen" |
+| 1 — Gesetzesmaterial beschaffen (Zweig) | Bei Bedarf | „Lehrplan auf Novellen prüfen", „RIS sync", „Gesetzesmaterial holen" |
+| 2 — Fach-Extraktion mit Erläuterungen | Bei Bedarf | „Lehrplan extrahieren", „Jahrespläne neu ziehen", „Erläuterungen ergänzen" |
+| 3 — Lehrstoffverteilung/Semesterplan (interaktiv) | Bei Bedarf | „Semesterplan erstellen", „Semesterplan überarbeiten", „Einheiten erstellen" |
 
-Before running Task 1, 2 or 3, display a short plan (what will be fetched,
-compared, written) and proceed. For write-heavy steps, confirm with the
-user if the plan deviates from what they asked for.
+Vor Aufgabe 1, 2 oder 3: einen kurzen Plan anzeigen (was wird gefetcht,
+verglichen, geschrieben) und dann fortfahren. Bei schreiblastigen
+Schritten mit dem Nutzer bestätigen, wenn der Plan vom Auftrag abweicht.
 
-## Task A — Gegenstand & Ausbildungszweig identifizieren
+## Aufgabe A — Gegenstand & Ausbildungszweig identifizieren
 
-Read, in order:
+In dieser Reihenfolge lesen:
 
-1. `lehrplan/METADATA.md` — legal basis (BGBl. number, Anlage), RIS
-   references (ELI, konsolidierte Fassung, NOR links), amendment history,
-   school-autonomy notes, class mapping, file inventory.
-2. `README.md`, `AGENTS.md`, `GLOSSAR.md` — subject name, conventions,
-   domain terms.
+1. `lehrplan/METADATA.md` — Rechtsgrundlage (BGBl.-Nummer, Anlage),
+   RIS-Verweise (ELI, konsolidierte Fassung, NOR-Links),
+   Änderungshistorie, Schulautonomie-Notizen, Klassen-Zuordnung,
+   Datei-Inventar.
+2. `README.md`, `AGENTS.md`, `GLOSSAR.md` — Gegenstandsname, Konventionen,
+   Domänenbegriffe.
 
-Then report:
+Danach berichten:
 
-- **Gegenstand**: subject name and abbreviation, **read from the repo's
-  own docs** (`METADATA.md`, `README.md`, `AGENTS.md`) — never invent an
-  expansion. Example: GRG-PMM uses "Prozessmanagement (PMM)" as the
-  Maturafach name (Anlage 1.28, Abschnitt 5), not any other expansion.
-- **Ausbildungszweig**: which Zweig the repo's subject belongs to (e.g.
-  WIT for PMM), and which Anlage covers it — shared with other subjects
-  or its own (see Ausbildungszweig-Konzept).
-- **Rechtsgrundlage**: BGBl. II number, Kundmachungsdatum, Anlage (e.g.
-  Anlage 1.28 of BGBl. II Nr. 262/2015), plus the Allgemeiner Teil (Anlage 1)
-  if referenced.
-- **RIS-Verweise**: the links stored in METADATA.md.
-- **Klassen**: class folders found, mapped to Jahrgänge via the postfix
-  table.
-- **Lücken**: if `lehrplan/METADATA.md` is missing or incomplete, propose
-  the standard structure (see below) before creating anything.
+- **Gegenstand**: Name und Abkürzung, **aus den eigenen Docs des Repos
+  gelesen** (`METADATA.md`, `README.md`, `AGENTS.md`) — nie eine
+  Auflösung erfinden. Beispiel: GRG-PMM nutzt „Prozessmanagement (PMM)"
+  als Maturafach-Name (Anlage 1.28, Abschnitt 5).
+- **Ausbildungszweig(e)**: welchem Zweig(en) der Gegenstand des Repos
+  angehört (z. B. WIT für PMM; HWII **und** HWIT für GRG-INFI) und welche
+  Anlage ihn deckt — gemeinsam mit anderen Gegenständen oder als eigene
+  (siehe Ausbildungszweig-Konzept).
+- **Rechtsgrundlage**: BGBl. II Nummer, Kundmachungsdatum, Anlage (z. B.
+  Anlage 1.28 der BGBl. II Nr. 262/2015), plus den Allgemeinen Teil
+  (Anlage 1), falls referenziert.
+- **RIS-Verweise**: die in METADATA.md gespeicherten Links.
+- **Klassen**: vorgefundene Klassenordner (pro `<fach>-<zweig>`), via
+  Postfix-Tabelle auf Jahrgänge abgebildet.
+- **Lücken**: falls `lehrplan/METADATA.md` fehlt oder unvollständig ist,
+  die Standardstruktur vorschlagen (siehe unten), bevor irgendetwas
+  erstellt wird — und nur auf ausdrücklichen Nutzer-Wunsch erstellen.
 
-### Konformitäts-Check (always run as part of Task A)
+### Konformitäts-Check (immer als Teil von Aufgabe A)
 
-After reading the repo, check and report each item — this answers the
-recurring question "ist alles eingerichtet, muss der Skill noch laufen?":
+Nach dem Lesen des Repos jeden Punkt prüfen und berichten — das beantwortet
+die wiederkehrende Frage „ist alles eingerichtet, muss der Skill noch
+laufen?":
 
-| Check | Conform if |
-|-------|-----------|
-| METADATA.md vollständig | All skeleton sections present and filled (Rechtsgrundlage, RIS-Verweise, Änderungshistorie, Klassen-Zuordnung, Datei-Inventar) |
-| Komplett-Extrakt | `lehrplan/<gegenstand>-lehrplan-text.md` exists, covers all Jahrgänge of the subject; in the Fachgruppen variant one complete extract per Fach folder (`lehrplan/<fach>-<zweig>/LEHRPLAN.md`) |
-| Klassen-Extrakte | `lehrplan/<KLASSE>/<KLASSE>.lehrplan.md` exists for every class folder |
-| Klassen-Zuordnung | METADATA.md maps every taught Jahrgang ↔ KM ↔ UPPERCASE Klassenname |
-| Novellen-Check-Datum | METADATA.md records when RIS was last queried ("RIS-Status abgefragt am …") and what it said |
-| RIS-Verzeichnis | All law-text PDFs stored under `lehrplan/RIS/` — PDFs in the `lehrplan/` root are a migration finding |
-| Erläuterungen | KM-Überblicke and Lernziel-Erläuterungen present in all extracts (see Task 2) |
-| Semesterpläne | `semesterplan-ws.md`/`semesterplan-ss.md` present for every active class, covering the current KMs |
+| Prüfpunkt | Konform, wenn |
+|-----------|---------------|
+| METADATA.md vollständig | Alle Skeleton-Abschnitte vorhanden und gefüllt (Rechtsgrundlage, RIS-Verweise, Änderungshistorie, Klassen-Zuordnung, Datei-Inventar) |
+| Zweig-Ebene vorhanden | Jeder unterrichtete Zweig hat ein `lehrplan/<fach>-<zweig>/`-Verzeichnis — flache Klassenordner direkt unter `lehrplan/` (Alt-Layout) sind ein Befund mit Migrationspflicht |
+| Komplett-Extrakt | `lehrplan/<fach>-<zweig>/LEHRPLAN.md` existiert pro Zweig, deckt alle Jahrgänge des Gegenstands in diesem Zweig ab |
+| Klassen-Extrakte | `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md` existiert für jeden Klassenordner |
+| Klassen-Zuordnung | METADATA.md bildet jeden unterrichteten Jahrgang ↔ KM ↔ GROSSBUCHSTABEN-Klassenname (pro Zweig) ab |
+| Novellen-Check-Datum | METADATA.md dokumentiert die letzte RIS-Abfrage („RIS-Status abgefragt am …") und ihr Ergebnis |
+| RIS-Verzeichnis | Alle Gesetzestext-PDFs unter `lehrplan/RIS/` — PDFs im `lehrplan/`-Root sind ein Migrationsbefund |
+| Erläuterungen | KM-Überblicke und Lernziel-Erläuterungen in allen Extrakten vorhanden (siehe Aufgabe 2) |
+| Unterrichts-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Migrationsbefund (Retrofit-Klausel) |
+| Stunden-Ordner | `NN-slug/` und `YYYY-MM-DD_thema/` liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Befund (zuständig: Unterricht-Skill) |
 
-Then state explicitly: **"Der Skill muss noch ausgeführt werden"** (list
-which Tasks 1/2/3 remain) **oder "Der Skill ist vollständig ausgeführt"**.
+Anschließend ausdrücklich feststellen: **„Der Skill muss noch ausgeführt
+werden"** (Auflistung, welche Aufgaben 1/2/3 ausstehen) **oder „Der Skill
+ist vollständig ausgeführt"** — oder, bei Repos ohne `lehrplan/`-Struktur:
+**„Repo noch nicht lehrplan-aktiviert; Aufgaben 1/2/3 stehen aus"** plus
+Befundliste. In keinem Fall eigenmächtig migrieren, anlegen oder löschen.
 
-### METADATA.md skeleton (propose only if missing/incomplete)
+### METADATA.md-Skeleton (nur vorschlagen, wenn fehlend/unvollständig)
 
 ```markdown
 # Metadaten zum Lehrplan
@@ -281,7 +382,7 @@ which Tasks 1/2/3 remain) **oder "Der Skill ist vollständig ausgeführt"**.
 <!-- Freiheitsgrade, schulautonome Stundentafel -->
 
 ## Klassen-Zuordnung
-<!-- | Jahrgang | Klassenname | -->  <!-- UPPERCASE generic labels -->
+<!-- | Zweig | Jahrgang | Klassenname | -->  <!-- GROSSBUCHSTABEN, generische Labels -->
 
 ## Zeitmodell
 <!-- Wochenstunden/Doppelstunden pro Semester -->
@@ -290,269 +391,327 @@ which Tasks 1/2/3 remain) **oder "Der Skill ist vollständig ausgeführt"**.
 <!-- | Datei (RIS-PDFs als `RIS/<name>.pdf`) | Herkunft | Beschreibung | -->
 ```
 
-## Task 1 (on-demand) — Gesetzesmaterial beschaffen (Ausbildungszweig)
+## Aufgabe 1 (bei Bedarf) — Gesetzesmaterial beschaffen (Ausbildungszweig)
 
-Purpose: ensure the repo fully mirrors the law in force for the subject's
-Ausbildungszweig, and that no legislative amendment from the **last 12
-months** was missed.
+Zweck: sicherstellen, dass das Repo das geltende Gesetz für den
+Ausbildungszweig des Gegenstands vollständig abbildet und keine
+gesetzgeberische Änderung der **letzten 12 Monate** verpasst wurde.
 
-Protocol:
+Protokoll:
 
-1. **Read stored state** from `lehrplan/METADATA.md`: Gesetzesnummer of the
-   konsolidierte Fassung, RIS links (especially the Anlage NOR link),
-   amendment history table, PDF inventory.
-2. **Novellen-Check (last 12 months)** — use the NOR-Kopf method (see
-   "RIS-Praxiswissen" below; **never** `webfetch` the `GeltendeFassung.wxe`
-   page — it contains the whole Lehrplanpaket, exceeds the fetch limit and
-   fails):
-   - `curl` the **NOR document of the Zweig's Anlage** (link in
-     METADATA.md). Its Kundmachungsorgan header contains the authoritative
-     one-line check, e.g.:
+1. **Gespeicherten Zustand lesen** aus `lehrplan/METADATA.md`:
+   Gesetzesnummer der konsolidierten Fassung, RIS-Links (insbesondere der
+   Anlage-NOR-Link), Änderungshistorie-Tabelle, PDF-Inventar.
+2. **Novellen-Check (letzte 12 Monate)** — mit der NOR-Kopf-Methode (siehe
+   „RIS-Praxiswissen" unten; **nie** `webfetch` auf die
+   `GeltendeFassung.wxe`-Seite — sie enthält das ganze Lehrplanpaket,
+   überschreitet das Fetch-Limit und schlägt fehl):
+   - `curl` auf das **NOR-Dokument der Anlage des Zweigs** (Link in
+     METADATA.md). Sein Kundmachungsorgan-Kopf enthält die
+     autoritative Ein-Zeilen-Prüfung, z. B.:
      „BGBl. II Nr. 262/2015 **zuletzt geändert durch** BGBl. II Nr. 250/2021"
-   - Compare the "zuletzt geändert durch" Novelle against the
-     Änderungshistorie table in METADATA.md. Record the query date.
-   - If the Novelle is already documented: report no change and continue
-     with step 4.
-3. **On finding a documented-later Novelle (only if newer than the last
-   documented entry):**
-   - **Identify** it via its **ELI page** (`https://www.ris.bka.gv.at/eli/
-     bgbl/II/<Jahr>/<Nr>`): Kurztitel, Kundmachungsdatum, Typ.
-   - **Download** the signed PDF:
-     `https://www.ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_<Jahr>_II_<Nr>/
-     BGBLA_<Jahr>_II_<Nr>.pdf`
-   - **Analyze impact**: `pdftotext`, then grep for `Anlage <N.N>` and
-     subject keywords. Novelle §§ are numbered per Novelle; the
-     Inkrafttreten pattern is typically „Abschnitte I und VII … treten
-     hinsichtlich des I. Jahrganges mit 1. September <Jahr> … jahrgangsweise
-     aufsteigend in Kraft".
-   - **Notify the user first**: what changed, which parts of the curriculum
-     of the Zweig are affected, whether the subject's Lehrstoff (the
-     Anlage's subject Abschnitt) is touched.
-   - Store the PDF into `lehrplan/RIS/` as
+   - Die „zuletzt geändert durch"-Novelle mit der Änderungshistorie-Tabelle
+     in METADATA.md vergleichen. Abfragedatum notieren.
+   - Ist die Novelle bereits dokumentiert: keine Änderung melden, mit
+     Schritt 4 fortfahren.
+3. **Bei einer dokumentierten-neueren Novelle (nur wenn neuer als der
+   letzte dokumentierte Eintrag):**
+   - **Identifizieren** über die **ELI-Seite**
+     (`https://www.ris.bka.gv.at/eli/bgbl/II/<Jahr>/<Nr>`): Kurztitel,
+     Kundmachungsdatum, Typ.
+   - **Herunterladen** des signierten PDFs:
+     `https://www.ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_<Jahr>_II_<Nr>/BGBLA_<Jahr>_II_<Nr>.pdf`
+   - **Auswirkungen analysieren**: `pdftotext`, dann nach `Anlage <N.N>`
+     und Gegenstands-Schlüsselwörtern greppen. Novellen-§§ sind pro
+     Novelle nummeriert; das Inkrafttreten-Muster ist typischerweise
+     „Abschnitte I und VII … treten hinsichtlich des I. Jahrganges mit
+     1. September <Jahr> … jahrgangsweise aufsteigend in Kraft".
+   - **Zuerst den Nutzer informieren**: was sich ändert, welche Teile des
+     Lehrplans des Zweigs betroffen sind, ob der Lehrstoff des Gegenstands
+     (der Abschnitt des Gegenstands in der Anlage) berührt ist.
+   - PDF speichern unter `lehrplan/RIS/` als
      `YYYY-MM-DD_BGBl-II-<Nr>_Novelle-<slug>.pdf` (Kundmachungsdatum).
-   - Update METADATA.md: RIS-Verweise (Novelle ELI link), Änderungshistorie
-     (append a row: Kundmachungsdatum, Novelle + Inkrafttreten, Betrifft),
-     file inventory, plus the evidence line "RIS-Status abgefragt am …".
-   - Flag Task 2 (re-extraction) as required **only if the subject's
-     Abschnitt/Lehrstoff text changed** (e.g. 250/2021 touched only
-     Religion/Ethik — the process-management Abschnitt stayed unchanged, so
-     extracts stayed valid).
-4. **Compare PDFs:** check whether the stored PDFs still match the current
-   RIS originals (compare dates/document identifiers; byte-compare if a
-   fresh download is available).
-5. **On no change:** report a confirmation with evidence — the NOR-Kopf
-   line fetched (with query date) and the date of the last entry in
-   METADATA.md. State explicitly: "Alles Relevante aus dem Gesetz ist im
-   Repository abgebildet."
-6. **On fetch failure:** report the exact error and stop — never guess or
-   fabricate legal state.
+   - METADATA.md aktualisieren: RIS-Verweise (Novellen-ELI-Link),
+     Änderungshistorie (Zeile anhängen: Kundmachungsdatum, Novelle +
+     Inkrafttreten, Betrifft), Datei-Inventar, plus die Belegzeile
+     „RIS-Status abgefragt am …".
+   - Aufgabe 2 (Re-Extraktion) als erforderlich markieren **nur, wenn der
+     Abschnitt/Lehrstoff des Gegenstands geändert wurde** (z. B. berührte
+     250/2021 nur Religion/Ethik — der Prozessmanagement-Abschnitt blieb
+     unverändert, die Extrakte blieben gültig).
+4. **PDFs vergleichen:** prüfen, ob die gespeicherten PDFs noch den
+   aktuellen RIS-Originalen entsprechen (Daten/Dokument-IDs vergleichen;
+   Byte-Vergleich, wenn ein frischer Download verfügbar ist).
+5. **Bei keiner Änderung:** Bestätigung mit Beleg berichten — die
+   gefetchte NOR-Kopf-Zeile (mit Abfragedatum) und das Datum des letzten
+   Eintrags in METADATA.md. Ausdrücklich festhalten: „Alles Relevante aus
+   dem Gesetz ist im Repository abgebildet."
+6. **Bei Fetch-Fehler:** den exakten Fehler melden und stoppen — nie den
+   Rechtsstand raten oder fabrizieren.
 
-## Task 2 (on-demand) — Fach-Extraktion mit Erläuterungen
+## Aufgabe 2 (bei Bedarf) — Fach-Extraktion mit Erläuterungen
 
-Purpose: turn the legal text into human-readable Markdown layers — the
-verbatim law plus the Erläuterungs-Ebene (what each topic actually is).
+Zweck: den Gesetzestext in lesbare Markdown-Schichten überführen — das
+wortwörtliche Gesetz plus die Erläuterungs-Ebene (was der Inhalt
+tatsächlich ist).
 
-1. **Source**: extract the text from the RIS HTML of the Zweig's Anlage
-   (preferred: current konsolidierte Fassung link in METADATA.md) or from
-   the stored PDF. Quote only fetched content — never reconstruct legal
-   text from memory.
-2. **Complete extract** — `lehrplan/<gegenstand>-lehrplan-text.md`:
-   - All Jahrgänge of the subject, in order (I.–V. Jahrgang).
-   - Structure: `## <Jahrgang>` → `### <Semester> — Kompetenzmodul <N>`
+1. **Quelle**: Text aus der RIS-HTML der Anlage des Zweigs extrahieren
+   (bevorzugt: aktueller konsolidierte-Fassung-Link in METADATA.md) oder
+   aus dem gespeicherten PDF. Nur gefetchte Inhalte zitieren — nie
+   Gesetzestext aus dem Gedächtnis rekonstruieren.
+2. **Komplett-Extrakt** — `lehrplan/<fach>-<zweig>/LEHRPLAN.md`:
+   - Alle Jahrgänge des Gegenstands in diesem Zweig, in Reihenfolge
+     (I.–V. Jahrgang).
+   - Struktur: `## <Jahrgang>` → `### <Semester> — Kompetenzmodul <N>`
      → `#### Bildungs- und Lehraufgabe` → `#### Lehrstoff`.
-   - **Erläuterungs-Ebene (mandatory)**, see "Qualitätskriterien für
+   - **Erläuterungs-Ebene (zwingend)**, siehe „Qualitätskriterien für
      Erläuterungen":
-     - **KM-Überblick**: directly under each `### <Semester> — Kompetenzmodul
-       <N>` heading, a short introductory description as annotation
-       (`> **Überblick:** …`) — worum geht es in diesem Kompetenzmodul
-       insgesamt.
-     - **Lernziel-Erläuterungen**: directly under **each Lernziel bullet**
-       of the Bildungs- und Lehraufgabe, an inline annotation
-       (`> **Erläuterung:** …`) explaining what the topic IS.
-     - **Lehrstoff-Erläuterungen**: one annotation (`> **Erläuterung:** …`)
-       per Lehrstoff-Bereich (Lehrstoff is compressed prose — one
-       Erläuterung per Bereich, not per fragment).
-   - Annotate milestones (e.g. "III. Jahrgang — Statistik beginnt hier")
-     if present in the source, marked clearly as annotations.
-   - Reference header: legal basis, RIS link, extraction date.
-3. **Class-wise extracts** — one per class folder:
-   - Target: `lehrplan/<KLASSE>/<KLASSE>.lehrplan.md` (e.g.
-     `lehrplan/4HWIT/4HWIT.lehrplan.md`).
-   - Content: **only** the class-relevant Jahrgang (e.g. IV. Jahrgang =
-     KM 7+KM 8 for a 4th-year class), i.e. Bildungs- und Lehraufgabe +
-     Lehrstoff of its Kompetenzmodule — **including the full
-     Erläuterungs-Ebene** (KM-Überblicke, Lernziel- und Lehrstoff-
-     Erläuterungen).
-   - Header: class name ↔ Jahrgang ↔ Kompetenzmodule mapping, legal basis,
-     extraction date.
-   - The Jahrgang ↔ KM mapping comes from METADATA.md.
-4. **Klassennamen in den Lehrplan aufnehmen:** ensure the Klassen-Zuordnung
-   table in METADATA.md maps every Jahrgang taught to its UPPERCASE class
-   name(s). Add missing rows; never remove rows without user confirmation.
-5. **Preserve manual annotations:** if an extract file already exists, read
-   it first. Re-extraction must not silently drop human annotations
-   (highlights, cross-references) **or existing Erläuterungen**. Rebuild
-   the legal text, then re-apply, regenerate or flag affected annotations
-   and Erläuterungen — never silently delete a human-authored Erläuterung;
-   when in doubt, keep it and flag it for review.
-6. Report: files written, Jahrgänge covered, any annotations or
-   Erläuterungen that need manual re-check.
+     - **KM-Überblick**: direkt unter jeder `### <Semester> —
+       Kompetenzmodul <N>`-Überschrift eine kurze Einleitungs-Beschreibung
+       als Annotation (`> **Überblick:** …`) — worum geht es in diesem
+       Kompetenzmodul insgesamt.
+     - **Lernziel-Erläuterungen**: direkt **unter jedem Lernziel-Bullet**
+       der Bildungs- und Lehraufgabe eine Inline-Annotation
+       (`> **Erläuterung:** …`), die erklärt, was das Thema IST.
+     - **Lehrstoff-Erläuterungen**: eine Annotation
+       (`> **Erläuterung:** …`) pro Lehrstoff-Bereich (Lehrstoff ist
+       verdichteter Fließtext — eine Erläuterung pro Bereich, nicht pro
+       Fragment).
+   - Meilensteine annotieren (z. B. „III. Jahrgang — Statistik beginnt
+     hier"), falls in der Quelle vorhanden, klar als Annotation markiert.
+   - Kopfzeile: Rechtsgrundlage, RIS-Link, Extraktionsdatum.
+3. **Klassen-Extrakte** — einer pro Klassenordner:
+   - Ziel: `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md`
+     (z. B. `lehrplan/infi-hwii/4HWII/4HWII.lehrplan.md`).
+   - Inhalt: **nur** der klassenrelevante Jahrgang (z. B. IV. Jahrgang =
+     KM 7 + KM 8 für eine 4.-Jahres-Klasse), also Bildungs- und
+     Lehraufgabe + Lehrstoff ihrer Kompetenzmodule — **inklusive der
+     vollständigen Erläuterungs-Ebene** (KM-Überblicke, Lernziel- und
+     Lehrstoff-Erläuterungen).
+   - Kopfzeile: Klassenname ↔ Jahrgang ↔ Kompetenzmodule, Rechtsgrundlage,
+     Extraktionsdatum.
+   - Die Jahrgang ↔ KM-Zuordnung stammt aus METADATA.md.
+4. **Klassennamen in den Lehrplan aufnehmen:** sicherstellen, dass die
+   Klassen-Zuordnung in METADATA.md jeden unterrichteten Jahrgang (pro
+   Zweig) auf seine GROSSBUCHSTABEN-Klassennamen abbildet. Fehlende Zeilen
+   ergänzen; nie Zeilen ohne Nutzer-Bestätigung entfernen.
+5. **Manuelle Annotationen bewahren:** existiert eine Extrakt-Datei
+   bereits, zuerst lesen. Re-Extraktion darf menschliche Annotationen
+   (Hervorhebungen, Querverweise) **oder existierende Erläuterungen**
+   nicht still verwerfen. Gesetzestext neu aufbauen, dann betroffene
+   Annotationen und Erläuterungen neu anwenden, regenerieren oder
+   markieren — nie eine menschlich verfasste Erläuterung still löschen;
+   im Zweifel behalten und zur Durchsicht markieren.
+6. Bericht: geschriebene Dateien, abgedeckte Jahrgänge, Annotationen oder
+   Erläuterungen, die manuell nachgeprüft werden müssen.
 
-## Task 3 (on-demand) — Semesterplan (interaktives Protokoll)
+## Aufgabe 3 (bei Bedarf) — Lehrstoffverteilung/Semesterplan (interaktives Protokoll)
 
-Purpose: turn the extracted Lehrpläne into a concrete semester plan
-(`semesterplan-ws.md` / `semesterplan-ss.md`). This is an **interactive
-protocol**: the skill drafts, the user decides. Never write a final
-semester plan without the user review step.
+Zweck: aus den extrahierten Lehrplänen eine konkrete Lehrstoffverteilung
+entwerfen — `jg<N>-einheiten.md` und `jg<N>-semesterplan-ws.md` bzw.
+`jg<N>-semesterplan-ss.md` unter `unterricht/<ZWEIG>-<FACH>/`. Dies ist
+ein **interaktives Protokoll**: der Skill entwirft, der Nutzer entscheidet.
+Nie eine finale Lehrstoffverteilung ohne den Nutzer-Review-Schritt
+schreiben.
 
-Protocol:
+Protokoll:
 
-1. **Input-Check** (all must exist; if not, point to the missing Task 1/2
-   outputs and stop):
-   - Class extract `lehrplan/<KLASSE>/<KLASSE>.lehrplan.md` with
-     Erläuterungs-Ebene (the content backbone).
-   - KM-Steckbriefe `lehrplan/kompetenzmodule/km<N>.md` (read for context).
-   - Zeitmodell from `lehrplan/METADATA.md` (Wochenstunden/Doppelstunden
-     pro Semester — determines the number of UE).
-   - Ressourcen-Matrix (e.g. `lehrplan/ressourcen-matrix.md`), if present —
-     for Lektüre-Anker.
-2. **UE-Grid-Entwurf**: map the KM content (Lernziele + Lehrstoff) onto UE
-   blocks according to the Zeitmodell (real UE + reserved DS for tests/
-   admin). Present the draft as a compact table (UE | Thema |
-   KM/Lernziel-Bezug | geplante Lektüre-Anker). State assumptions
-   explicitly (Vorwissen from earlier KMs, sequencing choices).
-3. **User-Review (Pflictschritt)**: present the draft and ask for
-   confirmation/adjustments — sequencing, Schwerpunkte, reserved slots.
-   Do not proceed before the user has reviewed the grid.
-4. **Ausarbeitung**: write `lehrplan/<KLASSE>/semesterplan-ws.md` or
-   `semesterplan-ss.md`, following the repo's existing semester plan
-   format (UE tables grouped by thematic blocks, header with Zeitmodell,
-   Werkzeug, KM-Steckbrief and Ressourcen-Anker references, reserved DS
-   and Schwerpunkte summary at the end).
-   - **Per UE-Themenblock: eine inhaltliche Beschreibung** — a short
-     Erläuterung paragraph (or annotated table rows) per thematic block /
-     UE: what the topic IS, with integrated Anwendungs- und Berufsbezug
-     (see "Qualitätskriterien für Erläuterungen"). Especially here the
-     Erläuterungen must be substantial — this is the layer teachers
-     actually teach from.
-5. **Preserve manual content**: if a semester plan already exists, read it
-   first. Reworking must not silently drop existing content (UE folders,
-   annotations, didactic notes). Show a diff-like summary of what changed.
-6. **Iteration**: offer follow-up adjustments (resequencing, swapping
-   Lektüre-Anker, adding reserve UE). The user decides when the plan is
-   final.
+1. **Input-Check** (alles muss existieren; falls nicht, auf die fehlenden
+   Aufgaben-1/2-Ausgaben hinweisen und stoppen):
+   - Klassen-Extrakt `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md`
+     mit Erläuterungs-Ebene (die inhaltliche Wirbelsäule).
+   - KM-Steckbriefe
+     `lehrplan/<fach>-<zweig>/kompetenzmodule/km<N>.md` (zur Kontextlektüre).
+   - Zeitmodell aus `lehrplan/METADATA.md` (Wochenstunden/
+     Doppelstunden pro Semester — bestimmt die Anzahl der UE).
+   - Ressourcen-Matrix (z. B. `lehrplan/ressourcen-matrix.md`), falls
+     vorhanden — für Lektüre-Anker.
+2. **UE-Raster-Entwurf**: den KM-Inhalt (Lernziele + Lehrstoff) gemäß
+   Zeitmodell auf UE-Blöcke abbilden (reale UE + reservierte DS für
+   Tests/Admin). Den Entwurf als kompakte Tabelle präsentieren
+   (UE | Thema | KM/Lernziel-Bezug | geplante Lektüre-Anker). Annahmen
+   explizit nennen (Vorwissen aus früheren KMs, Reihenfolge-Entscheidungen).
+3. **Nutzer-Review (Pflichtschritt)**: Entwurf präsentieren und nach
+   Bestätigung/Anpassungen fragen — Reihenfolge, Schwerpunkte, reservierte
+   Slots. Erst fortfahren, wenn der Nutzer das Raster geprüft hat.
+4. **Ausarbeitung**: `unterricht/<ZWEIG>-<FACH>/jg<N>-einheiten.md` bzw.
+   `jg<N>-semesterplan-ws.md` / `jg<N>-semesterplan-ss.md` schreiben,
+   dem bestehenden Format im Repo folgend (UE-Tabellen nach thematischen
+   Blöcken, Kopf mit Zeitmodell, Werkzeug, KM-Steckbrief- und
+   Ressourcen-Anker-Verweisen, reservierte DS und Schwerpunkte-Zusammenfassung
+   am Ende).
+   - `<N>` = Jahrgang der Zielklasse (z. B. 4HWII → `jg4-…`).
+   - **Pro UE-Themenblock: eine inhaltliche Beschreibung** — ein kurzer
+     Erläuterungsabsatz (oder annotierte Tabellenzeilen) pro thematischem
+     Block/UE: was das Thema IST, mit integriertem Anwendungs- und
+     Berufsbezug (siehe „Qualitätskriterien für Erläuterungen"). Gerade
+     hier müssen die Erläuterungen substantiell sein — dies ist die
+     Schicht, aus der Lehrkräfte tatsächlich unterrichten.
+5. **Manuellen Inhalt bewahren**: existiert bereits eine
+   Lehrstoffverteilung, zuerst lesen. Überarbeitung darf bestehenden
+   Inhalt (UE-Blöcke, Annotationen, didaktische Notizen) nicht still
+   verwerfen. Diff-artige Zusammenfassung der Änderungen zeigen.
+6. **Iteration**: Folge-Anpassungen anbieten (Umreihung, Lektüre-Anker
+    tauschen, Reserve-UE ergänzen). Der Nutzer entscheidet, wann der Plan
+   final ist.
+
+### Retrofit-Klausel (bereits lehrplan-aktivierte Repos)
+
+In Repos, in denen der Skill **vor der Unterrichts-Trennung** gelaufen
+ist, liegen Altbestände unter `lehrplan/` — typischerweise:
+
+- `lehrplan/<KLASSE>/semesterplan-ws.md` / `semesterplan-ss.md`
+- `lehrplan/<KLASSE>/jg<N>-einheiten.md` (z. B. GRG-INFI:
+  `lehrplan/4HWII/jg4-einheiten.md`)
+- `NN-slug/`- und `YYYY-MM-DD_thema/`-Stunden-Ordner unter
+  `lehrplan/<KLASSE>/`
+
+Vorgehen beim Antreffen (Aufgabe A oder 3):
+
+1. **Melden, nicht handeln:** Altbestände als Migrationsbefund listen
+   (Quelle → Ziel), z. B.
+   `lehrplan/4HWII/jg4-einheiten.md` → `unterricht/HWII-INFI/jg4-einheiten.md`.
+2. Umbenennungen auf das **einheitliche `jg<N>`-Schema** mit einbeziehen
+   (z. B. `semesterplan-ws.md` in einem 4HWII-Ordner →
+   `jg4-semesterplan-ws.md`; abweichende Namen wie `JG3-einheiten.md` →
+   `jg3-einheiten.md`).
+3. Migration (verschieben + umbenennen, bevorzugt `git mv`) **nur nach
+   ausdrücklicher Nutzer-Bestätigung** des Vorschlags — nie still
+   löschen, nie ohne Bestätigung verschieben.
+4. Nach der Migration: Querverweise in METADATA.md, README.md und den
+   Semesterplänen auf die neuen Pfade prüfen und (auf Wunsch) anpassen.
+
+Die Stunden-Ordner (`NN-slug/`, `YYYY-MM-DD_thema/`) gehören inhaltlich
+zum **Unterricht-Skill** — ihr Umzug wird gemeldet und empfohlen, ihre
+Detailpflege liegt danach beim Unterricht-Skill.
 
 ## Qualitätskriterien für Erläuterungen
 
-Shared rules for every Erläuterung (Task 2 extracts and Task 3 semester
-plans). An Erläuterung answers first and foremost: **"Was ist das
-eigentlich? Worum geht es?"**
+Gemeinsame Regeln für jede Erläuterung (Aufgabe-2-Extrakte und
+Aufgabe-3-Lehrstoffverteilungen). Eine Erläuterung beantwortet zuerst und
+vornehmlich: **„Was ist das eigentlich? Worum geht es?"**
 
 1. **Begriffserklärung (Kern, Hauptanteil):** Was ist das Thema inhaltlich?
    Grundidee, zentrale Konzepte, Methoden — verständlich auf Deutsch
-   beschrieben. Not a mere restatement of the legal text: unpack the
-   terminology.
+   beschrieben. Keine bloße Umformulierung des Gesetzestexts: die
+   Terminologie auspacken.
 2. **Anwendungs- und Berufsbezug (integrierter Bestandteil):** konkrete
-   Einsatzmöglichkeiten im Beruf (real, specific — e.g. „Annahmeprüfung →
-   Wareneingangskontrolle nach ISO 2859 in der Fertigung"). Integrated
-   into the explanation, not a bolted-on list.
-3. **Alltagsbezug und Querverweise (optional, wenn sinnvoll):** wo das
-   Thema im Alltag begegnet; Anknüpfungspunkte zu anderen Kompetenzmodulen,
-   Fächern oder späteren Jahrgängen.
+   Einsatzmöglichkeiten im Beruf (real, spezifisch — z. B.
+   „Annahmeprüfung → Wareneingangskontrolle nach ISO 2859 in der
+   Fertigung"). In die Erläuterung integriert, nicht angeflanscht.
+3. **Alltagsbezug und Querverweise (optional, wenn sinnvoll):** wo dem
+   Thema im Alltag begegnet; Anknüpfungspunkte zu anderen
+   Kompetenzmodulen, Fächern oder späteren Jahrgängen.
 
-Rules:
+Regeln:
 
 - **Länge:** 3–7 Sätze sind die Norm; bei bedürftigem Thema darf es gern
-  mehr sein — lieber ausführlich als knapp. No rigid 2–4-sentence template.
-- **German, substantive:** keine generischen Floskeln („wichtiges Thema",
-  „in vielen Bereichen relevant"). Every sentence must carry content.
-- **Never mix with legal text:** Erläuterungen are ALWAYS clearly marked as
-  annotations (Blockquote with `**Überblick:**` / `**Erläuterung:**`).
-  The verbatim law stays untouched and unmarked.
-- **Human-authored Erläuterungen outrank generated ones:** on re-runs,
-  preserve them (see Task 2, step 5).
+  mehr sein — lieber ausführlich als knapp. Keine starre
+  2–4-Satz-Schablone.
+- **Deutsch, substantiell:** keine generischen Floskeln („wichtiges
+  Thema", „in vielen Bereichen relevant"). Jeder Satz muss Inhalt tragen.
+- **Niemals mit dem Gesetzestext vermischen:** Erläuterungen sind IMMER
+  klar als Annotationen markiert (Blockquote mit `**Überblick:**` /
+  `**Erläuterung:**`). Das wortwörtliche Gesetz bleibt unmarkiert.
+- **Menschlich verfasste Erläuterungen rangieren über generierten:** bei
+  Wiederholungen bewahren (siehe Aufgabe 2, Schritt 5).
 
 ## RIS-Praxiswissen (projektübergreifend)
 
-Generic, subject-independent knowledge about fetching from
-ris.bka.gv.at. Accumulated from real Task 1/2 runs. **Persist-back rule:
-after every Task 1/2, move any newly learned generic RIS pattern into this
-section** (skill-level knowledge persistence — this knowledge is not
-project-specific and must not stay trapped in a repo's docs).
+Generisches, gegenstandsunabhängiges Wissen zum Fetchen von
+ris.bka.gv.at. Angereichert aus realen Aufgabe-1/2-Läufen.
+**Persist-back-Regel: nach jedem Aufgabe-1/2-Lauf neu gelernte generische
+RIS-Muster in diesen Abschnitt übernehmen** (Wissen auf Skill-Ebene —
+dieses Wissen ist nicht projektspezifisch und darf nicht in den Docs
+eines einzelnen Repos gefangen bleiben).
 
 ### Fetch-Strategien
 
-- **Never** `webfetch` the `GeltendeFassung.wxe` page (Gesetzesnummer URL)
-  — for Lehrplanpakete it returns the *entire* package (all Anlagen,
-  often > 5 MB) and exceeds the webfetch limit. Use `curl` + local parsing
-  instead.
-- **Autorisierender Ein-Zeilen-Novellen-Check:** `curl` the **NOR document
-  of the Zweig's Anlage** (link stored in METADATA.md). Its
-  Kundmachungsorgan header reads e.g. „BGBl. II Nr. 262/2015 zuletzt
-  geändert durch BGBl. II Nr. 250/2021" — one line, whole amendment check
-  done. `rg -o ".{200}zuletzt geändert.{200}"` to extract it.
-- **Novelle identifizieren:** ELI page
-  `https://www.ris.bka.gv.at/eli/bgbl/II/<Jahr>/<Nr>` is small and gives
+- **Nie** `webfetch` auf die `GeltendeFassung.wxe`-Seite
+  (Gesetzesnummer-URL) — bei Lehrplanpaketen liefert sie das *gesamte*
+  Paket (alle Anlagen, oft > 5 MB) und überschreitet das webfetch-Limit.
+  Stattdessen `curl` + lokales Parsen.
+- **Autorisierender Ein-Zeilen-Novellen-Check:** `curl` auf das
+  **NOR-Dokument der Anlage des Zweigs** (Link in METADATA.md gespeichert).
+  Sein Kundmachungsorgan-Kopf liest sich z. B. „BGBl. II Nr. 262/2015
+  zuletzt geändert durch BGBl. II Nr. 250/2021" — eine Zeile,
+  Änderungsprüfung komplett. Mit
+  `rg -o ".{200}zuletzt geändert.{200}"` extrahieren.
+- **Novelle identifizieren:** die ELI-Seite
+  `https://www.ris.bka.gv.at/eli/bgbl/II/<Jahr>/<Nr>` ist klein und liefert
   Kurztitel, Kundmachungsdatum, Typ, einbringende Stelle.
-- **Novellen-Detail:** signed PDF at
+- **Novellen-Details:** signiertes PDF unter
   `https://www.ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_<Jahr>_II_<Nr>/BGBLA_<Jahr>_II_<Nr>.pdf`,
-  then `pdftotext` + `rg`. Details:
-  - Novelle §§ are numbered consecutively **per Novelle** — grep for
-    `Anlage <N.N>` / subject keywords to find which §§ touch the
-    subject's Anlage.
-  - Inkrafttreten pattern: „Die Abschnitte I und VII der Anlage <N.N> …
+  dann `pdftotext` + `rg`. Details:
+  - Novellen-§§ sind fortlaufend **pro Novelle** nummeriert — nach
+    `Anlage <N.N>` / Gegenstands-Schlüsselwörtern greppen, um die §§ zu
+    finden, die die Anlage des Gegenstands berühren.
+  - Inkrafttreten-Muster: „Die Abschnitte I und VII der Anlage <N.N> …
     treten hinsichtlich des I. Jahrganges mit 1. September <Jahr> und
     hinsichtlich der weiteren Jahrgänge jeweils mit 1. September der
     Folgejahre jahrgangsweise aufsteigend in Kraft."
-  - A Novelle may touch only allgemeinbildende Abschnitte (e.g.
-    Religion/Ethik 2021) while the subject's Abschnitt stays unchanged —
-    in that case extracts remain valid, no re-extraction.
-- **ELI page of the Stammgesetz** (`…/eli/bgbl/II/2015/262/20150917`)
-  lists all Anlagen and core metadata — useful for Task A.
+  - Eine Novelle kann bloß allgemeinbildende Abschnitte berühren (z. B.
+    Religion/Ethik 2021), während der Abschnitt des Gegenstands
+    unverändert bleibt — in dem Fall bleiben die Extrakte gültig, keine
+    Re-Extraktion.
+- **ELI-Seite des Stammgesetzes** (`…/eli/bgbl/II/2015/262/20150917`)
+  listet alle Anlagen und Kern-Metadaten — nützlich für Aufgabe A.
 
 ### PDF-Ablage
 
-- RIS-PDFs go to `lehrplan/RIS/YYYY-MM-DD_<name>.pdf` with the
-  **Kundmachungsdatum** (fetch date is irrelevant — the prefix dates the
-  legal text). Novellen: `lehrplan/RIS/YYYY-MM-DD_BGBl-II-<Nr>_Novelle-<slug>.pdf`.
-- The `lehrplan/` root stays clean: law-text PDFs in the `lehrplan/` root
-  are a Konformitäts-Check finding with migration duty.
-- Other (non-RIS) reference PDFs are **not** subject to the date-prefix
-  convention and never go into `lehrplan/RIS/`.
+- RIS-PDFs nach `lehrplan/RIS/YYYY-MM-DD_<name>.pdf` mit dem
+  **Kundmachungsdatum** (das Fetch-Datum ist irrelevant — das Präfix
+  datiert den Gesetzestext). Novellen:
+  `lehrplan/RIS/YYYY-MM-DD_BGBl-II-<Nr>_Novelle-<slug>.pdf`.
+- Der `lehrplan/`-Root bleibt sauber: Gesetzestext-PDFs im
+  `lehrplan/`-Root sind ein Konformitäts-Check-Befund mit
+  Migrationspflicht.
+- Andere (nicht-RIS-)Referenz-PDFs unterliegen **nicht** der
+  Datumpräfix-Konvention und kommen nie in `lehrplan/RIS/`.
 
 ### Ausgabe in METADATA.md
 
-- Record every RIS query in METADATA.md: „RIS-Status abgefragt am
-  YYYY-MM-DD: … zuletzt geändert durch …" as evidence line under the
+- Jede RIS-Abfrage in METADATA.md dokumentieren: „RIS-Status abgefragt am
+  YYYY-MM-DD: … zuletzt geändert durch …" als Belegzeile unter der
   Änderungshistorie.
-- Never attribute an amendment to a BGBl. number without fetching it —
-  plausible-looking pairs (date + number) can be wrong (e.g. BGBl. II Nr.
-  74/2017 = IngG-Fachrichtungsverordnung, has nothing to do with the HTL
-  Lehrplanpaket).
+- Niemals eine Änderung einer BGBl.-Nummer zuordnen, ohne sie gefetcht zu
+  haben — plausibel aussehende Paare (Datum + Nummer) können falsch sein
+  (z. B. BGBl. II Nr. 74/2017 = IngG-Fachrichtungsverordnung, hat mit dem
+  HTL-Lehrplanpaket nichts zu tun).
 
-## Explicit Out of Scope
+## Explizit außerhalb des Scopes
 
-- **UE material, presentations, homework** belong to other skills (e.g.
-  `homework`, `teach`).
-- **KM-Steckbriefe** (`kompetenzmodule/`) are didactic authoring work;
-  this skill only reads them for context, never rewrites them.
-- **No auto-commit.** Never commit. Commits follow the repo's own issue
-  workflow if one exists.
+- **Stunden-Material, Präsentationen, Hausübungen** gehören zu anderen
+  Skills — der Unterricht-Skill (noch zu erstellen) ist für alles unter
+  `unterricht/<ZWEIG>-<FACH>/` außer den Einheiten- und Semesterplan-Dateien
+  zuständig; `homework` und `teach` für die jeweiligen Spezialfälle.
+- **KM-Steckbriefe** (`kompetenzmodule/`) sind didaktische Autorenschaft;
+  dieser Skill liest sie nur zur Kontextlektüre, schreibt sie nie um.
+- **Kein Auto-Commit.** Niemals committen. Commits folgen dem
+  Issue-Workflow des Repos, falls vorhanden.
+- **Keine Auto-Migration.** Alt-Layouts werden gemeldet (Befund mit
+  Migrationsvorschlag); verschoben/umbenannt wird nur nach
+  ausdrücklicher Nutzer-Bestätigung.
 
-## Constraints
+## Randbedingungen
 
-- German output with proper UTF-8 umlauts; no transliterations (ae/oe/ue).
-- Never fabricate legal text, dates, or BGBl. references. Quote only from
-  fetched RIS content; when unsure, re-fetch.
-- **Erläuterungen are always clearly marked as annotations** (Blockquote
-  with `**Überblick:**` / `**Erläuterung:**`) — legal text and didactic
-  explanation must never visually merge.
-- Date-prefix RIS law-text PDFs with ISO 8601 Kundmachungsdatum; other
-  reference PDFs are exempt.
-- Show a plan before writing files; confirm before deviating from the
-  requested scope.
-- Task 3 never writes a final semester plan without the user review step
-  (Pflictschritt).
-- The class mapping table in this skill is manually maintained — propose,
-  never auto-edit.
-- UPPERCASE class names everywhere (folders, extract files, METADATA.md).
+- Deutsche Ausgabe mit korrekten UTF-8-Umlauten; keine Transliterationen
+  (ae/oe/ue).
+- Niemals Gesetzestext, Daten oder BGBl.-Referenzen fabrizieren. Nur aus
+  gefetchtem RIS-Inhalt zitieren; im Zweifel neu fetchen.
+- **Erläuterungen sind immer klar als Annotationen markiert**
+  (Blockquote mit `**Überblick:**` / `**Erläuterung:**`) — Gesetzestext und
+  didaktische Erläuterung dürfen sich visuell nie vermischen.
+- RIS-Gesetzestext-PDFs mit ISO-8601-Kundmachungsdatum präfixen; andere
+  Referenz-PDFs sind ausgenommen.
+- Vor dem Schreiben von Dateien einen Plan zeigen; vor Abweichungen vom
+  angefragten Umfang bestätigen lassen.
+- Aufgabe 3 schreibt nie eine finale Lehrstoffverteilung ohne den
+  Nutzer-Review-Schritt (Pflichtschritt).
+- Die Klassen-Zuordnungstabelle in diesem Skill wird manuell gepflegt —
+  vorschlagen, nie selbst editieren.
+- GROSSBUCHSTABEN-Klassennamen überall (Ordner, Extrakt-Dateien,
+  METADATA.md); Ausnahme: die Ordner `lehrplan/<fach>-<zweig>/` sind
+  klein, `unterricht/<ZWEIG>-<FACH>/` groß.
+- Repos ohne `lehrplan/`-Struktur: nur berichten, nichts anlegen oder
+  migrieren ohne ausdrückliche Nutzer-Anweisung.
