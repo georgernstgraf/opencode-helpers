@@ -19,6 +19,8 @@ Read this file carefully before making changes in affected areas.
 - Host-local endpoints in shared skills break off-host: `localhost:8888` only resolves on the SearXNG host (claw). The searxng skill therefore uses `https://searxng.claw.graf.priv.at` as primary instance — never add localhost entries to shared tooling.
 - When refactoring shared content into `grading-shared`, keep grading-specific logic (date filtering, homework weighting) in the consuming skill — only truly shared protocols belong in `grading-shared`.
 - The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command.
+- Reference/illustrative material may live in sibling `*.md` files next to a `SKILL.md` (loaded on demand; the skill loader reads only `SKILL.md`). Runtime-critical instructions must stay in `SKILL.md`; sibling content must be linked as `[X.md](./X.md)`. `tests/test_skill_links.py` validates every `](./…)` link in `skills/*/SKILL.md` only — illustrative `./src/...` links inside sibling format templates are intentionally not checked.
+- When extracting a section that contains a fenced code block with Markdown headings, promote heading levels fence-aware (track the ` ``` ` toggles) — a blanket `###`→`##` replace corrupts headings inside the template code block.
 
 ## SearXNG Backend
 
