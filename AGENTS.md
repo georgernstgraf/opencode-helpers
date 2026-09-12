@@ -124,3 +124,4 @@ would become a phantom agent — no README.md inside `agents/`). The mattpocock 
 
 - Markdown for skills and commands
 - ev. JSON configs
+- Tests: `python3 -m unittest discover -s tests -v` — stdlib only and hermetic (local mock, no network, no live instance). Run them after changing `skills/searxng/searxng-search.sh` or its MCP server.

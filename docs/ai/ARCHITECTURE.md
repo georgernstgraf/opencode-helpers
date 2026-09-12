@@ -11,7 +11,8 @@ development workflows in opencode. Skills in `skills/` contain all workflow
 logic (and, for `searxng`, their own MCP server); the thin command layer in
 `commands/` delegates to skills. Global agents live in `agents/` as flat
 `<name>.md` files (linked via `~/.config/opencode/agents`). Utility scripts
-live in `scripts/` (retired ones in `scripts/archive/`). Session context is
+live in `scripts/` (retired ones in `scripts/archive/`). Executable code is
+covered by a hermetic `unittest` suite in `tests/`. Session context is
 persisted to a structured set of knowledge files in `docs/ai/`.
 
 ## Agents (`agents/`)
@@ -39,6 +40,17 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering |
 | `skills/searxng/searxng-search.sh` | Canonical search logic: two-phase query against the SearXNG instance chain (normal engines, then a quality-gated `braveapi` fallback), returns JSON on stdout |
 | `scripts/archive/` | Retired scripts (`opencode-searxng` legacy requests server, `opencode-ollama-sync`) — kept unregistered for reference |
+
+## Tests (`tests/`)
+
+Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
+`python3 -m unittest discover -s tests -v` — no network, no live instance.
+
+| File | Purpose |
+|------|---------|
+| `tests/searxng_mock.py` | In-process mock of the SearXNG JSON API plus a helper that points a temp copy of `searxng-search.sh` at it |
+| `tests/test_searxng_search.py` | `searxng-search.sh` behavior: fallback triggers (empty/weak), merge + dedupe, explicit-engine/category bypass, preserved params, instance chain, primary-instance-only fallback |
+| `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
 
 ## Skills (`skills/`)
 

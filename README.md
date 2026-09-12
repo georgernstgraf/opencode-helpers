@@ -35,6 +35,7 @@ opencode-helpers/
 ├── skills/              # Workflow-Skills (die eigentliche Logik)
 ├── docs/ai/             # Knowledge-Persistence-Dateien
 ├── scripts/             # Utility-Skripte (z.B. MCP-Server)
+├── tests/               # Hermetische Tests (stdlib unittest, lokaler Mock)
 ├── AGENTS.md            # Agents-Konfiguration (dieses Projekt)
 ├── AGENTS.template.md   # Vorlage für andere Projekte
 ├── IAM.md               # Entwickler-Identität & Präferenzen
@@ -192,6 +193,7 @@ opencode-helpers/
 ├── skills/              # Workflow skills (actual logic)
 ├── docs/ai/             # Knowledge persistence files
 ├── scripts/             # Utility scripts (e.g., MCP server)
+├── tests/               # Hermetic tests (stdlib unittest, local mock)
 ├── AGENTS.md            # Agent config (this project)
 ├── AGENTS.template.md   # Template for other projects
 ├── IAM.md               # Developer identity & preferences

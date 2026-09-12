@@ -237,3 +237,9 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Leaving Brave enabled and relying on ranking weight (does not gate usage); a SearXNG plugin (heavier and instance-specific); agent-only manual escalation (no enforcement).
 - **Tradeoff**: Brave fires only when results are weak — real failures still get a good answer while quota lasts far longer. The thresholds (0 / no-Google & <3, general only) are a heuristic, hardcoded in the script for portability.
 - **Also fixed**: SearXNG ignores `engines=` whenever `categories=` is present (the MCP always sends `category=general`), so explicit engine selection had silently never worked — the wrapper now omits the category when engines are given.
+
+## 2026-09-12: Repo-root tests/ with a hermetic stdlib unittest suite
+- **Choice**: Add a root `tests/` directory covering the repo's executable code (currently the `searxng` skill). Tests use Python 3 `unittest` plus an in-process `http.server` mock and run with `python3 -m unittest discover -s tests -v`; no network and no external dependencies.
+- **Reason**: Tests are development tooling for the repo, not part of the globally symlinked skills. A hermetic mock makes the fallback logic (triggers, merge/dedupe, explicit-engine bypass, instance chain) verifiable without spending Brave quota or depending on the live instance.
+- **Considered**: Putting tests inside the skill (`skills/searxng/tests/` — pollutes the global symlink); pytest (extra dependency vs. the stdlib-only MCP); a CI workflow (repo has no CI and is trunk/SVN-oriented — deferred).
+- **Tradeoff**: The suite patches a temp copy of the `INSTANCES=(...)` array in `searxng-search.sh` rather than adding a production seam, keeping the shipped script free of test-only environment variables or arguments — at the cost of coupling the tests to that literal.
