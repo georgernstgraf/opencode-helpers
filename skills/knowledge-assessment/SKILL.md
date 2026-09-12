@@ -18,9 +18,8 @@ communicating individual results.
 
 ## Output Language: MANDATORY GERMAN
 
-All student-facing content (grading reports, individual feedback, email bodies) 
-MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
-Never use English for content intended for students.
+Follow the `grading-shared` **Output Language** rule: natural German with proper
+UTF-8 umlauts (ä, ö, ü, ß), never English.
 
 ## Dependencies
 
@@ -111,9 +110,8 @@ Scan all files for:
   correctly left blank.
 - Do not award partial fractions within an option; each option is worth
   either 1 point or 0 points.
-- Treat each multiple-choice question as worth 4 points total because it has
-  exactly 4 answer options.
-- Treat each free-text question as worth 15 points.
+- Per-question point totals come from the `knowledge-exam` definitions and the
+  solutions file's total; do not hardcode them here.
 - Keep grading consistent across all students.
 - When parsing free-text answers, treat text that starts immediately after a
   separator such as `---` on the same line as a valid answer, not as an empty

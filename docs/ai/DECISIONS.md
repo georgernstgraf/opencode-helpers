@@ -198,6 +198,12 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Retiring the skill outright; keeping and refactoring it in place.
 - **Tradeoff**: The "pure orchestrator, never writes code" mode now applies only to large work instead of being an unconditional default.
 
+## 2026-09-12: Consolidate shared grading/search facts into single sources (P2)
+- **Choice**: Three identical German-language blocks (`knowledge-assessment`, `projectgrade`, `repograde`) now reference `grading-shared`; the address-style table was removed from `projectgrade` and the class list from `knowledge-exam`; per-question point totals now live only in `knowledge-exam`; `searxng`'s duplicate API-parameter table was removed. A "Single Source of Truth" rule was added to `docs/ai/CONVENTIONS.md`.
+- **Reason**: The same facts were maintained in up to four places, so a change in one could silently diverge from the others (the P1 email conflict was one such instance).
+- **Considered**: A neutral shared language-rule document; keeping tailored copies in `homework`/`knowledge-exam`.
+- **Tradeoff**: `homework` and `knowledge-exam` keep their tailored German statements (they name their own artifact and are loaded standalone); only the verbatim duplicates were collapsed.
+
 ## 2026-05-22: Restructure GitHub profile README with current projects
 - **Choice**: Rewrote `georgernstgraf/georgernstgraf/README.md` to show current projects (zazentimer, opencode-helpers, aitranscribe) prominently, teaching repos in a table, and past projects condensed
 - **Reason**: The profile was outdated and didn't reflect the three actively developed projects

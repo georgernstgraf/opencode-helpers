@@ -59,18 +59,6 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 | `pageno` | integer | no | Results page (1-indexed); default `1` |
 | `safesearch` | integer | no | `0` (off), `1` (moderate), `2` (strict) |
 
-## API Parameters
-
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `query` | string (required) | Search query | `"Gemma 4"` |
-| `category` | string | Search category | `general`, `images`, `news`, `it`, `science` |
-| `time_range` | string | Age filter | `day`, `week`, `month`, `year` |
-| `engines` | string | Comma-separated engine list | `"wikipedia,github"` |
-| `language` | string | Language code | `"en"`, `"de"`, `"fr"`, `"auto"` |
-| `pageno` | integer | Results page number | `1`, `2`, `3` |
-| `safesearch` | integer | Safe search filter | `0` (off), `1` (moderate), `2` (strict) |
-
 ## Available Engines
 
 Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.yml`).

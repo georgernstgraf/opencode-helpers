@@ -25,9 +25,8 @@ then mapped to student names via the uploadthing database.
 
 ## Output Language: MANDATORY GERMAN
 
-All student-facing content (grading reports, individual feedback, email bodies) 
-MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
-Never use English for content intended for students.
+Follow the `grading-shared` **Output Language** rule: natural German with proper
+UTF-8 umlauts (ä, ö, ü, ß), never English.
 
 ## Dependencies
 
@@ -317,15 +316,8 @@ Database path: `/home/georg/OneDrive/uploadthing.db`
 
 ### Address Style
 
-Use `grading-shared` address style mapping based on `klasse`:
-
-| Class | Address Style |
-|-------|---------------|
-| `2ahwii` | Informal |
-| `3ahwii` | Informal |
-| `5ahwii` | Informal |
-| `4aaif` | Informal |
-| All others | Formal |
+Use the `grading-shared` **Address Style Mapping** based on `klasse`; do not
+restate the class table here.
 
 ### Unmatched Students
 

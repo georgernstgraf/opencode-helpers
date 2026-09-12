@@ -47,9 +47,6 @@ Never use English for the exam questions or solutions.
   - If `exam-date` is `today`, compute today's ISO date.
   - If `exam-date` is `tomorrow`, compute tomorrow's ISO date.
   - Store this resolved date as `<isodate>` for output filenames.
-- The following classes are addressed informally in related communication:
-  `2ahwii`, `3ahwii`, `5ahwii`, `4aaif`.
-- All other classes use formal address in related communication.
 
 ### 2. Resolve Question Counts
 

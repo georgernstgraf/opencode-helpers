@@ -48,6 +48,12 @@ Follow these without question. Do not deviate unless explicitly told.
 - If any student email address is missing from the database, stop immediately and present all unresolved names to the user; do not generate `EMAIL.json` until all emails are resolved
 - Grading must use pure AI evaluation; scripting or automating the evaluation step is forbidden. Use sub-agents for large volumes of student submissions.
 
+## Single Source of Truth
+
+- Shared facts have exactly one home; every other document references it by name instead of restating it.
+- Grading: the German/UTF-8 output rule, the address-style class table, email/database rules, and the missing-email protocol live only in `grading-shared`. Per-question point totals live only in `knowledge-exam`.
+- Search: the parameter schema lives in the `searxng` MCP tool table; do not add a second table for the same schema.
+
 ## Search Strategy
 
 - **Freshness First:** For rapidly evolving topics (e.g., new AI models, recent software releases), always use the `time_range` parameter (e.g., `month` or `week`) in `searxng_search`.

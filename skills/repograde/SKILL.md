@@ -18,9 +18,8 @@ from a specified cutoff date onwards) in a single unified workflow.
 
 ## Output Language: MANDATORY GERMAN
 
-All student-facing content (grading reports, individual feedback, email bodies) 
-MUST be written in natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
-Never use English for content intended for students.
+Follow the `grading-shared` **Output Language** rule: natural German with proper
+UTF-8 umlauts (ä, ö, ü, ß), never English.
 
 ## Dependencies
 
