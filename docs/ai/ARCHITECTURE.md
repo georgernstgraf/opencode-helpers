@@ -37,7 +37,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | Script | Purpose |
 |--------|---------|
 | `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering |
-| `skills/searxng/searxng-search.sh` | Canonical search logic: curl against the SearXNG instance chain, returns JSON on stdout |
+| `skills/searxng/searxng-search.sh` | Canonical search logic: two-phase query against the SearXNG instance chain (normal engines, then a quality-gated `braveapi` fallback), returns JSON on stdout |
 | `scripts/archive/` | Retired scripts (`opencode-searxng` legacy requests server, `opencode-ollama-sync`) — kept unregistered for reference |
 
 ## Skills (`skills/`)
@@ -86,6 +86,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instance chain `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org` (no localhost entry — the skill runs on multiple hosts).
+- `skills/searxng/searxng-search.sh` two-phase search: phase 1 queries the normal engines; if a general search returns no reasonable result (0 results, or no Google result and < 3 results), phase 2 queries `engines=braveapi` and merges the deduplicated results (`fallback_used`/`fallback_reason` in the answer). An explicit `engines=` argument bypasses the fallback. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches.
 
 ## SearXNG Egress
 

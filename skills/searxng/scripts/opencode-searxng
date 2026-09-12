@@ -16,7 +16,7 @@ import sys
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "searxng"
-SERVER_VERSION = "1.1.0"
+SERVER_VERSION = "1.2.0"
 
 VALID_CATEGORIES = ("general", "images", "news", "it", "science")
 VALID_TIME_RANGES = ("day", "week", "month", "year")
@@ -31,6 +31,10 @@ SEARCH_TOOL = {
         "Search the web via the self-hosted SearXNG instance "
         "(searxng.claw.graf.priv.at) with public fallbacks. "
         "Returns JSON with title, url, engine and snippet for each result. "
+        "A general search automatically falls back to the Brave Search API only when the "
+        "primary engines yield no reasonable results (zero results, or no Google result "
+        "and fewer than three results); the answer then carries fallback_used/fallback_reason. "
+        "Passing 'engines' disables that fallback. "
         "For very recent topics or 'latest' news, always specify a 'time_range'."
     ),
     "inputSchema": {
@@ -53,7 +57,7 @@ SEARCH_TOOL = {
             },
             "engines": {
                 "type": "string",
-                "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection.",
+                "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection and disables the automatic Brave fallback.",
             },
             "language": {
                 "type": "string",

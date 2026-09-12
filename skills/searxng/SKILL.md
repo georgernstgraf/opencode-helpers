@@ -16,6 +16,23 @@ Three layers, bottom-up:
 2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API, returns JSON on stdout. Primary instance is the public URL `searxng.claw.graf.priv.at` (works on every host — only the SearXNG host itself would resolve `localhost:8888`); the historical public mirrors (`etsi.me`, `baresearch.org`) no longer serve `format=json` to anonymous clients (see below). Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
 3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
 
+## Quality-Gated Brave Fallback
+
+`searxng-search.sh` searches in two phases. Phase 1 queries the normal engines;
+only when a **general** search yields no reasonable results does phase 2 retry
+once with the `braveapi` engine and merge the results:
+
+- Trigger: **0 results**, or **no Google result and fewer than 3 results**.
+- The merged answer sets `fallback_used: true` and `fallback_reason`
+  (`empty` / `weak`); results are deduplicated by URL, primary results first.
+- An explicit `engines=` list **disables** the fallback (caller intent wins),
+  and the fallback applies to general searches only — not to
+  `news`/`it`/`science`/`images`.
+- If the fallback engine is unavailable/suspended, phase 1 results are returned
+  unchanged.
+- `braveapi` is excluded from normal instance searches, so ordinary searches do
+  not consume Brave quota.
+
 ## Backend Egress (deployment detail)
 
 Search quality and which engines are usable depend on the SearXNG instance's
@@ -36,7 +53,7 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 |----------|------|----------|-------------|
 | `query` | string | yes | Search query (quotes for exact versions) |
 | `category` | string | no | `general`, `images`, `news`, `it`, `science`; default `general` |
-| `engines` | string | no | Comma-separated engine list (e.g. `wikipedia,github`); overrides `category` |
+| `engines` | string | no | Comma-separated engine list (e.g. `wikipedia,github`); overrides `category` and disables the Brave fallback |
 | `time_range` | string | no | `day`, `week`, `month`, `year` — use for recent topics |
 | `language` | string | no | Language code (`en`, `de`, `auto`); default `en` |
 | `pageno` | integer | no | Results page (1-indexed); default `1` |
@@ -62,7 +79,9 @@ Last verified 2026-09-12.
 ### General Web Search
 - `google` — **primary general engine** (works via the backend's school-IP
   egress; see above)
-- `braveapi` — Brave Search API. May be suspended while the API quota is
+- `braveapi` — Brave Search API (independent index). **Fallback only**: excluded
+  from normal instance searches and queried automatically only by the quality
+  gate above (or explicitly via `engines=braveapi`). Suspended when its quota is
   exhausted; revives automatically after top-up.
 - `brave` — Brave HTML scraper. Occasionally rate-limit suspended; revives
   automatically.
