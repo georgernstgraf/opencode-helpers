@@ -68,13 +68,12 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | `knowledge-assessment` | Assess student knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` or natural language triggers ("persist knowledge") |
-| `orchestration` | Orchestrate sub-agents to decompose, delegate, and deliver work via issue-driven task decomposition | Direct invocation |
+| `orchestration` | Scope-gated coordination for large work: decompose into sub-issues, delegate implementation to sub-agents, verify behind a hard test gate | Natural language ("large", multi-session work) |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
 | `searxng` | Web search via the self-hosted SearXNG instance; owns the `searxng_search` MCP server and the standalone `searxng-search.sh` | MCP tool (automatic in all agents) plus direct invocation |
 | `sync-upstream-skills` | Re-transplant owned skills from the mattpocock upstream after a git pull; checks duplicate names and dangling references | Natural language ("sync skills") |
 | `teach` | Teach the user a new skill or concept | Direct invocation |
-| `telegram-send` | Send files/documents/photos to the user's Telegram chat via the local Bot API, using the running bot's credentials from `~/.config/oc-tg-bot*/.env` | Natural language triggers ("schick mir X ins Telegram", "send file to Telegram") |
 | `lehrplan` | Austrian HTL teaching repos: Gegenstand identification incl. conformity check, RIS sync with Novellen-Check (NOR-Kopf method), year-wise curriculum extraction into `lehrplan/` | Natural language ("Unterricht", "RIS sync", "Lehrplan extrahieren") |
 
 ## Knowledge Files (`docs/ai/`)

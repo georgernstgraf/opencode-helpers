@@ -40,6 +40,7 @@ Before starting any task, read the following files in order:
 5. `docs/ai/PITFALLS.md`
 6. `docs/ai/STATE.md`
 7. `docs/ai/DOMAIN.md` (if task involves business logic)
+8. `docs/ai/HISTORY.md` (reference only — read last, as needed)
 
 If the user says "continue", "resume", or "finish where we left off":
 read and act on HANDOFF.md immediately without asking clarifying questions. If `HANDOFF.md` contains open tasks, complete them before starting any new work unless the user explicitly says otherwise.
@@ -54,6 +55,7 @@ knowledge-persistence output is the `docs/ai/` knowledge set:
 - `PITFALLS.md` for non-obvious failures, gotchas, and ordering constraints
 - `DOMAIN.md` for business or teaching-domain rules when relevant
 - `STATE.md` for the current focus, completed work, pending work, and blockers
+- `HISTORY.md` for the append-only archive of superseded entries
 
 Treat this as the contract for the future knowledge-persistence implementation,
 even if the surrounding automation is still being refined.

@@ -329,11 +329,11 @@ Use `grading-shared` address style mapping based on `klasse`:
 
 ### Unmatched Students
 
-If an email cannot be matched in the database:
-- Set `mailto` to `null` in the email JSON.
-- Add a `note` field for manual review.
-- Include the student in grading using the email as identifier.
-- Do not invent contact data.
+If an email cannot be matched in the database, follow the `grading-shared`
+**Missing Email Address Handling (CRITICAL)** protocol: stop before generating
+the email payload, report every unresolved name to the user, and wait for the
+database to be updated. Do not invent contact data and do not emit `null`
+`mailto` values.
 
 ## Holistic Grading Philosophy
 

@@ -186,11 +186,17 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: 12 parallel agents consumed significant context, but all completed successfully with project-specific, non-template READMEs
 - **Languages**: English for zazentimer, aitranscribe, aitranscribe-android; bilingual for opencode-helpers; German for all teaching repos
 
-## 2026-09-01: Send Telegram files via raw Bot API instead of a plugin
-- **Choice**: New `telegram-send` skill sends files with `curl` against the Telegram Bot API, reusing the running bot's token from `~/.config/oc-tg-bot*/.env`
-- **Reason**: Works immediately in any session without config changes or opencode restarts; the plugin alternative (`opencode-telegram-send-file`) requires a plugin entry plus restart
-- **Considered**: Installing the `opencode-telegram-send-file` plugin, telling the user to download via the bot's `/ls` file browser
-- **Tradeoff**: Skill duplicates a small amount of delivery logic that a plugin would centralize; token handling is restricted to shell variables to avoid leaking secrets
+## 2026-09-12: Remove the `telegram-send` skill
+- **Choice**: Deleted the `telegram-send` skill; file delivery now goes through the bot's built-in UI.
+- **Reason**: The current bot version can attach more files directly through its interface, so the raw-Bot-API skill is redundant.
+- **Considered**: Keeping the skill as a fallback; installing the `opencode-telegram-send-file` plugin.
+- **Tradeoff**: Loses scripted/agent-initiated sending, acceptable because the bot UI covers the use case.
+
+## 2026-09-12: Slim `orchestration` to a scope-gated coordination policy
+- **Choice**: Reduced `skills/orchestration/SKILL.md` from 367 lines of generic decomposition/delegation guidance to a short, scope-gated policy (coordinate only for multi-session/multi-sub-issue work; hard test gate), with pointers to `issue-workflow`, `knowledge-persistence`, and `code-review`.
+- **Reason**: Current models already decompose and delegate to sub-agents natively; the generic bulk was no-op, and the skill duplicated the bootstrap protocol (with a phantom `docs/ai/ONBOARDING.md` reference and a numbering bug).
+- **Considered**: Retiring the skill outright; keeping and refactoring it in place.
+- **Tradeoff**: The "pure orchestrator, never writes code" mode now applies only to large work instead of being an unconditional default.
 
 ## 2026-05-22: Restructure GitHub profile README with current projects
 - **Choice**: Rewrote `georgernstgraf/georgernstgraf/README.md` to show current projects (zazentimer, opencode-helpers, aitranscribe) prominently, teaching repos in a table, and past projects condensed

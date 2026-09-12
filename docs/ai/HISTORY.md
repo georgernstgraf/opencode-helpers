@@ -46,3 +46,11 @@ Entries here are no longer active truth. Never delete from this file.
 - STATE.md bullet claimed `localhost:8888` first in the `searxng-search.sh` instance chain.
 - **Origin**: docs/ai/STATE.md (2026-09-06 snapshot, same day)
 - **Reason**: `localhost:8888` only resolves on the SearXNG host; the chain is now `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org`.
+
+## 2026-09-12 (SUPERSEDED 2026-09-01, origin: DECISIONS.md, reason: current bot version attaches files directly through its UI): Send Telegram files via raw Bot API instead of a plugin
+- **Choice**: New `telegram-send` skill sends files with `curl` against the Telegram Bot API, reusing the running bot's token from `~/.config/oc-tg-bot*/.env`
+- **Reason**: Works immediately in any session without config changes or opencode restarts; the plugin alternative (`opencode-telegram-send-file`) requires a plugin entry plus restart
+- **Considered**: Installing the `opencode-telegram-send-file` plugin, telling the user to download via the bot's `/ls` file browser
+- **Tradeoff**: Skill duplicates a small amount of delivery logic that a plugin would centralize; token handling is restricted to shell variables to avoid leaking secrets
+- **Origin**: docs/ai/DECISIONS.md
+- **Reason**: Removed — the current bot version attaches files directly through its UI, making the skill redundant.

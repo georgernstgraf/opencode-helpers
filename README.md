@@ -69,7 +69,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `projectgrade` | Bewertet Projekt-Repos ganzheitlich (Commits, Issues, PRs) | Direkter Skill-Aufruf |
 | `repograde` | Benotet Schüler-Repos (einzeln oder Bulk) | Direkter Skill-Aufruf |
 | `fork-policy` | Erzwingt Clean-Main-Branch-Policy auf Forks | On-Demand Skill-Aufruf |
-| `orchestration` | Orchestriert Sub-Agenten zur Aufgabenzerlegung | Direkter Skill-Aufruf |
+| `orchestration` | Koordiniert große, sitzungsübergreifende Arbeit: Sub-Issues, Delegation an Sub-Agenten, hartes Test-Gate (scope-gated) | Sprachsteuerung / direkter Aufruf |
 | `searxng` | Websuche über lokale SearXNG-Instanz | Automatisch via `available_skills` geladen (kein Befehl nötig) |
 | `grill-me` | Relentlesses Interview zum Schärfen eines Plans/Designs (stateless) | Sprachsteuerung: "grill me", "grill this plan" |
 | `grilling` | Die wiederverwendbare Interview-Schleife hinter grill-me/grill-with-docs | Automatisch (model-invoked) |
@@ -227,7 +227,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 | `projectgrade` | Holistic project repo grading (commits, issues, PRs) | Direct skill invocation |
 | `repograde` | Grade student repos (single or bulk) | Direct skill invocation |
 | `fork-policy` | Enforce clean-main branch policy on forks | On-demand skill invocation |
-| `orchestration` | Orchestrate sub-agents for task decomposition | Direct skill invocation |
+| `orchestration` | Scope-gated coordination for large work: sub-issues, sub-agent delegation, hard test gate | Natural language / direct invocation |
 | `searxng` | Web search via local SearXNG instance | Loaded automatically via `available_skills` (no command needed) |
 | `grill-me` | Relentless interview to sharpen a plan/design (stateless) | Natural language: "grill me", "grill this plan" |
 | `grilling` | The reusable interview loop behind grill-me/grill-with-docs | Automatic (model-invoked) |
