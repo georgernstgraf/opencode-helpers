@@ -86,3 +86,31 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instance chain `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org` (no localhost entry — the skill runs on multiple hosts).
+
+## SearXNG Egress
+
+Outgoing search-engine traffic from the self-hosted SearXNG instance (claw)
+does not leave via claw's datacenter IP. It is routed through the school
+network:
+
+```
+SearXNG (claw) ──VPN (tun0)──> tinyproxy on gregor (10.8.0.16:1080) ──> internet
+                                                                        (egress: 192.189.51.211)
+```
+
+- Egress IP `192.189.51.211` is the HTL Spengergasse school network.
+- Configured globally in the instance's `settings.yml` under
+  `outgoing.proxies` (`all://` → `http://10.8.0.16:1080`); every engine goes
+  through it.
+- **Reason:** claw's datacenter IP (`85.215.162.182`) is bot-blocked or served
+  garbage by most engines; the school IP is treated like normal user traffic.
+  `google` — the primary general engine — only works via this egress.
+- tinyproxy listens only on the VPN interface (`Listen 10.8.0.16`,
+  `Allow 10.8.0.0/24`) with a systemd `Restart=always` drop-in.
+- **Failure mode:** if tinyproxy/VPN is down, all engines return 0 results;
+  recovery is automatic via systemd restart.
+- Egress check: `curl --proxy http://10.8.0.16:1080 https://api.ipify.org`
+  must return `192.189.51.211`.
+
+This is backend deployment knowledge. The portable `searxng` skill only notes
+the 0-results failure mode; operational pitfalls live in `PITFALLS.md`.

@@ -13,8 +13,20 @@ Search the web using self-hosted SearXNG at `searxng.claw.graf.priv.at`.
 Three layers, bottom-up:
 
 1. **SearXNG instance** — self-hosted at `https://searxng.claw.graf.priv.at/search` (nginx → `localhost:8888` on the SearXNG host). JSON API: `?q=QUERY&format=json`.
-2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API with fallback across instances (`searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org`; the public URL is primary so the script works on every host — only the SearXNG host itself would resolve `localhost:8888`), returns JSON on stdout. Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
+2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API, returns JSON on stdout. Primary instance is the public URL `searxng.claw.graf.priv.at` (works on every host — only the SearXNG host itself would resolve `localhost:8888`); the historical public mirrors (`etsi.me`, `baresearch.org`) no longer serve `format=json` to anonymous clients (see below). Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
 3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
+
+## Backend Egress (deployment detail)
+
+Search quality and which engines are usable depend on the SearXNG instance's
+outgoing traffic, not on this skill. The backend currently egresses via a
+school IP; if **every** engine returns 0 results, the backend proxy/VPN is the
+likely cause — not the skill or the MCP server.
+
+Deployment specifics (proxy host, VPN topology, `settings.yml` proxy setup,
+failure modes, egress verification) are operational and host-specific. They are
+documented in `opencode-helpers` under `docs/ai/ARCHITECTURE.md` and
+`docs/ai/PITFALLS.md`, not here — this skill is portable across hosts.
 
 ## MCP Tool: `searxng_search`
 
@@ -37,7 +49,7 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 | `query` | string (required) | Search query | `"Gemma 4"` |
 | `category` | string | Search category | `general`, `images`, `news`, `it`, `science` |
 | `time_range` | string | Age filter | `day`, `week`, `month`, `year` |
-| `engines` | string | Comma-separated engine list | `"wikipedia,github,braveapi"` |
+| `engines` | string | Comma-separated engine list | `"wikipedia,github"` |
 | `language` | string | Language code | `"en"`, `"de"`, `"fr"`, `"auto"` |
 | `pageno` | integer | Results page number | `1`, `2`, `3` |
 | `safesearch` | integer | Safe search filter | `0` (off), `1` (moderate), `2` (strict) |
@@ -45,13 +57,21 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 ## Available Engines
 
 Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.yml`).
-Tested 2026-09-08 against SearXNG 2026.9.8.
+Last verified 2026-09-12.
 
 ### General Web Search
-- `braveapi` — Brave Search API (best quality, API key, supports `time_range`)
-- `bing` — Bing web
-- `mwmbl` — Mwmbl
+- `google` — **primary general engine** (works via the backend's school-IP
+  egress; see above)
+- `braveapi` — Brave Search API. May be suspended while the API quota is
+  exhausted; revives automatically after top-up.
+- `brave` — Brave HTML scraper. Occasionally rate-limit suspended; revives
+  automatically.
+- `mwmbl` — Mwmbl. Secondary/fallback. Small index: short/common queries
+  give relevant results, long-tail queries often return 0 (honest empty).
 - `searchmysite` — Indie websites
+
+> **Removed engines:** `bing` web and `yahoo`. Do not re-add without
+> re-testing — removal rationale is in `docs/ai/PITFALLS.md`.
 
 ### Knowledge / IT
 - `wikipedia` — Wikipedia (with infobox)
@@ -61,15 +81,15 @@ Tested 2026-09-08 against SearXNG 2026.9.8.
 - `docker hub`, `arch linux wiki`, `gentoo` — Tech resources
 
 ### News
-- `bing news` — Bing News
+- `bing news` — Bing News (separate scraper from the removed `bing` web engine)
 - `duckduckgo news` — DuckDuckGo News
 - `hackernews` — Hacker News
 
-> **Do not re-enable without testing:** `duckduckgo`, `startpage`, `google news`
-> and `mojeek` answer with CAPTCHA/access denied from this VPS IP, and
-> `brave.news` is the HTML scraper of brave.com (no API-key support, blocked).
-> Public fallback instances (etsi.me, baresearch.org) no longer serve
+> **Blocked / not usable** (Captcha, 403, or connection resets):
+> `mojeek`, `startpage`, `qwant`, `yep`, `ecosia`, `duckduckgo`.
+> Public fallback instances (`etsi.me`, `baresearch.org`) no longer serve
 > `format=json` to anonymous clients (429 / anti-bot challenge).
+> `google news` is untested on the current backend — test before enabling.
 
 ## SearXNG Instance
 

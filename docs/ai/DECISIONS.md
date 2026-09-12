@@ -216,3 +216,10 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Keeping the requests-based server in `scripts/`, keeping `localhost:8888` first with public fallback
 - **Tradeoff**: Requests from the SearXNG host take the nginx/TLS hop; the archived legacy copy remains in the repo (inert, unregistered).
 - **Also added**: Richer tool schema (`category`, `engines`, `time_range`, `safesearch`) ported into the stdlib server; empty result sets are valid answers instead of triggering instance fallbacks.
+
+## 2026-09-12: Route SearXNG egress via the school network (tinyproxy on gregor)
+- **Choice**: Send all outgoing SearXNG engine traffic through a tinyproxy on host gregor (`10.8.0.16:1080`, over VPN `tun0`), so requests leave via the HTL Spengergasse school IP (`192.189.51.211`) instead of claw's datacenter IP. Configured globally in the instance's `settings.yml` (`outgoing.proxies`).
+- **Reason**: claw's datacenter IP (`85.215.162.182`) is bot-blocked or served random/spam results by most engines; the school IP is treated like normal user traffic. `google` — now the primary general engine — only works via the school IP.
+- **Considered**: Staying on the datacenter IP with the reduced engine set (no google; only mwmbl/searchmysite/brave), using a commercial proxy/VPN egress.
+- **Tradeoff**: Search quality now depends on gregor + the VPN being up; if the proxy is down, all engines return 0 results (recovery is automatic via systemd restart). tinyproxy is restricted to the VPN interface (`Listen 10.8.0.16`, `Allow 10.8.0.0/24`).
+- **Kept out of the skill**: These host/IP/proxy specifics are deployment operations, not portable usage knowledge. They live in `ARCHITECTURE.md`/`PITFALLS.md`; `skills/searxng/SKILL.md` only notes the 0-results failure mode and points to the docs.

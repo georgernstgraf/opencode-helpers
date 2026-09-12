@@ -20,6 +20,14 @@ Read this file carefully before making changes in affected areas.
 - When refactoring shared content into `grading-shared`, keep grading-specific logic (date filtering, homework weighting) in the consuming skill — only truly shared protocols belong in `grading-shared`.
 - The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command.
 
+## SearXNG Backend
+
+- SearXNG egress goes through a tinyproxy on host gregor (school IP). If **all** engines return 0 results, suspect the proxy/VPN first — not the skill or MCP server. Egress check: `curl --proxy http://10.8.0.16:1080 https://api.ipify.org` must return `192.189.51.211`.
+- tinyproxy: use `Listen 10.8.0.16` (listening socket), **never** `Bind` — `Bind` forces the outgoing source IP and would push egress into the VPN tunnel. The user directive is `User`; `UserName` is invalid syntax.
+- In this SearXNG instance, `keep_only` alone does not remove an engine, and `disabled: true` is also insufficient (a disabled engine stays reachable via explicit `engines=<name>`). To fully remove an engine, remove it from `keep_only` **and** delete its custom block.
+- SearXNG's default `disabled: true` for `google` must be overridden with explicit `disabled: false` in `settings.yml` for the engine to work.
+- `bing` web and `yahoo` were removed 2026-09-12: `bing` web returned random or spam results non-deterministically, `yahoo` produced an lxml ParserError (no parseable HTML). Do not re-enable without testing.
+
 ## Database
 
 - Class lookup in `uploadthing.db` is case-sensitive; `klasse` column stores uppercase (e.g., "2AHWII") but `grading-shared` config uses lowercase ("2ahwii"); always use `UPPER(klasse)` comparison.
