@@ -134,7 +134,7 @@ relocate it.
   `gh issue create --title "<title>" --body "<body>"`. In HANDOFF.md,
   reference only the issue number:
   `1. [ ] See #42 — Refactor enrollment module to cursor pagination`
-- **SVN-/Projekte ohne Issue-System** (z. B. `~/svn/georg`, Deployed-Trees auf
+- **SVN-Projekte ohne Issue-System** (z. B. `~/svn/georg`, Deployed-Trees auf
   murl/claw): es existiert KEIN Issue-Tracking — solche Aufgaben bleiben
   vollständig in HANDOFF.md (mit Datei-/Pfad-Angabe); kein `gh`-Aufruf.
 - This keeps HANDOFF.md small and actionable while large work is
@@ -147,7 +147,7 @@ relocate it.
 
 ### 7. Comment on Active Issue (nur GitHub-Projekte; SVN: skip)
 
-- **Anwendbarkeit:** nur für Git/GitHub-Backing-Projekte. In SVN-/Projekten
+- **Anwendbarkeit:** nur für GitHub- (bzw. Git-)Projekte. In SVN-Projekten
   ohne Issue-System (`~/svn/georg` etc.) diesen Schritt still überspringen.
 - If there is a known active GitHub issue for the current session, post a
   brief comment summarizing what knowledge was persisted (files updated,
@@ -393,6 +393,6 @@ any new work unless the user explicitly says otherwise.
   Issue lifecycle management is the exclusive responsibility of the
   `issue-workflow` skill's `finish` mode. When invoked standalone, this
   skill may only create new issues (Escalation Rule) or comment on
-  existing ones. — gilt diesbezüglich nur für GitHub-Backing-Projekte;
-  SVN-/Projekte ohne Issue-System haben schlicht keine Issues (dann
+  existing ones. — gilt diesbezüglich nur für GitHub-Projekte;
+  SVN-Projekte ohne Issue-System haben schlicht keine Issues (dann
   entfällt der ganze Mechanik still).

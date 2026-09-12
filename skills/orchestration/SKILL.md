@@ -26,6 +26,21 @@ This skill defines the role of the main agent as a pure orchestrator that
 Use this skill whenever the main agent is coordinating multiple sub-tasks,
 managing an epic with sub-issues, or acting as a dispatcher for Task agents.
 
+## VCS- und Projekt-Scope
+
+- Dieses Skill orchestriert primär GitHub-Projekte (Sub-Issues via REST-API,
+  `gh run list` für CI-Gates, Issue-Nummern in Commits).
+- **Git trunk-based und SVN branchlos (trunk-only) — beides ohne langlebige
+  Branches.** Für SVN-Projekte ohne Issue-System (z. B. `~/svn/georg`,
+  Deployed-Trees auf murl/claw) gilt die Anpassung:
+  - Vor jeder Arbeit: `svn up` im relevanten Working Copy (trunk-Regel wie
+    `git pull` bei Git); bei Fehlschlag/Konflikt sofort stoppen und melden.
+  - Kein Issue-/Sub-Issue-Tracking und kein `gh`: Epics/Sub-Issues werden zu
+    einfachen Aufgabenlisten in `docs/ai/HANDOFF.md` (eine Zeile pro Aufgabe).
+  - Commit-Regel: klare deutsche Commit-Message ohne Issue-Referenz.
+  - „CI green"-Gate entfällt bzw. wird durch lokale Verifikation/Tests ersetzt
+    (z. B. `svn st` sauber, Dienste-/Smoke-Checks) — kein `gh run list`.
+
 ## Core Principle
 
 > The main agent must not create any code. It reads, plans, decomposes,
@@ -286,8 +301,8 @@ When sub-issues have dependencies, execute strictly in order:
 When sub-issues have no dependencies on each other:
 - They MAY be delegated to separate Task agents concurrently.
 - However, concurrent delegation increases risk of merge conflicts in
-  trunk-based development. Prefer sequential execution unless the sub-issues
-  touch completely disjoint file sets.
+  trunk-based development (Git trunk-based / SVN branchless). Prefer sequential
+  execution unless the sub-issues touch completely disjoint file sets.
 
 ### Blocker Handling
 
