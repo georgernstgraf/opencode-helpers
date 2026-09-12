@@ -204,6 +204,12 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: A neutral shared language-rule document; keeping tailored copies in `homework`/`knowledge-exam`.
 - **Tradeoff**: `homework` and `knowledge-exam` keep their tailored German statements (they name their own artifact and are loaded standalone); only the verbatim duplicates were collapsed.
 
+## 2026-09-12: Progressive disclosure for long reference material (P3a)
+- **Choice**: Moved illustrative and format reference out of six skills into sibling files loaded on demand: `grading-shared/EMAIL-EXAMPLES.md`, `knowledge-persistence/FILE-TEMPLATES.md`, `lehrplan/{KLASSEN-ZUORDNUNG,SPENGERGASSE-KLASSEN,RIS-PRAXIS,ERLAEUTERUNGS-QUALITAET}.md`, `repograde/REPORT-FORMAT.md`, `projectgrade/REPORT-FORMAT.md`. Normative rules stayed inline. Added `tests/test_skill_links.py` as a link guard.
+- **Reason**: Six SKILL.md files were 460-1026 lines; examples, templates and branch-specific domain detail are not needed on every run, and burying them dilutes attention (per the `writing-for-agents` information hierarchy).
+- **Considered**: Extracting normative protocols too (P3b); a neutral shared doc.
+- **Tradeoff**: Normative content (missing-email, methodology, scoring, output language, Repo-Konventionen, Ausbildungszweig-Konzept) stays inline to avoid a pointer behind a pointer, so files shrink less than possible. `KLASSEN-ZUORDNUNG.md` is now the user-editable table.
+
 ## 2026-05-22: Restructure GitHub profile README with current projects
 - **Choice**: Rewrote `georgernstgraf/georgernstgraf/README.md` to show current projects (zazentimer, opencode-helpers, aitranscribe) prominently, teaching repos in a table, and past projects condensed
 - **Reason**: The profile was outdated and didn't reflect the three actively developed projects

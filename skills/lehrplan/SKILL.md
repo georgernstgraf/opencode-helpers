@@ -93,7 +93,7 @@ unterricht/
 ```
 
 - Das `<ZWEIG>`-Kürzel folgt der Klassen-Postfix-Tabelle (siehe
-  Klassen-Zuordnung): `HWII`, `HWIT`, `AIF`, `KIF`, `CIF` usw.
+  [KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md)): `HWII`, `HWIT`, `AIF`, `KIF`, `CIF` usw.
 - Klein geschriebenes `jg<N>`-Präfix für alle Einheiten- und
   Semesterplan-Dateien — **einheitliches Schema, keine Ausnahmen**.
 - **Dokumentierte Ausnahme (GRG-WMC):** form-übergreifender Ordner
@@ -224,70 +224,15 @@ GLOSSAR.md
 
 ## Klassen-Zuordnung (MANUELL GEPFLEGT)
 
-Der Skill führt diese Gegenstand → Klassen-Postfix-Tabelle mit. **Nie
-selbst erweitern oder ändern.** Nutzt ein Repo einen Gegenstand, der hier
-fehlt, das dem Nutzer melden und einen Eintrag vorschlagen — aber der
-Nutzer editiert diese Skill-Datei selbst.
-
-| Gegenstand | Klassen-Postfix(e) |
-|------------|--------------------|
-| PMM        | HWIT               |
-| INFI (Anlage 1.24) | HWII       |
-| INFI (Anlage 1.28) | HWIT       |
-| SWP (Anlage 1.24)  | HWII       |
-| WMC        | AIF, KIF, CIF      |
-
-So funktioniert die Zuordnung:
-
-- Klassenordner sind `<Stufe><Postfix>` (z. B. `4HWII`, `5HWIT`; für WMC
-  z. B. `4KIF`, `5KIF`) — jeweils **innerhalb** des
-  `lehrplan/<fach>-<zweig>/`-Ordners.
-- Die `Stufe` (Ziffer) kommt aus dem Jahrgang, in dem der Gegenstand laut
-  Lehrplan unterrichtet wird (siehe METADATA.md / Fachgegenstände-Tabelle).
-- **Klassenordner generisch erkennen:** Jedes Verzeichnis unter
-  `lehrplan/<fach>-<zweig>/`, das `<Ziffer><bekannter-Postfix>`
-  entspricht, ist ein Klassenordner. Keine hardcodierte Liste voller
-  Klassennamen verwenden.
-- Ein Gegenstand in mehreren Zweigen (z. B. INFI in HWII und HWIT)
-  bedeutet: mehrere `<fach>-<zweig>`-Ordner, jeweils mit eigenen
-  Klassenordnern — die Tiefe kann je Zweig verschieden sein.
+Die handgepflegte Gegenstand→Klassen-Postfix-Tabelle steht in
+[KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md). Sie wird vom Nutzer editiert —
+nie selbst erweitern oder ändern.
 
 ## Spengergasse-Klassen-Decoder (Abendform, Berufstätige-Formen)
 
-Verifiziertes Wissen zu den Klassenkürzeln der HTL Spengergasse
-(Erwachsenenbildung, Stand 2026-09-06, Quelle: Schul-Website „Informatik –
-Abendform" + Lehrer-Angabe):
-
-**Code-Schema:** `<Semester><Form-Serie>IF` — die Ziffer ist das Semester,
-**ungerade = WS, gerade = SS** (z. B. `3AIF` WS → `4AIF` SS; `5KIF` WS →
-`6KIF` SS).
-
-| Form-Serie | Form | Dauer | Einstieg | Abschluss |
-|------------|------|-------|----------|-----------|
-| `AIF` | Aufbaulehrgang | 7 Semester | ohne Reifeprüfung (Vorbereitungslehrgang, Fachschule, facheinschlägiger Lehrabschluss) | **Reife- und Diplomprüfung** (Diplom + Matura) |
-| `KIF` | Kolleg | 6 Semester | Reifeprüfung / Berufsreifeprüfung / Studienberechtigungsprüfung → Matura bereits vorhanden | **Diplomprüfung** (nur Diplom) |
-| `CIF` | zweite Kolleg-Variante | 6 Semester | Matura bereits vorhanden | Diplomprüfung (nur Diplom); **C = Zweig, dessen Unterricht erst ab 17:10 beginnt** |
-
-- Praxiscodes der Kohorten tragen ein **Zug-Präfix** (A/B/C) auf dem
-  Form-Code: `4AAIF` (Zug A, AIF), `4AKIF` (Zug A, KIF), `4BKIF` (Zug B,
-  KIF), `4CAIF` (CIF).
-- Ein Schuljahrgang kann mehrere Form-Serien parallel bedienen (z. B.
-  Jahr 1 in `34AIF` + `34KIF` + `34CIF`); die Klassenordner sind dann
-  **Block-Ordner** für semestrierte Berufstätigen-Formen:
-  `<Sem3Sem4><Form>` (`34AIF`, `34KIF`, `34CIF`, `56KIF`) statt
-  Stufen-Notation — die PMM-Stufen-Notation (`4HWIT`) bleibt für
-  Tagesschul-Formen das Gegenmodell.
-- WMC/Informatik-Sonderformen: Rechtsgrundlage BGBl. II Nr. 368/2022
-  (Anlagen 1 + 1.9, Varianten I.3/I.4); Referenz-Raster Anlage 1.10
-  (262/2015 idF 383/2021). **Achtung:** Das signierte 383/2021-PDF enthält
-  nur den VO-Text — der Anlagen-Wortlaut steht im BgblAuth-**COO-HTML**
-  (konsolidierte Einzel-Anlage, fetchbar).
-- Erlaubte Konventions-Abweichung: ein **dreischichtiges `LEHRPLAN.md`**
-  statt eines reinen ①-Extrakts, wenn ② Schuladaption und ③ Didaktik
-  mitlegen.
-- Schul-Websites schreiben pauschal „Abschluss: Diplomprüfung" — die
-  Matura-Logik der Formen steht in der **Einstiegsvarianten-Tabelle**,
-  nicht in der Abschlusszeile.
+Verifiziertes Wissen zu den Abendform-/Berufstätigen-Klassenkürzeln (AIF, KIF,
+CIF) steht in [SPENGERGASSE-KLASSEN.md](./SPENGERGASSE-KLASSEN.md). Nur für
+Repos mit diesen Formen relevant.
 
 ## Ausbildungszweig-Konzept
 
@@ -612,97 +557,15 @@ Detailpflege liegt danach beim Unterricht-Skill.
 
 ## Qualitätskriterien für Erläuterungen
 
-Gemeinsame Regeln für jede Erläuterung (Aufgabe-2-Extrakte und
-Aufgabe-3-Lehrstoffverteilungen). Eine Erläuterung beantwortet zuerst und
-vornehmlich: **„Was ist das eigentlich? Worum geht es?"**
-
-1. **Begriffserklärung (Kern, Hauptanteil):** Was ist das Thema inhaltlich?
-   Grundidee, zentrale Konzepte, Methoden — verständlich auf Deutsch
-   beschrieben. Keine bloße Umformulierung des Gesetzestexts: die
-   Terminologie auspacken.
-2. **Anwendungs- und Berufsbezug (integrierter Bestandteil):** konkrete
-   Einsatzmöglichkeiten im Beruf (real, spezifisch — z. B.
-   „Annahmeprüfung → Wareneingangskontrolle nach ISO 2859 in der
-   Fertigung"). In die Erläuterung integriert, nicht angeflanscht.
-3. **Alltagsbezug und Querverweise (optional, wenn sinnvoll):** wo dem
-   Thema im Alltag begegnet; Anknüpfungspunkte zu anderen
-   Kompetenzmodulen, Fächern oder späteren Jahrgängen.
-
-Regeln:
-
-- **Länge:** 3–7 Sätze sind die Norm; bei bedürftigem Thema darf es gern
-  mehr sein — lieber ausführlich als knapp. Keine starre
-  2–4-Satz-Schablone.
-- **Deutsch, substantiell:** keine generischen Floskeln („wichtiges
-  Thema", „in vielen Bereichen relevant"). Jeder Satz muss Inhalt tragen.
-- **Niemals mit dem Gesetzestext vermischen:** Erläuterungen sind IMMER
-  klar als Annotationen markiert (Blockquote mit `**Überblick:**` /
-  `**Erläuterung:**`). Das wortwörtliche Gesetz bleibt unmarkiert.
-- **Menschlich verfasste Erläuterungen rangieren über generierten:** bei
-  Wiederholungen bewahren (siehe Aufgabe 2, Schritt 5).
+Die gemeinsamen Regeln für jede Erläuterung (Aufgabe-2-Extrakte und
+Aufgabe-3-Lehrstoffverteilungen) stehen in
+[ERLAEUTERUNGS-QUALITAET.md](./ERLAEUTERUNGS-QUALITAET.md).
 
 ## RIS-Praxiswissen (projektübergreifend)
 
-Generisches, gegenstandsunabhängiges Wissen zum Fetchen von
-ris.bka.gv.at. Angereichert aus realen Aufgabe-1/2-Läufen.
-**Persist-back-Regel: nach jedem Aufgabe-1/2-Lauf neu gelernte generische
-RIS-Muster in diesen Abschnitt übernehmen** (Wissen auf Skill-Ebene —
-dieses Wissen ist nicht projektspezifisch und darf nicht in den Docs
-eines einzelnen Repos gefangen bleiben).
-
-### Fetch-Strategien
-
-- **Nie** `webfetch` auf die `GeltendeFassung.wxe`-Seite
-  (Gesetzesnummer-URL) — bei Lehrplanpaketen liefert sie das *gesamte*
-  Paket (alle Anlagen, oft > 5 MB) und überschreitet das webfetch-Limit.
-  Stattdessen `curl` + lokales Parsen.
-- **Autorisierender Ein-Zeilen-Novellen-Check:** `curl` auf das
-  **NOR-Dokument der Anlage des Zweigs** (Link in METADATA.md gespeichert).
-  Sein Kundmachungsorgan-Kopf liest sich z. B. „BGBl. II Nr. 262/2015
-  zuletzt geändert durch BGBl. II Nr. 250/2021" — eine Zeile,
-  Änderungsprüfung komplett. Mit
-  `rg -o ".{200}zuletzt geändert.{200}"` extrahieren.
-- **Novelle identifizieren:** die ELI-Seite
-  `https://www.ris.bka.gv.at/eli/bgbl/II/<Jahr>/<Nr>` ist klein und liefert
-  Kurztitel, Kundmachungsdatum, Typ, einbringende Stelle.
-- **Novellen-Details:** signiertes PDF unter
-  `https://www.ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_<Jahr>_II_<Nr>/BGBLA_<Jahr>_II_<Nr>.pdf`,
-  dann `pdftotext` + `rg`. Details:
-  - Novellen-§§ sind fortlaufend **pro Novelle** nummeriert — nach
-    `Anlage <N.N>` / Gegenstands-Schlüsselwörtern greppen, um die §§ zu
-    finden, die die Anlage des Gegenstands berühren.
-  - Inkrafttreten-Muster: „Die Abschnitte I und VII der Anlage <N.N> …
-    treten hinsichtlich des I. Jahrganges mit 1. September <Jahr> und
-    hinsichtlich der weiteren Jahrgänge jeweils mit 1. September der
-    Folgejahre jahrgangsweise aufsteigend in Kraft."
-  - Eine Novelle kann bloß allgemeinbildende Abschnitte berühren (z. B.
-    Religion/Ethik 2021), während der Abschnitt des Gegenstands
-    unverändert bleibt — in dem Fall bleiben die Extrakte gültig, keine
-    Re-Extraktion.
-- **ELI-Seite des Stammgesetzes** (`…/eli/bgbl/II/2015/262/20150917`)
-  listet alle Anlagen und Kern-Metadaten — nützlich für Aufgabe A.
-
-### PDF-Ablage
-
-- RIS-PDFs nach `lehrplan/RIS/YYYY-MM-DD_<name>.pdf` mit dem
-  **Kundmachungsdatum** (das Fetch-Datum ist irrelevant — das Präfix
-  datiert den Gesetzestext). Novellen:
-  `lehrplan/RIS/YYYY-MM-DD_BGBl-II-<Nr>_Novelle-<slug>.pdf`.
-- Der `lehrplan/`-Root bleibt sauber: Gesetzestext-PDFs im
-  `lehrplan/`-Root sind ein Konformitäts-Check-Befund mit
-  Migrationspflicht.
-- Andere (nicht-RIS-)Referenz-PDFs unterliegen **nicht** der
-  Datumpräfix-Konvention und kommen nie in `lehrplan/RIS/`.
-
-### Ausgabe in METADATA.md
-
-- Jede RIS-Abfrage in METADATA.md dokumentieren: „RIS-Status abgefragt am
-  YYYY-MM-DD: … zuletzt geändert durch …" als Belegzeile unter der
-  Änderungshistorie.
-- Niemals eine Änderung einer BGBl.-Nummer zuordnen, ohne sie gefetcht zu
-  haben — plausibel aussehende Paare (Datum + Nummer) können falsch sein
-  (z. B. BGBl. II Nr. 74/2017 = IngG-Fachrichtungsverordnung, hat mit dem
-  HTL-Lehrplanpaket nichts zu tun).
+Generisches Wissen zum Fetchen von ris.bka.gv.at steht in
+[RIS-PRAXIS.md](./RIS-PRAXIS.md). Nach jedem Aufgabe-1/2-Lauf neu gelernte
+generische RIS-Muster dort ergänzen.
 
 ## Explizit außerhalb des Scopes
 
@@ -733,8 +596,8 @@ eines einzelnen Repos gefangen bleiben).
   angefragten Umfang bestätigen lassen.
 - Aufgabe 3 schreibt nie eine finale Lehrstoffverteilung ohne den
   Nutzer-Review-Schritt (Pflichtschritt).
-- Die Klassen-Zuordnungstabelle in diesem Skill wird manuell gepflegt —
-  vorschlagen, nie selbst editieren.
+- Die Klassen-Zuordnungstabelle ([KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md))
+  wird manuell gepflegt — vorschlagen, nie selbst editieren.
 - GROSSBUCHSTABEN-Klassennamen überall (Ordner, Extrakt-Dateien,
   METADATA.md); Ausnahme: die Ordner `lehrplan/<fach>-<zweig>/` sind
   klein, `unterricht/<ZWEIG>-<FACH>/` groß.

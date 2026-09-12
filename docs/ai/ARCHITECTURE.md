@@ -51,6 +51,7 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | `tests/searxng_mock.py` | In-process mock of the SearXNG JSON API plus a helper that points a temp copy of `searxng-search.sh` at it |
 | `tests/test_searxng_search.py` | `searxng-search.sh` behavior: fallback triggers (empty/weak), merge + dedupe, explicit-engine/category bypass, preserved params, instance chain, primary-instance-only fallback |
 | `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
+| `tests/test_skill_links.py` | Every `](./…)` link in a `skills/*/SKILL.md` resolves to an existing sibling file |
 
 ## Skills (`skills/`)
 
@@ -75,6 +76,8 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | `sync-upstream-skills` | Re-transplant owned skills from the mattpocock upstream after a git pull; checks duplicate names and dangling references | Natural language ("sync skills") |
 | `teach` | Teach the user a new skill or concept | Direct invocation |
 | `lehrplan` | Austrian HTL teaching repos: Gegenstand identification incl. conformity check, RIS sync with Novellen-Check (NOR-Kopf method), year-wise curriculum extraction into `lehrplan/` | Natural language ("Unterricht", "RIS sync", "Lehrplan extrahieren") |
+
+Long reference material lives in sibling files next to a skill's `SKILL.md`, linked as `[X.md](./X.md)` and loaded only on demand: `grading-shared/EMAIL-EXAMPLES.md`, `knowledge-persistence/FILE-TEMPLATES.md`, `lehrplan/{KLASSEN-ZUORDNUNG,SPENGERGASSE-KLASSEN,RIS-PRAXIS,ERLAEUTERUNGS-QUALITAET}.md`, `repograde/REPORT-FORMAT.md`, `projectgrade/REPORT-FORMAT.md`. The links are guarded by `tests/test_skill_links.py`.
 
 ## Knowledge Files (`docs/ai/`)
 

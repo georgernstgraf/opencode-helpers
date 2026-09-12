@@ -53,6 +53,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Shared facts have exactly one home; every other document references it by name instead of restating it.
 - Grading: the German/UTF-8 output rule, the address-style class table, email/database rules, and the missing-email protocol live only in `grading-shared`. Per-question point totals live only in `knowledge-exam`.
 - Search: the parameter schema lives in the `searxng` MCP tool table; do not add a second table for the same schema.
+- Skill reference material (examples, format templates, domain detail) lives in sibling files linked as `[X.md](./X.md)`; every such link must resolve. Guard: `tests/test_skill_links.py`.
 
 ## Search Strategy
 
