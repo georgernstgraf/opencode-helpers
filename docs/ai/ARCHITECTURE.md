@@ -111,6 +111,10 @@ SearXNG (claw) ──VPN (tun0)──> tinyproxy on gregor (10.8.0.16:1080) ─�
   recovery is automatic via systemd restart.
 - Egress check: `curl --proxy http://10.8.0.16:1080 https://api.ipify.org`
   must return `192.189.51.211`.
+- `braveapi` (Brave Search API, prepaid plan) is retained as the only
+  non-scraper general engine — an independent-index fallback immune to the
+  HTML bot-blocking the scraper engines hit. It pauses when its monthly free
+  credit is exhausted and revives automatically.
 
 This is backend deployment knowledge. The portable `searxng` skill only notes
 the 0-results failure mode; operational pitfalls live in `PITFALLS.md`.

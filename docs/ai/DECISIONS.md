@@ -223,3 +223,10 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Staying on the datacenter IP with the reduced engine set (no google; only mwmbl/searchmysite/brave), using a commercial proxy/VPN egress.
 - **Tradeoff**: Search quality now depends on gregor + the VPN being up; if the proxy is down, all engines return 0 results (recovery is automatic via systemd restart). tinyproxy is restricted to the VPN interface (`Listen 10.8.0.16`, `Allow 10.8.0.0/24`).
 - **Kept out of the skill**: These host/IP/proxy specifics are deployment operations, not portable usage knowledge. They live in `ARCHITECTURE.md`/`PITFALLS.md`; `skills/searxng/SKILL.md` only notes the 0-results failure mode and points to the docs.
+
+## 2026-09-12: Keep Brave Search API as the non-scraper fallback; consolidate the account to prepaid
+- **Choice**: Keep the `braveapi` engine in SearXNG as a dormant fallback, and use a single prepaid Brave "Search" plan (`$5`/1,000 requests, `$5` free credit per month) with a `$0` prepay balance so the service simply pauses when the free credit is used up. Retire the postpaid plan.
+- **Reason**: `google` is now primary, but every other general engine is an HTML scraper exposed to the same bot-blocking arms race that forced the school-IP egress. `braveapi` is the only API-based engine (independent index, immune to scraping blocks) and costs nothing while suspended, so it is valuable insurance.
+- **Considered**: Removing `braveapi` entirely to simplify the engine set; keeping both the postpaid and prepaid plans (rejected — the `$5` free credit is per plan, not per billing model, so a second plan adds no free credit while postpaid can incur pay-as-you-go charges).
+- **Tradeoff**: The engine is unavailable whenever the monthly credit is exhausted or the key/auth is wrong, and a plan change requires generating a new API key and updating `settings.yml`. Prepaid caps spend but gives no overage.
+- **Verified 2026-09-12**: After topping up, a direct Brave call returned HTTP 200 and the instance `engines=braveapi` query returned results with an empty `unresponsive_engines` list — no restart required.

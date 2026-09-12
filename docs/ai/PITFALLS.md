@@ -27,6 +27,10 @@ Read this file carefully before making changes in affected areas.
 - In this SearXNG instance, `keep_only` alone does not remove an engine, and `disabled: true` is also insufficient (a disabled engine stays reachable via explicit `engines=<name>`). To fully remove an engine, remove it from `keep_only` **and** delete its custom block.
 - SearXNG's default `disabled: true` for `google` must be overridden with explicit `disabled: false` in `settings.yml` for the engine to work.
 - `bing` web and `yahoo` were removed 2026-09-12: `bing` web returned random or spam results non-deterministically, `yahoo` produced an lxml ParserError (no parseable HTML). Do not re-enable without testing.
+- Brave Search API billing: new activations are **prepaid-only**; existing postpaid plans are grandfathered (unchanged) but **cannot be reactivated after cancellation** — cancelling means only prepaid is available afterwards. **Switching a plan means the old API key stops working; a new key must be generated** and put into `settings.yml`.
+- Brave gives **$5 in free credits per plan, per month** — not per billing model. Running postpaid + prepaid versions of the same plan does **not** yield double $5; the credit moves to the prepaid plan.
+- Prepaid pauses at $0 balance; postpaid keeps billing pay-as-you-go beyond the included credits (set a usage limit if kept).
+- Diagnosing `braveapi` suspensions: `unresponsive: braveapi → "Suspended: access denied"` means **key/auth** (wrong/old key). HTTP 402 `code: CREDIT_EXHAUSTED` with `current_balance_units < min_request_cost_units` means **insufficient credit**. After a top-up the engine revives automatically on the next query — **no `docker restart` needed**, because the key in `settings.yml` is unchanged.
 
 ## Database
 
