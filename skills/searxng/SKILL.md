@@ -116,6 +116,22 @@ Chain order for general searches: `brave` → `google` → `mwmbl,searchmysite` 
 - **Web UI:** https://searxng.claw.graf.priv.at/
 - **API:** https://searxng.claw.graf.priv.at/search?q=QUERY&format=json
 
+## Access Control (shared secret)
+
+The public instance is **not open**: nginx enforces HTTP Basic Auth on the whole
+vhost (UI and API), and SearXNG's port `8888` is bound to `127.0.0.1` only, so the
+instance cannot be reached except through nginx. Intended clients are claw,
+think and dell.
+
+- `searxng-search.sh` reads the credential from `$SEARXNG_AUTH` or
+  `~/.config/opencode/searxng.cred` (format `user:password`, mode `600`) and
+  sends it as Basic auth. Without a credential the request is unauthenticated
+  and nginx answers `401`.
+- Deploy the credential file (mode `600`) on each client host; never commit it.
+- The credential is served by the `searxng` htpasswd file at
+  `/etc/nginx/searxng.htpasswd` on the instance host. Rate limiting
+  (`limit_req`) is also enforced there.
+
 ## Docker Management
 
 > These commands run on the **SearXNG host** (where nginx proxies to `localhost:8888`), not necessarily the machine running OpenCode.

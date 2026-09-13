@@ -24,6 +24,9 @@ Read this file carefully before making changes in affected areas.
 
 ## SearXNG Backend
 
+- The public SearXNG instance is not open: nginx enforces HTTP Basic Auth on the whole vhost and the container port `8888` must stay published on `127.0.0.1` only. If `8888` is ever bound to `0.0.0.0` again, the API is reachable unauthenticated **bypassing nginx** (observed 2026-09-13: third-party Chinese-language queries hit `8888` directly, invisible in the nginx access log).
+- The JSON/CSV/RSS API and the HTML UI share the same credential. `searxng-search.sh` reads `$SEARXNG_AUTH` or `~/.config/opencode/searxng.cred` (`user:password`); missing/incorrect credentials yield `401`. Deploy the cred file on every client host, mode `600`, never in git/SVN.
+
 - SearXNG egress goes through a tinyproxy on host gregor (school IP). If **all** engines return 0 results, suspect the proxy/VPN first — not the skill or MCP server. Egress check: `curl --proxy http://10.8.0.16:1080 https://api.ipify.org` must return `192.189.51.211`.
 - tinyproxy: use `Listen 10.8.0.16` (listening socket), **never** `Bind` — `Bind` forces the outgoing source IP and would push egress into the VPN tunnel. The user directive is `User`; `UserName` is invalid syntax.
 - In this SearXNG instance, `disabled: true` excludes an engine from default queries but keeps it explicitly selectable (`engines=<name>` or `!<bang>`); `inactive: true` removes it entirely. `disabled: true` alone does **not** remove an engine (it stays reachable via explicit `engines=`) — to remove, drop it from `keep_only` **and** delete its custom block.

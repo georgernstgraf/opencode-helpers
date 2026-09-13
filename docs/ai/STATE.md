@@ -35,6 +35,12 @@ P4 remains.
       braveapi` (token-gated `< 3` free hits) replaces the two-phase quality
       gate; new envelope fields, per-engine mock, rewritten tests; docs updated
       (this cycle)
+- [x] SearXNG access control: nginx Basic-Auth (shared secret) for UI+API,
+      `8888` bound to `127.0.0.1`, `limit_req`; wrapper authenticates from
+      `~/.config/opencode/searxng.cred`; local perms locked (this cycle)
+- [ ] **Open**: SVN deployment mirror leaks secrets incl. infra private keys
+      (CA/host/SSH/VPN keys, bot `.env`, `EDV/api-keys.txt`); history purge on
+      `murl` pending decision
 
 ## Pending
 
