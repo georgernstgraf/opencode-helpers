@@ -3,13 +3,16 @@
 #
 # The default general search walks a strict chain, stopping at the first tier
 # that returns results:
-#   1. brave             (free HTML scraper)
+#   1. brave             (free HTML scraper) -- the ONLY default result engine
 #   2. google            (free HTML scraper)
 #   3. mwmbl,searchmysite (free, small indices)
 #   4. braveapi          (paid API) -- queried ONLY when tiers 1-2 failed AND
 #                        the tier-3 free result is weak (< FALLBACK_MIN_RESULTS).
-# When braveapi runs, its results are merged ahead of the free tier-3 results
-# (URL-deduplicated). An explicit `engines=` argument bypasses the chain.
+# Tiers 2-4 are fallback-only: they run only when the preceding tier is empty,
+# so google deliberately never appears in normal results (only via the fallback
+# chain, or an explicit `engines=google`). The `< 3` gate protects the Brave API
+# token. When braveapi runs, its results are merged ahead of the free tier-3
+# results (URL-deduplicated). An explicit `engines=` argument bypasses the chain.
 
 set -e
 

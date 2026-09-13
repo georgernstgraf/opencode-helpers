@@ -31,15 +31,22 @@ A tier "fails" when the engine is suspended (`unresponsive_engines`) or returns
 0 results. When `braveapi` runs, its results are merged **ahead of** the free
 tier-3 results, deduplicated by URL.
 
+> **`brave` is the only engine that serves normal results.** `google`,
+> `mwmbl,searchmysite` and `braveapi` are *fallback-only*: each runs only when
+> the preceding tier comes back empty. `google` therefore deliberately never
+> appears in an ordinary result set — it is reached solely inside the fallback
+> chain, or when a caller passes `engines=google` explicitly. Its absence from
+> default results is by design, not a fault.
+
 - The answer carries `engine_used` (`brave`/`google`/`braveapi`/`mwmbl`/
   `searchmysite`/`none`), `fallback_used` (`engine_used != "brave"`), `tried`
   (engines actually attempted) and `unresponsive_engines` (union, for diagnosis).
 - An explicit `engines=` list **disables** the chain (caller intent wins), and
   the chain applies to general searches only — not to
   `news`/`it`/`science`/`images`.
-- The `< 3` gate and the free tier-3 buffer exist to **conserve the paid Brave
-  API quota**: the chain only spends a Brave request when both free scrapers are
-  blocked and the free indices are too thin.
+- The `< 3` gate and the free tier-3 buffer exist to **protect the Brave API
+  token (paid quota)**: the chain only spends a Brave request when both free
+  scrapers are blocked and the free indices are too thin.
 - `braveapi` is excluded from normal instance searches, so ordinary searches do
   not consume Brave quota.
 
@@ -79,8 +86,10 @@ Chain order for general searches: `brave` → `google` → `mwmbl,searchmysite` 
 (`braveapi`, gated on < 3 free hits).
 - `brave` — **primary general engine** (HTML scraper). Occasionally rate-limit
   suspended; revives automatically.
-- `google` — **secondary** (HTML scraper; works via the backend's school-IP
-  egress; see above). Can be CAPTCHA-suspended.
+- `google` — **fallback tier 2 only** (HTML scraper; works via the backend's
+  school-IP egress; see above). Never a default result engine: reached only when
+  `brave` returns nothing, or via explicit `engines=google`. Can be
+  CAPTCHA-suspended.
 - `mwmbl` — Mwmbl (small index). Free last-resort before spending Brave quota:
   short/common queries give relevant results, long-tail queries often return 0.
 - `searchmysite` — Indie websites. Same free last-resort tier as `mwmbl`.
