@@ -140,6 +140,12 @@ think and dell.
 - The credential is served by the `searxng` htpasswd file at
   `/etc/nginx/searxng.htpasswd` on the instance host. Rate limiting
   (`limit_req`) is also enforced there.
+- The vhost logs to its **own** files — `/var/log/nginx/searxng.access.log`
+  (custom `searxng` format with `rt=$request_time`) and
+  `/var/log/nginx/searxng.error.log` — so Basic-Auth rejections (`401`) and
+  rate-limit hits (`429`) are measurable and the shared `access.log` stays free
+  of SearXNG traffic. Rotation is covered by the existing
+  `/etc/logrotate.d/nginx` glob. Config: `/etc/nginx/sites-available/searxng.claw.graf.priv.at`.
 
 ## Docker Management
 
