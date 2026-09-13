@@ -31,6 +31,10 @@ P4 remains.
       ARCHITECTURE test + sibling references, DECISIONS P3a
 - [x] Repo-managed `agents/` directory with `lehrplan-annotator`, symlinked
       via `~/.config/opencode/agents` (prior cycle; still current)
+- [x] SearXNG engine chain rework: `brave → google → mwmbl,searchmysite →
+      braveapi` (token-gated `< 3` free hits) replaces the two-phase quality
+      gate; new envelope fields, per-engine mock, rewritten tests; docs updated
+      (this cycle)
 
 ## Pending
 

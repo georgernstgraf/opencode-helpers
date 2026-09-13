@@ -38,7 +38,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | Script | Purpose |
 |--------|---------|
 | `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering |
-| `skills/searxng/searxng-search.sh` | Canonical search logic: two-phase query against the SearXNG instance chain (normal engines, then a quality-gated `braveapi` fallback), returns JSON on stdout |
+| `skills/searxng/searxng-search.sh` | Canonical search logic: prioritized engine chain against the SearXNG instance chain (`brave` → `google` → `mwmbl,searchmysite` → token-gated `braveapi`), returns JSON on stdout |
 | `scripts/archive/` | Retired scripts (`opencode-searxng` legacy requests server, `opencode-ollama-sync`) — kept unregistered for reference |
 
 ## Tests (`tests/`)
@@ -49,7 +49,7 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | File | Purpose |
 |------|---------|
 | `tests/searxng_mock.py` | In-process mock of the SearXNG JSON API plus a helper that points a temp copy of `searxng-search.sh` at it |
-| `tests/test_searxng_search.py` | `searxng-search.sh` behavior: fallback triggers (empty/weak), merge + dedupe, explicit-engine/category bypass, preserved params, instance chain, primary-instance-only fallback |
+| `tests/test_searxng_search.py` | `searxng-search.sh` behavior: chain tiers (`brave`/`google`/free), the `< 3` token gate + merge/dedupe, explicit-engine/category bypass, preserved params, instance chain, first-responsive-instance reuse |
 | `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
 | `tests/test_skill_links.py` | Every `](./…)` link in a `skills/*/SKILL.md` resolves to an existing sibling file |
 
@@ -100,7 +100,7 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instance chain `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org` (no localhost entry — the skill runs on multiple hosts).
-- `skills/searxng/searxng-search.sh` two-phase search: phase 1 queries the normal engines; if a general search returns no reasonable result (0 results, or no Google result and < 3 results), phase 2 queries `engines=braveapi` and merges the deduplicated results (`fallback_used`/`fallback_reason` in the answer). An explicit `engines=` argument bypasses the fallback. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches.
+- `skills/searxng/searxng-search.sh` prioritized chain: for general searches it stops at the first tier that returns results — `brave`, then `google`, then the free `mwmbl,searchmysite`, and finally `engines=braveapi` **only** when `brave` and `google` both failed and the free tier yielded fewer than 3 hits. `braveapi` results are merged ahead of the free results (URL-deduplicated); the answer carries `engine_used`/`fallback_used`/`tried`/`unresponsive_engines`. An explicit `engines=` argument bypasses the chain. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches.
 
 ## SearXNG Egress
 
@@ -119,7 +119,7 @@ SearXNG (claw) ──VPN (tun0)──> tinyproxy on gregor (10.8.0.16:1080) ─�
   through it.
 - **Reason:** claw's datacenter IP (`85.215.162.182`) is bot-blocked or served
   garbage by most engines; the school IP is treated like normal user traffic.
-  `google` — the primary general engine — only works via this egress.
+  `google` — the secondary scraper engine in the chain — only works via this egress.
 - tinyproxy listens only on the VPN interface (`Listen 10.8.0.16`,
   `Allow 10.8.0.0/24`) with a systemd `Restart=always` drop-in.
 - **Failure mode:** if tinyproxy/VPN is down, all engines return 0 results;
@@ -127,9 +127,9 @@ SearXNG (claw) ──VPN (tun0)──> tinyproxy on gregor (10.8.0.16:1080) ─�
 - Egress check: `curl --proxy http://10.8.0.16:1080 https://api.ipify.org`
   must return `192.189.51.211`.
 - `braveapi` (Brave Search API, prepaid plan) is retained as the only
-  non-scraper general engine — an independent-index fallback immune to the
-  HTML bot-blocking the scraper engines hit. It pauses when its monthly free
-  credit is exhausted and revives automatically.
+  non-scraper general engine — an independent-index, token-gated fallback
+  immune to the HTML bot-blocking the scraper engines hit. It pauses when its
+  monthly free credit is exhausted and revives automatically.
 
 This is backend deployment knowledge. The portable `searxng` skill only notes
 the 0-results failure mode; operational pitfalls live in `PITFALLS.md`.

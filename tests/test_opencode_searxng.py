@@ -56,11 +56,14 @@ class OpenCodeSearxngTest(unittest.TestCase):
 
         tool = by_id[2]["result"]["tools"][0]
         self.assertEqual(tool["name"], "search")
-        self.assertIn("fallback", tool["description"].lower())
+        self.assertIn("chain", tool["description"].lower())
         self.assertIn("engines", tool["inputSchema"]["properties"])
 
-    def test_tools_call_runs_fallback_end_to_end(self):
-        mock = searxng_mock.MockSearxng().start()
+    def test_tools_call_runs_chain_end_to_end(self):
+        mock = searxng_mock.MockSearxng(
+            engine_results={"google": [searxng_mock.result_item("G", "https://g.com/1", "google")]},
+            unresponsive=["brave"],
+        ).start()
         self.addCleanup(mock.stop)
         server = self._temp_server(mock.url)
 
@@ -77,11 +80,13 @@ class OpenCodeSearxngTest(unittest.TestCase):
         )
         payload = json.loads(out[0]["result"]["content"][0]["text"])
         self.assertTrue(payload["fallback_used"])
-        self.assertEqual(payload["fallback_reason"], "weak")
-        self.assertIn("braveapi", {r["engine"] for r in payload["results"]})
+        self.assertEqual(payload["engine_used"], "google")
+        self.assertIn("google", {r["engine"] for r in payload["results"]})
 
-    def test_tools_call_explicit_engines_bypasses_fallback(self):
-        mock = searxng_mock.MockSearxng().start()
+    def test_tools_call_explicit_engines_bypasses_chain(self):
+        mock = searxng_mock.MockSearxng(
+            engine_results={"braveapi": [searxng_mock.result_item("B", "https://b.com/1", "braveapi")]}
+        ).start()
         self.addCleanup(mock.stop)
         server = self._temp_server(mock.url)
 
@@ -101,6 +106,7 @@ class OpenCodeSearxngTest(unittest.TestCase):
         )
         payload = json.loads(out[0]["result"]["content"][0]["text"])
         self.assertFalse(payload["fallback_used"])
+        self.assertEqual(payload["engine_used"], "braveapi")
         self.assertEqual({r["engine"] for r in payload["results"]}, {"braveapi"})
         self.assertEqual(len(mock.requests), 1)
         self.assertEqual(mock.requests[0]["engines"], "braveapi")

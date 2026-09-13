@@ -16,20 +16,30 @@ Three layers, bottom-up:
 2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API, returns JSON on stdout. Primary instance is the public URL `searxng.claw.graf.priv.at` (works on every host — only the SearXNG host itself would resolve `localhost:8888`); the historical public mirrors (`etsi.me`, `baresearch.org`) no longer serve `format=json` to anonymous clients (see below). Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
 3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
 
-## Quality-Gated Brave Fallback
+## Prioritized Engine Chain with a Token Gate
 
-`searxng-search.sh` searches in two phases. Phase 1 queries the normal engines;
-only when a **general** search yields no reasonable results does phase 2 retry
-once with the `braveapi` engine and merge the results:
+`searxng-search.sh` walks a strict chain for **general** searches and stops at
+the first tier that returns results:
 
-- Trigger: **0 results**, or **no Google result and fewer than 3 results**.
-- The merged answer sets `fallback_used: true` and `fallback_reason`
-  (`empty` / `weak`); results are deduplicated by URL, primary results first.
-- An explicit `engines=` list **disables** the fallback (caller intent wins),
-  and the fallback applies to general searches only — not to
+1. `brave` — free HTML scraper
+2. `google` — free HTML scraper
+3. `mwmbl,searchmysite` — free, small-index last resort
+4. `braveapi` — paid API, queried **only** when tiers 1–2 failed *and* the
+   tier-3 free result has fewer than `FALLBACK_MIN_RESULTS` (3) hits
+
+A tier "fails" when the engine is suspended (`unresponsive_engines`) or returns
+0 results. When `braveapi` runs, its results are merged **ahead of** the free
+tier-3 results, deduplicated by URL.
+
+- The answer carries `engine_used` (`brave`/`google`/`braveapi`/`mwmbl`/
+  `searchmysite`/`none`), `fallback_used` (`engine_used != "brave"`), `tried`
+  (engines actually attempted) and `unresponsive_engines` (union, for diagnosis).
+- An explicit `engines=` list **disables** the chain (caller intent wins), and
+  the chain applies to general searches only — not to
   `news`/`it`/`science`/`images`.
-- If the fallback engine is unavailable/suspended, phase 1 results are returned
-  unchanged.
+- The `< 3` gate and the free tier-3 buffer exist to **conserve the paid Brave
+  API quota**: the chain only spends a Brave request when both free scrapers are
+  blocked and the free indices are too thin.
 - `braveapi` is excluded from normal instance searches, so ordinary searches do
   not consume Brave quota.
 
@@ -53,7 +63,7 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 |----------|------|----------|-------------|
 | `query` | string | yes | Search query (quotes for exact versions) |
 | `category` | string | no | `general`, `images`, `news`, `it`, `science`; default `general` |
-| `engines` | string | no | Comma-separated engine list (e.g. `wikipedia,github`); overrides `category` and disables the Brave fallback |
+| `engines` | string | no | Comma-separated engine list (e.g. `wikipedia,github`); overrides `category` and disables the engine chain |
 | `time_range` | string | no | `day`, `week`, `month`, `year` — use for recent topics |
 | `language` | string | no | Language code (`en`, `de`, `auto`); default `en` |
 | `pageno` | integer | no | Results page (1-indexed); default `1` |
@@ -65,17 +75,20 @@ Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.y
 Last verified 2026-09-12.
 
 ### General Web Search
-- `google` — **primary general engine** (works via the backend's school-IP
-  egress; see above)
-- `braveapi` — Brave Search API (independent index). **Fallback only**: excluded
-  from normal instance searches and queried automatically only by the quality
-  gate above (or explicitly via `engines=braveapi`). Suspended when its quota is
-  exhausted; revives automatically after top-up.
-- `brave` — Brave HTML scraper. Occasionally rate-limit suspended; revives
-  automatically.
-- `mwmbl` — Mwmbl. Secondary/fallback. Small index: short/common queries
-  give relevant results, long-tail queries often return 0 (honest empty).
-- `searchmysite` — Indie websites
+Chain order for general searches: `brave` → `google` → `mwmbl,searchmysite` →
+(`braveapi`, gated on < 3 free hits).
+- `brave` — **primary general engine** (HTML scraper). Occasionally rate-limit
+  suspended; revives automatically.
+- `google` — **secondary** (HTML scraper; works via the backend's school-IP
+  egress; see above). Can be CAPTCHA-suspended.
+- `mwmbl` — Mwmbl (small index). Free last-resort before spending Brave quota:
+  short/common queries give relevant results, long-tail queries often return 0.
+- `searchmysite` — Indie websites. Same free last-resort tier as `mwmbl`.
+- `braveapi` — Brave Search API (independent index, paid). **Token-gated**: excluded
+  from normal instance searches and queried automatically only when `brave` and
+  `google` both fail *and* the free tier-3 result is weak (< 3 hits), or
+  explicitly via `engines=braveapi`. Suspended when its quota is exhausted;
+  revives automatically after top-up.
 
 > **Removed engines:** `bing` web and `yahoo`. Do not re-add without
 > re-testing — removal rationale is in `docs/ai/PITFALLS.md`.

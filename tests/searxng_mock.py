@@ -3,6 +3,10 @@
 Provides an in-process mock of the SearXNG JSON API (stdlib only) and a helper
 to point a copy of `searxng-search.sh` at a mock instance. Nothing here touches
 the network or the real instance.
+
+The mock resolves results per requested engine: a request carrying
+`engines=brave,google` returns the concatenation of those engines' configured
+results, minus any engine listed as suspended (`unresponsive`).
 """
 
 import json
@@ -25,28 +29,6 @@ def result_item(title, url, engine):
     }
 
 
-BRAVE_RESULTS = [
-    result_item("Brave 1", "https://example.com/a", "braveapi"),
-    result_item("Brave 2", "https://example.com/new", "braveapi"),
-]
-
-# Query substring -> results. "braveapi" is matched via the engines parameter.
-DEFAULT_SCENARIOS = {
-    "braveapi": BRAVE_RESULTS,
-    "emptycase": [],
-    "weakcase": [
-        result_item("Weak 1", "https://example.com/a", "mwmbl"),
-        result_item("Weak 2", "https://example.com/b", "mwmbl"),
-    ],
-    "onegoogle": [result_item("Google 1", "https://g.com/1", "google")],
-    "googlecase": [
-        result_item("Google 1", "https://g.com/1", "google"),
-        result_item("Google 2", "https://g.com/2", "google"),
-        result_item("Google 3", "https://g.com/3", "google"),
-    ],
-}
-
-
 def patch_script_instances(script_text, instance_urls):
     """Return `script_text` with its INSTANCES array replaced by `instance_urls`."""
     block = "INSTANCES=(\n" + "".join('    "{0}"\n'.format(u) for u in instance_urls) + ")\n"
@@ -61,15 +43,24 @@ class MockSearxng:
 
     Usage::
 
-        mock = MockSearxng().start()
+        mock = MockSearxng(engine_results={"brave": [...]}).start()
         ...  # use mock.url, then inspect mock.requests
         mock.stop()
+
+    ``engine_results`` maps an engine name to the results it returns when
+    explicitly requested. ``unresponsive`` lists engines that are "suspended":
+    they contribute no results and appear in ``unresponsive_engines``.
+    ``broken_engines`` makes a request naming any of these engines fail at the
+    transport level (a non-JSON body), simulating a timeout/error.
+    Queries without an ``engines`` parameter return ``default``.
     """
 
-    def __init__(self, scenarios=None, default=None, unresponsive=None):
-        self.scenarios = dict(DEFAULT_SCENARIOS if scenarios is None else scenarios)
-        self.default = [] if default is None else default
+    def __init__(self, engine_results=None, unresponsive=None, default=None,
+                 broken_engines=None):
+        self.engine_results = dict(engine_results or {})
         self.unresponsive = list(unresponsive or [])
+        self.broken_engines = list(broken_engines or [])
+        self.default = [] if default is None else default
         self.requests = []
         self.port = None
         self._server = None
@@ -91,14 +82,22 @@ class MockSearxng:
                 }
                 outer.requests.append(record)
 
-                results = outer._resolve(record)
+                requested = [e for e in record["engines"].split(",") if e]
+                if any(name in outer.broken_engines for name in requested):
+                    body = b"<html>upstream error</html>"
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+
+                results, unresponsive = outer._resolve(record)
                 body = json.dumps(
                     {
                         "number_of_results": len(results),
                         "results": results,
-                        "unresponsive_engines": [
-                            [name, "Suspended: test"] for name in outer.unresponsive
-                        ],
+                        "unresponsive_engines": unresponsive,
                     }
                 ).encode()
                 self.send_response(200)
@@ -121,16 +120,22 @@ class MockSearxng:
         return "http://127.0.0.1:{0}".format(self.port)
 
     def _resolve(self, record):
-        # Explicit engines are being requested.
-        if record["engines"]:
-            if "braveapi" in record["engines"]:
-                return self.scenarios.get("braveapi", [])
-            return self.default
-        # Default query: match by query substring.
-        for key, results in self.scenarios.items():
-            if key != "braveapi" and key in record["q"]:
-                return results
-        return self.default
+        requested = [e for e in record["engines"].split(",") if e] if record["engines"] else []
+        if not requested:
+            # No explicit engines (category query): report all configured
+            # suspensions so a "broken" instance can be simulated.
+            return self.default, [
+                [name, "Suspended: test"] for name in self.unresponsive
+            ]
+
+        results = []
+        unresponsive = []
+        for name in requested:
+            if name in self.unresponsive:
+                unresponsive.append([name, "Suspended: test"])
+                continue
+            results.extend(self.engine_results.get(name, []))
+        return results, unresponsive
 
     def stop(self):
         if self._server is not None:

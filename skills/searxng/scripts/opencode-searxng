@@ -31,10 +31,12 @@ SEARCH_TOOL = {
         "Search the web via the self-hosted SearXNG instance "
         "(searxng.claw.graf.priv.at) with public fallbacks. "
         "Returns JSON with title, url, engine and snippet for each result. "
-        "A general search automatically falls back to the Brave Search API only when the "
-        "primary engines yield no reasonable results (zero results, or no Google result "
-        "and fewer than three results); the answer then carries fallback_used/fallback_reason. "
-        "Passing 'engines' disables that fallback. "
+        "A general search walks a strict engine chain, stopping at the first tier with "
+        "results: brave, then google, then the free mwmbl/searchmysite, and finally the "
+        "paid braveapi engine -- which is queried only when brave and google both fail "
+        "and the free result has fewer than three hits. The answer carries "
+        "engine_used/fallback_used/tried/unresponsive_engines. "
+        "Passing 'engines' disables the chain. "
         "For very recent topics or 'latest' news, always specify a 'time_range'."
     ),
     "inputSchema": {
@@ -57,7 +59,7 @@ SEARCH_TOOL = {
             },
             "engines": {
                 "type": "string",
-                "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection and disables the automatic Brave fallback.",
+                "description": "Comma-separated list of specific engines to use (e.g. 'wikipedia,github,braveapi'). Overrides category selection and disables the automatic engine chain.",
             },
             "language": {
                 "type": "string",
@@ -165,7 +167,7 @@ def handle_tools_call(msg_id, params):
              category, engines, time_range, safesearch],
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=90,
         )
     except subprocess.TimeoutExpired:
         error(msg_id, -32603, "SearXNG search timed out.")
