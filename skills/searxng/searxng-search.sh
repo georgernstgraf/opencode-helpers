@@ -27,6 +27,18 @@ FOLLOWUP_TIMEOUT=12
 MAX_RESULTS=10
 USER_AGENT="opencode-searxng/1.4"
 
+# Optional shared-secret auth for the public instance (HTTP Basic, enforced at
+# nginx). Read from $SEARXNG_AUTH or ~/.config/opencode/searxng.cred as
+# "user:password"; when absent, requests are sent unauthenticated.
+AUTH="${SEARXNG_AUTH:-}"
+if [[ -z "$AUTH" && -r "${HOME}/.config/opencode/searxng.cred" ]]; then
+    AUTH="$(head -n1 "${HOME}/.config/opencode/searxng.cred")"
+fi
+CURL_AUTH=()
+if [[ -n "$AUTH" ]]; then
+    CURL_AUTH=(--user "$AUTH")
+fi
+
 # Strict chain: free scrapers first, then the free last-resort tier, then the
 # paid API gated on a weak free result.
 CHAIN_PRIMARY="brave"
@@ -96,6 +108,7 @@ run_query() {
     for instance in "${instances[@]}"; do
         url="${instance}/search?q=${ENCODED_QUERY}&format=json&language=${LANG}&pageno=${PAGE}${extra}"
         response=$(curl -s --max-time "$timeout" \
+            "${CURL_AUTH[@]}" \
             -H "User-Agent: $USER_AGENT" \
             -H "Accept: application/json" \
             "$url" 2>/dev/null) || continue
