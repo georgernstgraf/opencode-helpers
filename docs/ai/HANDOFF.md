@@ -22,4 +22,11 @@ Open tasks:
       both), push. Also replicate the `agents/` directory + the
       `~/.config/opencode/agents` symlink on dell.
 
-Last updated: 2026-09-12.
+3. [ ] Credentials im SVN (infra) — canonical task lives in
+      `~/svn/georg/docs/ai/HANDOFF.md` **Task 5**
+      (consolidate → `svn:ignore` → history rewrite → rotation of all leaked
+      secrets incl. infra private keys). This repo only contributed the SearXNG
+      access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
+      credential) — that part is done. Track the SVN/secret work over there.
+
+Last updated: 2026-09-13.
