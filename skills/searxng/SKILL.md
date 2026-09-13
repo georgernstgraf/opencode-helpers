@@ -146,6 +146,11 @@ think and dell.
   rate-limit hits (`429`) are measurable and the shared `access.log` stays free
   of SearXNG traffic. Rotation is covered by the existing
   `/etc/logrotate.d/nginx` glob. Config: `/etc/nginx/sites-available/searxng.claw.graf.priv.at`.
+- `/robots.txt` is deliberately served **without auth** (`location = /robots.txt`)
+  as `User-agent: *` / `Disallow: /`, and every response carries
+  `X-Robots-Tag: noindex, nofollow, noarchive`, so crawlers are explicitly told
+  not to index the private instance. The backend's own `X-Robots-Tag` is
+  suppressed with `proxy_hide_header` to keep a single header.
 
 ## Docker Management
 
