@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-09-10.
+Living structural map of the system as of 2026-09-14.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -100,8 +100,8 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instance chain `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org` (no localhost entry — the skill runs on multiple hosts).
-- `skills/searxng/searxng-search.sh` prioritized chain: for general searches it stops at the first tier that returns results — `brave`, then `google`, then the free `mwmbl,searchmysite`, and finally `engines=braveapi` **only** when `brave` and `google` both failed and the free tier yielded fewer than 3 hits. `braveapi` results are merged ahead of the free results (URL-deduplicated); the answer carries `engine_used`/`fallback_used`/`tried`/`unresponsive_engines`. An explicit `engines=` argument bypasses the chain. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches.
-- SearXNG access control: the public vhost requires **HTTP Basic Auth** (shared secret in `/etc/nginx/searxng.htpasswd`) for both UI and API, and nginx applies `limit_req`. The SearXNG container port `8888` is published only on `127.0.0.1`, so the instance is reachable solely through nginx. Clients authenticate by reading `~/.config/opencode/searxng.cred` (or `$SEARXNG_AUTH`) in `searxng-search.sh`. Intended clients: claw, think, dell.
+- `skills/searxng/searxng-search.sh` prioritized chain: for general searches it stops at the first tier that returns results — `brave`, then `google`, then the free `mwmbl,searchmysite`, and finally `engines=braveapi` **only** when `brave` and `google` both failed and the free tier yielded fewer than 3 hits. `brave` is the **only** engine that serves normal results; `google`, the free tier and `braveapi` are **fallback-only**. `braveapi` results are merged ahead of the free results (URL-deduplicated); the answer carries `engine_used`/`fallback_used`/`tried`/`unresponsive_engines`. An explicit `engines=` argument bypasses the chain. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches (the `< 3` gate protects its paid token).
+- SearXNG access control: the public vhost requires **HTTP Basic Auth** (shared secret in `/etc/nginx/searxng.htpasswd`) for both UI and API, and nginx applies `limit_req`/`limit_conn`. The container port `8888` is published only on `127.0.0.1`, so the instance is reachable solely through nginx. `/robots.txt` is served **without** auth (`location = /robots.txt`, `Disallow: /`) and every response carries `X-Robots-Tag: noindex, nofollow, noarchive` (the backend's own `X-Robots-Tag` is hidden with `proxy_hide_header`). The vhost logs to dedicated files (`/var/log/nginx/searxng.access.log`, custom `searxng` format incl. `rt=`, and `searxng.error.log`) rather than the shared `access.log`. Clients authenticate by reading `~/.config/opencode/searxng.cred` (or `$SEARXNG_AUTH`) in `searxng-search.sh`. Intended clients: claw, think, dell.
 
 ## SearXNG Egress
 

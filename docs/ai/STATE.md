@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-09-12.
+Current status as of 2026-09-14.
 
 ## Current Focus
 
@@ -18,29 +18,34 @@ P4 remains.
       address table removed from `projectgrade`, class list from
       `knowledge-exam`, point totals only in `knowledge-exam`, `searxng`
       duplicate API table removed (`dbc9bde`)
-- [x] P3a progressive disclosure: 8 sibling reference files extracted
-      (`grading-shared/EMAIL-EXAMPLES.md`,
-      `knowledge-persistence/FILE-TEMPLATES.md`,
-      `lehrplan/{KLASSEN-ZUORDNUNG,SPENGERGASSE-KLASSEN,RIS-PRAXIS,ERLAEUTERUNGS-QUALITAET}.md`,
-      `repograde/REPORT-FORMAT.md`, `projectgrade/REPORT-FORMAT.md`);
+- [x] P3a progressive disclosure: 8 sibling reference files extracted;
       normative rules stayed inline; `tests/test_skill_links.py` link guard
       added (`070961a`)
 - [x] Upstream-skill sync check: no content changes on the 6 transplanted
       skills
-- [x] docs/ai updated this session: CONVENTIONS "Single Source of Truth" rule,
-      ARCHITECTURE test + sibling references, DECISIONS P3a
 - [x] Repo-managed `agents/` directory with `lehrplan-annotator`, symlinked
       via `~/.config/opencode/agents` (prior cycle; still current)
 - [x] SearXNG engine chain rework: `brave → google → mwmbl,searchmysite →
-      braveapi` (token-gated `< 3` free hits) replaces the two-phase quality
-      gate; new envelope fields, per-engine mock, rewritten tests; docs updated
-      (this cycle)
+      braveapi` (token-gated `< 3` free hits); new envelope fields, per-engine
+      mock, rewritten tests
 - [x] SearXNG access control: nginx Basic-Auth (shared secret) for UI+API,
       `8888` bound to `127.0.0.1`, `limit_req`; wrapper authenticates from
-      `~/.config/opencode/searxng.cred`; local perms locked (this cycle)
+      `~/.config/opencode/searxng.cred`; local perms locked
+- [x] SearXNG skill doc clarified: `brave` is the only default result engine;
+      `google` (and the free tier / `braveapi`) are fallback-only; the `< 3`
+      gate protects the Brave API token (`039e96d`, `a8dae74`, `f44b905`)
+- [x] SearXNG vhost: per-vhost logging (`searxng.access.log`/`.error.log`,
+      custom `searxng` format with `rt=`); public `robots.txt` (`Disallow: /`)
+      with server-level `X-Robots-Tag` and `proxy_hide_header` to avoid the
+      duplicate
+- [x] Corrected a misdiagnosis: `systemctl reload nginx` works here; the
+      earlier "no effect" observation was a draining old worker answering the
+      test request
+- [x] SVN `EDV/Deployed` searxng nginx config synced 1:1 incl. backfill
+      (`r7424`); `conf.d/{searxng-limits,searxng-logformat}.conf` added
 - [ ] **Open**: SVN deployment mirror leaks secrets incl. infra private keys
       (CA/host/SSH/VPN keys, bot `.env`, `EDV/api-keys.txt`); history purge on
-      `murl` pending decision
+      `murl` pending decision (`~/svn/georg/docs/ai/HANDOFF.md` Task 5)
 
 ## Pending
 

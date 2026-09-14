@@ -74,3 +74,6 @@ Follow these without question. Do not deviate unless explicitly told.
 ## Logging
 
 ## Build & Deploy
+
+- Infra/config changes on claw (e.g. `/etc/nginx`) are mirrored 1:1 into the SVN `EDV/Deployed/claw.graf.priv.at/` snapshot (`svn+ssh://www@murl/home/www/svnrepos/georg`) and committed in the same session. Git tracks the portable skills; SVN tracks the deployed host config.
+- Verify an nginx reload by a worker-PID change rather than the command's exit code; a graceful reload drains old workers first and they may briefly still serve the previous config.

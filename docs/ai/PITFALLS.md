@@ -39,6 +39,10 @@ Read this file carefully before making changes in affected areas.
 - Brave gives **$5 in free credits per plan, per month** — not per billing model. Running postpaid + prepaid versions of the same plan does **not** yield double $5; the credit moves to the prepaid plan.
 - Prepaid pauses at $0 balance; postpaid keeps billing pay-as-you-go beyond the included credits (set a usage limit if kept).
 - Diagnosing `braveapi` suspensions: `unresponsive: braveapi → "Suspended: access denied"` means **key/auth** (wrong/old key). HTTP 402 `code: CREDIT_EXHAUSTED` with `current_balance_units < min_request_cost_units` means **insufficient credit**. After a top-up the engine revives automatically on the next query — **no `docker restart` needed**, because the key in `settings.yml` is unchanged.
+- `systemctl reload nginx` **does work** (the unit's `ExecReload` runs `nginx -g 'daemon on; master_process on;' -s reload`). An earlier "systemctl reload has no effect" observation (2026-09-13) was a **misdiagnosis**: on a graceful reload the **old workers keep serving until they drain**, so a request issued in that window is still answered/logged with the *old* config. Verify a reload by a **worker-PID change** (`ps -o pid,lstart -C nginx`) and wait for the drain before concluding the reload failed.
+- The SearXNG backend already emits `X-Robots-Tag: noindex, nofollow`. The vhost adds its own `X-Robots-Tag: noindex, nofollow, noarchive`, so the proxy `location` needs `proxy_hide_header X-Robots-Tag;` — otherwise responses carry the header twice.
+- The vhost's `robots.txt` is an exact-match, **unauthenticated** `location = /robots.txt` (`User-agent: *` / `Disallow: /`). Without it, requests fall through to `location /` and get `401`, so crawlers never see the rules. Do **not** proxy the backend's own `/robots.txt` — it is permissive (`Allow: /`).
+- A custom nginx `log_format` (here `searxng`, adding `rt=$request_time`) must be defined in the **`http` context** (`/etc/nginx/conf.d/searxng-logformat.conf`) before the vhost's `access_log … searxng;` can reference it; `include conf.d/*.conf` runs before `sites-enabled/*` in `nginx.conf`.
 
 ## Database
 
