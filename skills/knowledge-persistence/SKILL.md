@@ -199,7 +199,8 @@ creating or overwriting it.
 - **Issue Safety**: This skill is a documentation-only operation. It
   must NEVER close, reopen, or change the state of any GitHub issue.
   Issue lifecycle management is the exclusive responsibility of the
-  `issue-workflow` skill's `finish` mode. When invoked standalone, this
+  `issue-workflow` skill (continuous completion criteria or its `finish`
+  override mode). When invoked standalone, this
   skill may only create new issues (Escalation Rule) or comment on
   existing ones. — gilt diesbezüglich nur für GitHub-Projekte;
   SVN-Projekte ohne Issue-System haben schlicht keine Issues (dann

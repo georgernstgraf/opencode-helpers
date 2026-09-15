@@ -10,7 +10,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Prefer thin commands that pass arguments and constraints into a skill.
 - Every `skills/<name>/SKILL.md` must start with OpenCode YAML frontmatter.
 - Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
-- Issue workflow is triggered by natural language (no slash commands). The agent parses user intent and invokes the `issue-workflow` skill directly.
+- Issue workflow is a continuous state (issue awareness, proactive commit/push); natural language ("issue start", "issue commit", "issue finish") acts as a manual override. The agent parses user intent and invokes the `issue-workflow` skill directly.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
 - Lesson directories inside class folders follow the naming pattern `<YYYY-MM-DD>_<topic>` (e.g., `2026-03-21_promises`).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
@@ -66,6 +66,10 @@ Follow these without question. Do not deviate unless explicitly told.
 
 - **Trunk-Based Development (CRITICAL):** Do not create feature branches or pull requests in this repository. All changes must be committed and pushed directly to the `main` branch.
 - **Commit Messages with Issues:** When working on a specific issue, always include the issue number in the commit message (e.g., `feat: ... (#123)`).
+- **Continuous Issue Awareness:** At any point in a session the agent knows which issue it works under; unambiguous new topics get an issue without user interaction, ambiguous assignments are clarified first.
+- **Proactive Commit and Push:** After each completed, self-contained unit of work, commit (with issue reference) and push immediately — but only when tests/lint for the affected area pass ("green commits only"). Never push a broken state.
+- **Issue Completion:** Closing an issue autonomously requires full goal coverage, green verification, and no open sub-issues; otherwise ask the user first.
+- The global policy lives in `AGENTS.global.md` (repo root, linked as `~/.config/opencode/AGENTS.md`); read-only/grading skills and student repos are excluded from it.
 
 ## Naming
 

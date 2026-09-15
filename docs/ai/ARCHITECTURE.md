@@ -65,7 +65,7 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | `grill-with-docs` | Grilling plus ADR/glossary docs created along the way | Natural language ("grill") |
 | `grilling` | Relentless interview to stress-test a plan, decision, or idea | Natural language ("grill") |
 | `homework` | Generate per-lesson `Hausübung.md` files from Git history | Direct invocation from class folder |
-| `issue-workflow` | Issue lifecycle management (start, checkpoint, finish) with mandatory issue-linked commits | Natural language triggers (no slash command) |
+| `issue-workflow` | Continuous issue awareness (always work under an issue), proactive issue-linked commit/push (green commits only), completion/auto-close criteria; `start`/`commit`/`finish` remain as manual override modes | Continuous + natural language override triggers (no slash command) |
 | `knowledge-assessment` | Assess student knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` or natural language triggers ("persist knowledge") |

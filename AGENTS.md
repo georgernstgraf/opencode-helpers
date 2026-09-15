@@ -69,7 +69,10 @@ The following skills have NO slash commands. Invoke them by natural language:
   "merk dir das", "save context", "persist knowledge"
   → load and execute the `knowledge-persistence` skill
 
-**Issue Workflow** — when the user says:
+**Issue Workflow** — the `issue-workflow` skill applies **continuously**
+  (issue awareness, proactive commit/push, completion criteria — see
+  `AGENTS.global.md` and the skill itself). Natural language triggers are
+  manual overrides:
   - start: "issue start", "start issue", "begin issue", "neues issue",
            "ich arbeite an"
   - commit: "issue commit", "commit issue", "speichere issue", "checkpoint"
@@ -98,6 +101,14 @@ The following skills have NO slash commands. Invoke them by natural language:
 ## Skill Source Rule
 
 This repo is the **single global skill source** (linked via `~/.config/opencode/skills`).
+
+## Global Instructions Rule
+
+`AGENTS.global.md` (repo root) is the **single global instructions file**,
+linked via `~/.config/opencode/AGENTS.md`. It carries the continuous
+issue-awareness and proactive commit/push policy and overrides the opencode
+default "never commit unless asked" for those workflows (read-only/grading
+skills excluded). Edit it here, not in `~/.config/opencode/`.
 
 ## Agent Source Rule
 

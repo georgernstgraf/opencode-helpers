@@ -44,7 +44,9 @@ The following skills have NO slash commands. Invoke them by natural language:
   "merk dir das", "save context", "persist knowledge"
   → load and execute the `knowledge-persistence` skill
 
-**Issue Workflow** — when the user says:
+**Issue Workflow** — the `issue-workflow` skill applies **continuously**
+  (issue awareness, proactive issue-linked commit/push, completion criteria).
+  Natural language triggers are manual overrides:
   - start: "issue start", "start issue", "begin issue", "neues issue",
            "ich arbeite an"
   - commit: "issue commit", "commit issue", "speichere issue", "checkpoint"

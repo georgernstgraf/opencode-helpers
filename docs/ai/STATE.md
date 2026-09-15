@@ -1,15 +1,20 @@
 # Project State
 
-Current status as of 2026-09-14.
+Current status as of 2026-09-15.
 
 ## Current Focus
 
-`writing-for-agents` audit across the skill set (remove no-op content,
-extract reference material, sharpen triggers). P1/P2/P3a are shipped;
-P4 remains.
+Continuous issue-awareness workflow: `AGENTS.global.md` + symlink and the
+`issue-workflow` rewrite (proactive commit/push, auto-close criteria) just
+shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] Continuous issue-awareness workflow: `AGENTS.global.md` linked as
+      `~/.config/opencode/AGENTS.md`; `issue-workflow` rewritten to proactive
+      issue-linked commit/push (green commits only) with modes as manual
+      overrides; `orchestration`, `AGENTS.md`, `AGENTS.template.md`,
+      README and knowledge files aligned
 - [x] P1 fixes: `orchestration` slimmed to a scope-gated policy (367→63
       lines), `telegram-send` skill removed, `projectgrade` follows the
       `grading-shared` missing-email protocol, `AGENTS.md` bootstrap list

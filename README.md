@@ -62,7 +62,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 |-------|-------------|--------|
 | `grading-shared` | Geteilte Protokolle: Adressstil, E-Mail-Formeln, DB-Lookup, Bulk-Konkurrenz | Referenziert von anderen Skills |
 | `homework` | Generiert per-Lesson `Hausübung.md` aus Git-Historie | Direkter Skill-Aufruf |
-| `issue-workflow` | Issue-Lebenszyklus: Start, Commit, Finish mit GitHub-Integration | Sprachsteuerung (s.u.) |
+| `issue-workflow` | Issue-Awareness als Dauerzustand: proaktives Commit/Push (grüne Commits), Abschluss-Kriterien, Sub-Issue-Regeln | Dauerzustand + Sprachsteuerung als Override (s.u.) |
 | `knowledge-assessment` | Bewertet Knowledge-Check-Abgaben, erstellt Berichte + E-Mail-JSON | `/knowledge-assess` |
 | `knowledge-exam` | Generiert deutsche Mini-Schularbeiten + Lösungen aus Git-Historie | `/knowledge-exam` |
 | `knowledge-persistence` | Persistiert Session-Kontext in `docs/ai/` | Sprachsteuerung (s.u.) |
@@ -105,6 +105,8 @@ Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `tea
 Diese Workflows haben **keine eigenen Slash-Kommandos**. Der Agent erkennt sie an natürlichen Sprachmustern:
 
 **Issue Workflow:**
+- Gilt **dauerhaft**: Der Agent arbeitet stets unter einem Issue, committet und pusht proaktiv (grüne Commits, `(#N)`-Referenz) und schließt das Issue bei erfüllten Kriterien (siehe `AGENTS.global.md`).
+- Die Sprachmuster sind **manuelle Overrides**:
 - *"issue start"*, *"start issue"*, *"begin issue"*, *"neues issue"*, *"ich arbeite an"* → start
 - *"issue commit"*, *"commit issue"*, *"speichere issue"*, *"checkpoint"* → commit
 - *"issue commit and push"*, *"finish issue"*, *"issue done"*, *"issue fertig"*, *"schließe issue"* → finish
@@ -220,7 +222,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 |-------|-------------|------------|
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, bulk concurrency | Referenced by other skills |
 | `homework` | Generate per-lesson `Hausübung.md` from Git history | Direct skill invocation |
-| `issue-workflow` | Issue lifecycle: start, commit, finish with GitHub integration | Natural language (see below) |
+| `issue-workflow` | Continuous issue awareness: proactive commit/push (green commits), completion criteria, sub-issue rules | Continuous + natural language overrides (see below) |
 | `knowledge-assessment` | Grade knowledge-check submissions, produce reports + email JSON | `/knowledge-assess` |
 | `knowledge-exam` | Generate German mini-exams + solutions from Git history | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into `docs/ai/` | Natural language (see below) |
@@ -263,6 +265,8 @@ Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach
 These workflows have **no dedicated slash commands**. The agent recognizes them from natural language patterns:
 
 **Issue Workflow:**
+- Applies **continuously**: the agent always works under an issue, commits and pushes proactively (green commits, `(#N)` reference), and closes the issue when the criteria are met (see `AGENTS.global.md`).
+- The language patterns are **manual overrides**:
 - *"issue start"*, *"start issue"*, *"begin issue"*, *"neues issue"*, *"ich arbeite an"* → start
 - *"issue commit"*, *"commit issue"*, *"speichere issue"*, *"checkpoint"* → commit
 - *"issue commit and push"*, *"finish issue"*, *"issue done"*, *"issue fertig"*, *"schließe issue"* → finish

@@ -57,6 +57,9 @@ pass/fail per suite — or an explicit blocker.
 - Trunk-based: commit directly to the tracked trunk line; no long-lived
   branches. See `issue-workflow` for the per-VCS variants (Git `pull`, SVN
   `up`, and the SVN case with no issue system).
+- Sub-agent commits follow the `issue-workflow` proactive commit/push policy
+  (issue-linked, green commits only) — delegation prompts must include this
+  requirement.
 - Never fabricate issue numbers.
 - Never create empty commits.
 - Escalate to the user when a blocker is fundamental (a design decision is
