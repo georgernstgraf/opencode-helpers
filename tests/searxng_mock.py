@@ -79,6 +79,7 @@ class MockSearxng:
                     "language": qs.get("language", [""])[0],
                     "time_range": qs.get("time_range", [""])[0],
                     "safesearch": qs.get("safesearch", [""])[0],
+                    "authorization": self.headers.get("Authorization", ""),
                 }
                 outer.requests.append(record)
 

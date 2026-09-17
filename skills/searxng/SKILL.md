@@ -19,13 +19,27 @@ Three layers, bottom-up:
 ## Prioritized Engine Chain with a Token Gate
 
 `searxng-search.sh` walks a strict chain for **general** searches and stops at
-the first tier that returns results:
+the first tier that returns results (default profile):
 
 1. `brave` — free HTML scraper
 2. `google` — free HTML scraper
 3. `mwmbl,searchmysite` — free, small-index last resort
 4. `braveapi` — paid API, queried **only** when tiers 1–2 failed *and* the
    tier-3 free result has fewer than `FALLBACK_MIN_RESULTS` (3) hits
+
+### Chain profiles and instance overlay (`env.sample`)
+
+- `SEARXNG_CHAIN=gregor` selects the school-instance profile:
+  `google` → `brave` → `braveapi` with **no** free tier
+  (tier 3 is the API, ungated).
+- `SEARXNG_PRIMARY` replaces the built-in instance list,
+  `SEARXNG_FALLBACK` appends a second instance. Each instance carries its
+  own auth (`SEARXNG_PRIMARY_AUTH` / `SEARXNG_FALLBACK_AUTH` as
+  `user:password`, or `..._CRED_FILE` pointing at such a file); empty means
+  no auth for that instance. Unset variables keep the built-in public chain
+  with the shared `$SEARXNG_AUTH` / `searxng.cred` default.
+- Real credentials live in private overlays only — never in this repo.
+  Copy `skills/searxng/env.sample` as the starting point.
 
 A tier "fails" when the engine is suspended (`unresponsive_engines`) or returns
 0 results. When `braveapi` runs, its results are merged **ahead of** the free

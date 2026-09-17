@@ -13,12 +13,21 @@
 # chain, or an explicit `engines=google`). The `< 3` gate protects the Brave API
 # token. When braveapi runs, its results are merged ahead of the free tier-3
 # results (URL-deduplicated). An explicit `engines=` argument bypasses the chain.
+# Profiles: SEARXNG_CHAIN=gregor walks google -> brave -> braveapi with no
+# free tier (school instance). Instances and per-instance auth come from
+# SEARXNG_PRIMARY[/_AUTH]/SEARXNG_FALLBACK[/_AUTH] (see env.sample).
 
 set -e
 
 # Instance chain - public primary, then public fallbacks.
 # No localhost entry: the skill runs on multiple hosts; only the SearXNG
 # host itself would resolve localhost:8888.
+#
+# Env overrides (see env.sample): SEARXNG_PRIMARY replaces the whole list;
+# SEARXNG_FALLBACK appends a second instance. Each instance has its own
+# auth (SEARXNG_PRIMARY_AUTH / SEARXNG_FALLBACK_AUTH as "user:password",
+# or SEARXNG_PRIMARY_CRED_FILE / SEARXNG_FALLBACK_CRED_FILE pointing at a
+# file with that format); empty means the shared default below.
 INSTANCES=(
     "https://searxng.claw.graf.priv.at"
     "https://etsi.me"
@@ -33,6 +42,7 @@ USER_AGENT="opencode-searxng/1.4"
 # Optional shared-secret auth for the public instance (HTTP Basic, enforced at
 # nginx). Read from $SEARXNG_AUTH or ~/.config/opencode/searxng.cred as
 # "user:password"; when absent, requests are sent unauthenticated.
+# This is the DEFAULT used for every instance without a per-instance override.
 AUTH="${SEARXNG_AUTH:-}"
 if [[ -z "$AUTH" && -r "${HOME}/.config/opencode/searxng.cred" ]]; then
     AUTH="$(head -n1 "${HOME}/.config/opencode/searxng.cred")"
@@ -42,6 +52,51 @@ if [[ -n "$AUTH" ]]; then
     CURL_AUTH=(--user "$AUTH")
 fi
 
+# Resolve one per-instance auth value. Set-but-empty direct value means
+# "no auth for this instance"; unset direct/file values mean "use the
+# shared CURL_AUTH default" (sentinel __SHARED__).
+resolve_instance_auth() {
+    local dref="$1" fref="$2"
+    if [[ -v $dref ]]; then
+        printf '%s' "${!dref}"
+    elif [[ -v $fref && -n "${!fref}" && -r "${!fref}" ]]; then
+        head -n1 "${!fref}"
+    else
+        printf '__SHARED__'
+    fi
+}
+
+INSTANCE_AUTHS=()
+if [[ -n "${SEARXNG_PRIMARY:-}" ]]; then
+    INSTANCES=("$SEARXNG_PRIMARY")
+    INSTANCE_AUTHS=(
+        "$(resolve_instance_auth SEARXNG_PRIMARY_AUTH SEARXNG_PRIMARY_CRED_FILE)"
+    )
+    if [[ -n "${SEARXNG_FALLBACK:-}" ]]; then
+        INSTANCES+=("$SEARXNG_FALLBACK")
+        INSTANCE_AUTHS+=(
+            "$(resolve_instance_auth SEARXNG_FALLBACK_AUTH SEARXNG_FALLBACK_CRED_FILE)"
+        )
+    fi
+fi
+
+# Curl auth args for instance $1 (index into INSTANCES): the per-instance
+# value when set, no auth when explicitly emptied, otherwise the shared
+# default. Result in $AUTH_ARGS.
+auth_args_for() {
+    # No colon in ${..-..}: an explicitly emptied entry means "no auth",
+    # only a missing entry falls back to the shared default.
+    local idx="$1" per="${INSTANCE_AUTHS[$idx]-__SHARED__}"
+    AUTH_ARGS=()
+    if [[ "$per" == "__SHARED__" ]]; then
+        if [[ "${#CURL_AUTH[@]}" -gt 0 ]]; then
+            AUTH_ARGS=("${CURL_AUTH[@]}")
+        fi
+    elif [[ -n "$per" ]]; then
+        AUTH_ARGS=(--user "$per")
+    fi
+}
+
 # Strict chain: free scrapers first, then the free last-resort tier, then the
 # paid API gated on a weak free result.
 CHAIN_PRIMARY="brave"
@@ -49,6 +104,13 @@ CHAIN_SECONDARY="google"
 FREE_FALLBACK="mwmbl,searchmysite"
 FALLBACK_ENGINE="braveapi"
 FALLBACK_MIN_RESULTS=3
+# Chain profile (see env.sample): "gregor" serves the Gregor school instance
+# as google -> brave -> braveapi with no free last-resort tier.
+if [[ "${SEARXNG_CHAIN:-default}" == "gregor" ]]; then
+    CHAIN_PRIMARY="google"
+    CHAIN_SECONDARY="brave"
+    FREE_FALLBACK=""
+fi
 EMPTY_JSON='{"number_of_results":0,"results":[]}'
 
 # Parse arguments
@@ -100,18 +162,19 @@ run_query() {
     local require_results="$2"
     local only_instance="${3:-}"
     local timeout="${4:-$TIMEOUT}"
-    local instance url response
     local first_json="" first_instance=""
-    local instances=("${INSTANCES[@]}")
-    if [[ -n "$only_instance" ]]; then
-        instances=("$only_instance")
-    fi
     R_JSON=""
     R_INSTANCE=""
-    for instance in "${instances[@]}"; do
+    local idx instance url response
+    for idx in "${!INSTANCES[@]}"; do
+        instance="${INSTANCES[$idx]}"
+        if [[ -n "$only_instance" && "$instance" != "$only_instance" ]]; then
+            continue
+        fi
         url="${instance}/search?q=${ENCODED_QUERY}&format=json&language=${LANG}&pageno=${PAGE}${extra}"
+        auth_args_for "$idx"
         response=$(curl -s --max-time "$timeout" \
-            "${CURL_AUTH[@]}" \
+            "${AUTH_ARGS[@]}" \
             -H "User-Agent: $USER_AGENT" \
             -H "Accept: application/json" \
             "$url" 2>/dev/null) || continue
@@ -285,11 +348,17 @@ if [[ "$(engine_hits "$SECOND_JSON" "$CHAIN_SECONDARY")" -gt 0 ]]; then
 fi
 
 # --- Tier 3: free last resort (mwmbl + searchmysite) -------------------------
-run_query "&engines=${FREE_FALLBACK}${CHAIN_PARAMS}" 0 "$ACTIVE_INSTANCE" "$FOLLOWUP_TIMEOUT"
-FREE_JSON="${R_JSON:-$EMPTY_JSON}"
-if [[ -n "$R_INSTANCE" ]]; then ACTIVE_INSTANCE="$R_INSTANCE"; fi
-mark_tried "$FREE_FALLBACK"
-collect_unresponsive "$R_JSON"
+# Empty in profiles without a free tier (e.g. gregor): fall through to the
+# API tier with an empty free result.
+if [[ -n "$FREE_FALLBACK" ]]; then
+    run_query "&engines=${FREE_FALLBACK}${CHAIN_PARAMS}" 0 "$ACTIVE_INSTANCE" "$FOLLOWUP_TIMEOUT"
+    FREE_JSON="${R_JSON:-$EMPTY_JSON}"
+    if [[ -n "$R_INSTANCE" ]]; then ACTIVE_INSTANCE="$R_INSTANCE"; fi
+    mark_tried "$FREE_FALLBACK"
+    collect_unresponsive "$R_JSON"
+else
+    FREE_JSON="$EMPTY_JSON"
+fi
 
 FREE_COUNT=$(echo "$FREE_JSON" | jq '.results | length' 2>/dev/null || echo 0)
 

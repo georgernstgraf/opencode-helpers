@@ -54,6 +54,23 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         return json.loads(proc.stdout)
 
+    def _run_env(self, script, env_overrides, *args):
+        import os
+
+        env = {
+            k: v for k, v in os.environ.items() if not k.startswith("SEARXNG_")
+        }
+        env.update(env_overrides)
+        proc = subprocess.run(
+            ["bash", script, *args],
+            capture_output=True,
+            text=True,
+            timeout=90,
+            env=env,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        return json.loads(proc.stdout)
+
     # --- Tier 1: brave ------------------------------------------------------
     def test_brave_results_stop_the_chain(self):
         mock = self._mock(engine_results={"brave": BRAVE, "google": GOOGLE})
@@ -248,6 +265,91 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(out["engine_used"], "google")
         self.assertEqual(len(primary.requests), 2)  # brave, then google
         self.assertEqual(len(secondary.requests), 1)  # brave tier only
+
+    # --- SEARXNG_PRIMARY / SEARXNG_FALLBACK env override ----------------------
+    def test_primary_env_replaces_instance_list(self):
+        primary = self._mock(engine_results={"brave": BRAVE})
+        secondary = self._mock(engine_results={"brave": BRAVE})
+        env = {"SEARXNG_PRIMARY": primary.url, "SEARXNG_FALLBACK": secondary.url}
+
+        out = self._run_env(str(SCRIPT), env, "bravecase")
+
+        self.assertEqual(out["instance"], primary.url)
+        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(len(primary.requests), 1)
+        self.assertEqual(len(secondary.requests), 0)
+
+    def test_fallback_env_used_when_primary_fails(self):
+        primary = self._mock(unresponsive=["brave"])
+        secondary = self._mock(engine_results={"brave": BRAVE})
+        env = {"SEARXNG_PRIMARY": primary.url, "SEARXNG_FALLBACK": secondary.url}
+
+        out = self._run_env(str(SCRIPT), env, "chaincase")
+
+        self.assertEqual(out["instance"], secondary.url)
+        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(len(primary.requests), 1)
+        self.assertEqual(len(secondary.requests), 1)
+
+    def test_explicit_empty_auth_sends_no_credentials(self):
+        import base64
+
+        mock = self._mock(engine_results={"brave": BRAVE})
+        env = {
+            "SEARXNG_PRIMARY": mock.url,
+            "SEARXNG_PRIMARY_AUTH": "",
+            "SEARXNG_AUTH": "user:pass",
+        }
+
+        out = self._run_env(str(SCRIPT), env, "bravecase")
+
+        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(mock.requests[0]["authorization"], "")
+
+    def test_shared_auth_reaches_primary_without_override(self):
+        import base64
+
+        mock = self._mock(engine_results={"brave": BRAVE})
+        env = {
+            "SEARXNG_PRIMARY": mock.url,
+            "SEARXNG_AUTH": "user:pass",
+        }
+
+        out = self._run_env(str(SCRIPT), env, "bravecase")
+
+        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(
+            mock.requests[0]["authorization"],
+            "Basic " + base64.b64encode(b"user:pass").decode(),
+        )
+
+    # --- SEARXNG_CHAIN=gregor profile -----------------------------------------
+    def test_gregor_chain_starts_with_google(self):
+        mock = self._mock(engine_results={"google": GOOGLE})
+        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
+
+        out = self._run_env(str(SCRIPT), env, "bravecase")
+
+        self.assertEqual(out["engine_used"], "google")
+        self.assertFalse(out["fallback_used"])
+        self.assertEqual(out["tried"], ["google"])
+        self.assertEqual(len(mock.requests), 1)
+        self.assertEqual(mock.requests[0]["engines"], "google")
+
+    def test_gregor_chain_falls_back_to_brave_then_braveapi(self):
+        mock = self._mock(engine_results={"braveapi": API_RESULTS})
+        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
+
+        out = self._run_env(str(SCRIPT), env, "weakcase")
+
+        self.assertEqual(out["engine_used"], "braveapi")
+        self.assertTrue(out["fallback_used"])
+        self.assertEqual(out["tried"], ["google", "brave", "braveapi"])
+        # No free-tier request: the gregor profile skips mwmbl/searchmysite.
+        self.assertNotIn(
+            "mwmbl", [r["engines"] for r in mock.requests]
+        )
+        self.assertEqual(len(mock.requests), 3)
 
 
 if __name__ == "__main__":
