@@ -7,7 +7,14 @@
       "command": [
         "python3",
         "/home/georg/repos/georgernstgraf/opencode-helpers/skills/searxng/scripts/opencode-searxng"
-      ]
+      ],
+      "environment": {
+        "SEARXNG_PRIMARY": "http://10.8.0.16",
+        "SEARXNG_PRIMARY_AUTH": "",
+        "SEARXNG_FALLBACK": "https://searxng.claw.graf.priv.at",
+        "SEARXNG_FALLBACK_CRED_FILE": "{env:HOME}/.config/opencode/searxng.cred",
+        "SEARXNG_CHAIN": "gregor"
+      }
     }
   }
 }
