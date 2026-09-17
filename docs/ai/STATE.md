@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-09-15.
+Current status as of 2026-09-17.
 
 ## Current Focus
 
@@ -10,6 +10,12 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] SearXNG-MCP auf Think mit Gregor als Primary, Claw als Fallback (#74):
+      `mcp.searxng.environment` im Repo-Template (`opencode.json`, secret-frei)
+      und in der Think-Live-Config; `env.sample`-Primary auf `http://10.8.0.16`
+      korrigiert; End-to-End verifiziert (`instance: http://10.8.0.16`).
+      Gregor als agentische Schul-Suchinstanz festgehalten (DECISIONS.md
+      2026-09-17: think → dell → Schüler-Agents)
 - [x] Continuous issue-awareness workflow: `AGENTS.global.md` linked as
       `~/.config/opencode/AGENTS.md`; `issue-workflow` rewritten to proactive
       issue-linked commit/push (green commits only) with modes as manual
@@ -57,7 +63,8 @@ shipped; observe daily practice and tune thresholds if needed.
 - [ ] P4 of the audit: Completion Criteria ("Done when …") + frontmatter
       description trigger branches across `skills/*`
 - [ ] dell replication: repo sync, `agents/` directory + `~/.config/opencode/agents`
-      symlink (see HANDOFF.md task 2)
+      symlink, plus `mcp.searxng.environment` (Gregor primary, chain `gregor`)
+      — rollout step 2 after think (see HANDOFF.md task 3)
 
 ## Blockers
 

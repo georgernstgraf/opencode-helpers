@@ -28,7 +28,10 @@ Open tasks:
       integrate with `ee3d02f` (think's Drei-Aufgaben-Struktur commit) and the
       newer main (P1/P2/P3a; text conflict in SKILL.md is likely — integrate
       both), push. Also replicate the `agents/` directory + the
-      `~/.config/opencode/agents` symlink on dell.
+      `~/.config/opencode/agents` symlink on dell. Also replicate the
+      `mcp.searxng.environment` block (Gregor primary, chain `gregor`)
+      into dell's `~/.config/opencode/opencode.json` — rollout step 2
+      after think (#74, DECISIONS.md 2026-09-17).
 
 4. [ ] Credentials im SVN (infra) — canonical task lives in
       `~/svn/georg/docs/ai/HANDOFF.md` **Task 5**
