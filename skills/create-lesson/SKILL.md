@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Baut Klassen-Lektionen (self-contained HTML: Erklärung, Quiz, Hausaufgabe) aus Semesterplänen und Lehrplan-Extrakten — für Erstkontakt und Wiederholung aus früheren Jahrgängen. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder a lesson HTML file is needed for classroom use."
+description: "Baut Klassen-Lektionen (self-contained HTML: Erklärung, Quiz, Hausübung) aus Semesterplänen und Lehrplan-Extrakten — für Erstkontakt und Wiederholung aus früheren Jahrgängen. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder a lesson HTML file is needed for classroom use."
 license: MIT
 compatibility: opencode
 ---
@@ -8,9 +8,9 @@ compatibility: opencode
 # Create-Lesson-Skill
 
 Baut **Klassen-Lektionen**: selbständige HTML-Seiten für Schüler:innen mit
-Erklärung, interaktivem Quiz und Hausaufgaben-Verweis — gegründet auf
-Semesterplan (Ziel-UE) und Lehrplan-Extrakt (Quelle-KM). Funktioniert in
-jedem Unterrichts-Repo, das der `lehrplan/`-Konvention folgt
+Erklärung, interaktivem Quiz und integrierter Hausübung am Lesson-Ende —
+gegründet auf Semesterplan (Ziel-UE) und Lehrplan-Extrakt (Quelle-KM).
+Funktioniert in jedem Unterrichts-Repo, das der `lehrplan/`-Konvention folgt
 (konventionsbasiert, nicht auf ein Fach verdrahtet — Vorbild: `lehrplan`-Skill).
 
 ## Abgrenzung zum Teach-Skill (wichtig, keine Duplikation)
@@ -74,9 +74,13 @@ Befunde melden, Bau fortsetzen soweit möglich.
 5. **Quiz:** genau 1 Frage pro Lesson; Richtige-Position aus der
    Klassen-Tabelle rotieren (A/B/C/D); Antwortoptionen gleiche Wortzahl
    (möglichst Zeichenzahl) — keine Format-Hinweise.
-6. **Hausaufgabe:** Auf bestehenden HÜ-Master verlinken. Existiert keiner,
-   wird die Lücke als Folge-Item (Datei + Issue) festgehalten — keine
-   HÜ ad hoc in die Lesson schreiben.
+6. **Hausübung:** Abschnitt „Hausübung" direkt am Lesson-Ende anhängen
+   (nach Zusammenfassung/Ausblick, vor dem Quiz-Script): Aufgaben
+   stufenweise gestuft aus dem Lesson-Stoff, Vorhersage-Aufgabe zuerst,
+   plus Abgabehinweis (Konvention der Klasse, z. B. Commit im
+   Schüler-Repo). Referenz im README des Tagesordners (z. B. „HÜ:
+   Abschnitt am Lesson-Ende"). Existiert ein HÜ-Master im Repo, auf ihn
+   verlinken statt duplizieren.
 7. **Code-Stil:** Projekt-Konvention (z. B. `<-`, Snake_case, natives Pipe);
    Output als Kommentar, Erklärung als Kommentar; Zeilen kurz halten.
 
@@ -95,11 +99,15 @@ oder `<klasse>/teach/lessons/`).
 3. Kein CDN / keine externen Abhängigkeiten (Offline-Lesbarkeit), außer
    verlinkter Lektüre.
 4. Quiz klickbar, genau eine Richtige, Rotation eingehalten.
+5. Hausübung: Abschnitt am Lesson-Ende vorhanden (oder HÜ-Master-Link),
+   Tages-README referenziert sie.
 
 ## Nachziehen (gleicher Commit)
 
 - Lessons-Tabelle im Klassen-README (Nr. · Ziel-UE vollqualifiziert ·
   Thema · Quelle · Typ · Quiz-Richtige · Status).
+- Tages-README des Lessons-Ordners (Konvention des Repos, z. B.
+  `<klasse>/YYYY-MM-DD_thema/README.md`) mit HÜ-Referenz.
 - Kohorten-Spiegel nach Master-Regel des Repos.
 - Neue Fachbegriffe ins Glossar (mit vollqualifiziertem UE-Verweis).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
@@ -107,5 +115,6 @@ oder `<klasse>/teach/lessons/`).
 ## Was dieser Skill NICHT tut
 
 - Keine Semesterpläne entwerfen (lehrplan-Skill, Aufgabe 3).
-- Keine Folien/Hausaufgaben-Master anlegen (Folge-Items statt Ad-hoc-Bau).
+- Keine Folien anlegen. Die HÜ gehört in die Lesson — ein separater
+  HÜ-Master entsteht nur, wenn die Repo-Konvention einen verlangt.
 - Keine Selbstlern-Pfade (teach-Skill).
