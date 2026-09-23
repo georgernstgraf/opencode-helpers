@@ -17,6 +17,12 @@ Follow these without question. Do not deviate unless explicitly told.
 - MCP servers live inside the skill that owns them (`skills/<name>/scripts/`); `opencode.json` references the server by absolute path — no `~/bin` indirection.
 - Shared skills and scripts must use host-independent service URLs (e.g., `https://searxng.claw.graf.priv.at`), never host-local endpoints like `localhost` ports.
 
+## Classroom Material (create-lesson)
+
+- Lesson HTML always includes a shared light/dark toggle asset under `assets/` (CSS variables + toggle JS): default follows `prefers-color-scheme`, the choice persists via `localStorage`, print stays light, no CDN. Reuse the asset, never inline a per-lesson copy.
+- The Tages-README (`<klasse>/YYYY-MM-DD_thema/README.md`) leads with content (lesson link, summary, Aufgabe reference) and ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
+- Student-facing lesson wording is always **Aufgabe**, never "Hausübung"; the Aufgabe **is** the Mitarbeit. On-disk master files may keep repo-convention names (`hausaufgabe.md`/`Hausübung.md`), and the `homework` skill's per-lesson `Hausübung.md` artifact name is unaffected.
+
 ## Grading Workflow
 
 - **All grading skills must output a percentage (0-100%) alongside the score.** This is mandatory for every skill that produces grading outputs.

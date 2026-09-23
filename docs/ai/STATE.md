@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-09-17.
+Current status as of 2026-09-23.
 
 ## Current Focus
 
@@ -10,6 +10,10 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] create-lesson output rules (#77, `3183819`): shared light/dark toggle
+      asset, `## Housekeeping` (Lehrplan · KM-Bezug · Runtime) at the bottom of
+      the Tages-README, student-facing "Aufgabe" (= Mitarbeit) instead of
+      "Hausübung"; tests green
 - [x] SearXNG-MCP auf Think mit Gregor als Primary, Claw als Fallback (#74):
       `mcp.searxng.environment` im Repo-Template (`opencode.json`, secret-frei)
       und in der Think-Live-Config; `env.sample`-Primary auf `http://10.8.0.16`

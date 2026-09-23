@@ -40,4 +40,4 @@ Open tasks:
       access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
       credential) — that part is done. Track the SVN/secret work over there.
 
-Last updated: 2026-09-15.
+Last updated: 2026-09-23.

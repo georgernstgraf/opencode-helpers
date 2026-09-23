@@ -294,6 +294,13 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: One school-wide instance for agentic search keeps chain semantics and egress behavior uniform across agent hosts. Google-CAPTCHA suspensions on the shared school-IP egress are a browser-context phenomenon — agent-side they are absorbed by the engine chain (`google` → `brave` → `braveapi`), so students clicking "Verify I'm Human" on google.com is unrelated to instance health.
 - **Considered**: Keeping claw primary everywhere (Gregor would stay an egress-proxy host only); offering the Gregor web UI as a student search portal (rejected — the instance's role is agentic, students search in the browser).
 - **Tradeoff**: All agent hosts share Gregor's availability; when it is down, the claw fallback in each host's MCP environment carries the load.
+## 2026-09-23: create-lesson output conventions — dark toggle, README housekeeping, Aufgabe framing
+- **Choice**: (1) Every lesson HTML carries a shared light/dark toggle asset (`assets/`: CSS variables + toggle JS), OS default via `prefers-color-scheme`, persisted in `localStorage`, print light, no CDN. (2) The three housekeeping infos (Lehrplan · KM-Bezug · Runtime) live in a `## Housekeeping` block at the very bottom of the Tages-README, not in the HTML header. (3) Student-facing wording is always **Aufgabe**, never "Hausübung"; the Aufgabe **is** the Mitarbeit.
+- **Reason**: Driver was the GRG-WMC 5akif async-await lesson (dark-only HTML; Tages-README led with KM-Bezug/Lehrplan/Runtime, burying the content). "Aufgabe = Mitarbeit" reframes the take-home task as graded participation so it reads as classwork, not optional homework.
+- **Considered**: Inline per-lesson toggle code (rejected — duplicate, shared asset wins); housekeeping in the HTML footer (rejected — the README is the index); keeping "Hausübung" with an "Aufgabe" gloss (rejected — one term).
+- **Tradeoff**: On-disk master files may still be named `hausaufgabe.md`/`Hausübung.md` (repo convention) while the student-facing term is Aufgabe; `homework`/grading skills keep their existing artifact names.
+- **Issue**: #77 (`3183819`)
+
 ## 2026-09-23: Skills-Entkopplung von mattpocock — alles aus opencode-helpers
 - **Choice**: Alle Skills werden in `opencode-helpers/skills/` gepflegt;
   OpenCode-Instanzen werden per Symlink (`~/.config/opencode/skills`)

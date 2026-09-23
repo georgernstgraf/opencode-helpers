@@ -22,6 +22,7 @@ Read this file carefully before making changes in affected areas.
 - The `repograde` skill now handles both full-history and date-filtered grading; there is no separate `repogradesince` skill or command.
 - Reference/illustrative material may live in sibling `*.md` files next to a `SKILL.md` (loaded on demand; the skill loader reads only `SKILL.md`). Runtime-critical instructions must stay in `SKILL.md`; sibling content must be linked as `[X.md](./X.md)`. `tests/test_skill_links.py` validates every `](./…)` link in `skills/*/SKILL.md` only — illustrative `./src/...` links inside sibling format templates are intentionally not checked.
 - When extracting a section that contains a fenced code block with Markdown headings, promote heading levels fence-aware (track the ` ``` ` toggles) — a blanket `###`→`##` replace corrupts headings inside the template code block.
+- `tests/test_skill_links.py` scans every `](./…)` link in `skills/*/SKILL.md`, including links **inside fenced code blocks** — an illustrative example link like `[x](./lesson.html)` fails the guard. Write example paths as plain backticked text (`` `lesson.html` ``), not as Markdown links.
 
 ## SearXNG Backend
 
