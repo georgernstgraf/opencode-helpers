@@ -38,7 +38,7 @@ verdrahtet — Vorbild: `lehrplan`-Skill).
 5. **Daten:** Welche Datensätze nutzt die Zielklasse (Assets/CSV, Pakete)?
    Lesson-Code muss auf denselben Daten laufen wie der Unterricht.
 6. **Tabellen-Stand:** Lessons-Tabelle im Klassen-README (Nr., Quiz-Richtige)?
-   Nächste freie Nummer + nächste Quiz-Position daraus ablesen.
+   Nächste freie Nummer + Start-Rotation der Quiz-Positionen daraus ablesen.
 7. **Assets/Theme:** gemeinsames Theme-Asset der Klasse (`assets/`)? Den
    Light/Dark-Umschalter und das Stylesheet wiederverwenden, nicht pro Lesson
    neu bauen.
@@ -84,9 +84,11 @@ Befunde melden, Bau fortsetzen soweit möglich.
    früherer Lessons) → Typische Fehler (je mit Anti-Beispiel-Code) →
    Zusammenfassung (Tabelle) + Ausblick (Folge-UE im **Ziel**-Semesterplan).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
-6. **Quiz:** genau 1 Frage pro Lesson; Richtige-Position aus der
-   Klassen-Tabelle rotieren (A/B/C/D); Antwortoptionen gleiche Wortzahl
-   (möglichst Zeichenzahl) — keine Format-Hinweise.
+6. **Quiz:** je nach Stoff **3–5 Fragen** pro Lesson (so viele, wie sich
+   mit dem Stoff sinnvoll abdecken lassen); die Richtige-Positionen über
+   die Fragen ausgewogen rotieren (A/B/C/D), je Frage genau eine Richtige;
+   Antwortoptionen gleiche Wortzahl (möglichst Zeichenzahl) — keine
+   Format-Hinweise.
 7. **Aufgabe:** Abschnitt **„Aufgabe"** direkt am Lesson-Ende anhängen
    (nach Zusammenfassung/Ausblick, vor dem Quiz-Script): stufenweise aus dem
    Lesson-Stoff gestuft, Vorhersage-Aufgabe zuerst, plus Abgabehinweis
@@ -134,7 +136,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    Semesterplan).
 3. Kein CDN / keine externen Abhängigkeiten (Offline-Lesbarkeit), außer
    verlinkter Lektüre.
-4. Quiz klickbar, genau eine Richtige, Rotation eingehalten.
+4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die 3–5
+   Fragen eingehalten.
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link),
    Tages-README referenziert sie.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
@@ -144,7 +147,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 ## Nachziehen (gleicher Commit)
 
 - Lessons-Tabelle im Klassen-README (Nr. · Ziel-UE vollqualifiziert ·
-  Thema · Quelle · Typ · Quiz-Richtige · Status); Aufgaben-Spalte statt „HÜ".
+  Thema · Quelle · Typ · Quiz-Richtige · Status); Aufgaben-Spalte statt „HÜ",
+  Quiz-Richtige als Sequenz (z. B. `B·A·C·D·B`).
 - Tages-README des Lessons-Ordners nach § Tages-README (Aufgaben-Referenz
   oben, Housekeeping-Block unten).
 - Kohorten-Spiegel nach Master-Regel des Repos.
