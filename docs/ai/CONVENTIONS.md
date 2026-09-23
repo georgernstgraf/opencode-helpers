@@ -22,6 +22,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Lesson HTML always includes a shared light/dark toggle asset under `assets/` (CSS variables + toggle JS): default follows `prefers-color-scheme`, the choice persists via `localStorage`, print stays light, no CDN. Reuse the asset, never inline a per-lesson copy.
 - The Tages-README (`<klasse>/YYYY-MM-DD_thema/README.md`) leads with content (lesson link, summary, Aufgabe reference) and ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
 - Student-facing lesson wording is always **Aufgabe**, never "Hausübung"; the Aufgabe **is** the Mitarbeit. On-disk master files may keep repo-convention names (`hausaufgabe.md`/`Hausübung.md`), and the `homework` skill's per-lesson `Hausübung.md` artifact name is unaffected.
+- Quizzes carry **3–5 questions** per lesson, sized to the material; the correct positions rotate across them (a single question is no longer the rule). Lessons tables record the sequence (e.g. `B·A·C·D·B`), each question exactly one correct.
 
 ## Grading Workflow
 

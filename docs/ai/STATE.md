@@ -10,6 +10,9 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] create-lesson Quiz-Regel (#78, `6049e7f`): 3–5 Fragen je Lesson
+      passungsabhängig, Richtige-Positionen rotieren, je Frage genau eine
+      Richtige; Präludium/Verifikation/Nachziehen angeglichen; Tests grün
 - [x] create-lesson output rules (#77, `3183819`): shared light/dark toggle
       asset, `## Housekeeping` (Lehrplan · KM-Bezug · Runtime) at the bottom of
       the Tages-README, student-facing "Aufgabe" (= Mitarbeit) instead of

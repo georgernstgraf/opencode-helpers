@@ -322,3 +322,10 @@ Each entry documents WHAT was decided and WHY.
   Upstream-Syncs erhalten (Prüfpunkt); `create-lesson` ist Eigenentwicklung
   ohne Upstream. Neustart von opencode nötig, damit neue/geänderte Skills
   laden.
+
+## 2026-09-23: create-lesson Quiz 3–5 Fragen (passungsabhängig) mit Rotation
+- **Choice**: Statt "genau 1 Frage pro Lesson" erzeugt `create-lesson` **3–5 Fragen** je nach Stoff; die Richtige-Positionen rotieren ausgewogen über die Fragen (A/B/C/D), je Frage genau eine Richtige. Die Lessons-Tabelle führt die Sequenz (z. B. `B·A·C·D·B`).
+- **Reason**: Die GRG-WMC-Lektion async/await (siehe #77) brauchte für mehr Stoff mehr Prüf-Oberfläche; eine Frage deckt mehrstufige Konzepte nicht ab.
+- **Considered**: Fest bei 5 (verworfen — Stoffmenge schwankt); bei 1 bleiben (verworfen — zu dünn für mehrstufige Lessons).
+- **Tradeoff**: Die Rotation wird pro Lesson statt pro Frage dokumentiert (Sequenz in der Tabelle); Präludium/Skill verlangen das Ablesen der Start-Rotation.
+- **Issue**: #78 (`6049e7f`)
