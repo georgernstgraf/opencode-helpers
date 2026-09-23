@@ -294,3 +294,24 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: One school-wide instance for agentic search keeps chain semantics and egress behavior uniform across agent hosts. Google-CAPTCHA suspensions on the shared school-IP egress are a browser-context phenomenon — agent-side they are absorbed by the engine chain (`google` → `brave` → `braveapi`), so students clicking "Verify I'm Human" on google.com is unrelated to instance health.
 - **Considered**: Keeping claw primary everywhere (Gregor would stay an egress-proxy host only); offering the Gregor web UI as a student search portal (rejected — the instance's role is agentic, students search in the browser).
 - **Tradeoff**: All agent hosts share Gregor's availability; when it is down, the claw fallback in each host's MCP environment carries the load.
+## 2026-09-23: Skills-Entkopplung von mattpocock — alles aus opencode-helpers
+- **Choice**: Alle Skills werden in `opencode-helpers/skills/` gepflegt;
+  OpenCode-Instanzen werden per Symlink (`~/.config/opencode/skills`)
+  versorgt. Projekt-Repos führen kein `.opencode/`-Verzeichnis (in GRG-PMM
+  entfernt). Übernommen: neuer globaler `create-lesson`-Skill (Bau von
+  Klassen-Lektionen aus Semesterplänen, Abgrenzung zu `teach` als Referenz);
+  Zweistelligkeits-Regel für Klassen-Lessons im `teach`-Skill (Selbststudium
+  vierstellig ausgenommen); vier nur-projektlokale Skills aus dem alten
+  Symlink-Bestand (`handoff`, `to-questionnaire`, `wait-what`,
+  `writing-for-agents` inkl. SKILL-MECHANICS; Codex-`agents/` weggelassen).
+  `grill-me`/`grilling`/`teach`-Deltas waren trivial (Frontmatter) —
+  Helpers-Bestand gilt. Falscher lokaler Commit im mattpocock-Klon per Reset
+  entfernt (Klon wieder sauber, kein Push ins Upstream).
+- **Reason**: Host-Konfigurationsfehler — `GRG-PMM/.opencode/skills/
+  productivity/` zeigte in den mattpocock-Klon statt in entkoppelte Skills;
+  4 Skills existierten nur dort (nirgends versioniert unter eigener
+  Kontrolle). Die Entkopplung war früher entschieden, aber nie vollzogen.
+- **Tradeoff**: `sync-upstream-skills` muss die übernommenen Inhalte bei
+  Upstream-Syncs erhalten (Prüfpunkt); `create-lesson` ist Eigenentwicklung
+  ohne Upstream. Neustart von opencode nötig, damit neue/geänderte Skills
+  laden.
