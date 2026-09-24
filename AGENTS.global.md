@@ -43,15 +43,17 @@ workflows below.
 
 ## Issue Completion
 
-- When the agent believes the issue's goal is fully implemented, it normally
-  asks the user before closing the issue.
-- The agent may close the issue autonomously only when ALL of these hold:
+- When the agent believes the issue's goal is fully implemented, it **closes
+  the issue autonomously** — no need to ask first — and reports the closure,
+  naming the issue number, in its final message to the user.
+- It may close only when ALL of these hold:
   - the implementation covers the issue goal completely,
   - verification (tests/lint) is green,
   - the issue has no open sub-issues (always check via the `issue-workflow`
     sub-issues API first),
   - the user has not signalled anything that contradicts completion.
-- Otherwise report the status and ask.
+- If any criterion is not met, report the status, state what is missing, and
+  ask.
 
 ## Scope Exclusions (read-only stays read-only)
 

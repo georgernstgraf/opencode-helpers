@@ -10,6 +10,11 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] issue-workflow Auto-Close (#81): erledigte Issues werden autonom
+      geschlossen, sobald die vier Sicherheitskriterien erfüllt sind (kein
+      Nachfragen mehr); der Vollzug samt Issue-Nummer muss in der finalen
+      Nachricht genannt werden; `AGENTS.global.md`, Skill (Purpose, Issue
+      Completion, Output Expectations) und README angeglichen
 - [x] `oc-models-report --provider <ID>` (#80): exakter, case-insensitive
       providerID-Filter, kombinierbar mit Substring-Filtern
       (`--provider openrouter opus`), provider-only listet alle Modelle des

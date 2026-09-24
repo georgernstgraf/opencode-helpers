@@ -342,3 +342,11 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Substring-Match für Provider (verworfen — Tippfehler sollen auffallen); mehrere/kommagetrennte Provider (verworfen — YAGNI); unbekannter Provider als „no match“ mit exit 1 (verworfen — Nutzungsfehler, kein leeres Ergebnis).
 - **Tradeoff**: Provider-Fehler wird erst nach einem evtl. Cache-Refresh geprüft (die „collected info“-Zeile kann davor erscheinen). Tests decken provider-only, provider+Filter, case-insensitive, exakter Match (Teilstring-Fehler), unbekannter Provider, provider+Filter ohne Treffer und „weder noch“ ab.
 - **Issue**: #80
+
+## 2026-09-24: issue-workflow schließt erledigte Issues autonom und nennt den Vollzug (#81)
+- **Choice**: Der Agent schließt ein Issue, sobald er das Goal als vollständig umgesetzt ansieht und die vier Sicherheitskriterien erfüllt sind (Goal komplett, Tests/Lint grün, keine offenen Sub-Issues, kein User-Widerspruch) — **ohne vorher zu fragen**. Der Vollzug wird in der finalen Nachricht an den User genannt (Issue-Nummer + „closed“); bei einem nicht erfüllten Kriterium wird stattdessen berichtet und nachgefragt. Angeglichen in `skills/issue-workflow/SKILL.md` (Purpose, Issue Completion, Output Expectations) und `AGENTS.global.md`.
+- **Reason**: Die bisherige Policy („normally asks the user before closing“) erzwang einen unnötigen Bestätigungs-Schritt am Ende jedes vollständig erledigten Arbeitsblocks; der Nutzer wünscht den Abschluss als Default, solange die Sicherheitskriterien greifen.
+- **Considered**: „Immer schließen ohne Gate“ (verworfen — rote Tests oder offene Sub-Issues dürfen nicht stillschweigend zugehen); nur das Skill ohne `AGENTS.global.md` ändern (verworfen — die gespiegelte Policy wäre widersprüchlich geworden).
+- **Tradeoff**: Autonome Closures sind weniger sichtbar kontrollierbar; die vier Kriterien und die Sub-Issue-Prüfung bleiben die Bremse, Read-only-/Grading-Skills bleiben ausgenommen.
+- **Supersedes**: Teil (3) des Eintrags „2026-09-15: Continuous issue awareness + proactive commit/push“.
+- **Issue**: #81

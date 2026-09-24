@@ -273,7 +273,7 @@ Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach
 These workflows have **no dedicated slash commands**. The agent recognizes them from natural language patterns:
 
 **Issue Workflow:**
-- Applies **continuously**: the agent always works under an issue, commits and pushes proactively (green commits, `(#N)` reference), and closes the issue when the criteria are met (see `AGENTS.global.md`).
+- Applies **continuously**: the agent always works under an issue, commits and pushes proactively (green commits, `(#N)` reference), and closes the issue autonomously once the criteria are met, reporting the closure in its final message (see `AGENTS.global.md`).
 - The language patterns are **manual overrides**:
 - *"issue start"*, *"start issue"*, *"begin issue"*, *"neues issue"*, *"ich arbeite an"* → start
 - *"issue commit"*, *"commit issue"*, *"speichere issue"*, *"checkpoint"* → commit

@@ -15,7 +15,8 @@ metadata:
 This skill governs issue-centered work as a **continuous state**, not a
 user-invoked sequence. At any point in a session the agent knows which issue
 it is working under, commits and pushes completed units proactively, and
-closes the issue when the completion criteria are met. The natural-language
+closes the issue autonomously once the completion criteria are met, reporting
+the closure in its final message. The natural-language
 triggers ("issue start", "issue commit", "issue commit and push") are manual
 overrides, not activation conditions — the rules below apply even without
 being invoked.
@@ -187,18 +188,22 @@ Use this mode to force finalization and issue closure (e.g., "issue finish",
 
 Applies at any time, independent of the modes:
 
-- When the agent believes the issue's goal is fully implemented, it normally
-  **asks the user** before closing the issue.
-- The agent may close the issue **autonomously** only when ALL of these hold:
+- When the agent believes the issue's goal is fully implemented, it **closes
+  the issue autonomously** — it does not wait for the user to ask and does not
+  ask for permission first.
+- The agent may close autonomously only when ALL of these hold:
   - the implementation covers the issue goal completely,
   - verification (tests/lint) is green,
   - the issue has no open sub-issues (always check via the `issue-workflow`
     sub-issues API first),
   - the user has not signalled anything that contradicts completion.
-- Before closing, also comment on the issue with a final implementation
+- Before closing, comment on the issue with a final implementation
   report (persist session knowledge via `knowledge-persistence` when new
   knowledge exists).
-- Otherwise report the status, state what is missing, and ask.
+- The final message to the user **MUST** state that the issue was closed and
+  name its number (e.g. "Issue #123 closed"). A silent closure is not enough.
+- If any criterion is not met, do **not** close: report the status, state what
+  is missing, and ask.
 
 ## Issue Creation Guidance
 
@@ -291,4 +296,5 @@ At the end of the workflow, report:
 - whether a comment was added
 - whether a commit was created, including its message
 - whether knowledge persistence was run
-- whether the issue remains open or was closed
+- the issue number and its final state: when the issue was closed, state this
+  explicitly (e.g. "Issue #123 closed"); otherwise note that it remains open
