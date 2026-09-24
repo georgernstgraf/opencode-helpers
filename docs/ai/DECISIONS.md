@@ -350,3 +350,10 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: Autonome Closures sind weniger sichtbar kontrollierbar; die vier Kriterien und die Sub-Issue-Prüfung bleiben die Bremse, Read-only-/Grading-Skills bleiben ausgenommen.
 - **Supersedes**: Teil (3) des Eintrags „2026-09-15: Continuous issue awareness + proactive commit/push“.
 - **Issue**: #81
+
+## 2026-09-24: oc-models-report Substring-Filter trifft auch „free"-Kosten (#82)
+- **Choice**: `matches()` hängt den gerenderten Kostenwert (`fmt_cost`) an den Such-Haystack an. Damit findet `oc-models-report free` alle Modelle mit `cost` 0/0 (nicht mehr nur solche mit `:free` in der id), und `--provider groq free` listet die kostenlosen Groq-Modelle. Bewusst **nur** die Kosten-Zelle, keine Kontext- oder Capability-Keywords.
+- **Reason**: Der Filter durchsuchte nur `provider id name family`; `free` matchte Zufallstreffer über `:free`-id-Suffixe, verfehlte aber echte 0/0-Modelle wie bei Groq (die Kosten-Spalte rendert „free", war aber nicht durchsuchbar).
+- **Considered**: Kontextgrößen („128k"/„1m") mitdurchsuchen (verworfen — nicht angefragt, Rauschen); semantische Keywords für Capabilities/Modalitäten (verworfen — die Tabelle zeigt ✓/–, kein Text); dediziertes `--free`-Flag (verworfen — der bestehende Positions-Filter genügt).
+- **Tradeoff**: Da `fmt_cost` fehlende Kosten als 0/0 behandelt, matchen auch Modelle ohne `cost`-Block auf `free`; der Kosten-String (z. B. `0.15/0.6`) wird zusätzlich durchsuchbar.
+- **Issue**: #82

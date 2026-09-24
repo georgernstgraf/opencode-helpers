@@ -298,6 +298,24 @@ class OcModelsReportTest(unittest.TestCase):
         self.assertIn("at least one substring or --provider", err)
         self.assertEqual(out, "")
 
+    def test_filter_matches_free_cost(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "free"])
+        self.assertEqual(rc, 0)
+        self.assertIn("alpha/alpha-two", out)
+        self.assertNotIn("alpha/alpha-one", out)
+        self.assertNotIn("beta/beta-one", out)
+        self.assertIn("1 match(es) for: free", out)
+
+    def test_filter_matches_free_cost_within_provider(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "--provider", "alpha", "free"])
+        self.assertEqual(rc, 0)
+        self.assertIn("alpha/alpha-two", out)
+        self.assertNotIn("alpha/alpha-one", out)
+        self.assertNotIn("beta/beta-one", out)
+        self.assertIn("1 match(es) for: free (provider alpha)", out)
+
 
 if __name__ == "__main__":
     unittest.main()

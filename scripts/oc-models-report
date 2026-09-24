@@ -4,7 +4,7 @@
 Optional --provider ID restricts the output to models of one provider
 (exact, case-insensitive match against providerID; an unknown provider is an
 error). Without --provider the substrings are matched against
-provider/id/name/family.
+provider/id/name/family and the rendered cost (so "free" finds 0/0 models).
 
 The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
 ($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
@@ -174,7 +174,8 @@ def matches(rec, filters):
     _, data = rec
     prov = data.get("providerID", "")
     id_, name, family = data["id"], data.get("name", ""), data.get("family", "")
-    hay = f"{prov} {id_} {name} {family}".lower()
+    cost = fmt_cost(data.get("cost", {}))
+    hay = f"{prov} {id_} {name} {family} {cost}".lower()
     return any(a.lower() in hay for a in filters)
 
 
@@ -196,7 +197,8 @@ def parse_args(argv):
         ),
     )
     p.add_argument("filters", metavar="substring", nargs="*",
-                   help="case-insensitive substring matched against provider/id/name/family")
+                   help="case-insensitive substring matched against provider/id/name/family "
+                        "and the rendered cost (e.g. 'free')")
     p.add_argument("--provider", metavar="ID",
                    help="restrict to models of this provider (exact, case-insensitive "
                         "match on providerID); unknown provider is an error")

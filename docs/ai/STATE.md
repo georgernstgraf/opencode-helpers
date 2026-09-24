@@ -10,6 +10,10 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] `oc-models-report` Filter matcht „free"-Kosten (#82): `matches()`
+      durchsucht zusätzlich den gerenderten Kostenwert (`fmt_cost`), damit
+      `--provider groq free` die 0/0-Modelle findet; nur Kosten, keine
+      Kontext-/Keyword-Erweiterung; 2 neue Tests, Suite grün (42)
 - [x] issue-workflow Auto-Close (#81): erledigte Issues werden autonom
       geschlossen, sobald die vier Sicherheitskriterien erfüllt sind (kein
       Nachfragen mehr); der Vollzug samt Issue-Nummer muss in der finalen
