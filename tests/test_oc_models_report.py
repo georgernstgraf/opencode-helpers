@@ -48,6 +48,46 @@ fake/paid-model
 }
 """
 
+MULTI_DUMP = """\
+alpha/alpha-one
+{
+  "id": "alpha-one",
+  "providerID": "alpha",
+  "name": "Alpha One",
+  "family": "one",
+  "cost": {"input": 1, "output": 2},
+  "limit": {"context": 128000},
+  "capabilities": {"reasoning": true, "toolcall": true, "temperature": true,
+                   "attachment": false,
+                   "input": {"text": true}, "output": {"text": true}}
+}
+alpha/alpha-two
+{
+  "id": "alpha-two",
+  "providerID": "alpha",
+  "name": "Alpha Two",
+  "family": "two",
+  "cost": {"input": 0, "output": 0},
+  "limit": {"context": 32000},
+  "capabilities": {"reasoning": false, "toolcall": true, "temperature": true,
+                   "attachment": false,
+                   "input": {"text": true}, "output": {"text": true}}
+}
+beta/beta-one
+{
+  "id": "beta-one",
+  "providerID": "beta",
+  "name": "Beta One",
+  "family": "one",
+  "cost": {"input": 5, "output": 10},
+  "limit": {"context": 200000},
+  "capabilities": {"reasoning": true, "toolcall": false, "temperature": false,
+                   "attachment": true,
+                   "input": {"text": true, "image": true},
+                   "output": {"text": true}}
+}
+"""
+
 
 def load_script():
     loader = importlib.machinery.SourceFileLoader("oc_models_report", SCRIPT)
@@ -198,6 +238,65 @@ class OcModelsReportTest(unittest.TestCase):
             rc, out, err = self.run_main(["nosuchmodel"])
         self.assertEqual(rc, 1)
         self.assertIn("no models match", err)
+
+    def write_dump(self, content, name="multi.txt"):
+        path = os.path.join(self.tmp.name, name)
+        with open(path, "w") as fh:
+            fh.write(content)
+        return path
+
+    def test_provider_only_lists_all_of_provider(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "--provider", "alpha"])
+        self.assertEqual(rc, 0)
+        self.assertIn("alpha/alpha-one", out)
+        self.assertIn("alpha/alpha-two", out)
+        self.assertNotIn("beta/beta-one", out)
+        self.assertIn("2 match(es) for: provider alpha", out)
+
+    def test_provider_plus_filter_intersects(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "--provider", "alpha", "two"])
+        self.assertEqual(rc, 0)
+        self.assertIn("alpha/alpha-two", out)
+        self.assertNotIn("alpha/alpha-one", out)
+        self.assertNotIn("beta/beta-one", out)
+        self.assertIn("1 match(es) for: two (provider alpha)", out)
+
+    def test_provider_is_case_insensitive(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "--provider", "ALPHA"])
+        self.assertEqual(rc, 0)
+        self.assertIn("alpha/alpha-one", out)
+        self.assertIn("2 match(es) for: provider ALPHA", out)
+
+    def test_provider_must_match_exactly(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, err = self.run_main(["--file", dump, "--provider", "alph"])
+        self.assertEqual(rc, 2)
+        self.assertIn("unknown provider: alph", err)
+        self.assertEqual(out, "")
+
+    def test_unknown_provider_exits_2(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, err = self.run_main(["--file", dump, "--provider", "gamma"])
+        self.assertEqual(rc, 2)
+        self.assertIn("unknown provider: gamma", err)
+        self.assertEqual(out, "")
+
+    def test_provider_filter_no_match_exits_1(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, err = self.run_main(["--file", dump, "--provider", "alpha", "zzz"])
+        self.assertEqual(rc, 1)
+        self.assertIn("no models match: zzz (provider alpha)", err)
+        self.assertEqual(out, "")
+
+    def test_neither_provider_nor_filter_exits_2(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, err = self.run_main(["--file", dump])
+        self.assertEqual(rc, 2)
+        self.assertIn("at least one substring or --provider", err)
+        self.assertEqual(out, "")
 
 
 if __name__ == "__main__":

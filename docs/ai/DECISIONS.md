@@ -335,3 +335,10 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: The old script forced a manual `opencode models --verbose > ~/f` step before every use; the model list changes slowly, so a TTL cache removes the friction while staying fresh enough.
 - **Considered**: `~/.cache/` per XDG (rejected — user chose `.local/share`); keeping the script source in SVN (rejected — helper scripts belong in the versioned project); a lock file for concurrent regenerations (deferred — atomic `os.replace` makes races harmless).
 - **Tradeoff**: A stale cache is silently used (with warning) when regeneration fails; the 12 h TTL is fixed unless `OC_MODELS_REPORT_MAX_AGE` overrides it.
+
+## 2026-09-24: oc-models-report --provider <ID> (exakt, case-insensitive) (#80)
+- **Choice**: `--provider ID` schränkt die Ausgabe auf Modelle eines Providers ein; der Match ist exakte, case-insensitive Gleichheit gegen `providerID` (kein Substring). Unbekannter Provider → `error: unknown provider: <ID>` auf stderr, exit 2. Genau ein Provider pro Aufruf. `filters` ist jetzt `nargs="*"`, aber ohne Filter und ohne `--provider` bricht argparse ab (exit 2). Provider-Selektion und Substring-Filter sind additiv (`--provider openrouter opus`); ohne Filter listet `--provider` alle Modelle des Providers.
+- **Reason**: Provider-Scoping war vorher nur über Substrings im gemeinsamen Haystack (provider/id/name/family) möglich, was Treffer anderer Provider nicht ausschließt.
+- **Considered**: Substring-Match für Provider (verworfen — Tippfehler sollen auffallen); mehrere/kommagetrennte Provider (verworfen — YAGNI); unbekannter Provider als „no match“ mit exit 1 (verworfen — Nutzungsfehler, kein leeres Ergebnis).
+- **Tradeoff**: Provider-Fehler wird erst nach einem evtl. Cache-Refresh geprüft (die „collected info“-Zeile kann davor erscheinen). Tests decken provider-only, provider+Filter, case-insensitive, exakter Match (Teilstring-Fehler), unbekannter Provider, provider+Filter ohne Treffer und „weder noch“ ab.
+- **Issue**: #80

@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-09-23.
+Current status as of 2026-09-24.
 
 ## Current Focus
 
@@ -10,6 +10,11 @@ shipped; observe daily practice and tune thresholds if needed.
 
 ## Completed (this cycle)
 
+- [x] `oc-models-report --provider <ID>` (#80): exakter, case-insensitive
+      providerID-Filter, kombinierbar mit Substring-Filtern
+      (`--provider openrouter opus`), provider-only listet alle Modelle des
+      Providers; unbekannter Provider → stderr + exit 2; ohne Filter und ohne
+      `--provider` → argparse-Fehler; 8 neue hermetic Tests, Suite grün
 - [x] create-lesson Quiz-Regel (#78, `6049e7f`): 3–5 Fragen je Lesson
       passungsabhängig, Richtige-Positionen rotieren, je Frage genau eine
       Richtige; Präludium/Verifikation/Nachziehen angeglichen; Tests grün

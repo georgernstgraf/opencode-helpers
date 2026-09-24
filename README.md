@@ -28,7 +28,7 @@ Wir betreiben einen selbstgehosteten [SearXNG](https://searxng.claw.graf.priv.at
 
 ### 🛠 Utility-Skripte
 
-- **`scripts/oc-models-report`** — tabellarischer Modellvergleich (`opencode models`): Fähigkeiten, Modalitäten, Preise, Kontext. Der Dump wird unter `~/.local/share/oc-models-report/` gecacht und automatisch erneuert, sobald er älter als 12 Stunden ist (`--refresh` erzwingt, `--file` parst einen gegebenen Dump). Aufruf: `oc-models-report <substring> …` (via Symlink in `~/bin`).
+- **`scripts/oc-models-report`** — tabellarischer Modellvergleich (`opencode models`): Fähigkeiten, Modalitäten, Preise, Kontext. Der Dump wird unter `~/.local/share/oc-models-report/` gecacht und automatisch erneuert, sobald er älter als 12 Stunden ist (`--refresh` erzwingt, `--file` parst einen gegebenen Dump). Aufruf: `oc-models-report [--provider ID] <substring> …` — `--provider` schränkt exakt (case-insensitive) auf einen Provider ein und ist mit Substring-Filtern kombinierbar (`--provider openrouter opus`); unbekannte Provider sind ein Fehler (via Symlink in `~/bin`).
 
 ### Struktur
 
@@ -192,7 +192,7 @@ We run a self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch in
 
 ### 🛠 Utility Scripts
 
-- **`scripts/oc-models-report`** — tabular model comparison (`opencode models`): capabilities, modalities, pricing, context. The dump is cached under `~/.local/share/oc-models-report/` and auto-regenerated when older than 12 hours (`--refresh` forces it, `--file` parses a given dump). Usage: `oc-models-report <substring> …` (via symlink in `~/bin`).
+- **`scripts/oc-models-report`** — tabular model comparison (`opencode models`): capabilities, modalities, pricing, context. The dump is cached under `~/.local/share/oc-models-report/` and auto-regenerated when older than 12 hours (`--refresh` forces it, `--file` parses a given dump). Usage: `oc-models-report [--provider ID] <substring> …` — `--provider` restricts exactly (case-insensitive) to one provider and combines with substring filters (`--provider openrouter opus`); unknown providers are an error (via symlink in `~/bin`).
 
 ### Structure
 

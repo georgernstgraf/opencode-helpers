@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Report capabilities/pricing of opencode models matching given substrings.
 
+Optional --provider ID restricts the output to models of one provider
+(exact, case-insensitive match against providerID; an unknown provider is an
+error). Without --provider the substrings are matched against
+provider/id/name/family.
+
 The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
 ($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
 whenever it is missing or older than 12 hours. Internal overrides (mainly for
@@ -165,12 +170,20 @@ def modcell(inb, outb):
     return flag(inb) + flag(outb)
 
 
-def matches(rec, args):
+def matches(rec, filters):
     _, data = rec
     prov = data.get("providerID", "")
     id_, name, family = data["id"], data.get("name", ""), data.get("family", "")
     hay = f"{prov} {id_} {name} {family}".lower()
-    return any(a.lower() in hay for a in args)
+    return any(a.lower() in hay for a in filters)
+
+
+def select_provider(models, provider):
+    """Return models of provider (exact, case-insensitive) or None if unknown."""
+    target = provider.lower()
+    if target not in {r[1].get("providerID", "").lower() for r in models}:
+        return None
+    return [r for r in models if r[1].get("providerID", "").lower() == target]
 
 
 def parse_args(argv):
@@ -182,13 +195,19 @@ def parse_args(argv):
             "than 12 hours."
         ),
     )
-    p.add_argument("filters", metavar="substring", nargs="+",
+    p.add_argument("filters", metavar="substring", nargs="*",
                    help="case-insensitive substring matched against provider/id/name/family")
+    p.add_argument("--provider", metavar="ID",
+                   help="restrict to models of this provider (exact, case-insensitive "
+                        "match on providerID); unknown provider is an error")
     p.add_argument("--refresh", action="store_true",
                    help="force regeneration of the cached model list")
     p.add_argument("--file", metavar="PATH", dest="file",
                    help="parse this dump file instead of the cache (no refresh)")
-    return p.parse_args(argv)
+    args = p.parse_args(argv)
+    if not args.filters and not args.provider:
+        p.error("specify at least one substring or --provider")
+    return args
 
 
 def main(argv):
@@ -208,11 +227,24 @@ def main(argv):
     if regenerated:
         print(f"collected info of {len(models)} models\n")
 
-    hits = [r for r in models if matches(r, args.filters)]
+    if args.provider:
+        scoped = select_provider(models, args.provider)
+        if scoped is None:
+            print(f"error: unknown provider: {args.provider}", file=sys.stderr)
+            return 2
+        models = scoped
+
+    hits = [r for r in models if not args.filters or matches(r, args.filters)]
     hits.sort(key=lambda r: r[0])
 
+    if args.provider:
+        scope = f"provider {args.provider}"
+        desc = f"{' '.join(args.filters)} ({scope})" if args.filters else scope
+    else:
+        desc = " ".join(args.filters)
+
     if not hits:
-        print(f"no models match: {' '.join(args.filters)}", file=sys.stderr)
+        print(f"no models match: {desc}", file=sys.stderr)
         return 1
 
     cost_w = 11
@@ -257,7 +289,7 @@ def main(argv):
             + " ".join(f"{v:<{w}}" for v, (_, w) in zip(modvals, modcols))
         )
         print(line)
-    print(f"\n{len(hits)} match(es) for: {' '.join(args.filters)}")
+    print(f"\n{len(hits)} match(es) for: {desc}")
     return 0
 
 
