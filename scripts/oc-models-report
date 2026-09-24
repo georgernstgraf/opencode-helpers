@@ -1,0 +1,265 @@
+#!/usr/bin/env python3
+"""Report capabilities/pricing of opencode models matching given substrings.
+
+The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
+($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
+whenever it is missing or older than 12 hours. Internal overrides (mainly for
+tests): OC_MODELS_REPORT_CACHE_DIR, OC_MODELS_REPORT_MAX_AGE (seconds),
+OC_MODELS_REPORT_CMD (command line to run instead of `opencode models
+--verbose`).
+
+Zero external dependencies (Python 3 stdlib only).
+"""
+
+import argparse
+import json
+import os
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+HDR = re.compile(r"^([A-Za-z0-9_.-]+/.+?)\s*$")
+
+APP = "oc-models-report"
+CACHE_FILE = "models-verbose.txt"
+DEFAULT_MAX_AGE = 12 * 3600
+
+
+def cache_dir():
+    override = os.environ.get("OC_MODELS_REPORT_CACHE_DIR")
+    if override:
+        return override
+    base = os.environ.get("XDG_DATA_HOME") or os.path.join(
+        os.path.expanduser("~"), ".local", "share"
+    )
+    return os.path.join(base, APP)
+
+
+def max_age():
+    try:
+        return int(os.environ.get("OC_MODELS_REPORT_MAX_AGE", DEFAULT_MAX_AGE))
+    except ValueError:
+        return DEFAULT_MAX_AGE
+
+
+def collect_cmd():
+    override = os.environ.get("OC_MODELS_REPORT_CMD")
+    if override:
+        return shlex.split(override)
+    return [shutil.which("opencode") or "opencode", "models", "--verbose"]
+
+
+def needs_refresh(path, force, age_limit):
+    if force or not os.path.isfile(path):
+        return True
+    return (time.time() - os.path.getmtime(path)) > age_limit
+
+
+def collect(path, cmd):
+    """Run the collect command and atomically store its stdout at path."""
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    except FileNotFoundError:
+        raise RuntimeError(f"command not found: {cmd[0]}")
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"command timed out: {' '.join(cmd)}")
+    if proc.returncode != 0:
+        detail = proc.stderr.strip().splitlines()
+        raise RuntimeError(
+            f"{' '.join(cmd)} failed (exit {proc.returncode})"
+            + (f": {detail[-1]}" if detail else "")
+        )
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(
+        dir=os.path.dirname(path), prefix=".models-verbose.", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "w") as fh:
+            fh.write(proc.stdout)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def ensure_dump(path, force, age_limit):
+    """Return True when the dump was (re)generated in this run."""
+    if not needs_refresh(path, force, age_limit):
+        return False
+    try:
+        collect(path, collect_cmd())
+    except RuntimeError as exc:
+        if os.path.isfile(path):
+            print(f"warning: {exc}; using cached dump", file=sys.stderr)
+            return False
+        print(f"error: {exc}", file=sys.stderr)
+        sys.exit(2)
+    return True
+
+
+def load_models(path):
+    models = []
+    current_id = None
+    buf = []
+    with open(path) as fh:
+        for line in fh:
+            m = HDR.match(line)
+            if m:
+                if current_id is not None:
+                    _emit(models, current_id, buf)
+                current_id = m.group(1)
+                buf = []
+            elif current_id is not None:
+                buf.append(line)
+    if current_id is not None:
+        _emit(models, current_id, buf)
+    return models
+
+
+def _emit(models, current_id, buf):
+    try:
+        models.append((current_id, json.loads("".join(buf))))
+    except json.JSONDecodeError:
+        print(f"warning: skipping truncated/invalid model block '{current_id}'", file=sys.stderr)
+
+
+def fmt_money(v):
+    if v == int(v):
+        return str(int(v))
+    return ("%.3f" % v).rstrip("0").rstrip(".")
+
+
+def fmt_cost(c):
+    i, o = c.get("input", 0), c.get("output", 0)
+    if i == 0 and o == 0:
+        return "free"
+    return f"{fmt_money(i)}/{fmt_money(o)}"
+
+
+def fmt_ctx(n):
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.0f}m"
+    if n >= 1000:
+        return f"{n / 1000:.0f}k"
+    return str(n)
+
+
+def fmt_model(qid, w):
+    if len(qid) <= w:
+        return qid
+    return "…" + qid[-(w - 1):]
+
+
+def flag(b):
+    return "✓" if b else "–"
+
+
+def modcell(inb, outb):
+    return flag(inb) + flag(outb)
+
+
+def matches(rec, args):
+    _, data = rec
+    prov = data.get("providerID", "")
+    id_, name, family = data["id"], data.get("name", ""), data.get("family", "")
+    hay = f"{prov} {id_} {name} {family}".lower()
+    return any(a.lower() in hay for a in args)
+
+
+def parse_args(argv):
+    p = argparse.ArgumentParser(
+        prog="oc-models-report",
+        description=(
+            "Report capabilities/pricing of opencode models matching the given "
+            "substrings. The model list is cached and auto-refreshed when older "
+            "than 12 hours."
+        ),
+    )
+    p.add_argument("filters", metavar="substring", nargs="+",
+                   help="case-insensitive substring matched against provider/id/name/family")
+    p.add_argument("--refresh", action="store_true",
+                   help="force regeneration of the cached model list")
+    p.add_argument("--file", metavar="PATH", dest="file",
+                   help="parse this dump file instead of the cache (no refresh)")
+    return p.parse_args(argv)
+
+
+def main(argv):
+    args = parse_args(argv)
+
+    path = args.file
+    regenerated = False
+    if path is None:
+        path = os.path.join(cache_dir(), CACHE_FILE)
+        regenerated = ensure_dump(path, args.refresh, max_age())
+
+    if not os.path.isfile(path):
+        print(f"dump not found: {path}", file=sys.stderr)
+        return 2
+
+    models = load_models(path)
+    if regenerated:
+        print(f"collected info of {len(models)} models\n")
+
+    hits = [r for r in models if matches(r, args.filters)]
+    hits.sort(key=lambda r: r[0])
+
+    if not hits:
+        print(f"no models match: {' '.join(args.filters)}", file=sys.stderr)
+        return 1
+
+    cost_w = 11
+    ctx_w = 6
+    flagcols = [("REA", 3), ("TOOL", 4), ("TMP", 3), ("ATT", 3)]
+    modcols = [("TXT", 3), ("IMG", 4), ("AUD", 4), ("VID", 4), ("PDF", 4)]
+    term = shutil.get_terminal_size(fallback=(100, 24)).columns
+    flag_w = sum(w for _, w in flagcols) + len(flagcols) - 1
+    mod_w = sum(w for _, w in modcols) + len(modcols) - 1
+    overhead = 1 + cost_w + 1 + ctx_w + 1 + flag_w + 2 + mod_w
+    W = max(8, term - overhead - 1)
+    hdr = (
+        f"{'MODEL':<{W}} {'$/MTok':<{cost_w}} {'CTX':<{ctx_w}} "
+        + " ".join(f"{name:<{w}}" for name, w in flagcols)
+        + "  "
+        + " ".join(f"{name:<{w}}" for name, w in modcols)
+    )
+    print(hdr)
+    print("-" * len(hdr))
+    for qid, d in hits:
+        caps = d.get("capabilities", {})
+        inn = caps.get("input", {})
+        out = caps.get("output", {})
+        flagvals = [
+            flag(caps.get("reasoning")),
+            flag(caps.get("toolcall")),
+            flag(caps.get("temperature")),
+            flag(caps.get("attachment")),
+        ]
+        modvals = [
+            modcell(inn.get("text"), out.get("text")),
+            modcell(inn.get("image"), out.get("image")),
+            modcell(inn.get("audio"), out.get("audio")),
+            modcell(inn.get("video"), out.get("video")),
+            modcell(inn.get("pdf"), out.get("pdf")),
+        ]
+        line = (
+            f"{fmt_model(qid, W):<{W}} {fmt_cost(d.get('cost', {})):<{cost_w}} "
+            f"{fmt_ctx(d.get('limit', {}).get('context', 0)):<{ctx_w}} "
+            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(flagvals, flagcols))
+            + "  "
+            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(modvals, modcols))
+        )
+        print(line)
+    print(f"\n{len(hits)} match(es) for: {' '.join(args.filters)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

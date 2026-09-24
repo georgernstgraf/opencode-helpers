@@ -17,6 +17,11 @@ shipped; observe daily practice and tune thresholds if needed.
       asset, `## Housekeeping` (Lehrplan · KM-Bezug · Runtime) at the bottom of
       the Tages-README, student-facing "Aufgabe" (= Mitarbeit) instead of
       "Hausübung"; tests green
+- [x] `oc-models-report` in-repo (#79): `scripts/oc-models-report` caches the
+      verbose model dump under `~/.local/share/oc-models-report/` with 12 h
+      auto-refresh (`--refresh`, `--file`); table output byte-identical to
+      the old script; hermetic tests added; `~/bin` copy replaced by a repo
+      symlink (SVN)
 - [x] SearXNG-MCP auf Think mit Gregor als Primary, Claw als Fallback (#74):
       `mcp.searxng.environment` im Repo-Template (`opencode.json`, secret-frei)
       und in der Think-Live-Config; `env.sample`-Primary auf `http://10.8.0.16`
