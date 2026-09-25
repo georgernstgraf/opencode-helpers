@@ -120,18 +120,20 @@ Legacy: nicht migrieren, nicht weiterverwenden.
 
 Pro Lektion gehört ein Tages-README **im selben Datums-Ordner**
 `<klasse>/YYYY-MM-DD__thema/README.md`. Oben steht der Inhalt:
-Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt. Eine
-**Aufgaben-Referenz ist Pflicht** — jeder Tages-README nennt die Aufgabe
-(Kurzbeschreibung + Abgabekonvention), immer. Die **Housekeeping-Infos**
-(Lehrplan · KM-Bezug · Runtime) stehen als **letzter Abschnitt** — nie im
-Kopf, nie im HTML-Header:
+Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt (Liste mit
+Demo/Quiz/…). Die Aufgabe ist **Pflicht** und steht als **erster eigener
+`## Aufgabe`-Abschnitt (H2)** — nicht als Listenpunkt. Die
+**Housekeeping-Infos** (Lehrplan · KM-Bezug · Runtime) stehen als
+**letzter Abschnitt** — nie im Kopf, nie im HTML-Header:
 
 ```
 # <Thema> (<Datum>)
 
 Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Demo/Quiz/… (Inhalt, soweit vorhanden)
-- Aufgabe (Pflicht): <Kurzbeschreibung> — Abgabe <Konvention>
+
+## Aufgabe
+<Kurzbeschreibung> — Abgabe <Konvention>
 
 ## Housekeeping
 - Lehrplan: <Pfad/Link>
@@ -150,7 +152,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
    tatsächliche Fragenzahl (1–5) eingehalten.
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
-   **und** Aufgaben-Referenz im Tages-README vorhanden — beides Pflicht.
+   **und** im Tages-README als erster eigener `## Aufgabe`-Abschnitt (H2)
+   vorhanden — beides Pflicht.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
    Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell, alles
    offline.
@@ -160,8 +163,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Lessons-Tabelle im Klassen-README (Nr. · Ziel-UE vollqualifiziert ·
   Thema · Quelle · Typ · Quiz-Richtige · Status); Aufgaben-Spalte statt „HÜ",
   Quiz-Richtige als Sequenz (z. B. `B·A·C·D·B`).
-- Tages-README des Datums-Ordners nach § Tages-README (Aufgaben-Referenz
-  als Pflichtfeld oben, Housekeeping-Block unten).
+- Tages-README des Datums-Ordners nach § Tages-README (Aufgabe als erster
+  `## Aufgabe`-Abschnitt (H2), Housekeeping-Block zuletzt).
 - Kohorten-Spiegel nach Master-Regel des Repos.
 - Neue Fachbegriffe ins Glossar (mit vollqualifiziertem UE-Verweis).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
