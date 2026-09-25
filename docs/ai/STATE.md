@@ -1,15 +1,22 @@
 # Project State
 
-Current status as of 2026-09-24.
+Current status as of 2026-09-25.
 
 ## Current Focus
 
-Continuous issue-awareness workflow: `AGENTS.global.md` + symlink and the
-`issue-workflow` rewrite (proactive commit/push, auto-close criteria) just
-shipped; observe daily practice and tune thresholds if needed.
+`create-lesson` output rules corrected (#83): lessons always live in the
+date-topic folder (`YYYY-MM-DD__thema/lesson.html` + Tages-README, with a
+mandatory Aufgabe reference); quiz size relaxed to 1–5. Continuous
+issue-awareness workflow continues to be observed.
 
 ## Completed (this cycle)
 
+- [x] create-lesson Ablage/Aufgabe/Quiz (#83): Lektionen liegen **immer**
+      im Datums-Ordner `<klasse>/YYYY-MM-DD__thema/` (`lesson.html` +
+      Tages-README), kein `lessons/`-Ordner mehr; Aufgaben-Referenz im
+      Tages-README ist Pflicht; Quiz 1–5 statt 3–5. `SKILL.md`,
+      `docs/ai/CONVENTIONS.md` und `docs/ai/DECISIONS.md` angeglichen;
+      Suite grün (42, inkl. `test_skill_links`)
 - [x] `oc-models-report` Filter matcht „free"-Kosten (#82): `matches()`
       durchsucht zusätzlich den gerenderten Kostenwert (`fmt_cost`), damit
       `--provider groq free` die 0/0-Modelle findet; nur Kosten, keine

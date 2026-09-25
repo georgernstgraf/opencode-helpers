@@ -12,7 +12,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Keep skill `name` values lowercase, hyphenated, and identical to the skill directory name.
 - Issue workflow is a continuous state (issue awareness, proactive commit/push); natural language ("issue start", "issue commit", "issue finish") acts as a manual override. The agent parses user intent and invokes the `issue-workflow` skill directly.
 - Use class-folder content generation commands as thin wrappers around dedicated standalone skills.
-- Lesson directories inside class folders follow the naming pattern `<YYYY-MM-DD>_<topic>` (e.g., `2026-03-21_promises`).
+- Lesson directories inside class folders live directly as `<YYYY-MM-DD>__<topic>/` with `lesson.html` + `README.md` (e.g., `2026-09-25__r-kennzahlen-und-verteilungen`); create-lesson never uses a separate `lessons/` folder (existing such folders are legacy).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
 - MCP servers live inside the skill that owns them (`skills/<name>/scripts/`); `opencode.json` references the server by absolute path — no `~/bin` indirection.
 - Shared skills and scripts must use host-independent service URLs (e.g., `https://searxng.claw.graf.priv.at`), never host-local endpoints like `localhost` ports.
@@ -20,9 +20,9 @@ Follow these without question. Do not deviate unless explicitly told.
 ## Classroom Material (create-lesson)
 
 - Lesson HTML always includes a shared light/dark toggle asset under `assets/` (CSS variables + toggle JS): default follows `prefers-color-scheme`, the choice persists via `localStorage`, print stays light, no CDN. Reuse the asset, never inline a per-lesson copy.
-- The Tages-README (`<klasse>/YYYY-MM-DD_thema/README.md`) leads with content (lesson link, summary, Aufgabe reference) and ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
+- The Tages-README (`<klasse>/YYYY-MM-DD__thema/README.md`) leads with content (lesson link, summary) and **always** carries an Aufgabe reference (mandatory) with its submission convention; it ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
 - Student-facing lesson wording is always **Aufgabe**, never "Hausübung"; the Aufgabe **is** the Mitarbeit. On-disk master files may keep repo-convention names (`hausaufgabe.md`/`Hausübung.md`), and the `homework` skill's per-lesson `Hausübung.md` artifact name is unaffected.
-- Quizzes carry **3–5 questions** per lesson, sized to the material; the correct positions rotate across them (a single question is no longer the rule). Lessons tables record the sequence (e.g. `B·A·C·D·B`), each question exactly one correct.
+- Quizzes carry **1–5 questions** per lesson, sized to the material; the correct positions rotate across the actual question count. Lessons tables record the sequence (e.g. `B·A·C·D·B`), each question exactly one correct.
 
 ## Grading Workflow
 

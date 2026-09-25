@@ -357,3 +357,10 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Kontextgrößen („128k"/„1m") mitdurchsuchen (verworfen — nicht angefragt, Rauschen); semantische Keywords für Capabilities/Modalitäten (verworfen — die Tabelle zeigt ✓/–, kein Text); dediziertes `--free`-Flag (verworfen — der bestehende Positions-Filter genügt).
 - **Tradeoff**: Da `fmt_cost` fehlende Kosten als 0/0 behandelt, matchen auch Modelle ohne `cost`-Block auf `free`; der Kosten-String (z. B. `0.15/0.6`) wird zusätzlich durchsuchbar.
 - **Issue**: #82
+
+## 2026-09-25: create-lesson — Lektion immer im Datums-Ordner, Aufgaben-Referenz Pflicht, Quiz 1–5 (#83)
+- **Choice**: `create-lesson` legt jede Lektion **immer direkt im Datums-Thema-Ordner** `<klasse>/YYYY-MM-DD__thema/` ab, als `lesson.html` plus Tages-README; ein separater `lessons/`-Ordner wird nicht mehr verwendet (bestehende sind Legacy, werden nicht migriert). Der Tages-README enthält **immer** eine Aufgaben-Referenz (Kurzbeschreibung + Abgabe) — im Skill-Abschnitt, in der Verifikation und im Nachziehen als Pflicht festgehalten. Quiz-Umfang von starr 3–5 auf **1–5, stoffabhängig** gelockert. Kohorten-spezifische Aufhol-/Recap-Lektionen dürfen direkt in der Zielkohorte entstehen.
+- **Reason**: Der `lessons/`-Ordner widersprach dem Skill-eigenen Tages-README (`lesson.html` im Datums-Ordner) und verschleierte Datum/Thema; die Klassen-Lessons 01–03 nutzten real genau 1 Quiz, was die 3–5-Regel überstreng machte. Die Aufgabe ist die Mitarbeit und muss am Ablageort (README) auffindbar sein.
+- **Considered**: `NN-thema-slug.html` im Datums-Ordner (verworfen — Nummer lebt in Kicker/Tabelle, Dateiname fest); einfacher Unterstrich `YYYY-MM-DD_thema` (verworfen — reale Ordner nutzen doppelt); 3–5 beibehalten (verworfen).
+- **Tradeoff**: Nummerierung `NN` ist nur noch in Kicker + Lessons-Tabelle sichtbar, nicht im Dateinamen; Altbestand `lessons/` bleibt als tote Ablage liegen (bewusst).
+- **Issue**: #83

@@ -35,6 +35,9 @@ verdrahtet — Vorbild: `lehrplan`-Skill).
    Falls nein: Fallback-Dramaturgie aus § Bauablauf Schritt 5.
 4. **Kohorten-Modell:** Klassenordner mit Master/Kopie-Regel aus README?
    Falls ja: Master bauen, Kopien spiegeln. Falls nein/unbekannt: erfragen.
+   Kohorten-spezifische Lektionen (z. B. Aufhol-/Recap-Bedarf in nur einer
+   Kohorte) dürfen direkt in der Zielkohorte entstehen — im Klassen-README
+   als kohorten-spezifisch kennzeichnen.
 5. **Daten:** Welche Datensätze nutzt die Zielklasse (Assets/CSV, Pakete)?
    Lesson-Code muss auf denselben Daten laufen wie der Unterricht.
 6. **Tabellen-Stand:** Lessons-Tabelle im Klassen-README (Nr., Quiz-Richtige)?
@@ -84,11 +87,11 @@ Befunde melden, Bau fortsetzen soweit möglich.
    früherer Lessons) → Typische Fehler (je mit Anti-Beispiel-Code) →
    Zusammenfassung (Tabelle) + Ausblick (Folge-UE im **Ziel**-Semesterplan).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
-6. **Quiz:** je nach Stoff **3–5 Fragen** pro Lesson (so viele, wie sich
+6. **Quiz:** je nach Stoff **1–5 Fragen** pro Lesson (so viele, wie sich
    mit dem Stoff sinnvoll abdecken lassen); die Richtige-Positionen über
-   die Fragen ausgewogen rotieren (A/B/C/D), je Frage genau eine Richtige;
-   Antwortoptionen gleiche Wortzahl (möglichst Zeichenzahl) — keine
-   Format-Hinweise.
+   die tatsächliche Fragenzahl ausgewogen rotieren (A/B/C/D), je Frage
+   genau eine Richtige; Antwortoptionen gleiche Wortzahl (möglichst
+   Zeichenzahl) — keine Format-Hinweise.
 7. **Aufgabe:** Abschnitt **„Aufgabe"** direkt am Lesson-Ende anhängen
    (nach Zusammenfassung/Ausblick, vor dem Quiz-Script): stufenweise aus dem
    Lesson-Stoff gestuft, Vorhersage-Aufgabe zuerst, plus Abgabehinweis
@@ -100,27 +103,35 @@ Befunde melden, Bau fortsetzen soweit möglich.
 8. **Code-Stil:** Projekt-Konvention (z. B. `<-`, Snake_case, natives Pipe);
    Output als Kommentar, Erklärung als Kommentar; Zeilen kurz halten.
 
-## Dateinamen
+## Ablage & Dateinamen
 
-`NN-thema-slug.html` (zweistellig, kleingeschrieben, Bindestriche),
-z. B. `04-anova-varianzanalyse.html`. Ablage: Lessons-Ordner des
-Klassenverzeichnisses (Konvention des Repos, z. B. `<klasse>/lessons/`
-oder `<klasse>/teach/lessons/`).
+Jede Lektion liegt **immer direkt im Datums-Thema-Ordner der Klasse**:
+`<klasse>/YYYY-MM-DD__thema/` (Datum mit doppeltem Unterstrich, Thema
+kleingeschrieben mit Bindestrichen). Darin liegen genau zwei Dateien:
 
-## Tages-README (Layout)
+- `lesson.html` — die Lektion (Dateiname fest; die laufende Nummer `NN`
+  lebt nur im Kicker und in der Lessons-Tabelle, **nicht** im Dateinamen)
+- `README.md` — der Tages-README (siehe § Tages-README)
 
-Pro Lektion gehört ein Tages-README (Konvention des Repos, z. B.
-`<klasse>/YYYY-MM-DD_thema/README.md`). Oben steht der Inhalt: Lektions-Link
-plus ein bis zwei Zeilen, was die Lesson lehrt, und die Aufgaben-Referenz. Die
-**Housekeeping-Infos** (Lehrplan · KM-Bezug · Runtime) stehen als **letzter
-Abschnitt** — nie im Kopf, nie im HTML-Header:
+Kein separater `lessons/`-Ordner. Bestehende `lessons/`-Ablagen sind
+Legacy: nicht migrieren, nicht weiterverwenden.
+
+## Tages-README (Layout, Pflicht)
+
+Pro Lektion gehört ein Tages-README **im selben Datums-Ordner**
+`<klasse>/YYYY-MM-DD__thema/README.md`. Oben steht der Inhalt:
+Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt. Eine
+**Aufgaben-Referenz ist Pflicht** — jeder Tages-README nennt die Aufgabe
+(Kurzbeschreibung + Abgabekonvention), immer. Die **Housekeeping-Infos**
+(Lehrplan · KM-Bezug · Runtime) stehen als **letzter Abschnitt** — nie im
+Kopf, nie im HTML-Header:
 
 ```
 # <Thema> (<Datum>)
 
 Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Demo/Quiz/… (Inhalt, soweit vorhanden)
-- Aufgabe: <Kurzbeschreibung> — Abgabe <Konvention>
+- Aufgabe (Pflicht): <Kurzbeschreibung> — Abgabe <Konvention>
 
 ## Housekeeping
 - Lehrplan: <Pfad/Link>
@@ -136,10 +147,10 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    Semesterplan).
 3. Kein CDN / keine externen Abhängigkeiten (Offline-Lesbarkeit), außer
    verlinkter Lektüre.
-4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die 3–5
-   Fragen eingehalten.
-5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link),
-   Tages-README referenziert sie.
+4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
+   tatsächliche Fragenzahl (1–5) eingehalten.
+5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
+   **und** Aufgaben-Referenz im Tages-README vorhanden — beides Pflicht.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
    Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell, alles
    offline.
@@ -149,8 +160,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Lessons-Tabelle im Klassen-README (Nr. · Ziel-UE vollqualifiziert ·
   Thema · Quelle · Typ · Quiz-Richtige · Status); Aufgaben-Spalte statt „HÜ",
   Quiz-Richtige als Sequenz (z. B. `B·A·C·D·B`).
-- Tages-README des Lessons-Ordners nach § Tages-README (Aufgaben-Referenz
-  oben, Housekeeping-Block unten).
+- Tages-README des Datums-Ordners nach § Tages-README (Aufgaben-Referenz
+  als Pflichtfeld oben, Housekeeping-Block unten).
 - Kohorten-Spiegel nach Master-Regel des Repos.
 - Neue Fachbegriffe ins Glossar (mit vollqualifiziertem UE-Verweis).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
