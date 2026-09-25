@@ -4,13 +4,22 @@ Current status as of 2026-09-25.
 
 ## Current Focus
 
-`create-lesson` output rules corrected (#83): lessons always live in the
-date-topic folder (`YYYY-MM-DD__thema/lesson.html` + Tages-README, with a
-mandatory Aufgabe reference); quiz size relaxed to 1–5. Continuous
-issue-awareness workflow continues to be observed.
+`create-lesson` Tages-README refined (#84): the Aufgabe is now the first
+own `## Aufgabe` H2 section, never a list item. Two pending grading-skill
+edits shipped (#85): `4ahwit`/`5ahwit` informal addresses and
+`knowledge-assessment` allowed inside a Git working tree (no Git ops).
+Continuous issue-awareness workflow continues to be observed.
 
 ## Completed (this cycle)
 
+- [x] create-lesson Aufgabe als erster `## Aufgabe`-Abschnitt (#84):
+      Layout-Template, Verifikation, Nachziehen im Skill und die
+      Classroom-Material-Konvention in `docs/ai/CONVENTIONS.md`
+      angeglichen; Link-Test grün
+- [x] Grading-Skill-Konfiguration (#85): `grading-shared` Adresstabelle
+      um `4ahwit`/`5ahwit` (Informal) ergänzt; `knowledge-assessment`
+      läuft nun auch in einem Git-Working-Tree, ohne Git-Operationen;
+      `docs/ai/CONVENTIONS.md` (Grading-Kontext) gespalten
 - [x] create-lesson Ablage/Aufgabe/Quiz (#83): Lektionen liegen **immer**
       im Datums-Ordner `<klasse>/YYYY-MM-DD__thema/` (`lesson.html` +
       Tages-README), kein `lessons/`-Ordner mehr; Aufgaben-Referenz im

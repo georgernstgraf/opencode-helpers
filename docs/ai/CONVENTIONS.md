@@ -32,7 +32,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - `repograde` subagents must not improvise free-form grading bodies; they must keep the required section order, include the required metrics, and stay within the requested section scope.
 - `repograde` homework grading emails must follow one fixed paragraph order: greeting, automatic assessment disclaimer, grading period opening, commit summary, homework overview, per-homework evaluation, coverage/timeliness summary, recommendations, final score, closing.
 - `projectgrade` is the project-grading skill; it runs from inside the project Git repo. There is no separate command — invoke the skill directly.
-- Grading operates from a local folder (CWD), NOT from within a Git repository — except `projectgrade` which MUST run from inside a Git repo.
+- Grading operates from the current working directory. `repograde` and `projectgrade` require a Git context (`projectgrade` MUST run from inside a Git repo); `knowledge-assessment` may run from a plain folder **or** inside a Git working tree, but performs no Git operations and never commits its outputs.
 - `Hausübungen.md` (legacy, cumulative) or per-lesson `Hausübung.md` files in `<date>_<topic>` directories provide homework assignments for grading; at least one must exist in the CWD.
 - Student repositories must already exist locally; never clone them as part of grading.
 - Before grading, use `git pull` to verify latest version and `git status` to check for uncommitted changes; if uncommitted changes exist, stop immediately.

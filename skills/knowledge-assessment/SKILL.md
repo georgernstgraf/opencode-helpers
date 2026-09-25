@@ -29,18 +29,21 @@ German/UTF-8 constraints, and reporting protocol.
 
 ## Execution Context
 
-This skill operates from a local folder (current working directory), NOT from
-within a Git repository. Calling this skill from inside a Git repository is
-an error.
+This skill operates from the current working directory, which may be a plain
+local folder or a directory inside a Git working tree. The skill itself performs
+no Git operations: do not run any `git` commands and never commit the generated
+grading files. The repository-based skills (`repograde`, `projectgrade`) are the
+ones that use Git; their rules are unchanged.
 
 The skill grades student submissions located in the current working directory
 alongside knowledge-check solution files.
 
 ## Inputs
 
-- Student submission files in the current working directory (local folder,
-  NOT a Git repository); each submission filename contains the class
-  identifier that determines whether formal or informal address should be used.
+- Student submission files in the current working directory (a plain folder or a
+  directory inside a Git working tree; no Git operations are performed); each
+  submission filename contains the class identifier that determines whether
+  formal or informal address should be used.
 - Matching knowledge-check files with questions and solutions, including a
   solutions file in the same directory that can be used as the reference for
   correct answers and for the total achievable points listed at the bottom of
@@ -283,7 +286,8 @@ If the script exits with a non-zero status or reports errors on stderr,
 
 ### 5. Constraints
 
-- This skill must NOT be invoked from within a Git repository.
+- This skill performs no Git operations and must not commit its outputs, but may
+  run from a directory inside a Git working tree.
 - Write all report files in German.
 - Write `EMAIL.json` bodies in German.
 - All student-facing content must use second-person address (Sie or Du).

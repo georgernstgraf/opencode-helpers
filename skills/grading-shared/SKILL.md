@@ -39,6 +39,8 @@ Determine formal vs informal address based on class identifier:
 | `2ahwii` | Informal |
 | `3ahwii` | Informal |
 | `5ahwii` | Informal |
+| `4ahwit` | Informal |
+| `5ahwit` | Informal |
 | `4aaif` | Informal |
 | All others | Formal |
 

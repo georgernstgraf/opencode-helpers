@@ -364,3 +364,17 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: `NN-thema-slug.html` im Datums-Ordner (verworfen — Nummer lebt in Kicker/Tabelle, Dateiname fest); einfacher Unterstrich `YYYY-MM-DD_thema` (verworfen — reale Ordner nutzen doppelt); 3–5 beibehalten (verworfen).
 - **Tradeoff**: Nummerierung `NN` ist nur noch in Kicker + Lessons-Tabelle sichtbar, nicht im Dateinamen; Altbestand `lessons/` bleibt als tote Ablage liegen (bewusst).
 - **Issue**: #83
+
+## 2026-09-25: create-lesson — Aufgabe als erster `## Aufgabe`-Abschnitt (#84)
+- **Choice**: Die Aufgabe im Tages-README ist ein **eigener `## Aufgabe`-Abschnitt (H2)** und steht **als erster H2** (direkt nach dem Inhaltsüberblick, vor Haushalts-/weiteren Abschnitten) — kein Listenpunkt. Das Layout-Template, die Verifikation und das Nachziehen im Skill sowie die Classroom-Material-Konvention in `docs/ai/CONVENTIONS.md` sind angeglichen.
+- **Reason**: Ein Listenpunkt zwischen „Setup/Quiz" geht optisch unter; die Aufgabe ist die Mitarbeit und soll als eigener Abschnitt auffindbar sein.
+- **Considered**: Listenpunkt mit Fettdruck (verworfen — zu unauffällig); Aufgabe erst nach weiteren Abschnitten (verworfen — Nutzer: erster H2).
+- **Tradeoff**: Der Inhaltsüberblick bleibt eine reine Liste (Setup/Quiz), die Aufgabe wird strukturell gleichrangig mit Housekeeping.
+- **Issue**: #84
+
+## 2026-09-25: Grading — Klassen-Adressen + knowledge-assessment im Git-Working-Tree (#85)
+- **Choice**: `grading-shared` führt `4ahwit` und `5ahwit` als **Informal**; `knowledge-assessment` darf aus einem normalen Ordner **oder** einem Git-Working-Tree laufen, führt aber selbst keine Git-Operationen aus und committet seine Ausgaben nie. `docs/ai/CONVENTIONS.md` unterscheidet jetzt: `repograde`/`projectgrade` brauchen Git-Kontext, `knowledge-assessment` nicht.
+- **Reason**: Beide Änderungen waren lokal vorbereitet und uncommittet; die alte pauschale Git-Verbotsregel widersprach dem gewünschten Einsatz von `knowledge-assessment` in geklonten Repos.
+- **Considered**: Git-Verbot beibehalten (verworfen — blockiert legitime Nutzung); ein `4ahwit`/`5ahwit`-Sonderfall in `knowledge-assessment` (verworfen — die Adresstabelle gehört in `grading-shared`).
+- **Tradeoff**: Die Aussage „no Git" gilt nur noch für `knowledge-assessment`, nicht für alle Grading-Skills; die Konvention wurde entsprechend aufgespalten.
+- **Issue**: #85
