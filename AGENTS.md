@@ -16,7 +16,8 @@ This agent operates with ZERO knowledge of the OpenClaw framework.
 - Standard git/github operations (trunk-based development: always commit and push directly to main; no branches or PRs)
 - AGENTS.md for project instructions
 - docs/ai/ knowledge files
-- **ONLY skills from workspace skills/ directory** (this repository's skills)
+- **ONLY skills from this repository** — the workspace `skills/` directory
+  (global source) and the project-local `.opencode/skills/` directory
 - Project-specific workflows only
 
 ## Project Identity
@@ -97,6 +98,12 @@ The following skills have NO slash commands. Invoke them by natural language:
   "sync skills", "refresh from upstream", "pull matt's skills",
   "sync upstream", "bring transplanted skills up to date"
   → load and execute the `sync-upstream-skills` skill
+
+**Model Params** (repo-local project skill `.opencode/skills/model-params/`)
+  — when the user says:
+  "model params aktualisieren", "update model params", "params sync",
+  "modellparameter aktualisieren", "neue Modelle in params aufnehmen"
+  → load and execute the `model-params` skill
 
 ## Skill Source Rule
 

@@ -8,9 +8,18 @@ provider/id/name/family and the rendered cost (so "free" finds 0/0 models).
 
 Results are sorted by model id by default. --sort KEY orders them by a
 capability/price column: model (aliases id, name), provider, in/input,
-out/output, cost (aliases $, mtok, price = input+output), or ctx/context;
-all keys sort ascending, -r/--reverse flips the active key. Ties keep the
-model id ascending as a stable secondary order.
+out/output, cost (aliases $, mtok, price = input+output), ctx/context, or
+params (aliases param, size); all keys sort ascending, -r/--reverse flips
+the active key. Ties keep the model id ascending as a stable secondary
+order; unknown parameter counts always sort last.
+
+Parameter counts (billions of parameters) come from a curated JSON file
+(models + aliases) read from, in order: --params PATH, the
+OC_MODELS_REPORT_PARAMS environment variable, or model-params.json next to
+this script. The lookup key is the model id's last path segment, lowercased,
+with a trailing ":free" stripped, then resolved through the aliases map. A
+missing file is fine (all counts show "–"); a malformed file is a stderr
+warning. --params-missing lists the keys that still lack an entry.
 
 The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
 ($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
@@ -38,6 +47,7 @@ HDR = re.compile(r"^([A-Za-z0-9_.-]+/.+?)\s*$")
 
 APP = "oc-models-report"
 CACHE_FILE = "models-verbose.txt"
+PARAMS_FILE = "model-params.json"
 DEFAULT_MAX_AGE = 12 * 3600
 
 SORT_ALIASES = {
@@ -55,6 +65,9 @@ SORT_ALIASES = {
     "price": "cost",
     "ctx": "ctx",
     "context": "ctx",
+    "params": "params",
+    "param": "params",
+    "size": "params",
 }
 
 
@@ -80,6 +93,76 @@ def collect_cmd():
     if override:
         return shlex.split(override)
     return [shutil.which("opencode") or "opencode", "models", "--verbose"]
+
+
+def default_params_path():
+    """model-params.json next to the real script (survives the ~/bin symlink)."""
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), PARAMS_FILE)
+
+
+def resolve_params_path(cli_path):
+    if cli_path:
+        return cli_path
+    env = os.environ.get("OC_MODELS_REPORT_PARAMS")
+    if env:
+        return env
+    return default_params_path()
+
+
+def load_params(path):
+    """Return (aliases, models) dicts, or None when absent/unreadable."""
+    try:
+        with open(path) as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        return None
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"warning: ignoring params file {path}: {exc}", file=sys.stderr)
+        return None
+    aliases = data.get("aliases", {}) if isinstance(data, dict) else {}
+    models = data.get("models", {}) if isinstance(data, dict) else {}
+    if not isinstance(aliases, dict) or not isinstance(models, dict):
+        print(f"warning: ignoring malformed params file {path}", file=sys.stderr)
+        return None
+    return aliases, models
+
+
+def params_key(qid):
+    key = qid.rsplit("/", 1)[-1].lower()
+    if key.endswith(":free"):
+        key = key[:-len(":free")]
+    return key
+
+
+def lookup_params(params, qid):
+    if not params:
+        return None
+    aliases, models = params
+    key = params_key(qid)
+    entry = models.get(key)
+    if entry is None:
+        canon = aliases.get(key)
+        if canon is not None:
+            entry = models.get(canon)
+    return entry if isinstance(entry, dict) else None
+
+
+def fmt_param_num(v):
+    if v >= 1000:
+        return ("%.1f" % (v / 1000)).rstrip("0").rstrip(".") + "T"
+    if v >= 1:
+        return ("%.1f" % v).rstrip("0").rstrip(".") + "B"
+    return ("%.0f" % (v * 1000)) + "m"
+
+
+def fmt_params(entry):
+    if not entry or entry.get("total") is None:
+        return "–"
+    s = fmt_param_num(entry["total"])
+    active = entry.get("active")
+    if active is not None:
+        s += "/" + fmt_param_num(active)
+    return "~" + s if entry.get("estimated") else s
 
 
 def needs_refresh(path, force, age_limit):
@@ -216,7 +299,7 @@ def normalize_sort(name):
     return SORT_ALIASES.get(name.lower())
 
 
-def sort_value(key, rec):
+def sort_value(key, rec, params):
     _, d = rec
     cost = d.get("cost", {})
     if key == "provider":
@@ -229,18 +312,32 @@ def sort_value(key, rec):
         return cost.get("input", 0) + cost.get("output", 0)
     if key == "ctx":
         return d.get("limit", {}).get("context", 0)
+    if key == "params":
+        entry = lookup_params(params, rec[0])
+        return entry.get("total") if entry and entry.get("total") is not None else None
     return rec[0].lower()
 
 
-def sort_models(hits, key, reverse):
-    """Sort hits in place by key; ties keep model id ascending."""
+def sort_models(hits, key, reverse, params=None):
+    """Sort hits in place by key; ties keep model id ascending.
+
+    Unknown values (None) always sort last, regardless of --reverse.
+    """
     direction = -1 if reverse else 1
 
     def compare(a, b):
-        va, vb = sort_value(key, a), sort_value(key, b)
-        if va != vb:
-            return direction * (-1 if va < vb else 1)
-        return (a[0] > b[0]) - (a[0] < b[0])
+        va, vb = sort_value(key, a, params), sort_value(key, b, params)
+        if va is None and vb is None:
+            c = 0
+        elif va is None:
+            return 1
+        elif vb is None:
+            return -1
+        else:
+            c = 0 if va == vb else (-1 if va < vb else 1)
+        if c == 0:
+            return (a[0] > b[0]) - (a[0] < b[0])
+        return direction * c
 
     hits.sort(key=functools.cmp_to_key(compare))
     return hits
@@ -268,17 +365,41 @@ def parse_args(argv):
     p.add_argument("--sort", metavar="KEY", default="model",
                    help="sort by: model (default; aliases id, name), provider, "
                         "in/input, out/output, cost ($, mtok, price = input+output), "
-                        "ctx/context")
+                        "ctx/context, params (param, size)")
     p.add_argument("-r", "--reverse", action="store_true",
                    help="reverse the sort order")
+    p.add_argument("--params", metavar="PATH",
+                   help="parameter-count JSON file (default: model-params.json next "
+                        "to the script, or $OC_MODELS_REPORT_PARAMS)")
+    p.add_argument("--params-missing", action="store_true",
+                   help="list models that have no parameter entry and exit")
     args = p.parse_args(argv)
-    if not args.filters and not args.provider:
+    if not args.filters and not args.provider and not args.params_missing:
         p.error("specify at least one substring or --provider")
     key = normalize_sort(args.sort)
     if key is None:
         p.error(f"invalid --sort key: {args.sort}")
     args.sort = key
     return args
+
+
+def report_params_missing(hits, params):
+    """Print the distinct keys in hits that lack a parameter entry."""
+    missing = {}
+    for qid, d in hits:
+        if lookup_params(params, qid) is not None:
+            continue
+        key = params_key(qid)
+        provs, _ = missing.setdefault(key, (set(), qid))
+        provs.add(d.get("providerID", ""))
+    if not missing:
+        print("no missing parameter entries")
+        return 0
+    for key in sorted(missing):
+        provs, example = missing[key]
+        print(f"{key}\t{','.join(sorted(provs))}\t{example}")
+    print(f"\n{len(missing)} missing key(s)")
+    return 0
 
 
 def main(argv):
@@ -298,6 +419,8 @@ def main(argv):
     if regenerated:
         print(f"collected info of {len(models)} models\n")
 
+    params = load_params(resolve_params_path(args.params))
+
     if args.provider:
         scoped = select_provider(models, args.provider)
         if scoped is None:
@@ -306,7 +429,11 @@ def main(argv):
         models = scoped
 
     hits = [r for r in models if not args.filters or matches(r, args.filters)]
-    sort_models(hits, args.sort, args.reverse)
+
+    if args.params_missing:
+        return report_params_missing(hits, params)
+
+    sort_models(hits, args.sort, args.reverse, params)
 
     if args.provider:
         scope = f"provider {args.provider}"
@@ -320,15 +447,16 @@ def main(argv):
 
     cost_w = 11
     ctx_w = 6
+    param_w = 12
     flagcols = [("REA", 3), ("TOOL", 4), ("TMP", 3), ("ATT", 3)]
     modcols = [("TXT", 3), ("IMG", 4), ("AUD", 4), ("VID", 4), ("PDF", 4)]
     term = shutil.get_terminal_size(fallback=(100, 24)).columns
     flag_w = sum(w for _, w in flagcols) + len(flagcols) - 1
     mod_w = sum(w for _, w in modcols) + len(modcols) - 1
-    overhead = 1 + cost_w + 1 + ctx_w + 1 + flag_w + 2 + mod_w
+    overhead = 1 + cost_w + 1 + ctx_w + 1 + param_w + 1 + flag_w + 2 + mod_w
     W = max(8, term - overhead - 1)
     hdr = (
-        f"{'MODEL':<{W}} {'$/MTok':<{cost_w}} {'CTX':<{ctx_w}} "
+        f"{'MODEL':<{W}} {'$/MTok':<{cost_w}} {'CTX':<{ctx_w}} {'PARAM':<{param_w}} "
         + " ".join(f"{name:<{w}}" for name, w in flagcols)
         + "  "
         + " ".join(f"{name:<{w}}" for name, w in modcols)
@@ -355,6 +483,7 @@ def main(argv):
         line = (
             f"{fmt_model(qid, W):<{W}} {fmt_cost(d.get('cost', {})):<{cost_w}} "
             f"{fmt_ctx(d.get('limit', {}).get('context', 0)):<{ctx_w}} "
+            f"{fmt_params(lookup_params(params, qid)):<{param_w}} "
             + " ".join(f"{v:<{w}}" for v, (_, w) in zip(flagvals, flagcols))
             + "  "
             + " ".join(f"{v:<{w}}" for v, (_, w) in zip(modvals, modcols))

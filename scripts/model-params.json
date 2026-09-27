@@ -1,0 +1,1950 @@
+{
+ "aliases": {
+  "claude-4-5-sonnet": "claude-sonnet-4.5",
+  "claude-4-6-sonnet": "claude-sonnet-4.6",
+  "claude-fable-5-1": "claude-fable-5.1",
+  "claude-haiku-4-5": "claude-haiku-4.5",
+  "claude-opus-4-5": "claude-opus-4.5",
+  "claude-opus-4-6": "claude-opus-4.6",
+  "claude-opus-4-7": "claude-opus-4.7",
+  "claude-opus-4-8": "claude-opus-4.8",
+  "claude-opus-5-5": "claude-opus-5.5",
+  "claude-opus4-5": "claude-opus-4.5",
+  "claude-opus4-6": "claude-opus-4.6",
+  "claude-opus4-7": "claude-opus-4.7",
+  "claude-opus4-8": "claude-opus-4.8",
+  "claude-sonnet-4-5": "claude-sonnet-4.5",
+  "claude-sonnet-4-6": "claude-sonnet-4.6",
+  "ling-3.0-flash-fin-free": "ling-3.0-flash-fin",
+  "mimo-v2.6-flash-free": "mimo-v2.6-flash",
+  "mistral-large-2402": "mistral-large",
+  "mistral-large-2407": "mistral-large",
+  "mistral-medium-3-5": "mistral-medium-3.5",
+  "mistral-medium-3-instruct": "mistral-medium-3",
+  "mistral-nemo-instruct-2407": "mistral-nemo",
+  "muse-spark-1.3-contributor-free": "muse-spark-1.3-contributor",
+  "nemotron-3.5-lightning-free": "nemotron-3.5-lightning",
+  "nova-2-lite-v1": "nova-2-lite",
+  "space-bunny-free": "space-bunny-alpha"
+ },
+ "models": {
+  "active-speaker-detection": {
+   "note": "NVIDIA NIM audio-visual active-speaker-detection model; not an LLM, no published parameter count"
+  },
+  "aion-2.0": {
+   "active": 37,
+   "note": "DeepSeek V3.2 roleplay variant",
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
+   "total": 685
+  },
+  "aion-3.0": {
+   "note": "AionLabs multi-model roleplay/storytelling system built on the GLM family; no parameter count disclosed"
+  },
+  "aion-3.0-mini": {
+   "note": "AionLabs multi-model collaborative generation system (DeepSeek family); no single parameter count"
+  },
+  "aion-3.5": {
+   "note": "Aion Labs collaborative generation model; parameter count not published (vendor describes a multi-model system)"
+  },
+  "aion-3.5-mini": {
+   "note": "AionLabs multi-model roleplaying/storytelling system built on the GLM family; vendor publishes no parameter count."
+  },
+  "aion-rp-llama-3.1-8b": {
+   "total": 8.0
+  },
+  "allam-2-7b": {
+   "total": 7.0
+  },
+  "apertus-70b": {
+   "total": 70.0
+  },
+  "auto": {
+   "note": "OpenRouter Auto Router (openrouter/auto) — meta-router that selects an underlying model per prompt; no parameter count of its own."
+  },
+  "bevformer": {
+   "source": "https://simple-bev.github.io/simple_bev_sep30.pdf",
+   "total": 0.0687
+  },
+  "bge-m3": {
+   "source": "https://huggingface.co/BAAI/bge-m3",
+   "total": 0.568
+  },
+  "big-pickle": {
+   "note": "opencode-internal model; provider publishes no parameter count"
+  },
+  "bodybuilder": {
+   "note": "OpenRouter Body Builder router/tooling; no meaningful parameter count"
+  },
+  "claude-4-5-sonnet": {
+   "note": "Closed proprietary model; Anthropic has not disclosed parameter count"
+  },
+  "claude-4-6-sonnet": {
+   "note": "Anthropic closed model; parameter count undisclosed"
+  },
+  "claude-fable-5": {
+   "note": "Anthropic proprietary model; parameter count not disclosed."
+  },
+  "claude-fable-5-1": {
+   "note": "Anthropic Claude Fable 5.1 is proprietary; Anthropic has not disclosed the parameter count."
+  },
+  "claude-fable-5.1": {
+   "note": "proprietary; Anthropic does not disclose parameter counts"
+  },
+  "claude-fable-latest": {
+   "note": "Anthropic 'latest' alias for the Claude Fable line; model size undisclosed"
+  },
+  "claude-haiku-4-5": {
+   "note": "Anthropic closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "claude-haiku-4.5": {
+   "note": "Anthropic proprietary model; parameter count undisclosed"
+  },
+  "claude-haiku-latest": {
+   "note": "Rolling alias for Anthropic's latest Haiku; proprietary, size undisclosed"
+  },
+  "claude-opus-4-5": {
+   "note": "Anthropic closed model; parameter count undisclosed"
+  },
+  "claude-opus-4-6": {
+   "note": "Anthropic proprietary model; size not disclosed (Artificial Analysis: not disclosed)."
+  },
+  "claude-opus-4-7": {
+   "note": "Anthropic Claude Opus 4.7 is proprietary; Anthropic has not disclosed the parameter count."
+  },
+  "claude-opus-4-8": {
+   "note": "proprietary; Anthropic does not disclose parameter counts"
+  },
+  "claude-opus-4.1": {
+   "note": "Proprietary; Anthropic has not disclosed the parameter count"
+  },
+  "claude-opus-4.5": {
+   "note": "Anthropic closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "claude-opus-4.6": {
+   "note": "Anthropic proprietary model; parameter count undisclosed"
+  },
+  "claude-opus-4.7": {
+   "note": "Proprietary model; Anthropic has not disclosed parameter count"
+  },
+  "claude-opus-4.8": {
+   "note": "Anthropic closed model; parameter count undisclosed"
+  },
+  "claude-opus-5": {
+   "note": "Anthropic proprietary model; parameter count not disclosed."
+  },
+  "claude-opus-5-5": {
+   "note": "Anthropic Claude Opus 5.5 is proprietary; Anthropic has not disclosed the parameter count."
+  },
+  "claude-opus-5.5": {
+   "note": "proprietary; Anthropic does not disclose parameter counts"
+  },
+  "claude-opus-latest": {
+   "note": "Anthropic 'latest' alias; model size undisclosed"
+  },
+  "claude-opus4-5": {
+   "note": "Anthropic closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "claude-opus4-6": {
+   "note": "Anthropic proprietary model (Claude Opus 4.6); parameter count undisclosed"
+  },
+  "claude-opus4-7": {
+   "note": "Alias of claude-opus-4.7; proprietary, size undisclosed"
+  },
+  "claude-opus4-8": {
+   "note": "Anthropic closed model; parameter count undisclosed (same model as claude-opus-4.8)"
+  },
+  "claude-sonnet-4": {
+   "note": "Anthropic proprietary model; parameter count not disclosed."
+  },
+  "claude-sonnet-4-5": {
+   "note": "Anthropic Claude Sonnet 4.5 is proprietary; Anthropic has not disclosed the parameter count."
+  },
+  "claude-sonnet-4-6": {
+   "note": "proprietary; Anthropic does not disclose parameter counts"
+  },
+  "claude-sonnet-4.5": {
+   "note": "Proprietary; Anthropic has not disclosed the parameter count"
+  },
+  "claude-sonnet-4.6": {
+   "note": "Anthropic closed model; parameter count undisclosed"
+  },
+  "claude-sonnet-5": {
+   "note": "Anthropic proprietary model; parameter count undisclosed"
+  },
+  "claude-sonnet-latest": {
+   "note": "Rolling alias for Anthropic's latest Sonnet; proprietary, size undisclosed"
+  },
+  "codestral-2508": {
+   "note": "Mistral API-only coding model; parameter count not published"
+  },
+  "command-a": {
+   "source": "https://huggingface.co/CohereLabs/c4ai-command-a-03-2025",
+   "total": 111
+  },
+  "command-a-plus": {
+   "active": 25,
+   "source": "https://docs.cohere.com/docs/command-a-plus",
+   "total": 218
+  },
+  "command-r-08-2024": {
+   "source": "https://huggingface.co/CohereLabs/c4ai-command-r-08-2024",
+   "total": 32
+  },
+  "command-r-plus-08-2024": {
+   "source": "https://huggingface.co/CohereLabs/c4ai-command-r-plus-08-2024",
+   "total": 104
+  },
+  "command-r7b-12-2024": {
+   "total": 7.0
+  },
+  "compound": {
+   "note": "Groq compound agent/router system; no single parameter count"
+  },
+  "compound-mini": {
+   "note": "OpenRouter compound/aggregator model; no parameter count"
+  },
+  "cosmos-predict1-5b": {
+   "total": 5.0
+  },
+  "cosmos-reason2-8b": {
+   "total": 8.0
+  },
+  "cosmos-transfer1-7b": {
+   "total": 7.0
+  },
+  "cosmos-transfer2_5-2b": {
+   "total": 2.0
+  },
+  "cydonia-24b-v4.1": {
+   "total": 24.0
+  },
+  "deep-research-max-preview-04-2026": {
+   "note": "Closed Google DeepMind deep-research agent model; no public parameter count"
+  },
+  "deep-research-preview-04-2026": {
+   "note": "Google Gemini Deep Research agent (reasoning core Gemini 3 Pro); no single model parameter count"
+  },
+  "deepseek-chat": {
+   "active": 37,
+   "source": "https://arxiv.org/abs/2412.19437",
+   "total": 671
+  },
+  "deepseek-chat-v3-0324": {
+   "active": 37,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V3",
+   "total": 671
+  },
+  "deepseek-chat-v3.1": {
+   "active": 37,
+   "source": "https://www.together.ai/models/deepseek-v3-1",
+   "total": 671
+  },
+  "deepseek-flash": {
+   "total": 552,
+   "active": 8,
+   "source": "https://build.nvidia.com/deepseek-ai/deepseek-v4.1-flash/modelcard"
+  },
+  "deepseek-flash-latest": {
+   "active": 8,
+   "note": "alias redirecting to latest DeepSeek Flash (currently V4.1 Flash); 8B active prefill / 16B decode",
+   "source": "https://build.nvidia.com/deepseek-ai/deepseek-v4.1-flash/modelcard",
+   "total": 552
+  },
+  "deepseek-pro-latest": {
+   "active": 49,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+   "total": 1600
+  },
+  "deepseek-r1": {
+   "active": 37,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-R1",
+   "total": 671
+  },
+  "deepseek-r1-0528": {
+   "active": 37,
+   "source": "https://openrouter.ai/deepseek/deepseek-r1-0528",
+   "total": 671
+  },
+  "deepseek-r1-distill-llama-70b": {
+   "total": 70.0
+  },
+  "deepseek-v3.1-terminus": {
+   "active": 37,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1",
+   "total": 671
+  },
+  "deepseek-v3.2": {
+   "active": 37,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
+   "total": 685
+  },
+  "deepseek-v3.2-exp": {
+   "active": 37,
+   "source": "https://www.deeplearning.ai/the-batch/deepseek-v3-2-exp-streamlines-processing-using-a-lightning-indexer-boosting-efficiency",
+   "total": 685
+  },
+  "deepseek-v4-flash": {
+   "active": 13,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash",
+   "total": 284
+  },
+  "deepseek-v4-flash-0731": {
+   "active": 13,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731",
+   "total": 284
+  },
+  "deepseek-v4-flash-latest": {
+   "active": 13,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash",
+   "total": 284
+  },
+  "deepseek-v4-flash-vision-exp": {
+   "active": 13,
+   "source": "https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+   "total": 284
+  },
+  "deepseek-v4-pro": {
+   "active": 49,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+   "total": 1600
+  },
+  "deepseek-v4-pro-0813": {
+   "active": 49,
+   "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+   "total": 1600
+  },
+  "deepseek-v4.1-flash": {
+   "active": 8,
+   "source": "https://build.nvidia.com/deepseek-ai/deepseek-v4.1-flash/modelcard",
+   "total": 552
+  },
+  "devstral-2512": {
+   "source": "https://huggingface.co/mistralai/Devstral-2-123B-Instruct-2512",
+   "total": 123
+  },
+  "dolphin-mistral-24b-venice-edition": {
+   "total": 24.0
+  },
+  "dots-3-note-preview": {
+   "active": 16,
+   "source": "https://huggingface.co/dots-studio/dots3-note-prev",
+   "total": 280
+  },
+  "dracarys-llama-3.1-70b-instruct": {
+   "total": 70.0
+  },
+  "ember-1": {
+   "note": "Fireworks Research specialized reasoning model built on Kimi K3; parameter count undisclosed"
+  },
+  "ernie-4.5-vl-424b-a47b": {
+   "total": 424.0,
+   "active": 47.0
+  },
+  "esm2-650m": {
+   "total": 0.65
+  },
+  "esmfold": {
+   "source": "https://github.com/facebookresearch/esm",
+   "total": 3.69
+  },
+  "flux.1-dev": {
+   "source": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+   "total": 12
+  },
+  "flux_1-kontext-dev": {
+   "source": "https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev",
+   "total": 12
+  },
+  "flux_1-schnell": {
+   "source": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+   "total": 12
+  },
+  "flux_2-klein-4b": {
+   "total": 4.0
+  },
+  "free": {
+   "note": "OpenRouter free-models router/aggregator — routes to various free models; no single parameter count."
+  },
+  "fugu-max": {
+   "note": "Sakana AI Fugu is a learned multi-agent orchestration system, not a monolithic model with a parameter count"
+  },
+  "fugu-ultra": {
+   "note": "Sakana AI multi-agent orchestrator/router; no single underlying model parameter count published"
+  },
+  "fugu-ultra-v2": {
+   "note": "Sakana AI multi-agent orchestration system (model router/ensemble); no single parameter count"
+  },
+  "fusion": {
+   "note": "OpenRouter Fusion compound/router model; no parameter count"
+  },
+  "gemini-2.5-computer-use-preview-10-2025": {
+   "note": "Closed proprietary model; Google has not disclosed parameter count"
+  },
+  "gemini-2.5-flash": {
+   "note": "Google closed model; parameter count undisclosed"
+  },
+  "gemini-2.5-flash-image": {
+   "note": "Google proprietary image model (Nano Banana); parameter count not disclosed."
+  },
+  "gemini-2.5-flash-lite": {
+   "note": "Google Gemini 2.5 Flash-Lite is proprietary; Google has not disclosed the parameter count."
+  },
+  "gemini-2.5-flash-preview-tts": {
+   "note": "Google does not disclose parameter counts for Gemini models"
+  },
+  "gemini-2.5-pro": {
+   "note": "Proprietary; Google has not disclosed the parameter count"
+  },
+  "gemini-2.5-pro-preview": {
+   "note": "Google closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "gemini-2.5-pro-preview-tts": {
+   "note": "Google text-to-speech model; no meaningful parameter count"
+  },
+  "gemini-3-flash": {
+   "note": "Closed proprietary model; Google has not disclosed parameter count"
+  },
+  "gemini-3-flash-preview": {
+   "note": "Google closed model; Google has not disclosed model size or parameter count"
+  },
+  "gemini-3-pro-image": {
+   "note": "Google proprietary image model; parameter count not disclosed."
+  },
+  "gemini-3-pro-image-preview": {
+   "note": "Google Gemini 3 Pro Image (Nano Banana Pro) image-generation model; parameter count not disclosed."
+  },
+  "gemini-3.1-flash-image": {
+   "note": "image generation model; parameter count not disclosed"
+  },
+  "gemini-3.1-flash-image-preview": {
+   "note": "Closed image-generation model; Google has not disclosed a parameter count"
+  },
+  "gemini-3.1-flash-lite": {
+   "note": "Google closed model; parameter count undisclosed"
+  },
+  "gemini-3.1-flash-lite-image": {
+   "note": "Google image generation model; parameter count undisclosed"
+  },
+  "gemini-3.1-flash-lite-preview": {
+   "note": "Closed proprietary model; Google has not disclosed parameter count"
+  },
+  "gemini-3.1-flash-live-preview": {
+   "note": "Google closed realtime audio model; parameter count undisclosed"
+  },
+  "gemini-3.1-flash-tts-preview": {
+   "note": "Google proprietary text-to-speech model; parameter count not disclosed."
+  },
+  "gemini-3.1-pro": {
+   "note": "Google Gemini 3.1 Pro is proprietary; Google has not disclosed the parameter count."
+  },
+  "gemini-3.1-pro-preview": {
+   "note": "Google does not disclose parameter counts for Gemini models"
+  },
+  "gemini-3.1-pro-preview-customtools": {
+   "note": "Proprietary preview; Google has not disclosed the parameter count"
+  },
+  "gemini-3.5-flash": {
+   "note": "Google closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "gemini-3.5-flash-lite": {
+   "note": "Google proprietary model; parameter count undisclosed"
+  },
+  "gemini-3.5-live-translate-preview": {
+   "note": "Closed audio model based on Gemini 3 Pro; no public parameter count"
+  },
+  "gemini-3.6-flash": {
+   "note": "Google closed model; parameter count undisclosed"
+  },
+  "gemini-3.7-flash": {
+   "note": "Google proprietary model; size not disclosed (Artificial Analysis: not disclosed)."
+  },
+  "gemini-3.8-flash": {
+   "note": "Google Gemini 3.8 Flash is proprietary; Google has not disclosed the parameter count."
+  },
+  "gemini-embedding-001": {
+   "note": "embedding model; parameter count not disclosed"
+  },
+  "gemini-embedding-2": {
+   "note": "Closed multimodal embedding model; Google does not publish a parameter count (3072-dim output)"
+  },
+  "gemini-flash-latest": {
+   "note": "alias redirecting to latest Gemini Flash model; no single parameter count"
+  },
+  "gemini-flash-lite-latest": {
+   "note": "Google proprietary Flash-Lite alias; parameter count undisclosed"
+  },
+  "gemini-omni-flash-preview": {
+   "note": "Closed video-generation/editing model; no public parameter count"
+  },
+  "gemini-pro-latest": {
+   "note": "Google closed model alias; parameter count undisclosed"
+  },
+  "gemma-2-27b-it": {
+   "total": 27.0
+  },
+  "gemma-2-2b-it": {
+   "total": 2.0
+  },
+  "gemma-3-12b-it": {
+   "total": 12.0
+  },
+  "gemma-3-27b-it": {
+   "total": 27.0
+  },
+  "gemma-3-4b-it": {
+   "total": 4.0
+  },
+  "gemma-3n-e2b-it": {
+   "total": 2,
+   "note": "E2B = effektive Parameter (Gemma 3n, PLE)"
+  },
+  "gemma-3n-e4b-it": {
+   "total": 4,
+   "note": "E4B = effektive Parameter (Gemma 3n, PLE)"
+  },
+  "gemma-4-26b-a4b-it": {
+   "total": 26.0,
+   "active": 4.0
+  },
+  "gemma-4-31b-it": {
+   "total": 31.0
+  },
+  "gemma4:12b": {
+   "total": 12.0
+  },
+  "gemma4:12b-it-qat": {
+   "total": 12.0
+  },
+  "gemma4:e2b": {
+   "total": 2,
+   "note": "E2B = effektive Parameter (Gemma 4)"
+  },
+  "gemma4:e2b-128k": {
+   "total": 2,
+   "note": "E2B = effektive Parameter (Gemma 4)"
+  },
+  "gliner-pii": {
+   "source": "https://docs.api.nvidia.com/nim/reference/nvidia-gliner-pii",
+   "total": 0.57
+  },
+  "glm-4.5": {
+   "active": 32,
+   "source": "https://docs.z.ai/guides/llm/glm-4.5",
+   "total": 355
+  },
+  "glm-4.5-air": {
+   "active": 12,
+   "source": "https://huggingface.co/zai-org/GLM-4.5-Air",
+   "total": 106
+  },
+  "glm-4.5v": {
+   "active": 12,
+   "source": "https://huggingface.co/zai-org/GLM-4.5V",
+   "total": 106
+  },
+  "glm-4.6": {
+   "active": 32,
+   "source": "https://artificialanalysis.ai/models/glm-4-6-reasoning",
+   "total": 357
+  },
+  "glm-4.6v": {
+   "active": 12,
+   "source": "https://openrouter.ai/z-ai/glm-4.6v",
+   "total": 106
+  },
+  "glm-4.7": {
+   "active": 32,
+   "source": "https://artificialanalysis.ai/models/glm-4-7",
+   "total": 357
+  },
+  "glm-4.7-flash": {
+   "active": 3,
+   "source": "https://huggingface.co/zai-org/GLM-4.7-Flash",
+   "total": 30
+  },
+  "glm-5": {
+   "active": 40,
+   "source": "https://docs.z.ai/guides/llm/glm-5",
+   "total": 744
+  },
+  "glm-5-turbo": {
+   "active": 40,
+   "source": "https://ai-tldr.dev/models/glm-5-turbo/",
+   "total": 744
+  },
+  "glm-5.1": {
+   "active": 40,
+   "source": "https://recipes.vllm.ai/zai-org/GLM-5.1",
+   "total": 744
+  },
+  "glm-5.2": {
+   "active": 40,
+   "source": "https://huggingface.co/docs/transformers/en/model_doc/glm_moe_dsa",
+   "total": 744
+  },
+  "glm-5.2-highspeed": {
+   "active": 40,
+   "note": "GLM-5.2 served with high-speed serving config",
+   "source": "https://recipes.vllm.ai/zai-org/GLM-5.2",
+   "total": 744
+  },
+  "glm-5.3": {
+   "active": 40,
+   "source": "https://build.nvidia.com/z-ai/glm-5-3/modelcard",
+   "total": 753
+  },
+  "glm-5.3-flash": {
+   "active": 18,
+   "source": "https://docs.z.ai/guides/vlm/glm-5.3-flash",
+   "total": 320
+  },
+  "glm-5.3-flashx": {
+   "active": 18,
+   "source": "https://docs.z.ai/guides/vlm/glm-5.3-flash",
+   "total": 320
+  },
+  "glm-5.3-highspeed": {
+   "note": "Z.ai high-throughput serving variant of GLM-5.3; no separate parameter count published."
+  },
+  "glm-5.3-prime": {
+   "active": 40,
+   "source": "https://developer.puter.com/ai/z-ai/glm-5.3-prime/",
+   "total": 744
+  },
+  "glm-5v-turbo": {
+   "note": "Z.AI has not disclosed the parameter count"
+  },
+  "glm-flash-latest": {
+   "note": "Provider 'latest' alias (resolves to GLM-5.3-Flash, 320B total / 18B active as of 2026), not a fixed model"
+  },
+  "glm-latest": {
+   "note": "Z.ai alias redirecting to latest GLM model; no single parameter count"
+  },
+  "google-paligemma": {
+   "source": "https://huggingface.co/google/paligemma-3b-pt-224",
+   "total": 3
+  },
+  "gpt-3.5-turbo": {
+   "note": "Closed model; OpenAI has never disclosed parameter count"
+  },
+  "gpt-3.5-turbo-0613": {
+   "note": "OpenAI closed model; parameter count never disclosed"
+  },
+  "gpt-3.5-turbo-16k": {
+   "note": "OpenAI proprietary model; parameter count never disclosed."
+  },
+  "gpt-3.5-turbo-instruct": {
+   "note": "OpenAI gpt-3.5-turbo-instruct is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-4": {
+   "estimated": true,
+   "source": "https://the-decoder.com/gpt-4-architecture-datasets-costs-and-more-leaked/",
+   "total": 1800
+  },
+  "gpt-4-turbo": {
+   "estimated": true,
+   "source": "https://explodingtopics.com/blog/gpt-parameters",
+   "total": 1760
+  },
+  "gpt-4.1": {
+   "note": "OpenAI closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "gpt-4.1-mini": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-4.1-nano": {
+   "note": "Closed proprietary model; OpenAI has not disclosed parameter count"
+  },
+  "gpt-4o": {
+   "note": "OpenAI closed model; parameter count never disclosed"
+  },
+  "gpt-4o-2024-05-13": {
+   "estimated": true,
+   "source": "https://www.aibase.com/news/14418",
+   "total": 200
+  },
+  "gpt-4o-2024-08-06": {
+   "estimated": true,
+   "source": "https://the-decoder.com/large-language-models-arent-so-large-anymore-ai-analysts-estimate/",
+   "total": 200
+  },
+  "gpt-4o-2024-11-20": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-4o-mini": {
+   "estimated": true,
+   "source": "https://www.deeplearning.ai/the-batch/openais-gpt-4o-mini-offers-big-performance-at-a-small-price",
+   "total": 8
+  },
+  "gpt-4o-mini-2024-07-18": {
+   "estimated": true,
+   "note": "OpenAI told TechCrunch it is roughly the size of the 8B Llama 3",
+   "source": "https://www.deeplearning.ai/the-batch/openais-gpt-4o-mini-offers-big-performance-at-a-small-price",
+   "total": 8
+  },
+  "gpt-5": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-5-codex": {
+   "note": "Closed proprietary model; OpenAI has not disclosed parameter count"
+  },
+  "gpt-5-image": {
+   "note": "OpenAI closed image generation model; parameter count undisclosed"
+  },
+  "gpt-5-image-mini": {
+   "note": "OpenAI proprietary image model; parameter count not disclosed."
+  },
+  "gpt-5-mini": {
+   "note": "OpenAI GPT-5-mini is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-5-nano": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-5-pro": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "gpt-5.1": {
+   "note": "OpenAI closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "gpt-5.1-codex": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-5.1-codex-max": {
+   "note": "Closed proprietary model; OpenAI has not disclosed parameter count"
+  },
+  "gpt-5.1-codex-mini": {
+   "note": "OpenAI closed model; parameter count undisclosed"
+  },
+  "gpt-5.2": {
+   "note": "OpenAI proprietary model; parameter count not disclosed (speculative multi-trillion claims unverified)."
+  },
+  "gpt-5.2-chat": {
+   "note": "OpenAI GPT-5.2 Chat is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-5.2-codex": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-5.2-pro": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "gpt-5.3-codex": {
+   "note": "OpenAI closed model; parameter count undisclosed"
+  },
+  "gpt-5.3-codex-spark": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-5.4": {
+   "note": "Proprietary model; OpenAI has not disclosed parameter count"
+  },
+  "gpt-5.4-image-2": {
+   "note": "OpenAI closed image model; parameter count undisclosed"
+  },
+  "gpt-5.4-mini": {
+   "note": "OpenAI proprietary model; architecture and parameter count not disclosed."
+  },
+  "gpt-5.4-nano": {
+   "note": "OpenAI GPT-5.4 nano is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-5.4-pro": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-5.5": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "gpt-5.5-pro": {
+   "note": "OpenAI closed model; parameter count undisclosed"
+  },
+  "gpt-5.6-luna": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-5.6-luna-pro": {
+   "note": "Closed OpenAI Luna-tier model; parameter count undisclosed"
+  },
+  "gpt-5.6-sol": {
+   "note": "OpenAI closed model; parameter count undisclosed"
+  },
+  "gpt-5.6-sol-pro": {
+   "note": "OpenAI proprietary model (GPT-5.6 Sol family); parameter count not disclosed."
+  },
+  "gpt-5.6-terra": {
+   "note": "OpenAI GPT-5.6 Terra is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-5.6-terra-pro": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-6-astra": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "gpt-6-astra-pro": {
+   "note": "OpenAI closed model (GPT-6 Astra Pro); parameter count undisclosed"
+  },
+  "gpt-6-luna": {
+   "note": "OpenAI proprietary model; parameter count undisclosed"
+  },
+  "gpt-6-luna-pro": {
+   "note": "Closed OpenAI Luna-tier model; parameter count undisclosed"
+  },
+  "gpt-6-sol": {
+   "note": "OpenAI closed model; parameter count undisclosed"
+  },
+  "gpt-6-sol-pro": {
+   "note": "No released OpenAI model with this id; no parameter count available."
+  },
+  "gpt-astra-latest": {
+   "note": "OpenAI GPT-6 Astra (latest alias) is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "gpt-audio": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "gpt-audio-mini": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "gpt-chat-latest": {
+   "note": "OpenAI API alias resolving to the latest Instant chat model; no single parameter count"
+  },
+  "gpt-luna-latest": {
+   "note": "OpenAI Luna alias; parameter count undisclosed"
+  },
+  "gpt-mini-latest": {
+   "note": "Rolling alias for OpenAI's latest mini model; proprietary, size undisclosed"
+  },
+  "gpt-oss-120b": {
+   "total": 116.8,
+   "active": 5.1,
+   "source": "https://arxiv.org/html/2508.10925v1"
+  },
+  "gpt-oss-20b": {
+   "total": 20.9,
+   "active": 3.6,
+   "source": "https://arxiv.org/html/2508.10925v1"
+  },
+  "gpt-oss-safeguard-120b": {
+   "total": 116.8,
+   "active": 5.1,
+   "source": "https://arxiv.org/html/2508.10925v1"
+  },
+  "gpt-oss-safeguard-20b": {
+   "total": 20.9,
+   "active": 3.6,
+   "source": "https://arxiv.org/html/2508.10925v1"
+  },
+  "gpt-sol-latest": {
+   "note": "OpenAI closed model alias; parameter count undisclosed"
+  },
+  "gpt-terra-latest": {
+   "note": "OpenAI proprietary model (GPT-5.6 Terra tier); parameter count not disclosed."
+  },
+  "granite-4.0-h-micro": {
+   "source": "https://huggingface.co/ibm-granite/granite-4.0-h-micro",
+   "total": 3
+  },
+  "granite-4.2-8b": {
+   "total": 8.0
+  },
+  "grok-4.20": {
+   "note": "xAI does not disclose parameter counts"
+  },
+  "grok-4.20-multi-agent": {
+   "note": "xAI multi-agent system; underlying model size not disclosed"
+  },
+  "grok-4.3": {
+   "note": "xAI closed model; parameter count undisclosed"
+  },
+  "grok-4.5": {
+   "estimated": true,
+   "source": "https://felloai.com/grok-4-5/",
+   "total": 1500
+  },
+  "grok-4.6": {
+   "estimated": true,
+   "source": "https://tbreak.com/grok-4-6-4-7-xai-release-date-specs/",
+   "total": 1500
+  },
+  "grok-4.7": {
+   "estimated": true,
+   "source": "https://www.androidheadlines.com/2026/09/grok-4-7-ai-launch-coding-upgrades-pricing.html",
+   "total": 2100
+  },
+  "grok-build-0.1": {
+   "note": "xAI closed-weight coding model; parameter count not disclosed (uncorroborated third-party estimate ~314B MoE)."
+  },
+  "grok-latest": {
+   "note": "xAI 'latest' alias pointing to the newest Grok release; the referenced model varies and no fixed parameter count applies."
+  },
+  "hermes-3-llama-3.1-405b": {
+   "total": 405.0
+  },
+  "hermes-3-llama-3.1-70b": {
+   "total": 70.0
+  },
+  "hermes-4-405b": {
+   "total": 405.0
+  },
+  "hunyuan-a13b-instruct": {
+   "active": 13,
+   "source": "https://huggingface.co/tencent/Hunyuan-A13B-Instruct",
+   "total": 80
+  },
+  "hy-mt2-1.8b": {
+   "total": 1.8
+  },
+  "hy-mt2-30b-a3b": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "hy-mt2-7b": {
+   "total": 7.0
+  },
+  "hy3": {
+   "active": 21,
+   "source": "https://huggingface.co/tencent/Hy3",
+   "total": 295
+  },
+  "hy3-preview": {
+   "active": 21,
+   "source": "https://huggingface.co/tencent/Hy3-preview",
+   "total": 295
+  },
+  "hy4-preview": {
+   "active": 49,
+   "source": "https://huggingface.co/tencent/Hy4-preview",
+   "total": 770
+  },
+  "inkling": {
+   "active": 41,
+   "source": "https://thinkingmachines.ai/news/introducing-inkling/",
+   "total": 975
+  },
+  "inkling-small": {
+   "active": 12,
+   "source": "https://huggingface.co/thinkingmachines/Inkling-Small",
+   "total": 276
+  },
+  "kat-coder-pro-v2.5": {
+   "active": 72,
+   "source": "https://www.atlascloud.ai/models/kwaipilot/kat-coder-pro-v2.5",
+   "total": 1000
+  },
+  "kimi-k2": {
+   "active": 32,
+   "source": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
+   "total": 1000
+  },
+  "kimi-k2-0905": {
+   "active": 32,
+   "source": "https://huggingface.co/moonshotai/Kimi-K2-Instruct-0905",
+   "total": 1000
+  },
+  "kimi-k2-thinking": {
+   "active": 32,
+   "source": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
+   "total": 1000
+  },
+  "kimi-k2.5": {
+   "active": 32,
+   "source": "https://artificialanalysis.ai/models/kimi-k2-5",
+   "total": 1000
+  },
+  "kimi-k2.6": {
+   "active": 32,
+   "source": "https://huggingface.co/moonshotai/Kimi-K2.6",
+   "total": 1000
+  },
+  "kimi-k2.7-code": {
+   "active": 32,
+   "source": "https://developers.cloudflare.com/changelog/post/2026-06-12-kimi-k2-7-code-workers-ai/",
+   "total": 1000
+  },
+  "kimi-k3": {
+   "active": 104,
+   "source": "https://huggingface.co/moonshotai/Kimi-K3",
+   "total": 2800
+  },
+  "kimi-latest": {
+   "active": 104,
+   "source": "https://www.morphllm.com/kimi-k3",
+   "total": 2800
+  },
+  "l3-lunaris-8b": {
+   "total": 8.0
+  },
+  "l3.1-euryale-70b": {
+   "total": 70.0
+  },
+  "l3.3-euryale-70b": {
+   "total": 70.0
+  },
+  "laguna-s-2.1": {
+   "active": 8,
+   "source": "https://huggingface.co/poolside/Laguna-S-2.1",
+   "total": 118
+  },
+  "laguna-xs-2.1": {
+   "active": 3,
+   "source": "https://huggingface.co/poolside/Laguna-XS-2.1",
+   "total": 33
+  },
+  "lfm-2.5-2.6b": {
+   "total": 2.6
+  },
+  "ling-3.0-flash": {
+   "active": 5.1,
+   "source": "https://huggingface.co/inclusionAI/Ling-3.0-flash",
+   "total": 124
+  },
+  "ling-3.0-flash-fin": {
+   "active": 5.1,
+   "source": "https://openrouter.ai/inclusionai/ling-3.0-flash-fin",
+   "total": 124
+  },
+  "ling-3.0-flash-fin-free": {
+   "active": 5.1,
+   "source": "https://huggingface.co/inclusionAI/Ling-3.0-flash",
+   "total": 124
+  },
+  "ling-3.0-flash-sante": {
+   "active": 5.1,
+   "source": "https://openrouter.ai/inclusionai/ling-3.0-flash",
+   "total": 124
+  },
+  "ling-3.0-flash-vl": {
+   "active": 5.5,
+   "source": "https://www.kucoin.com/news/flash/ant-group-open-sources-multimodal-model-ling-3-0-flash-vl-with-124b-parameters",
+   "total": 124
+  },
+  "llama-3.1-70b-instruct": {
+   "total": 70.0
+  },
+  "llama-3.1-8b-instant": {
+   "total": 8.0
+  },
+  "llama-3.1-8b-instruct": {
+   "total": 8.0
+  },
+  "llama-3.1-nemotron-70b-instruct": {
+   "total": 70.0
+  },
+  "llama-3.1-nemotron-nano-8b-v1": {
+   "total": 8.0
+  },
+  "llama-3.1-nemotron-nano-vl-8b-v1": {
+   "total": 8.0
+  },
+  "llama-3.1-nemotron-safety-guard-8b-v3": {
+   "total": 8.0
+  },
+  "llama-3.1-nemotron-ultra-253b-v1": {
+   "total": 253.0
+  },
+  "llama-3.2-11b-vision-instruct": {
+   "total": 11.0
+  },
+  "llama-3.2-1b-instruct": {
+   "total": 1.0
+  },
+  "llama-3.2-3b-instruct": {
+   "total": 3.0
+  },
+  "llama-3.2-90b-vision-instruct": {
+   "total": 90.0
+  },
+  "llama-3.3-70b-instruct": {
+   "total": 70.0
+  },
+  "llama-3.3-70b-versatile": {
+   "total": 70.0
+  },
+  "llama-3.3-nemotron-super-49b-v1": {
+   "total": 49.0
+  },
+  "llama-3.3-nemotron-super-49b-v1.5": {
+   "total": 49.0
+  },
+  "llama-3_2-nemoretriever-300m-embed-v1": {
+   "total": 0.3
+  },
+  "llama-4-maverick": {
+   "active": 17,
+   "source": "https://www.llama.com/docs/model-cards-and-prompt-formats/llama4/",
+   "total": 400
+  },
+  "llama-4-maverick-17b-128e-instruct": {
+   "total": 400,
+   "active": 17,
+   "source": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct"
+  },
+  "llama-4-scout": {
+   "active": 17,
+   "source": "https://huggingface.co/blog/llama4-release",
+   "total": 109
+  },
+  "llama-guard-4-12b": {
+   "total": 12.0
+  },
+  "llama-nemotron-embed-vl-1b-v2": {
+   "total": 1.0
+  },
+  "llama-nemotron-rerank-vl-1b-v2": {
+   "total": 1.0
+  },
+  "llama-prompt-guard-2-22m": {
+   "total": 0.022
+  },
+  "llama-prompt-guard-2-86m": {
+   "total": 0.086
+  },
+  "longcat-2.0": {
+   "active": 48,
+   "source": "https://huggingface.co/meituan-longcat/LongCat-2.0",
+   "total": 1600
+  },
+  "longcat-2.5-preview-free": {
+   "active": 48,
+   "source": "https://www.ai-all.info/en/ai-models/longcat-2-5-preview",
+   "total": 1600
+  },
+  "lyria-3-clip-preview": {
+   "note": "Google music-generation model; no LLM parameter count"
+  },
+  "lyria-3-pro-preview": {
+   "note": "Google music generation model; no meaningful parameter count"
+  },
+  "magistral-small-2506": {
+   "source": "https://huggingface.co/mistralai/Magistral-Small-2506",
+   "total": 24
+  },
+  "magnum-v4-72b": {
+   "total": 72.0
+  },
+  "magpie-tts-zeroshot": {
+   "note": "NVIDIA Magpie TTS zero-shot voice-cloning text-to-speech model; no published parameter count for this variant"
+  },
+  "mai-code-1.1-flash": {
+   "active": 5,
+   "source": "https://microsoft.ai/pdf/MAI-Code-1.1-Flash-Model-Card.PDF",
+   "total": 137
+  },
+  "mercury-2": {
+   "note": "Inception Mercury 2 diffusion reasoning LLM; Inception has not disclosed the parameter count."
+  },
+  "mercury-2.5": {
+   "note": "Inception does not disclose the parameter count of this diffusion LLM"
+  },
+  "mimo-v2.5": {
+   "active": 15,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.5",
+   "total": 310
+  },
+  "mimo-v2.5-pro": {
+   "active": 42,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.5-Pro",
+   "total": 1020
+  },
+  "mimo-v2.6-flash": {
+   "active": 15,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Flash-RL",
+   "total": 309
+  },
+  "mimo-v2.6-flash-free": {
+   "active": 15,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Flash-RL",
+   "total": 309
+  },
+  "mimo-v2.6-pro": {
+   "active": 42,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL",
+   "total": 1020
+  },
+  "mimo-v2.6-pro-ultraspeed": {
+   "active": 42,
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL",
+   "total": 1020
+  },
+  "minicpm-v-4.5": {
+   "source": "https://huggingface.co/openbmb/MiniCPM-V-4_5",
+   "total": 8
+  },
+  "minimax-01": {
+   "active": 45.9,
+   "source": "https://huggingface.co/MiniMaxAI/MiniMax-Text-01",
+   "total": 456
+  },
+  "minimax-m1": {
+   "active": 45.9,
+   "source": "https://huggingface.co/docs/transformers/model_doc/minimax",
+   "total": 456
+  },
+  "minimax-m2": {
+   "active": 10,
+   "source": "https://huggingface.co/MiniMaxAI/MiniMax-M2",
+   "total": 230
+  },
+  "minimax-m2-her": {
+   "note": "MiniMax roleplay model; parameter count not disclosed"
+  },
+  "minimax-m2.1": {
+   "active": 10,
+   "source": "https://www.minimax.io/news/post-training-experience-and-insights-for-agent-models",
+   "total": 230
+  },
+  "minimax-m2.5": {
+   "active": 10,
+   "source": "https://huggingface.co/MiniMaxAI/MiniMax-M2.5",
+   "total": 230
+  },
+  "minimax-m2.7": {
+   "active": 10,
+   "source": "https://developer.nvidia.com/blog/minimax-m2-7-advances-scalable-agentic-workflows-on-nvidia-platforms-for-complex-ai-applications/",
+   "total": 230
+  },
+  "minimax-m3": {
+   "active": 23,
+   "source": "https://huggingface.co/MiniMaxAI/MiniMax-M3",
+   "total": 428
+  },
+  "ministral-14b-2512": {
+   "total": 14.0
+  },
+  "ministral-14b-instruct-2512": {
+   "total": 14.0
+  },
+  "ministral-3b-2512": {
+   "total": 3.0
+  },
+  "ministral-8b-2512": {
+   "total": 8.0
+  },
+  "mistral-7b-instruct-v0.2": {
+   "total": 7.0
+  },
+  "mistral-7b-instruct-v0.3": {
+   "total": 7.0
+  },
+  "mistral-large": {
+   "source": "https://huggingface.co/mistralai/Mistral-Large-Instruct-2407",
+   "total": 123
+  },
+  "mistral-large-2402": {
+   "source": "https://mistral.ai/news/mistral-large",
+   "total": 123
+  },
+  "mistral-large-2407": {
+   "source": "https://huggingface.co/mistralai/Mistral-Large-Instruct-2407",
+   "total": 123
+  },
+  "mistral-large-2512": {
+   "active": 41,
+   "source": "https://docs.mistral.ai/models/mistral-large-3-25-12",
+   "total": 675
+  },
+  "mistral-large-3-675b-instruct-2512": {
+   "total": 675,
+   "active": 41,
+   "source": "https://docs.mistral.ai/models/mistral-large-3-25-12"
+  },
+  "mistral-medium-3": {
+   "note": "Closed enterprise model; Mistral has not disclosed parameter count"
+  },
+  "mistral-medium-3-5": {
+   "source": "https://huggingface.co/mistralai/Mistral-Medium-3.5-128B",
+   "total": 128
+  },
+  "mistral-medium-3-instruct": {
+   "note": "Closed API-only Mistral Medium 3 (May 2025); parameter count not disclosed."
+  },
+  "mistral-medium-3.1": {
+   "note": "Mistral Medium 3.1 is proprietary; Mistral has not disclosed the parameter count (Artificial Analysis confirms undisclosed)."
+  },
+  "mistral-medium-3.5": {
+   "source": "https://huggingface.co/mistralai/Mistral-Medium-3.5-128B",
+   "total": 128
+  },
+  "mistral-medium-3.5-128b": {
+   "total": 128.0
+  },
+  "mistral-nemo": {
+   "source": "https://huggingface.co/nvidia/Mistral-NeMo-12B-Instruct",
+   "total": 12
+  },
+  "mistral-nemo-instruct-2407": {
+   "source": "https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407",
+   "total": 12
+  },
+  "mistral-nemotron": {
+   "note": "NVIDIA-optimized Mistral model; parameter count not disclosed"
+  },
+  "mistral-saba": {
+   "source": "https://mistral.ai/news/mistral-saba/",
+   "total": 24
+  },
+  "mistral-small-24b-instruct-2501": {
+   "total": 24.0
+  },
+  "mistral-small-2503": {
+   "source": "https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Base-2503",
+   "total": 24
+  },
+  "mistral-small-2603": {
+   "active": 6.5,
+   "source": "https://docs.api.nvidia.com/nim/reference/mistralai-mistral-small-4-119b-2603",
+   "total": 119
+  },
+  "mistral-small-3.1-24b-instruct": {
+   "total": 24.0
+  },
+  "mistral-small-3.2-24b-instruct": {
+   "total": 24.0
+  },
+  "mistral-small-3.2-24b-instruct-2506": {
+   "total": 24.0
+  },
+  "mistral-small-4-119b-2603": {
+   "total": 119.0
+  },
+  "mixtral-8x22b-instruct": {
+   "total": 141,
+   "active": 39,
+   "source": "https://huggingface.co/mistralai/Mixtral-8x22B-Instruct-v0.1"
+  },
+  "mixtral-8x7b-instruct": {
+   "total": 46.7,
+   "active": 12.9,
+   "source": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1"
+  },
+  "mixtral-8x7b-instruct-v0.1": {
+   "total": 46.7,
+   "active": 12.9,
+   "source": "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1"
+  },
+  "morph-v3-fast": {
+   "note": "Morph V3 Fast is a code-edit 'apply' model; Morph has not disclosed the parameter count."
+  },
+  "morph-v3-large": {
+   "note": "Morph does not disclose the parameter count of this code-edit apply model"
+  },
+  "muse-glimmer-30b": {
+   "total": 30.0
+  },
+  "muse-spark-1.1": {
+   "note": "Meta Muse Spark 1.1; Meta has not disclosed the parameter count"
+  },
+  "muse-spark-1.2": {
+   "note": "Meta closed reasoning model; parameter count undisclosed (open weights announced but not sized)"
+  },
+  "muse-spark-1.2-contributor": {
+   "note": "Meta proprietary model; parameter count undisclosed"
+  },
+  "muse-spark-1.3": {
+   "note": "Meta has not disclosed the parameter count for Muse Spark 1.3"
+  },
+  "muse-spark-1.3-contributor": {
+   "note": "Meta hosted model; parameter count not disclosed for the 1.3 generation"
+  },
+  "muse-spark-1.3-contributor-free": {
+   "note": "Meta proprietary multimodal model; closed weights, parameter count not disclosed."
+  },
+  "mythomax-l2-13b": {
+   "total": 13.0
+  },
+  "nemotron-3-content-safety": {
+   "source": "https://huggingface.co/blog/nvidia/nemotron-3-content-safety",
+   "total": 4
+  },
+  "nemotron-3-nano-30b-a3b": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "nemotron-3-nano-omni-30b-a3b-reasoning": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "nemotron-3-super-120b-a12b": {
+   "total": 120.0,
+   "active": 12.0
+  },
+  "nemotron-3-ultra-550b-a55b": {
+   "total": 550.0,
+   "active": 55.0
+  },
+  "nemotron-3-ultra-free": {
+   "active": 55,
+   "source": "https://research.nvidia.com/labs/nemotron/Nemotron-3-Ultra/",
+   "total": 550
+  },
+  "nemotron-3.5-content-safety": {
+   "source": "https://huggingface.co/blog/nvidia/nemotron-3-5-content-safety",
+   "total": 4
+  },
+  "nemotron-3.5-lightning": {
+   "active": 3,
+   "source": "https://developer.nvidia.com/blog/nvidia-nemotron-3-5-lightning-delivers-fast-accurate-specialized-task-execution-for-long-running-agents/",
+   "total": 30
+  },
+  "nemotron-3.5-lightning-30b-a3b": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "nemotron-3.5-lightning-free": {
+   "active": 3,
+   "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+   "total": 30
+  },
+  "nemotron-content-safety-reasoning-4b": {
+   "total": 4.0
+  },
+  "nemotron-mini-4b-instruct": {
+   "total": 4.0
+  },
+  "nemotron-nano-12b-v2-vl": {
+   "total": 12.0
+  },
+  "nemotron-nano-v2-12b": {
+   "total": 12.0
+  },
+  "nemotron-voicechat": {
+   "source": "https://huggingface.co/nvidia/NVIDIA-NemotronLabs-VoiceChat-11B",
+   "total": 11
+  },
+  "north-mini-code": {
+   "active": 3,
+   "source": "https://docs.cohere.com/docs/north-mini-code-1.0",
+   "total": 30
+  },
+  "nova-2-lite": {
+   "note": "Amazon Nova 2 Lite; parameter count not disclosed."
+  },
+  "nova-2-lite-v1": {
+   "note": "Amazon Nova 2 Lite is proprietary; Amazon has not disclosed the parameter count."
+  },
+  "nova-lite-v1": {
+   "note": "Amazon does not disclose parameter counts for Nova models"
+  },
+  "nova-micro-v1": {
+   "estimated": true,
+   "source": "https://lifearchitect.ai/olympus/",
+   "total": 11
+  },
+  "nova-premier-v1": {
+   "estimated": true,
+   "note": "Amazon has not disclosed the size; third-party estimate by Dr Alan D. Thompson",
+   "source": "https://lifearchitect.ai/olympus/",
+   "total": 470
+  },
+  "nova-pro-v1": {
+   "note": "Amazon Nova Pro proprietary model; parameter count undisclosed"
+  },
+  "nv-embed-v1": {
+   "source": "https://huggingface.co/nvidia/NV-Embed-v1",
+   "total": 7
+  },
+  "nv-embedcode-7b-v1": {
+   "total": 7.0
+  },
+  "nvidia-nemotron-3-nano-30b-a3b": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "nvidia-nemotron-nano-9b-v2": {
+   "total": 9.0
+  },
+  "o1": {
+   "note": "OpenAI closed reasoning model; parameter count never disclosed"
+  },
+  "o1-pro": {
+   "note": "OpenAI proprietary model; size not disclosed (Artificial Analysis: not disclosed)."
+  },
+  "o3": {
+   "note": "OpenAI o3 is proprietary; OpenAI has not disclosed the parameter count."
+  },
+  "o3-mini": {
+   "note": "OpenAI does not disclose parameter counts"
+  },
+  "o3-mini-high": {
+   "note": "Proprietary; OpenAI has not disclosed the parameter count"
+  },
+  "o3-pro": {
+   "note": "OpenAI closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "o4-mini": {
+   "note": "OpenAI proprietary small reasoning model; parameter count undisclosed"
+  },
+  "o4-mini-high": {
+   "note": "Proprietary model; OpenAI has not disclosed parameter count"
+  },
+  "orpheus-arabic-saudi": {
+   "source": "https://github.com/canopyai/Orpheus-TTS",
+   "total": 3
+  },
+  "orpheus-v1-english": {
+   "source": "https://huggingface.co/canopylabs/orpheus-3b-0.1-ft",
+   "total": 3
+  },
+  "palmyra-x5": {
+   "note": "Writer Palmyra X5 is proprietary; Writer has not disclosed the parameter count."
+  },
+  "pareto": {
+   "note": "OpenRouter Pareto router selects among other models; no parameter count of its own"
+  },
+  "pareto-code": {
+   "note": "OpenRouter routing/aggregator that selects among coding models; not a single model, no parameter count"
+  },
+  "perceptron-mk1": {
+   "note": "Perceptron closed vision-language model; parameter count undisclosed"
+  },
+  "perceptron-mk1.5": {
+   "note": "Perceptron embodied-reasoning model; parameter count not disclosed"
+  },
+  "phi-4": {
+   "source": "https://huggingface.co/microsoft/phi-4",
+   "total": 14
+  },
+  "phi-4-mini-instruct": {
+   "source": "https://huggingface.co/microsoft/Phi-4-mini-instruct",
+   "total": 3.8
+  },
+  "phi-4-multimodal-instruct": {
+   "source": "https://huggingface.co/microsoft/Phi-4-multimodal-instruct",
+   "total": 5.6
+  },
+  "pixtral-12b-2409": {
+   "total": 12.0
+  },
+  "pixtral-large-2502": {
+   "source": "https://huggingface.co/mistralai/Pixtral-Large-Instruct-2411",
+   "total": 124
+  },
+  "qwen-2.5-72b-instruct": {
+   "total": 72.0
+  },
+  "qwen-2.5-7b-instruct": {
+   "total": 7.0
+  },
+  "qwen-2.5-coder-32b-instruct": {
+   "total": 32.0
+  },
+  "qwen-image": {
+   "source": "https://docs.comfy.org/tutorials/image/qwen/qwen-image",
+   "total": 20
+  },
+  "qwen-image-edit": {
+   "source": "https://huggingface.co/Qwen/Qwen-Image-Edit",
+   "total": 20
+  },
+  "qwen-plus": {
+   "note": "Alibaba closed API tier (Qwen2.5-based); parameter count undisclosed"
+  },
+  "qwen-plus-2025-07-28": {
+   "note": "Alibaba closed Qwen Plus model; parameter count undisclosed"
+  },
+  "qwen2.5-coder-32b-instruct": {
+   "total": 32.0
+  },
+  "qwen2.5-vl-72b-instruct": {
+   "total": 72.0
+  },
+  "qwen3-14b": {
+   "total": 14.0
+  },
+  "qwen3-235b-a22b": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-235b-a22b-2507": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-235b-a22b-instruct-2507": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-235b-a22b-thinking-2507": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-30b-a3b": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-30b-a3b-instruct-2507": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-30b-a3b-thinking-2507": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-32b": {
+   "total": 32.0
+  },
+  "qwen3-8b": {
+   "total": 8.0
+  },
+  "qwen3-coder": {
+   "active": 35,
+   "source": "https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct",
+   "total": 480
+  },
+  "qwen3-coder-30b-a3b-instruct": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-coder-480b-a35b-instruct": {
+   "total": 480.0,
+   "active": 35.0
+  },
+  "qwen3-coder-flash": {
+   "active": 3.3,
+   "source": "https://simonwillison.net/2025/Jul/31/qwen3-coder-flash/",
+   "total": 30.5
+  },
+  "qwen3-coder-next": {
+   "active": 3,
+   "source": "https://huggingface.co/Qwen/Qwen3-Coder-Next",
+   "total": 80
+  },
+  "qwen3-coder-plus": {
+   "active": 35,
+   "source": "https://qwenlm.github.io/blog/qwen3-coder/",
+   "total": 480
+  },
+  "qwen3-max": {
+   "estimated": true,
+   "source": "https://qwen.ai/blog?id=qwen3-max",
+   "total": 1000
+  },
+  "qwen3-max-thinking": {
+   "estimated": true,
+   "source": "https://qwen.ai/blog?id=qwen3-max",
+   "total": 1000
+  },
+  "qwen3-next-80b-a3b-instruct": {
+   "total": 80.0,
+   "active": 3.0
+  },
+  "qwen3-next-80b-a3b-thinking": {
+   "total": 80.0,
+   "active": 3.0
+  },
+  "qwen3-vl-235b-a22b": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-vl-235b-a22b-instruct": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-vl-235b-a22b-thinking": {
+   "total": 235.0,
+   "active": 22.0
+  },
+  "qwen3-vl-30b-a3b-instruct": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-vl-30b-a3b-thinking": {
+   "total": 30.0,
+   "active": 3.0
+  },
+  "qwen3-vl-32b-instruct": {
+   "total": 32.0
+  },
+  "qwen3-vl-8b-instruct": {
+   "total": 8.0
+  },
+  "qwen3-vl-8b-thinking": {
+   "total": 8.0
+  },
+  "qwen3.5-122b-a10b": {
+   "total": 122.0,
+   "active": 10.0
+  },
+  "qwen3.5-27b": {
+   "total": 27.0
+  },
+  "qwen3.5-35b-a3b": {
+   "total": 35.0,
+   "active": 3.0
+  },
+  "qwen3.5-397b-a17b": {
+   "total": 397.0,
+   "active": 17.0
+  },
+  "qwen3.5-9b": {
+   "total": 9.0
+  },
+  "qwen3.5-flash-02-23": {
+   "active": 3,
+   "source": "https://huggingface.co/Qwen/Qwen3.5-35B-A3B",
+   "total": 35
+  },
+  "qwen3.5-plus": {
+   "active": 17,
+   "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+   "total": 397
+  },
+  "qwen3.5-plus-02-15": {
+   "active": 17,
+   "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+   "total": 397
+  },
+  "qwen3.5-plus-20260420": {
+   "active": 17,
+   "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+   "total": 397
+  },
+  "qwen3.6-27b": {
+   "total": 27.0
+  },
+  "qwen3.6-35b-a3b": {
+   "total": 35.0,
+   "active": 3.0
+  },
+  "qwen3.6-flash": {
+   "active": 3,
+   "source": "https://qwen.ai/blog?id=qwen3.6-35b-a3b",
+   "total": 35
+  },
+  "qwen3.6-max-preview": {
+   "estimated": true,
+   "source": "https://openrouter.ai/qwen/qwen3.6-max-preview",
+   "total": 1000
+  },
+  "qwen3.6-plus": {
+   "note": "Alibaba has not disclosed the parameter count"
+  },
+  "qwen3.7-flash": {
+   "note": "API-only model; Alibaba does not publish a parameter count"
+  },
+  "qwen3.7-max": {
+   "active": 95,
+   "estimated": true,
+   "note": "Alibaba has not officially disclosed architecture; figures cited for the Qwen3 Max MoE",
+   "source": "https://www.datacamp.com/blog/qwen3-8-max",
+   "total": 2400
+  },
+  "qwen3.7-plus": {
+   "active": 17,
+   "source": "https://www.unite.ai/qwen3-8-flash-next-previews-qwen4-architecture-with-6b-active-parameters/",
+   "total": 397
+  },
+  "qwen3.8-2.4t-a95b": {
+   "total": 2400.0,
+   "active": 95.0
+  },
+  "qwen3.8-27b": {
+   "total": 27.0
+  },
+  "qwen3.8-flash": {
+   "active": 6,
+   "source": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+   "total": 125
+  },
+  "qwen3.8-flash-next": {
+   "active": 6,
+   "source": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+   "total": 125
+  },
+  "qwen3.8-max": {
+   "active": 95,
+   "source": "https://qwen.ai/blog?id=qwen3.8",
+   "total": 2400
+  },
+  "qwen3.8-max-0902": {
+   "active": 95,
+   "source": "https://www.datacamp.com/blog/qwen3-8-max",
+   "total": 2400
+  },
+  "qwen3.8-max-prime": {
+   "active": 95,
+   "source": "https://www.digitalapplied.com/blog/qwen3-8-max-full-release-benchmarks-open-weights",
+   "total": 2400
+  },
+  "qwen3.8-omni-flash": {
+   "note": "Alibaba does not publish a parameter count for the Qwen3.8-Omni-Flash API model"
+  },
+  "qwen3guard-gen-0.6b": {
+   "total": 0.6
+  },
+  "qwen3guard-gen-8b": {
+   "total": 8.0
+  },
+  "reka-edge": {
+   "source": "https://reka.ai/news/reka-edge-frontier-level-edge-intelligence-for-physical-ai",
+   "total": 7
+  },
+  "reka-flash-3": {
+   "source": "https://reka.ai/news/introducing-reka-flash",
+   "total": 21
+  },
+  "relace-apply-3": {
+   "note": "Specialized code-patching LLM; no parameter count disclosed"
+  },
+  "relace-search": {
+   "note": "Relace codebase search/retrieval agent; proprietary, no published parameter count"
+  },
+  "remm-slerp-l2-13b": {
+   "total": 13.0
+  },
+  "rerank-qa-mistral-4b": {
+   "total": 4.0
+  },
+  "riva-translate-4b-instruct-v1.1": {
+   "total": 4.0
+  },
+  "sakana-namazu": {
+   "active": 32,
+   "source": "https://docs.api.nvidia.com/nim/reference/moonshotai-kimi-k2-6",
+   "total": 1000
+  },
+  "sarvam-m": {
+   "source": "https://docs.sarvam.ai/api-reference-docs/getting-started/models/sarvam-m",
+   "total": 24
+  },
+  "schematron-v2-small": {
+   "source": "https://docs.aimlapi.com/api-references/text-models-llm/inference.net/schematron-v2-small",
+   "total": 3
+  },
+  "schematron-v2-turbo": {
+   "source": "https://openrouter.ai/inference-net/schematron-v2-turbo",
+   "total": 3
+  },
+  "seed-1.6": {
+   "active": 23,
+   "source": "https://vercel.com/ai-gateway/models/seed-1.6",
+   "total": 230
+  },
+  "seed-1.6-flash": {
+   "note": "ByteDance Doubao Seed 1.6 Flash; parameter count undisclosed"
+  },
+  "seed-2-1-turbo": {
+   "note": "ByteDance has not published parameter counts for the Seed 2.1 family"
+  },
+  "seed-2.0-code": {
+   "note": "ByteDance Seed closed coding model; parameter count not published"
+  },
+  "seed-2.0-lite": {
+   "note": "ByteDance Seed 2.0 Lite; parameter count not disclosed."
+  },
+  "seed-2.0-mini": {
+   "note": "ByteDance Seed-2.0-Mini is proprietary; ByteDance has not disclosed the parameter count."
+  },
+  "seed-oss-36b-instruct": {
+   "total": 36.0
+  },
+  "skyfall-36b-v2": {
+   "total": 36.0
+  },
+  "solar-10.7b-instruct": {
+   "total": 10.7
+  },
+  "solar-mini4": {
+   "active": 3,
+   "source": "https://openrouter.ai/upstage/solar-mini4",
+   "total": 35
+  },
+  "solar-pro-3": {
+   "active": 12,
+   "source": "https://www.upstage.ai/blog/en/solar-pro-3-0323",
+   "total": 102
+  },
+  "solar-pro4": {
+   "note": "Upstage closed model; parameter count undisclosed (Artificial Analysis: not disclosed)"
+  },
+  "sonar": {
+   "note": "Perplexity proprietary model; parameter count undisclosed"
+  },
+  "sonar-deep-research": {
+   "note": "Perplexity proprietary research model; parameter count undisclosed"
+  },
+  "sonar-pro": {
+   "note": "Perplexity closed search model; parameter count undisclosed"
+  },
+  "sonar-pro-search": {
+   "note": "Perplexity proprietary search model; size not disclosed (Artificial Analysis: not disclosed)."
+  },
+  "sonar-reasoning-pro": {
+   "note": "Perplexity Sonar Reasoning Pro is a hosted reasoning/search model; Perplexity has not disclosed the parameter count."
+  },
+  "space-bunny-alpha": {
+   "note": "anonymous stealth model; parameter count not disclosed"
+  },
+  "space-bunny-free": {
+   "note": "Anonymous stealth model; identity and weights undisclosed, no parameter count"
+  },
+  "sparsedrive": {
+   "note": "NVIDIA end-to-end autonomous-driving model; not an LLM, no parameter count"
+  },
+  "step-3.5-flash": {
+   "active": 11,
+   "source": "https://docs.api.nvidia.com/nim/reference/stepfun-ai-step-3-5-flash",
+   "total": 196
+  },
+  "step-3.7-flash": {
+   "active": 11,
+   "source": "https://recipes.vllm.ai/stepfun-ai/Step-3.7-Flash",
+   "total": 198
+  },
+  "streampetr": {
+   "note": "StreamPETR multi-view 3D object detection model; not an LLM, no published parameter count"
+  },
+  "studiovoice": {
+   "note": "NVIDIA Studio Voice is a speech-enhancement (audio-to-audio) model, not an LLM; no meaningful parameter count."
+  },
+  "synthetic-video-detector": {
+   "note": "NVIDIA Synthetic Video Detector is an AI microservice / classifier for detecting AI-generated video, not an LLM; no meaningful parameter count."
+  },
+  "ternary-bonsai-2-27b": {
+   "total": 27.0
+  },
+  "trinity-large-thinking": {
+   "active": 13,
+   "source": "https://huggingface.co/arcee-ai/Trinity-Large-Thinking",
+   "total": 398
+  },
+  "ui-tars-1.5-7b": {
+   "total": 7.0
+  },
+  "unslopnemo-12b": {
+   "total": 12.0
+  },
+  "usdcode": {
+   "source": "https://docs.omniverse.nvidia.com/services/latest/services/usd-code/usage.html",
+   "total": 70
+  },
+  "usdvalidate": {
+   "note": "NVIDIA USD validation tooling; no parameter count"
+  },
+  "veo-3.1-fast-generate-preview": {
+   "note": "Google video generation model; no meaningful parameter count"
+  },
+  "veo-3.1-generate-preview": {
+   "note": "Closed video-generation model; no public parameter count"
+  },
+  "veo-3.1-lite-generate-preview": {
+   "note": "Google Veo 3.1 Lite video-generation model; not an LLM, no published parameter count"
+  },
+  "voxtral-small-24b-2507": {
+   "total": 24.0
+  },
+  "voxtral-small-2507": {
+   "source": "https://huggingface.co/mistralai/Voxtral-Small-24B-2507",
+   "total": 24
+  },
+  "weaver": {
+   "note": "Mancer Weaver (alpha) is a hosted roleplay LLM; Mancer has not disclosed the parameter count."
+  },
+  "whisper-large-v3": {
+   "source": "https://build.nvidia.com/openai/whisper-large-v3/modelcard",
+   "total": 1.55
+  },
+  "whisper-large-v3-turbo": {
+   "source": "https://huggingface.co/openai/whisper-large-v3-turbo",
+   "total": 0.809
+  },
+  "wizardlm-2-8x22b": {
+   "total": 141,
+   "active": 39,
+   "source": "https://huggingface.co/microsoft/WizardLM-2-8x22B"
+  }
+ }
+}

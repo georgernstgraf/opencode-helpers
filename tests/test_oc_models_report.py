@@ -399,5 +399,141 @@ class OcModelsReportTest(unittest.TestCase):
         self.assertEqual(out, "")
 
 
+PARAMS_JSON = """\
+{
+  "aliases": {"alpha-one": "alpha-1"},
+  "models": {
+    "alpha-1": {"total": 7},
+    "alpha-two": {"total": 0.65, "estimated": true},
+    "beta-one": {"total": 2400, "active": 95, "source": "https://example.com/beta"}
+  }
+}
+"""
+
+
+class OcModelsReportParamsTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dump = self.write("multi.txt", MULTI_DUMP)
+        self.params = self.write("params.json", PARAMS_JSON)
+
+    def write(self, name, content):
+        path = os.path.join(self.tmp.name, name)
+        with open(path, "w") as fh:
+            fh.write(content)
+        return path
+
+    def run_main(self, argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = mod.main(argv)
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def order(self, out):
+        return [line.split()[0] for line in out.splitlines()
+                if line.startswith(("alpha/", "beta/"))]
+
+    def test_params_key_strips_free_and_takes_last_segment(self):
+        self.assertEqual(mod.params_key("openrouter/openai/gpt-oss-120b"),
+                         "gpt-oss-120b")
+        self.assertEqual(mod.params_key("openrouter/x/y:free"), "y")
+        self.assertEqual(mod.params_key("ollama/gemma4:12b"), "gemma4:12b")
+
+    def test_lookup_resolves_alias(self):
+        params = mod.load_params(self.params)
+        self.assertEqual(params[0]["alpha-one"], "alpha-1")
+        self.assertEqual(mod.lookup_params(params, "alpha/alpha-one")["total"], 7)
+
+    def test_fmt_params_variants(self):
+        self.assertEqual(mod.fmt_params({"total": 70}), "70B")
+        self.assertEqual(mod.fmt_params({"total": 0.65}), "650m")
+        self.assertEqual(mod.fmt_params({"total": 2400, "active": 95}), "2.4T/95B")
+        self.assertEqual(mod.fmt_params({"total": 275, "estimated": True}), "~275B")
+        self.assertEqual(mod.fmt_params({"note": "router"}), "–")
+        self.assertEqual(mod.fmt_params(None), "–")
+
+    def test_column_shows_counts_and_estimated(self):
+        rc, out, _ = self.run_main(["--file", self.dump, "a",
+                                    "--params", self.params])
+        self.assertEqual(rc, 0)
+        self.assertIn("7B", out)
+        self.assertIn("~650m", out)
+        self.assertIn("2.4T/95B", out)
+        self.assertIn("PARAM", out)
+
+    def test_sort_params_ascending_and_unknown_last(self):
+        rc, out, _ = self.run_main(["--file", self.dump, "a",
+                                    "--params", self.params, "--sort", "params"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"],
+        )
+
+    def test_sort_params_reverse_keeps_unknown_last(self):
+        rc, out, _ = self.run_main(["--file", self.dump, "a",
+                                    "--params", self.params,
+                                    "--sort", "params", "-r"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["beta/beta-one", "alpha/alpha-one", "alpha/alpha-two"],
+        )
+
+    def test_sort_params_unknown_last_only_partial(self):
+        partial = self.write("partial.json", '{"models": {"alpha-one": {"total": 7}}}')
+        rc, out, _ = self.run_main(["--file", self.dump, "a",
+                                    "--params", partial, "--sort", "params"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(self.order(out)[0], "alpha/alpha-one")
+        self.assertEqual(self.order(out)[1:], ["alpha/alpha-two", "beta/beta-one"])
+
+    def test_params_missing_lists_uncovered_keys(self):
+        partial = self.write("partial.json", '{"models": {"alpha-one": {"total": 7}}}')
+        rc, out, _ = self.run_main(["--file", self.dump, "a",
+                                    "--params", partial, "--params-missing"])
+        self.assertEqual(rc, 0)
+        self.assertNotIn("alpha-one", out)
+        self.assertIn("alpha-two", out)
+        self.assertIn("beta-one", out)
+        self.assertIn("2 missing key(s)", out)
+
+    def test_params_missing_none(self):
+        rc, out, _ = self.run_main(["--file", self.dump, "alpha-one",
+                                    "--params", self.params, "--params-missing"])
+        self.assertEqual(rc, 0)
+        self.assertIn("no missing parameter entries", out)
+
+    def test_missing_params_file_is_silent(self):
+        rc, out, err = self.run_main(["--file", self.dump, "a",
+                                      "--params", os.path.join(self.tmp.name, "nope.json")])
+        self.assertEqual(rc, 0)
+        self.assertEqual(err, "")
+        self.assertIn("–", out)
+
+    def test_malformed_params_file_warns(self):
+        bad = self.write("bad.json", "{ not json")
+        rc, out, err = self.run_main(["--file", self.dump, "a", "--params", bad])
+        self.assertEqual(rc, 0)
+        self.assertIn("warning:", err)
+
+    def test_params_env_override(self):
+        with mock.patch.dict(os.environ, {"OC_MODELS_REPORT_PARAMS": self.params}):
+            rc, out, _ = self.run_main(["--file", self.dump, "alpha-one"])
+        self.assertEqual(rc, 0)
+        self.assertIn("7B", out)
+
+    def test_params_missing_allows_no_filter(self):
+        partial = self.write("partial.json", '{"models": {"alpha-one": {"total": 7}}}')
+        rc, out, _ = self.run_main(["--file", self.dump,
+                                    "--params", partial, "--params-missing"])
+        self.assertEqual(rc, 0)
+        self.assertIn("missing key(s)", out)
+
+
 if __name__ == "__main__":
     unittest.main()
