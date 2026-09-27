@@ -15,8 +15,8 @@ Treat the current directory as a teaching workspace. The state of their learning
 - `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
 - `RESOURCES.md`: A list of resources which can be explored to ground your teaching in contextual knowledge, or to acquire knowledge and wisdom. Use the format in [RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md).
 - `./learning-records/*.md`: A directory of learning records, which capture what the user has learned. These are loosely equivalent to architectural decision records in software development - they capture non-obvious lessons and key insights that may need to be revised later, or drive future sessions. These should be used to calculate the zone of proximal development. They are titled `0001-<dash-case-name>.md`, where the number increments each time. Use the format in [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md).
-- `./lessons/*.html`: A directory of lessons. A **lesson** is a single, self-contained HTML output that teaches one tightly-scoped thing tied to the mission. This is the primary unit of teaching in this workspace.
-- `./assets/*`: Reusable **components** shared across lessons. See [Assets](#assets).
+- `./prepared-lessons/*.html`: A directory of lessons. A **lesson** is a single, self-contained HTML output that teaches one tightly-scoped thing tied to the mission. This is the primary unit of teaching in this workspace. (Dated/taught lessons may instead live in a dated folder, e.g. `YYYY-MM-DD__thema/lesson.html`.)
+- `assets/*` (repo root): Reusable **components** shared across the whole repository. See [Assets](#assets).
 - `NOTES.md`: A scratchpad for you to jot down user preferences, or working notes.
 
 ## Philosophy
@@ -46,7 +46,7 @@ Fluency can give the user an illusory sense of mastery, but storage strength is 
 
 ## Lessons
 
-A lesson is the main thing you produce: the unit in which knowledge and skills reach the user. Each lesson is one self-contained HTML file, saved to `./lessons/` and titled `0001-<dash-case-name>.html` where the number increments each time.
+A lesson is the main thing you produce: the unit in which knowledge and skills reach the user. Each lesson is one self-contained HTML file, saved to `./prepared-lessons/` and titled `0001-<dash-case-name>.html` where the number increments each time.
 
 **Numbering rule for classroom use:** Lessons built as classroom material
 (one school year per class holds at most ~40 lessons) use **two-digit**
@@ -68,11 +68,25 @@ Each lesson should contain a reminder to ask followup questions to the agent. Th
 
 ## Assets
 
-Lessons are built from reusable **components**, stored in `./assets/`: stylesheets, quiz widgets, simulators, diagram helpers, and anything else a second lesson could reuse.
+Lessons are built from reusable **components**, stored in **one repo-root `assets/` folder** shared by every workspace and page in the repository: stylesheets, quiz widgets, the theme toggle, diagram helpers, and anything else a second lesson could reuse.
 
-Reuse is the default, not the exception. Before authoring a lesson, read `./assets/` and build from the components already there. When a lesson needs something new and reusable, write it as a component in `./assets/` and link to it; never inline code a future lesson would duplicate.
+Reuse is the default, not the exception. Before authoring a lesson, read `assets/` and build from the components already there. When a lesson needs something new and reusable, write it as a component in `assets/` and link to it; never inline code a future lesson would duplicate.
 
 A shared stylesheet is the first component every workspace earns: every lesson links it, so the lessons look like one consistent course rather than a pile of one-offs. As the workspace grows, so should the component library.
+
+### Bootstrap & badge (required on every page)
+
+Every generated HTML page must:
+
+- load the shared assets through the generic **inline bootstrap** in `<head>` —
+  it discovers `assets/loader.js` by walking up the ancestor directories, so
+  pages work at any folder depth and without any repo name in the code; and
+- carry the „Auf GitHub Pages ansehen" **badge** (injected by the shared
+  `assets/github-pages-link.js`; the pages base is configured once in
+  `assets/site.js`).
+
+Serve the pages over a **live server** (or the deployed site), never `file://`:
+Firefox blocks `file://` subresources from parent/sibling directories.
 
 ## The Mission
 

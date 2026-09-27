@@ -42,9 +42,9 @@ verdrahtet — Vorbild: `lehrplan`-Skill).
    Lesson-Code muss auf denselben Daten laufen wie der Unterricht.
 6. **Tabellen-Stand:** Lessons-Tabelle im Klassen-README (Nr., Quiz-Richtige)?
    Nächste freie Nummer + Start-Rotation der Quiz-Positionen daraus ablesen.
-7. **Assets/Theme:** gemeinsames Theme-Asset der Klasse (`assets/`)? Den
-   Light/Dark-Umschalter und das Stylesheet wiederverwenden, nicht pro Lesson
-   neu bauen.
+7. **Assets/Theme:** zentraler repo-weiter `assets/`-Ordner vorhanden? Den
+   gemeinsamen Bootstrap (`assets/loader.js`), das Theme (`assets/theme.js` +
+   Stylesheet) und den Badge wiederverwenden, nicht pro Lesson neu bauen.
 
 Nichts davon ohne ausdrückliche Anweisung neu anlegen oder migrieren —
 Befunde melden, Bau fortsetzen soweit möglich.
@@ -73,13 +73,15 @@ Befunde melden, Bau fortsetzen soweit möglich.
    Provenienz zweitrangig aber auffindbar. Lehrplan, KM-Bezug und Runtime
    gehören **nicht** in den HTML-Header — sie stehen unten im Tages-README
    (siehe § Tages-README).
-4. **HTML-Gerüst & Theme:** Jede Lesson bindet das **gemeinsame Theme-Asset**
-   der Klasse ein (`assets/`: Stylesheet mit CSS-Variablen für Hell/Dunkel +
-   kleines Toggle-Script), Toggle-Button im Header. Default folgt
-   `prefers-color-scheme`, die Wahl wird per `localStorage` gemerkt, **Print
-   immer hell**, kein CDN. Fehlt das Asset, einmal anlegen (z. B.
-   `assets/theme.js` + Stylesheet) und von allen Lessons verlinken — Reuse vor
-   Duplikat.
+4. **HTML-Gerüst, Bootstrap & Badge:** Jede Lesson nutzt im `<head>` den
+   **generischen Inline-Bootstrap** (findet `assets/loader.js` über die
+   Ahnen-Verzeichnisse; Repo-Name nirgends im Code) mit `data-css`/`data-js`
+   (Stylesheet + Theme + Quiz). Der Loader injiziert zusätzlich `assets/site.js`
+   (Pages-Basis) und `assets/github-pages-link.js` (Badge „Auf GitHub Pages
+   ansehen", fixiert, `no-print`). Toggle-Button im Header. Default folgt
+   `prefers-color-scheme`, die Wahl per `localStorage` gemerkt, **Print immer
+   hell**, kein CDN. Fehlt ein Baustein im zentralen `assets/`, einmal ergänzen
+   — Reuse vor Duplikat. Seiten laufen über den Live-Server, nie `file://`.
 5. **Dramaturgie (6 Bausteine):** Einstiegsfrage (reale Frage mit Datenbezug)
    → Ziel-Artefakt (fertiger Plot/Tabelle als Sehnsuchtsbild) →
    inkrementeller Aufbau (ein Konzept pro Schritt, ein Datensatz durchgehend)
@@ -105,7 +107,11 @@ Befunde melden, Bau fortsetzen soweit möglich.
 
 ## Ablage & Dateinamen
 
-Jede Lektion liegt **immer direkt im Datums-Thema-Ordner der Klasse**:
+**Vorbereitete, noch nicht terminierte Lektionen** liegen in
+`<klasse>/prepared-lessons/NN-slug.html` (zweistellig pro Schuljahr pro
+Klasse; die laufende Nummer steckt im Dateinamen).
+
+**Terminierte/abgehaltene Lektionen** liegen im Datums-Thema-Ordner der Klasse:
 `<klasse>/YYYY-MM-DD__thema/` (Datum mit doppeltem Unterstrich, Thema
 kleingeschrieben mit Bindestrichen). Darin liegen genau zwei Dateien:
 
@@ -113,8 +119,7 @@ kleingeschrieben mit Bindestrichen). Darin liegen genau zwei Dateien:
   lebt nur im Kicker und in der Lessons-Tabelle, **nicht** im Dateinamen)
 - `README.md` — der Tages-README (siehe § Tages-README)
 
-Kein separater `lessons/`-Ordner. Bestehende `lessons/`-Ablagen sind
-Legacy: nicht migrieren, nicht weiterverwenden.
+Der frühere Ordner `lessons/` heißt jetzt `prepared-lessons/`.
 
 ## Tages-README (Layout, Pflicht)
 
@@ -147,16 +152,18 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    Daten prüfen; behauptete Zahlen = berechnete Zahlen).
 2. Alle relativen Links auflösbar (Assets, Nachbar-Lessons, Aufgabe,
    Semesterplan).
-3. Kein CDN / keine externen Abhängigkeiten (Offline-Lesbarkeit), außer
-   verlinkter Lektüre.
+3. Kein CDN / keine externen Abhängigkeiten (läuft über den lokalen
+   Live-Server), außer verlinkter Lektüre.
 4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
    tatsächliche Fragenzahl (1–5) eingehalten.
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
    **und** im Tages-README als erster eigener `## Aufgabe`-Abschnitt (H2)
    vorhanden — beides Pflicht.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
-   Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell, alles
-   offline.
+   Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell.
+7. Bootstrap + Badge: generische Inline-Bootstrap im `<head>` vorhanden und
+   `assets/loader.js` erreichbar; der Badge erscheint und zeigt auf die
+   kanonische Pages-URL. Alles über den Live-Server (`serve.sh`), nie `file://`.
 
 ## Nachziehen (gleicher Commit)
 

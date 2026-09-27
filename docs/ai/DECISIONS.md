@@ -378,3 +378,10 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Git-Verbot beibehalten (verworfen — blockiert legitime Nutzung); ein `4ahwit`/`5ahwit`-Sonderfall in `knowledge-assessment` (verworfen — die Adresstabelle gehört in `grading-shared`).
 - **Tradeoff**: Die Aussage „no Git" gilt nur noch für `knowledge-assessment`, nicht für alle Grading-Skills; die Konvention wurde entsprechend aufgespalten.
 - **Issue**: #85
+
+## 2026-09-27: teach/create-lesson — `prepared-lessons/` + zentraler `assets/` + Bootstrap/Badge (#86)
+
+- **Choice**: Lektionsablage heißt `prepared-lessons/` (vorbereitete, noch nicht terminierte Lektionen); terminierte Lektionen liegen im Datums-Ordner. Es gibt genau **einen** repo-weiten `assets/`-Ordner (Repo-Root), den alle Seiten über einen generischen Inline-Bootstrap finden (Loader leitet den Root aus seiner eigenen URL ab — kein Repo-Name im Code). Jede erzeugte HTML-Seite trägt den Badge „Auf GitHub Pages ansehen". Nutzung über Live-Server/Pages, nicht `file://`.
+- **Reason**: Lesson-Ordner sollen innerhalb des Repos beliebig (auch tief) verschiebbar sein, ohne dass CSS/JS-Links brechen; ein zentraler Asset-Ordner plus generischer Loader leistet das. Firefox' `file://`-Origin-Policy blockiert zentrale Assets aus Eltern-/Geschwisterverzeichnissen, daher Live-Server statt `file://`.
+- **Tradeoff**: Seiten brauchen einen Server (kein Doppelklick auf die Datei); `file://` wird nicht mehr unterstützt.
+- **Origin**: GRG-PMM #19.
