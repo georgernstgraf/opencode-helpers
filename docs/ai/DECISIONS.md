@@ -385,3 +385,11 @@ Each entry documents WHAT was decided and WHY.
 - **Reason**: Lesson-Ordner sollen innerhalb des Repos beliebig (auch tief) verschiebbar sein, ohne dass CSS/JS-Links brechen; ein zentraler Asset-Ordner plus generischer Loader leistet das. Firefox' `file://`-Origin-Policy blockiert zentrale Assets aus Eltern-/Geschwisterverzeichnissen, daher Live-Server statt `file://`.
 - **Tradeoff**: Seiten brauchen einen Server (kein Doppelklick auf die Datei); `file://` wird nicht mehr unterstützt.
 - **Origin**: GRG-PMM #19.
+
+## 2026-09-27: oc-models-report — `--sort KEY` + `--reverse` (#87)
+
+- **Choice**: `scripts/oc-models-report` bekommt `--sort KEY` (Default `model`). Schlüssel: `model` (Aliase `id`, `name`), `provider`, `in`/`input`, `out`/`output`, `cost` (Aliase `$`, `mtok`, `price` = Summe input+output), `ctx`/`context`. **Alle** Schlüssel sortieren aufsteigend; `-r`/`--reverse` kehrt den aktiven Schlüssel um. Bei Gleichstand bleibt die Model-id aufsteigend als stabiler Sekundärschlüssel; ein unbekannter Schlüssel ist ein Fehler (Exit 2).
+- **Reason**: Große Provider-Listen (z. B. `--provider groq`) ließen sich nur nach Model-id sortiert lesen; die natürliche Frage „billigstes/größtes Kontextfenster zuerst" brauchte manuelle Nacharbeit.
+- **Considered**: Für `ctx` absteigend als natürliche Richtung (verworfen — Nutzer wollte überall aufsteigend plus `--reverse`); Richtung als Suffix im Schlüssel (`ctx:desc`, verworfen — ein Flag reicht); `$`/`mtok` nur auf den Output-Preis (verworfen — Summe input+output abgestimmt).
+- **Tradeoff**: `cost` ist ein gemischter Skalar (Summe), keine der beiden angezeigten Spalten exakt; die Anzeige zeigt weiterhin getrennt `in/out`.
+- **Issue**: #87

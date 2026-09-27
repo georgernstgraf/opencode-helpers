@@ -316,6 +316,88 @@ class OcModelsReportTest(unittest.TestCase):
         self.assertNotIn("beta/beta-one", out)
         self.assertIn("1 match(es) for: free (provider alpha)", out)
 
+    def order(self, out):
+        return [line.split()[0] for line in out.splitlines()
+                if line.startswith(("alpha/", "beta/"))]
+
+    def test_default_sort_is_model_id(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-one", "alpha/alpha-two", "beta/beta-one"],
+        )
+
+    def test_sort_by_input_price(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "in"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"],
+        )
+
+    def test_sort_by_output_price(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "out"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"],
+        )
+
+    def test_sort_by_total_cost(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "cost"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"],
+        )
+
+    def test_sort_cost_aliases(self):
+        dump = self.write_dump(MULTI_DUMP)
+        expected = ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"]
+        for alias in ("$", "mtok", "price"):
+            rc, out, _ = self.run_main(["--file", dump, "a", "--sort", alias])
+            self.assertEqual(rc, 0, alias)
+            self.assertEqual(self.order(out), expected, alias)
+
+    def test_sort_by_context(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "ctx"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-two", "alpha/alpha-one", "beta/beta-one"],
+        )
+
+    def test_sort_by_provider(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "provider"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["alpha/alpha-one", "alpha/alpha-two", "beta/beta-one"],
+        )
+
+    def test_reverse_flips_active_key(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, _ = self.run_main(["--file", dump, "a", "--sort", "ctx", "-r"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            self.order(out),
+            ["beta/beta-one", "alpha/alpha-one", "alpha/alpha-two"],
+        )
+
+    def test_sort_invalid_key_exits_2(self):
+        dump = self.write_dump(MULTI_DUMP)
+        rc, out, err = self.run_main(["--file", dump, "a", "--sort", "bogus"])
+        self.assertEqual(rc, 2)
+        self.assertIn("invalid --sort key: bogus", err)
+        self.assertEqual(out, "")
+
 
 if __name__ == "__main__":
     unittest.main()

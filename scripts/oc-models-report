@@ -6,6 +6,12 @@ Optional --provider ID restricts the output to models of one provider
 error). Without --provider the substrings are matched against
 provider/id/name/family and the rendered cost (so "free" finds 0/0 models).
 
+Results are sorted by model id by default. --sort KEY orders them by a
+capability/price column: model (aliases id, name), provider, in/input,
+out/output, cost (aliases $, mtok, price = input+output), or ctx/context;
+all keys sort ascending, -r/--reverse flips the active key. Ties keep the
+model id ascending as a stable secondary order.
+
 The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
 ($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
 whenever it is missing or older than 12 hours. Internal overrides (mainly for
@@ -17,6 +23,7 @@ Zero external dependencies (Python 3 stdlib only).
 """
 
 import argparse
+import functools
 import json
 import os
 import re
@@ -32,6 +39,23 @@ HDR = re.compile(r"^([A-Za-z0-9_.-]+/.+?)\s*$")
 APP = "oc-models-report"
 CACHE_FILE = "models-verbose.txt"
 DEFAULT_MAX_AGE = 12 * 3600
+
+SORT_ALIASES = {
+    "model": "model",
+    "id": "model",
+    "name": "model",
+    "provider": "provider",
+    "in": "in",
+    "input": "in",
+    "out": "out",
+    "output": "out",
+    "cost": "cost",
+    "$": "cost",
+    "mtok": "cost",
+    "price": "cost",
+    "ctx": "ctx",
+    "context": "ctx",
+}
 
 
 def cache_dir():
@@ -187,6 +211,41 @@ def select_provider(models, provider):
     return [r for r in models if r[1].get("providerID", "").lower() == target]
 
 
+def normalize_sort(name):
+    """Return the canonical sort key for name, or None when unknown."""
+    return SORT_ALIASES.get(name.lower())
+
+
+def sort_value(key, rec):
+    _, d = rec
+    cost = d.get("cost", {})
+    if key == "provider":
+        return d.get("providerID", "").lower()
+    if key == "in":
+        return cost.get("input", 0)
+    if key == "out":
+        return cost.get("output", 0)
+    if key == "cost":
+        return cost.get("input", 0) + cost.get("output", 0)
+    if key == "ctx":
+        return d.get("limit", {}).get("context", 0)
+    return rec[0].lower()
+
+
+def sort_models(hits, key, reverse):
+    """Sort hits in place by key; ties keep model id ascending."""
+    direction = -1 if reverse else 1
+
+    def compare(a, b):
+        va, vb = sort_value(key, a), sort_value(key, b)
+        if va != vb:
+            return direction * (-1 if va < vb else 1)
+        return (a[0] > b[0]) - (a[0] < b[0])
+
+    hits.sort(key=functools.cmp_to_key(compare))
+    return hits
+
+
 def parse_args(argv):
     p = argparse.ArgumentParser(
         prog="oc-models-report",
@@ -206,9 +265,19 @@ def parse_args(argv):
                    help="force regeneration of the cached model list")
     p.add_argument("--file", metavar="PATH", dest="file",
                    help="parse this dump file instead of the cache (no refresh)")
+    p.add_argument("--sort", metavar="KEY", default="model",
+                   help="sort by: model (default; aliases id, name), provider, "
+                        "in/input, out/output, cost ($, mtok, price = input+output), "
+                        "ctx/context")
+    p.add_argument("-r", "--reverse", action="store_true",
+                   help="reverse the sort order")
     args = p.parse_args(argv)
     if not args.filters and not args.provider:
         p.error("specify at least one substring or --provider")
+    key = normalize_sort(args.sort)
+    if key is None:
+        p.error(f"invalid --sort key: {args.sort}")
+    args.sort = key
     return args
 
 
@@ -237,7 +306,7 @@ def main(argv):
         models = scoped
 
     hits = [r for r in models if not args.filters or matches(r, args.filters)]
-    hits.sort(key=lambda r: r[0])
+    sort_models(hits, args.sort, args.reverse)
 
     if args.provider:
         scope = f"provider {args.provider}"
