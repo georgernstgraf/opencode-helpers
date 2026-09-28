@@ -76,9 +76,11 @@ Die Welt ist zweigeteilt in zwei Ebenen mit eigenen Wurzeln im Repo-Root:
 | **Lehrplan-Ebene** (Gesetz + Planung) | `lehrplan/` | Gesetzesmaterial, Extrakte, METADATA, KM-Steckbriefe | **dieser Skill** |
 | **Unterrichtsebene** (Vorbereitung + Durchführung) | `unterricht/` | Lehrstoffverteilungen, Semesterpläne, Stunden-Ordner | **Unterricht-Skill (noch zu erstellen)** |
 
-Der `/unterricht/`-Ordner am Repo-Root ist **flach** aufgebaut — ein
-Ordner pro Zweig-Fach-Kombination, darin die Dateien direkt, **ohne**
-Jahrgangs-Unterordner und **ohne** Klassen-Unterordner:
+Der `/unterricht/`-Ordner am Repo-Root ist **flach** aufgebaut. Vorbereitete
+Einheiten-Ordner liegen **direkt** unter `unterricht/` und tragen das
+zugehörige Kompetenzmodul im Namen (`KM<#>-<NN>-<slug>` bzw. `SA-<NN>-<slug>`
+für schulautonome Teile; `<NN>` läuft pro KM). Die Planungs-Dateien eines
+Zweig-Fachs liegen in einem Unterordner `<ZWEIG>-<FACH>/`:
 
 ```
 unterricht/
@@ -88,8 +90,9 @@ unterricht/
     jg4-einheiten.md
     jg4-semesterplan-ws.md        # Semesterplan Wintersemester
     jg4-semesterplan-ss.md        # Semesterplan Sommersemester
-    NN-slug/                      # Stunden-Ordner während der Vorbereitung
-    YYYY-MM-DD_thema/             # Stunden-Ordner, sobald der Termin fixiert ist
+  KM<#>-<NN>-<slug>/              # vorbereitete Einheit (KM-Lehrstoff)
+  SA-<NN>-<slug>/                 # vorbereitete Einheit (schulautonom)
+  YYYY-MM-DD_thema/               # terminierte Einheit / Kohorten-Lektion
 ```
 
 - Das `<ZWEIG>`-Kürzel folgt der Klassen-Postfix-Tabelle (siehe
@@ -145,8 +148,9 @@ unterricht/                      # siehe "Abgrenzung zum Unterricht"
     jg<N>-einheiten.md
     jg<N>-semesterplan-ws.md
     jg<N>-semesterplan-ss.md
-    NN-slug/                     # Stunden-Ordner (Vorbereitung)
-    YYYY-MM-DD_thema/            # Stunden-Ordner (Termin fixiert)
+  KM<#>-<NN>-<slug>/             # vorbereitete Einheit (KM-Lehrstoff)
+  SA-<NN>-<slug>/                # vorbereitete Einheit (schulautonom)
+  YYYY-MM-DD_thema/              # terminierte Einheit / Kohorten-Lektion
 AGENTS.md                        # Repo-weite Agent-Regeln
 GLOSSAR.md                       # Domänen-Abkürzungen und Begriffe
 ```
@@ -201,9 +205,10 @@ GLOSSAR.md
   `4HWII`, `4HWIT`), **innerhalb** des `<fach>-<zweig>`-Ordners.
   Generische Labels decken Parallellklassen ab (`4HWIT` deckt
   4AHWIT/4BHWIT ab).
-- Stunden-Ordner: `NN-slug/` während der Vorbereitung, umbenannt zu
-  `YYYY-MM-DD_slug/`, sobald der Unterrichtstermin fixiert ist —
-  **ausschließlich** unter `unterricht/<ZWEIG>-<FACH>/`.
+- Einheiten-Ordner: `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
+  `SA` = schulautonom; `<NN>` läuft pro KM) liegen **direkt** unter
+  `unterricht/`; sobald der Unterrichtstermin fixiert ist, wandern die
+  Inhalte in die Kohorten-Ablage `YYYY-MM-DD_thema/`.
 - Einheiten/Semesterpläne: `jg<N>-einheiten.md` und
   `jg<N>-semesterplan-{ws,ss}.md`, kleines `jg`, Unterstrich, flach unter
   `unterricht/<ZWEIG>-<FACH>/`.
@@ -325,7 +330,7 @@ laufen?":
 | RIS-Verzeichnis | Alle Gesetzestext-PDFs unter `lehrplan/RIS/` — PDFs im `lehrplan/`-Root sind ein Migrationsbefund |
 | Erläuterungen | KM-Überblicke und Lernziel-Erläuterungen in allen Extrakten vorhanden (siehe Aufgabe 2) |
 | Unterrichts-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Migrationsbefund (Retrofit-Klausel) |
-| Stunden-Ordner | `NN-slug/` und `YYYY-MM-DD_thema/` liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Befund (zuständig: Unterricht-Skill) |
+| Einheiten-Ordner | Vorbereitete Ordner `<KM#/SA>-<NN>-<slug>/` liegen **direkt** unter `unterricht/` (KM-Präfix, `<NN>` pro KM); terminierte `YYYY-MM-DD_thema/` liegen in der Kohorten-Ablage. Unter `unterricht/<ZWEIG>-<FACH>/` oder `lehrplan/` ist das ein Befund (zuständig: create-lesson/Unterricht-Skill) |
 | Root-Klassenordner | Klein geschriebene Klassenordner am Repo-Root (z. B. `5ahwit/`) sind **konforme Kohorten-Einstiegspunkte** (Ablage pro Kohorte, Archivierung am Schuljahresende) — kein Befund; GROSSBUCHSTABEN-Klassenordner mit Lehrplan-Extrakten liegen unverändert unter `lehrplan/<fach>-<zweig>/` |
 
 Anschließend ausdrücklich feststellen: **„Der Skill muss noch ausgeführt

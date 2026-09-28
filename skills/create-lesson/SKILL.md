@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder Teilen davon — den geplanten Einheiten im unterricht/-Ordner — eine Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/prepared-lessons/ ab. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder Teilen davon — den geplanten Einheiten im unterricht/-Ordner — eine Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -16,7 +16,7 @@ Klassenordner erfolgt per Hand. Konventionsbasiert, nicht auf ein Fach
 verdrahtet (Vorbild: `lehrplan`- und `teach`-Skill).
 
 Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
-`prepared-lessons/`, Beamer-taugliche Code-Boxen, Stil-Leitfaden):
+`<PREFIX>-<NN>-<slug>/`, Beamer-taugliche Code-Boxen, Stil-Leitfaden):
 `/home/georg/repos/georgernstgraf/GRG-PMM`.
 
 ## Abgrenzung zum Teach-Skill (wichtig, keine Duplikation)
@@ -26,7 +26,7 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
   Quiz-Widget-Muster) wird hier **referenziert, nicht kopiert**.
 - **`create-lesson` = Lehren** (Schüler-Material): KM-/einheitengebunden,
   lektüregebunden (Lizenzregeln!), per Code-Ausführung verifiziert, als
-  **Prepared Lesson** in `unterricht/prepared-lessons/` abgelegt.
+  **Prepared Lesson** in `unterricht/<PREFIX>-<NN>-<slug>/` abgelegt.
 - Faustregel: Wer `MISSION.md`/`learning-records/` braucht → `teach`.
   Wer `KM + Ziel-UE` nennt → dieser Skill.
 
@@ -42,14 +42,15 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
    Reihenfolge: (a) `unterricht/`-Plan + KM, (b) `Unterlagen/` und bestehende
    Lektionen, (c) PMM-Referenz. Einzige zulässige Rückfrage: fehlendes
    Bestellformat (KM/Ziel-UE/Thema).
-3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen in
-   `unterricht/prepared-lessons/NN-slug.html` (zweistellig pro KM/Jahr; die
-   laufende Nummer steckt im Dateinamen). Klassenordner werden **nicht**
-   direkt beschrieben — die Lehrperson kopiert die Prepared Lesson von Hand
-   in den Klassenordner der laufenden Klasse.
-4. **Eine Doppelstunde tragen.** Umfang und Tiefe müssen eine ganze
-   Doppelstunde (~90 min) füllen: mehrere Aufbauschritte, Beispiele, Übungen,
-   Quiz — nicht eine 15-Minuten-Zusammenfassung.
+3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
+   `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
+   `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
+   `praesentation.html` + `hausaufgabe.md` + `lesson.html`. Klassenordner
+   werden **nicht** direkt beschrieben — die Lehrperson kopiert die Lesson per
+   Hand in den Datums-Ordner der Klasse.
+4. **Immer 90 Minuten.** Eine Lesson ist **immer** eine ganze Doppelstunde
+   (~90 min) — auch eine Wiederholung. Mehrere Aufbauschritte, Beispiele,
+   Übungen, Quiz; nie eine 15-Minuten-Zusammenfassung.
 5. **Vollständigkeit des KM.** Alle Wege/Konzepte des KM kommen vor (Beispiel
    CSS-Einbindung: `style`-Attribut, `<style>`-Block im HTML, verlinktes
    Stylesheet — alle drei).
@@ -61,7 +62,7 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
-1. **Plan/KM:** `unterricht/<FACH>/` — die UE-Zeile zum Ziel-KM/Teil-KM
+1. **Plan/KM:** `unterricht/` — die UE-Zeile zum Ziel-KM/Teil-KM
    finden (Lektüre-Anker, Ziel). `lehrplan/`-Ebene (KM-Steckbriefe) bei Bedarf
    gegenlesen.
 2. **Unterlagen (Coverage-Check):** themenspezifische `Unterlagen/`
@@ -104,8 +105,8 @@ Ohne Bestellformat wird nicht gebaut — das ist die einzige zulässige Rückfra
    reaktivieren + eine Stufe höher (keine Grundbegriffe neu einführen),
    Anschluss an das Vorwissen der Zielklasse explizit benennen. Immer so viel
    Stoff, dass es eine **Doppelstunde** trägt.
-3. **Kopf (themenfokussiert):** Zeile 1 = `Lektion NN · Thema` (zweistellig,
-   pro KM/Jahr — max. ~40 Wochen). Zeile 2 klein = `UE n · Klasse Semester [·
+3. **Kopf (themenfokussiert):** Zeile 1 = `Lektion <PREFIX>-<NN> · Thema`
+   (`KM<#>`/`SA`, z. B. `KM5-01`). Zeile 2 klein = `UE n · Klasse Semester [·
    Wiederholung aus KMx]`. Thema zuerst, Provenienz zweitrangig aber
    auffindbar. Lehrplan, KM-Bezug und Runtime gehören **nicht** in den
    HTML-Header — sie stehen unten im Tages-README (siehe § Tages-README).
@@ -126,8 +127,8 @@ Ohne Bestellformat wird nicht gebaut — das ist die einzige zulässige Rückfra
    früherer Lessons) → Typische Fehler (je mit Anti-Beispiel-Code) →
    Zusammenfassung (Tabelle) + Ausblick (Folge-UE im **Ziel**-Semesterplan).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
-6. **Quiz:** je nach Stoff **1–5 Fragen** pro Lesson (so viele, wie sich
-   mit dem Stoff sinnvoll abdecken lassen); die Richtige-Positionen über die
+6. **Quiz:** so viele Fragen, wie der Stoff braucht — **keine harte
+   Obergrenze** (auch 10+ sind in Ordnung). Die Richtige-Positionen über die
    tatsächliche Fragenzahl ausgewogen rotieren, je Frage genau eine Richtige;
    Antwortoptionen gleiche Wortzahl (möglichst Zeichenzahl) — keine
    Format-Hinweise. Fragen decken **ausschließlich** Stoff, der in der Lesson
@@ -148,22 +149,22 @@ Ohne Bestellformat wird nicht gebaut — das ist die einzige zulässige Rückfra
 
 ## Prepared Lessons (Ablage & Lebenszyklus)
 
-**Prepared Lesson** (undatiert, vorbereitet) liegt in
-`unterricht/prepared-lessons/NN-slug.html` (zweistellig pro KM/Jahr; die
-laufende Nummer steckt im Dateinamen). Dazu gehört eine **Tages-README-Vorlage**
-`NN-slug.md` (Inhalt + `## Aufgabe` + `## Housekeeping`, siehe § Tages-README).
+**Prepared Lesson** (undatiert, vorbereitet) liegt **flach** in
+`unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul, `SA` =
+schulautonom; `<NN>` läuft pro KM) zusammen mit `praesentation.html` +
+`hausaufgabe.md` + `lesson.html`. Dazu gehört eine **Tages-README-Vorlage**
+`<PREFIX>-<NN>-<slug>.md` (Inhalt + `## Aufgabe` + `## Housekeeping`, siehe
+§ Tages-README).
 
 **Übernahme in den Unterricht:** Die Lehrperson kopiert die Prepared Lesson
-per Hand in den Klassenordner der laufenden Klasse `<klasse>/YYYY-MM-DD__thema/`
+per Hand in den Datums-Ordner der laufenden Klasse `<klasse>/YYYY-MM-DD__thema/`
 als `lesson.html` plus `README.md` (aus der Vorlage). Der Skill schreibt **nie**
-direkt in Klassenordner.
-
-Der frühere Ordner `lessons/` heißt jetzt `prepared-lessons/`.
+direkt in Klassenordner; Kohorten-`prepared-lessons/` gibt es nicht mehr.
 
 ## Tages-README (Layout, Pflicht bei der Übernahme)
 
 Zu einer Lesson gehört ein Tages-README **im selben Datums-Ordner**
-`<klasse>/YYYY-MM-DD__thema/README.md` (aus der Vorlage `NN-slug.md`). Oben
+`<klasse>/YYYY-MM-DD__thema/README.md` (aus der Vorlage `<PREFIX>-<NN>-<slug>.md`). Oben
 steht der Inhalt: Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt
 (Liste mit Demo/Quiz/…). Die Aufgabe ist **Pflicht** und steht als **erster
 eigener `## Aufgabe`-Abschnitt (H2)** — nicht als Listenpunkt. Die
@@ -194,7 +195,7 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 3. Kein CDN / keine externen Abhängigkeiten (läuft über den lokalen
    Live-Server `serve.sh`), außer verlinkter Lektüre.
 4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
-   tatsächliche Fragenzahl (1–5) eingehalten; **jede Frage ist durch den
+   tatsächliche Fragenzahl eingehalten; **jede Frage ist durch den
    Lesson-Text gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff).
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
    **und** Tages-README-Vorlage mit erstem eigenem `## Aufgabe`-Abschnitt (H2)
@@ -206,7 +207,7 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    kanonische Pages-URL. Alles über den Live-Server (`serve.sh`), nie `file://`.
 8. **Beamer:** keine dunklen Code-Boxen; Code ausreichend groß und
    umbruchfreundlich.
-9. **Umfang:** die Lesson trägt eine ganze Doppelstunde (~90 min).
+9. **Umfang:** die Lesson ist eine ganze Doppelstunde (90 min) — Pflicht.
 10. **KM-Vollständigkeit:** alle im KM geforderten Wege/Konzepte kommen vor.
 
 ## Nachziehen (gleicher Commit)
