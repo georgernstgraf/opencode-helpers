@@ -23,7 +23,7 @@ prepared-lessons umstellen.
       (`commit`, `finish`, Continuous-Issue-Completion, Output Expectations)
       und `commands/knowledge-persist.md` angeglichen; `docs/ai/`-Doku
       aktualisiert; Test-Suite grün (70)
-- [x] create-lesson (#90, `SKILL.md` + `docs/ai`): Anforderung ist das
+- [x] #90 CLOSED 2026-09-28 — create-lesson: Anforderung ist das
       **KM/Teil-KM**; `Unterlagen/` als kritisch geprüfte *gelebte Praxis*
       (borgen/kopieren erlaubt, keine Obergrenze); Arbeitsort **`unterricht/`**
       mit `prepared-lessons/NN-slug.html` + Tages-README-Vorlage; Klassenordner
