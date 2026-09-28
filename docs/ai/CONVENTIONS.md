@@ -19,10 +19,15 @@ Follow these without question. Do not deviate unless explicitly told.
 
 ## Classroom Material (create-lesson)
 
+- The skill prepares a lesson for a **KM / part of a KM** (the planned units in `unterricht/`). The requirement is the **KM**; `Unterlagen/` and older lessons are *lived practice* — critically checked for coverage, borrow/copy allowed, but **not an upper bound**; gaps are filled by the skill.
+- Workspace is **`unterricht/`**: prepared lessons live in `unterricht/prepared-lessons/NN-slug.html` (plus a Tages-README template `NN-slug.md`). Class folders are **never** written directly — the teacher copies `lesson.html` + `README.md` into `<klasse>/YYYY-MM-DD__thema/` by hand.
+- The skill **never asks** (single exception: a missing order format `KM/part-KM + Ziel-UE + Thema`).
+- Every lesson carries a full **double period (~90 min)** and covers the KM **completely** (e.g. CSS inclusion: `style` attribute, `<style>` block, linked stylesheet — all three).
 - Lesson HTML always includes a shared light/dark toggle asset under `assets/` (CSS variables + toggle JS): default follows `prefers-color-scheme`, the choice persists via `localStorage`, print stays light, no CDN. Reuse the asset, never inline a per-lesson copy.
-- The Tages-README (`<klasse>/YYYY-MM-DD__thema/README.md`) leads with content (lesson link, summary list) and **always** carries the Aufgabe as its **first own `## Aufgabe` H2 section** (mandatory, with submission convention) — never as a list item; it ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
+- **Beamer suitability:** code boxes are light (light background, dark text), high-contrast and large enough for a projector; no black/dark code boxes. When a central repo asset defines the boxes, fix it at the central location, not per lesson.
+- The Tages-README (`<klasse>/YYYY-MM-DD__thema/README.md`, copied from the `NN-slug.md` template) leads with content (lesson link, summary list) and **always** carries the Aufgabe as its **first own `## Aufgabe` H2 section** (mandatory, with submission convention) — never as a list item; it ends with a `## Housekeeping` block carrying exactly Lehrplan · KM-Bezug · Runtime — never in the HTML header.
 - Student-facing lesson wording is always **Aufgabe**, never "Hausübung"; the Aufgabe **is** the Mitarbeit. On-disk master files may keep repo-convention names (`hausaufgabe.md`/`Hausübung.md`), and the `homework` skill's per-lesson `Hausübung.md` artifact name is unaffected.
-- Quizzes carry **1–5 questions** per lesson, sized to the material; the correct positions rotate across the actual question count. Lessons tables record the sequence (e.g. `B·A·C·D·B`), each question exactly one correct.
+- Quizzes carry **1–5 questions** per lesson, sized to the material; the correct positions rotate across the actual question count, each question exactly one correct. Quiz markup is `<div class="quiz" data-loesung="N">` (central `assets/quiz.js`), and every question must be covered by the lesson text (no next-unit material, no merely name-dropped terms). Lessons tables record the sequence (e.g. `B·A·C·D·B`).
 
 ## Grading Workflow
 

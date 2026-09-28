@@ -1,78 +1,114 @@
 ---
 name: create-lesson
-description: "Baut Klassen-Lektionen (self-contained HTML: Erklärung, Quiz, Aufgabe) aus Semesterplänen und Lehrplan-Extrakten — für Erstkontakt und Wiederholung aus früheren Jahrgängen. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder a lesson HTML file is needed for classroom use."
+description: "Richtet zu einem Kompetenzmodul (KM) oder Teilen davon — den geplanten Einheiten im unterricht/-Ordner — eine Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/prepared-lessons/ ab. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
 
 # Create-Lesson-Skill
 
-Baut **Klassen-Lektionen**: selbständige HTML-Seiten für Schüler:innen mit
-Erklärung, interaktivem Quiz und integrierter **Aufgabe** am Lesson-Ende
-(Aufgabe = Mitarbeit) — gegründet auf Semesterplan (Ziel-UE) und
-Lehrplan-Extrakt (Quelle-KM). Funktioniert in jedem Unterrichts-Repo, das der
-`lehrplan/`-Konvention folgt (konventionsbasiert, nicht auf ein Fach
-verdrahtet — Vorbild: `lehrplan`-Skill).
+Richtet zu einem **Kompetenzmodul (KM) oder Teilen eines KM** — den geplanten
+Einheiten im `unterricht/`-Ordner — eine **Lesson** her: eine selbständige
+HTML-Seite für Schüler:innen mit Erklärung, interaktivem Quiz und integrierter
+**Aufgabe** am Lesson-Ende (Aufgabe = Mitarbeit). Der Skill arbeitet **in
+`unterricht/`** und legt dort **Prepared Lessons** ab; die Übernahme in den
+Klassenordner erfolgt per Hand. Konventionsbasiert, nicht auf ein Fach
+verdrahtet (Vorbild: `lehrplan`- und `teach`-Skill).
+
+Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
+`prepared-lessons/`, Beamer-taugliche Code-Boxen, Stil-Leitfaden):
+`/home/georg/repos/georgernstgraf/GRG-PMM`.
 
 ## Abgrenzung zum Teach-Skill (wichtig, keine Duplikation)
 
 - **`teach` = Selbstlernen** (die Lehrperson lernt: Lernpfade, Meisterschaft,
   Learning Records). Die HTML-Anatomie dort (self-contained, Assets,
   Quiz-Widget-Muster) wird hier **referenziert, nicht kopiert**.
-- **`create-lesson` = Lehren** (Schüler-Material): lehrplangebunden
-  (Quelle↔Ort), lektüregebunden (Lizenzregeln!), per Code-Ausführung
-  verifiziert, in Klassenordnern abgelegt und ggf. über Kohorten gespiegelt.
+- **`create-lesson` = Lehren** (Schüler-Material): KM-/einheitengebunden,
+  lektüregebunden (Lizenzregeln!), per Code-Ausführung verifiziert, als
+  **Prepared Lesson** in `unterricht/prepared-lessons/` abgelegt.
 - Faustregel: Wer `MISSION.md`/`learning-records/` braucht → `teach`.
-  Wer `Thema + Ziel-UE` nennt → dieser Skill.
+  Wer `KM + Ziel-UE` nennt → dieser Skill.
+
+## Grundregeln (nicht verhandelbar)
+
+1. **Anforderung ist das KM, nicht die Unterlage.** Was die Lesson lehren
+   muss, ergibt sich aus dem KM/der Ziel-UE im `unterricht/`-Plan. Der
+   vorhandene Bestand (`Unterlagen/`, frühere Lektionen) ist die *bisherige
+   gelebte Praxis*: Der Skill prüft **kritisch, ob er das geforderte Material
+   ausreichend abdeckt**, darf daraus borgen und kopieren — aber der Bestand
+   ist **keine Obergrenze**. Deckt er nicht, ergänzt der Skill eigenständig.
+2. **Nie nachfragen.** Fehlende Angaben werden autonom aufgelöst, in dieser
+   Reihenfolge: (a) `unterricht/`-Plan + KM, (b) `Unterlagen/` und bestehende
+   Lektionen, (c) PMM-Referenz. Einzige zulässige Rückfrage: fehlendes
+   Bestellformat (KM/Ziel-UE/Thema).
+3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen in
+   `unterricht/prepared-lessons/NN-slug.html` (zweistellig pro KM/Jahr; die
+   laufende Nummer steckt im Dateinamen). Klassenordner werden **nicht**
+   direkt beschrieben — die Lehrperson kopiert die Prepared Lesson von Hand
+   in den Klassenordner der laufenden Klasse.
+4. **Eine Doppelstunde tragen.** Umfang und Tiefe müssen eine ganze
+   Doppelstunde (~90 min) füllen: mehrere Aufbauschritte, Beispiele, Übungen,
+   Quiz — nicht eine 15-Minuten-Zusammenfassung.
+5. **Vollständigkeit des KM.** Alle Wege/Konzepte des KM kommen vor (Beispiel
+   CSS-Einbindung: `style`-Attribut, `<style>`-Block im HTML, verlinktes
+   Stylesheet — alle drei).
+6. **Beamer-Tauglichkeit.** Code-Boxen sind **hell** (heller Grund, dunkle
+   Schrift), kontrastreich, ausreichend groß und umbruchfreundlich; **keine
+   schwarzen/dunklen Code-Boxen**. Erzeugen zentrale Assets die Boxen, wird
+   das Asset an der zentralen Stelle korrigiert (nicht pro Lesson
+   überschrieben).
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
-1. **Lehrplan-Ebene:** `lehrplan/<zweig>/` vorhanden? KM-Steckbriefe
-   (`kompetenzmodule/km*.md`), Ressourcen-Matrix, LEHRPLAN-Extrakt lesen.
-2. **Unterrichtsebene:** `unterricht/<ZWEIG>-<FACH>/jgN-semesterplan-{ws,ss}.md`
-   — die UE-Zeile zum Thema finden (Lektüre-Anker, R-Umsetzung/Werkzeug).
-3. **Stil:** Repo-eigener Stil-Leitfaden (z. B. `docs/stil-leitfaden.md`)?
-   Falls nein: Fallback-Dramaturgie aus § Bauablauf Schritt 5.
-4. **Kohorten-Modell:** Klassenordner mit Master/Kopie-Regel aus README?
-   Falls ja: Master bauen, Kopien spiegeln. Falls nein/unbekannt: erfragen.
-   Kohorten-spezifische Lektionen (z. B. Aufhol-/Recap-Bedarf in nur einer
-   Kohorte) dürfen direkt in der Zielkohorte entstehen — im Klassen-README
-   als kohorten-spezifisch kennzeichnen.
-5. **Daten:** Welche Datensätze nutzt die Zielklasse (Assets/CSV, Pakete)?
-   Lesson-Code muss auf denselben Daten laufen wie der Unterricht.
+1. **Plan/KM:** `unterricht/<FACH>/` — die UE-Zeile zum Ziel-KM/Teil-KM
+   finden (Lektüre-Anker, Ziel). `lehrplan/`-Ebene (KM-Steckbriefe) bei Bedarf
+   gegenlesen.
+2. **Unterlagen (Coverage-Check):** themenspezifische `Unterlagen/`
+   (Folien-PDF/PPTX, `.md`, Demos) + bestehende Lektionen lesen. Notieren, was
+   sie lehren — und **was zur KM-Anforderung fehlt** (wird ergänzt).
+3. **Stil:** (a) bestehende Lektionen des Repos, (b) `docs/stil-leitfaden.md`,
+   (c) PMMs `docs/stil-leitfaden.md`. Nie nachfragen.
+4. **Layout:** Konvention des Repos/der Zielklasse übernehmen; kein fremdes
+   Layout aufzwingen.
+5. **Assets:** zentrales repo-weites `assets/` vorhanden? Den gemeinsamen
+   Bootstrap (`assets/loader.js`), das Theme (`assets/theme.js` +
+   `lesson.css`), das Quiz (`assets/quiz.js`) und den Badge wiederverwenden.
+   Fehlt ein Baustein, einmal im zentralen `assets/` ergänzen — Reuse vor
+   Duplikat.
 6. **Tabellen-Stand:** Lessons-Tabelle im Klassen-README (Nr., Quiz-Richtige)?
    Nächste freie Nummer + Start-Rotation der Quiz-Positionen daraus ablesen.
-7. **Assets/Theme:** zentraler repo-weiter `assets/`-Ordner vorhanden? Den
-   gemeinsamen Bootstrap (`assets/loader.js`), das Theme (`assets/theme.js` +
-   Stylesheet) und den Badge wiederverwenden, nicht pro Lesson neu bauen.
 
-Nichts davon ohne ausdrückliche Anweisung neu anlegen oder migrieren —
-Befunde melden, Bau fortsetzen soweit möglich.
+Nichts ungefragt anlegen oder migrieren, außer es fehlt zum Bau (dann ergänzen,
+Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) `unterricht/`-Plan,
+(b) bestehenden Lektionen, (c) PMM-Referenz schließen.
 
 ## Bestellformat
 
-`Thema + Ziel-UE [+ Quelle bei Wiederholung]`. Beispiele:
+`KM/Teil-KM + Ziel-UE + Thema`. Beispiele:
 
-- „ANOVA-Varianzanalyse für 4AHWIT UE 8" (Erstkontakt: Quelle = Ziel-KM)
-- „Wiederholung Verteilungen aus KM5 für 4AHWIT UE 4" (Quelle ≠ Ziel)
+- „KM3 Basis-Webtechniken, UE 3: CSS-Basics für 3AAIF/3CAIF"
+- „Wiederholung Verteilungen aus KM5 für 4AHWIT UE 4"
 
-## Bauablauf (on-demand, 8 Schritte)
+Ohne Bestellformat wird nicht gebaut — das ist die einzige zulässige Rückfrage.
 
-1. **Quelle grounden:** Matrix-Key des Quell-KMs, KM-Steckbrief
-   (Wissen/Verstehen/Können), Lektüre-Anker. **Lizenzregel:** Lektüre immer
-   per URL/Kapitel zuweisen, nie Text übernehmen („link, don't copy";
-   besonders CC BY-NC-ND-Werke: Didaktik übernehmen, Wortlaut nie).
-   Nur verlinken, was verifiziert existiert (keine erfundenen Deep-Links —
-   im Zweifel Buch-Root + Kapitelnummer).
-2. **Tiefe wählen:** Erstkontakt = Grundbegriffe aufbauen. Wiederholung =
+## Bauablauf (8 Schritte)
+
+1. **Quelle grounden:** KM-Anforderung festhalten; `Unterlagen/` + frühere
+   Lektionen als Quelle nutzen (borgen/kopieren erlaubt). **Lizenzregel:**
+   Lektüre immer per URL/Kapitel zuweisen, nie Text übernehmen („link, don't
+   copy"; besonders CC BY-NC-ND-Werke: Didaktik übernehmen, Wortlaut nie).
+   Nur verlinken, was verifiziert existiert (keine erfundenen Deep-Links — im
+   Zweifel Buch-Root + Kapitelnummer).
+2. **Tiefe & Umfang:** Erstkontakt = Grundbegriffe aufbauen. Wiederholung =
    reaktivieren + eine Stufe höher (keine Grundbegriffe neu einführen),
-   Anschluss an das Vorwissen der Zielklasse explizit benennen.
-3. **Kopf (themenfokussiert):** Zeile 1 = `Lektion NN · Thema`
-   (zweistellig, pro Schuljahr pro Klasse — max. ~40 Wochen). Zeile 2 klein =
-   `UE n · Klasse Semester [· Wiederholung aus KMx]`. Thema zuerst,
-   Provenienz zweitrangig aber auffindbar. Lehrplan, KM-Bezug und Runtime
-   gehören **nicht** in den HTML-Header — sie stehen unten im Tages-README
-   (siehe § Tages-README).
+   Anschluss an das Vorwissen der Zielklasse explizit benennen. Immer so viel
+   Stoff, dass es eine **Doppelstunde** trägt.
+3. **Kopf (themenfokussiert):** Zeile 1 = `Lektion NN · Thema` (zweistellig,
+   pro KM/Jahr — max. ~40 Wochen). Zeile 2 klein = `UE n · Klasse Semester [·
+   Wiederholung aus KMx]`. Thema zuerst, Provenienz zweitrangig aber
+   auffindbar. Lehrplan, KM-Bezug und Runtime gehören **nicht** in den
+   HTML-Header — sie stehen unten im Tages-README (siehe § Tages-README).
 4. **HTML-Gerüst, Bootstrap & Badge:** Jede Lesson nutzt im `<head>` den
    **generischen Inline-Bootstrap** (findet `assets/loader.js` über die
    Ahnen-Verzeichnisse; Repo-Name nirgends im Code) mit `data-css`/`data-js`
@@ -81,53 +117,56 @@ Befunde melden, Bau fortsetzen soweit möglich.
    ansehen", fixiert, `no-print`). Toggle-Button im Header. Default folgt
    `prefers-color-scheme`, die Wahl per `localStorage` gemerkt, **Print immer
    hell**, kein CDN. Fehlt ein Baustein im zentralen `assets/`, einmal ergänzen
-   — Reuse vor Duplikat. Seiten laufen über den Live-Server, nie `file://`.
+   — Reuse vor Duplikat. Seiten laufen über den Live-Server (`serve.sh`), nie
+   `file://`.
 5. **Dramaturgie (6 Bausteine):** Einstiegsfrage (reale Frage mit Datenbezug)
    → Ziel-Artefakt (fertiger Plot/Tabelle als Sehnsuchtsbild) →
-   inkrementeller Aufbau (ein Konzept pro Schritt, ein Datensatz durchgehend)
+   inkrementeller Aufbau (ein Konzept pro Schritt, ein Beispiel durchgehend)
    → „Jetzt du!" (3 Aufgaben: Vorhersage zuerst, dann ausführen; Interleaving
    früherer Lessons) → Typische Fehler (je mit Anti-Beispiel-Code) →
    Zusammenfassung (Tabelle) + Ausblick (Folge-UE im **Ziel**-Semesterplan).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
 6. **Quiz:** je nach Stoff **1–5 Fragen** pro Lesson (so viele, wie sich
-   mit dem Stoff sinnvoll abdecken lassen); die Richtige-Positionen über
-   die tatsächliche Fragenzahl ausgewogen rotieren (A/B/C/D), je Frage
-   genau eine Richtige; Antwortoptionen gleiche Wortzahl (möglichst
-   Zeichenzahl) — keine Format-Hinweise.
+   mit dem Stoff sinnvoll abdecken lassen); die Richtige-Positionen über die
+   tatsächliche Fragenzahl ausgewogen rotieren, je Frage genau eine Richtige;
+   Antwortoptionen gleiche Wortzahl (möglichst Zeichenzahl) — keine
+   Format-Hinweise. Fragen decken **ausschließlich** Stoff, der in der Lesson
+   tatsächlich eingeführt wurde — kein Vorgriff auf Folge-UE, keine nur
+   beiläufig genannten Begriffe. Markup:
+   `<div class="quiz" data-loesung="N">` (zentrales `assets/quiz.js`).
 7. **Aufgabe:** Abschnitt **„Aufgabe"** direkt am Lesson-Ende anhängen
-   (nach Zusammenfassung/Ausblick, vor dem Quiz-Script): stufenweise aus dem
-   Lesson-Stoff gestuft, Vorhersage-Aufgabe zuerst, plus Abgabehinweis
-   (Konvention der Klasse, z. B. Commit im Schüler-Repo). Der schülerseitige
-   Begriff ist immer **Aufgabe**, nie „Hausübung" — die Aufgabe **ist** die
-   Mitarbeit. Referenz im Tages-README (z. B. „Aufgabe: Abschnitt am
-   Lesson-Ende"). Existiert ein Aufgaben-Master im Repo (on-disk ggf.
-   `hausaufgabe.md`/`Hausübung.md`), auf ihn verlinken statt duplizieren.
-8. **Code-Stil:** Projekt-Konvention (z. B. `<-`, Snake_case, natives Pipe);
-   Output als Kommentar, Erklärung als Kommentar; Zeilen kurz halten.
+   (nach Zusammenfassung/Ausblick): stufenweise aus dem Lesson-Stoff gestuft,
+   Vorhersage-Aufgabe zuerst, plus Abgabehinweis (Konvention der Klasse, z. B.
+   Commit im Schüler-Repo). Der schülerseitige Begriff ist immer **Aufgabe**,
+   nie „Hausübung" — die Aufgabe **ist** die Mitarbeit. Die Tages-README-
+   Vorlage verweist darauf (z. B. „Aufgabe: Abschnitt am Lesson-Ende").
+   Existiert ein Aufgaben-Master im Repo, auf ihn verlinken statt duplizieren.
+8. **Beamer-Check & Code-Stil:** Code-Boxen hell und groß genug für den
+   Projektor (siehe Grundregel 6). Projekt-Konvention (z. B. `<-`, Snake_case,
+   natives Pipe); Output als Kommentar, Erklärung als Kommentar; Zeilen kurz
+   halten.
 
-## Ablage & Dateinamen
+## Prepared Lessons (Ablage & Lebenszyklus)
 
-**Vorbereitete, noch nicht terminierte Lektionen** liegen in
-`<klasse>/prepared-lessons/NN-slug.html` (zweistellig pro Schuljahr pro
-Klasse; die laufende Nummer steckt im Dateinamen).
+**Prepared Lesson** (undatiert, vorbereitet) liegt in
+`unterricht/prepared-lessons/NN-slug.html` (zweistellig pro KM/Jahr; die
+laufende Nummer steckt im Dateinamen). Dazu gehört eine **Tages-README-Vorlage**
+`NN-slug.md` (Inhalt + `## Aufgabe` + `## Housekeeping`, siehe § Tages-README).
 
-**Terminierte/abgehaltene Lektionen** liegen im Datums-Thema-Ordner der Klasse:
-`<klasse>/YYYY-MM-DD__thema/` (Datum mit doppeltem Unterstrich, Thema
-kleingeschrieben mit Bindestrichen). Darin liegen genau zwei Dateien:
-
-- `lesson.html` — die Lektion (Dateiname fest; die laufende Nummer `NN`
-  lebt nur im Kicker und in der Lessons-Tabelle, **nicht** im Dateinamen)
-- `README.md` — der Tages-README (siehe § Tages-README)
+**Übernahme in den Unterricht:** Die Lehrperson kopiert die Prepared Lesson
+per Hand in den Klassenordner der laufenden Klasse `<klasse>/YYYY-MM-DD__thema/`
+als `lesson.html` plus `README.md` (aus der Vorlage). Der Skill schreibt **nie**
+direkt in Klassenordner.
 
 Der frühere Ordner `lessons/` heißt jetzt `prepared-lessons/`.
 
-## Tages-README (Layout, Pflicht)
+## Tages-README (Layout, Pflicht bei der Übernahme)
 
-Pro Lektion gehört ein Tages-README **im selben Datums-Ordner**
-`<klasse>/YYYY-MM-DD__thema/README.md`. Oben steht der Inhalt:
-Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt (Liste mit
-Demo/Quiz/…). Die Aufgabe ist **Pflicht** und steht als **erster eigener
-`## Aufgabe`-Abschnitt (H2)** — nicht als Listenpunkt. Die
+Zu einer Lesson gehört ein Tages-README **im selben Datums-Ordner**
+`<klasse>/YYYY-MM-DD__thema/README.md` (aus der Vorlage `NN-slug.md`). Oben
+steht der Inhalt: Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt
+(Liste mit Demo/Quiz/…). Die Aufgabe ist **Pflicht** und steht als **erster
+eigener `## Aufgabe`-Abschnitt (H2)** — nicht als Listenpunkt. Die
 **Housekeeping-Infos** (Lehrplan · KM-Bezug · Runtime) stehen als
 **letzter Abschnitt** — nie im Kopf, nie im HTML-Header:
 
@@ -153,32 +192,39 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 2. Alle relativen Links auflösbar (Assets, Nachbar-Lessons, Aufgabe,
    Semesterplan).
 3. Kein CDN / keine externen Abhängigkeiten (läuft über den lokalen
-   Live-Server), außer verlinkter Lektüre.
+   Live-Server `serve.sh`), außer verlinkter Lektüre.
 4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
-   tatsächliche Fragenzahl (1–5) eingehalten.
+   tatsächliche Fragenzahl (1–5) eingehalten; **jede Frage ist durch den
+   Lesson-Text gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff).
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
-   **und** im Tages-README als erster eigener `## Aufgabe`-Abschnitt (H2)
-   vorhanden — beides Pflicht.
+   **und** Tages-README-Vorlage mit erstem eigenem `## Aufgabe`-Abschnitt (H2)
+   und `## Housekeeping` zuletzt — Pflicht.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
    Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell.
 7. Bootstrap + Badge: generische Inline-Bootstrap im `<head>` vorhanden und
    `assets/loader.js` erreichbar; der Badge erscheint und zeigt auf die
    kanonische Pages-URL. Alles über den Live-Server (`serve.sh`), nie `file://`.
+8. **Beamer:** keine dunklen Code-Boxen; Code ausreichend groß und
+   umbruchfreundlich.
+9. **Umfang:** die Lesson trägt eine ganze Doppelstunde (~90 min).
+10. **KM-Vollständigkeit:** alle im KM geforderten Wege/Konzepte kommen vor.
 
 ## Nachziehen (gleicher Commit)
 
 - Lessons-Tabelle im Klassen-README (Nr. · Ziel-UE vollqualifiziert ·
   Thema · Quelle · Typ · Quiz-Richtige · Status); Aufgaben-Spalte statt „HÜ",
   Quiz-Richtige als Sequenz (z. B. `B·A·C·D·B`).
-- Tages-README des Datums-Ordners nach § Tages-README (Aufgabe als erster
+- Tages-README-Vorlage nach § Tages-README (Aufgabe als erster
   `## Aufgabe`-Abschnitt (H2), Housekeeping-Block zuletzt).
-- Kohorten-Spiegel nach Master-Regel des Repos.
 - Neue Fachbegriffe ins Glossar (mit vollqualifiziertem UE-Verweis).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
 
 ## Was dieser Skill NICHT tut
 
 - Keine Semesterpläne entwerfen (lehrplan-Skill, Aufgabe 3).
+- Keine Lessons unterhalb der KM-Anforderung oder ohne Bezug zu KM/Unterlagen
+  erfinden.
 - Keine Folien anlegen. Die Aufgabe gehört in die Lesson — ein separater
   Aufgaben-Master entsteht nur, wenn die Repo-Konvention einen verlangt.
+- Nicht direkt in Klassenordnern schreiben (Übernahme per Hand).
 - Keine Selbstlern-Pfade (teach-Skill).

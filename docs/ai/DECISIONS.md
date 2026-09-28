@@ -3,6 +3,13 @@
 Records architectural and technical decisions with rationale.
 Each entry documents WHAT was decided and WHY.
 
+## 2026-09-28: create-lesson — KM-Anforderung, unterricht/-Arbeitsort, Prepared Lessons, Beamer-Boxen (#90)
+- **Choice**: Der `create-lesson`-Skill (1) nimmt das **KM/Teil-KM** (die geplanten Einheiten) als Anforderung und behandelt `Unterlagen/`/bestehende Lektionen als **gelebte Praxis** — kritisch auf Abdeckung geprüft, borgen/kopieren erlaubt, aber **keine Obergrenze**; Lücken ergänzt der Skill eigenständig. (2) Arbeitsort ist **`unterricht/`**; Prepared Lessons liegen in `unterricht/prepared-lessons/NN-slug.html` (+ Tages-README-Vorlage `NN-slug.md`), die Klassenübernahme passiert **per Hand**. (3) Der Skill **fragt nie** (einzige Ausnahme: fehlendes Bestellformat). (4) Pflicht: **Doppelstunden-Umfang**, **KM-Vollständigkeit** (z. B. CSS: alle drei Einbindungsarten) und **Beamer-Tauglichkeit** (helle Code-Boxen, keine schwarzen). PMM bleibt kanonische Referenz.
+- **Reason**: Eine erzeugte CSS-Basics-Lesson war inhaltlich dünn, zeigte nur eine der drei CSS-Einbindungsarten und hatte schwarze, am Beamer unlesbare Code-Boxen. Der alte Skill legte Lessons pro Klasse ab und ließ an mehreren Stellen `erfragen` zu.
+- **Considered**: Unterlagen als Obergrenze/Stoffgrenze (verworfen — die KM-Anforderung ist maßgeblich); Ablage pro Klasse (verworfen — Arbeitsort `unterricht/`, Kopie manuell); Per-Lesson-Inline-Styles für Code-Boxen (verworfen — zentrale Assets werden zentral korrigiert).
+- **Tradeoff**: Der Klassenordner wird nicht mehr automatisch beschrieben; die Lehrperson kopiert Lesson + README von Hand. Die Konvention berührt Repos, die noch `<klasse>/prepared-lessons/` nutzen (PMM) — PMM wird nicht migriert, bleibt Referenz.
+- **Issue**: #90
+
 ## 2026-03-04: Use docs/ai/ for knowledge persistence
 - **Choice**: Store knowledge files in `docs/ai/` directory
 - **Reason**: Follows common docs structure, keeps AI context with other documentation

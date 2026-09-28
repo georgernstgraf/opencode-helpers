@@ -40,4 +40,9 @@ Open tasks:
       access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
       credential) — that part is done. Track the SVN/secret work over there.
 
+5. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
+      weiterhin `<klasse>/prepared-lessons/` und das alte Ablagemodell. Bei
+      nächster Gelegenheit auf die #90-Regeln angleichen (KM-Anforderung,
+      `unterricht/prepared-lessons/`, Beamer-Boxen) — erst nach Rücksprache.
+
 Last updated: 2026-09-28.

@@ -10,11 +10,11 @@ so the knowledge commit is expected, no empty commit follows it, and a post-clos
 follow-up commit carries `STATE.md`/`HANDOFF.md`. Previously the workflow could
 leave knowledge files uncommitted.
 
-`create-lesson` Tages-README refined (#84): the Aufgabe is now the first
-own `## Aufgabe` H2 section, never a list item. Two pending grading-skill
-edits shipped (#85): `4ahwit`/`5ahwit` informal addresses and
-`knowledge-assessment` allowed inside a Git working tree (no Git ops).
-Continuous issue-awareness workflow continues to be observed.
+`create-lesson` (#90) wurde umgebaut: KM-Anforderung statt Unterlagen-Obergrenze,
+Arbeitsort `unterricht/` mit `prepared-lessons/NN-slug.html`, kein Nachfragen,
+Doppelstunden-Umfang, KM-Vollständigkeit und Beamer-taugliche Code-Boxen.
+Erste Anwendung: GRG-WMC auf zentrales `assets/` + selbst-geführte
+prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
@@ -23,6 +23,13 @@ Continuous issue-awareness workflow continues to be observed.
       (`commit`, `finish`, Continuous-Issue-Completion, Output Expectations)
       und `commands/knowledge-persist.md` angeglichen; `docs/ai/`-Doku
       aktualisiert; Test-Suite grün (70)
+- [x] create-lesson (#90, `SKILL.md` + `docs/ai`): Anforderung ist das
+      **KM/Teil-KM**; `Unterlagen/` als kritisch geprüfte *gelebte Praxis*
+      (borgen/kopieren erlaubt, keine Obergrenze); Arbeitsort **`unterricht/`**
+      mit `prepared-lessons/NN-slug.html` + Tages-README-Vorlage; Klassenordner
+      nur per Hand; **kein Nachfragen** (außer Bestellformat);
+      Doppelstunden-Umfang, KM-Vollständigkeit und Beamer-taugliche helle
+      Code-Boxen als Pflicht + Verifikationspunkte
 - [x] create-lesson Aufgabe als erster `## Aufgabe`-Abschnitt (#84):
       Layout-Template, Verifikation, Nachziehen im Skill und die
       Classroom-Material-Konvention in `docs/ai/CONVENTIONS.md`
