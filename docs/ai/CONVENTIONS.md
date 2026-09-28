@@ -76,6 +76,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - **Continuous Issue Awareness:** At any point in a session the agent knows which issue it works under; unambiguous new topics get an issue without user interaction, ambiguous assignments are clarified first.
 - **Proactive Commit and Push:** After each completed, self-contained unit of work, commit (with issue reference) and push immediately — but only when tests/lint for the affected area pass ("green commits only"). Never push a broken state.
 - **Issue Completion:** Closing an issue autonomously requires full goal coverage, green verification, and no open sub-issues; otherwise ask the user first.
+- **Knowledge persistence always ends with its own commit + push** (`svn ci` in SVN), carrying the active issue reference. Persisting to disk without committing/pushing is incomplete. Because `STATE.md`/`HANDOFF.md` record the closed state, a post-close knowledge commit is expected; never leave `docs/ai/` changes uncommitted/unpushed, and never close/reopen issues from the persistence step.
 - The global policy lives in `AGENTS.global.md` (repo root, linked as `~/.config/opencode/AGENTS.md`); read-only/grading skills and student repos are excluded from it.
 
 ## Naming

@@ -65,10 +65,10 @@ Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 | `grill-with-docs` | Grilling plus ADR/glossary docs created along the way | Natural language ("grill") |
 | `grilling` | Relentless interview to stress-test a plan, decision, or idea | Natural language ("grill") |
 | `homework` | Generate per-lesson `Hausübung.md` files from Git history | Direct invocation from class folder |
-| `issue-workflow` | Continuous issue awareness (always work under an issue), proactive issue-linked commit/push (green commits only), completion/auto-close criteria; `start`/`commit`/`finish` remain as manual override modes | Continuous + natural language override triggers (no slash command) |
+| `issue-workflow` | Continuous issue awareness (always work under an issue), proactive issue-linked commit/push (green commits only), completion/auto-close criteria; `start`/`commit`/`finish` remain as manual override modes. Treats the knowledge-persistence commit as part of the flow (no empty commit after it) and expects a post-close knowledge follow-up commit | Continuous + natural language override triggers (no slash command) |
 | `knowledge-assessment` | Assess student knowledge-check submissions, produce grading reports and email payloads | `/knowledge-assess` |
 | `knowledge-exam` | Generate German knowledge-check exams and solution files | `/knowledge-exam` |
-| `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files | `/knowledge-persist` or natural language triggers ("persist knowledge") |
+| `knowledge-persistence` | Persist session context into structured docs/ai/ knowledge files; **always ends with its own commit + push** of the knowledge files (issue-referenced; `svn ci` in SVN), never closes issues | `/knowledge-persist` or natural language triggers ("persist knowledge") |
 | `orchestration` | Scope-gated coordination for large work: decompose into sub-issues, delegate implementation to sub-agents, verify behind a hard test gate | Natural language ("large", multi-session work) |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
@@ -96,7 +96,7 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 
 - `commands/*.md` → `skills/<name>/SKILL.md`: Commands pass user arguments and constraints into skills for execution.
 - `grading-shared` → `repograde`/`knowledge-assessment`/`projectgrade`: Shared protocols injected via skill reference at runtime.
-- `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files.
+- `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files, then commits + pushes them (issue-referenced) — the run is only complete once they are on the trunk.
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instance chain `https://searxng.claw.graf.priv.at` → `etsi.me` → `baresearch.org` (no localhost entry — the skill runs on multiple hosts).

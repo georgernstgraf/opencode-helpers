@@ -402,3 +402,11 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: 212 der 524 Keys bleiben bei `note` statt Zahl (proprietäre/undisclosed Modelle, Router, Nicht-LLM-Tools); geschätzte Werte sind mit `~` und `estimated` markiert. Der Suchkey ignoriert Provider-Prefixe, daher teilen sich gleichnamige Modelle verschiedener Provider einen Eintrag (erwünscht); reine Schreibweisen-Varianten (`claude-opus-4-5` vs `-4.5` vs `opus4-5`) werden über `aliases` kanonisiert.
 - **Origin**: Recherche einmalig über HF-API (`safetensors.total`), OpenRouter (`hugging_face_id`), Vendor-Docs und Artificial Analysis; Skill hält den Ablauf für neue Modelle reproduzierbar.
 - **Issue**: #88
+
+## 2026-09-28: knowledge-persistence endet immer mit eigenem Commit + Push (#89)
+
+- **Choice**: `knowledge-persistence` schreibt die `docs/ai/`-Dateien und **committet + pusht sie danach zwingend** in einem eigenen Commit mit Issue-Referenz (`docs: persist knowledge (#N)`; SVN: `svn ci`). `issue-workflow` wurde angeglichen: `commit`/`finish` erzeugen danach keinen leeren Commit mehr und erwarten einen **Post-Close-Follow-up-Commit**, weil `STATE.md`/`HANDOFF.md` den geschlossenen Zustand protokollieren. `commands/knowledge-persist.md` nennt den Commit+Push ebenfalls.
+- **Reason**: Die Skill-Doku ließ offen, was mit den nach dem Code-Commit geschriebenen Knowledge-Dateien passiert — sie konnten uncommitted zurückbleiben und vom Trunk divergieren (in einer Session real beobachtet).
+- **Considered**: Knowledge in den bestehenden Code-Commit falten (verworfen — STATE/HANDOFF entstehen zwangsläufig nach dem Close); nur im `finish`-Modus committen (verworfen — der Dauerzustand-Pfad persistiert ebenso).
+- **Tradeoff**: Zwei Commits pro Finish (Code/Doku + Knowledge-Follow-up) sind normal; der Agent muss einen leeren Commit erkennen und unterlassen. `knowledge-persistence` schließt weiterhin **nie** Issues — nur `issue-workflow`.
+- **Issue**: #89

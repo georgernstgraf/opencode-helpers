@@ -1,8 +1,14 @@
 # Project State
 
-Current status as of 2026-09-25.
+Current status as of 2026-09-28.
 
 ## Current Focus
+
+`knowledge-persistence` now always ends with its own commit + push (#89):
+`issue-workflow` (`commit`/`finish` + the continuous completion path) was aligned
+so the knowledge commit is expected, no empty commit follows it, and a post-close
+follow-up commit carries `STATE.md`/`HANDOFF.md`. Previously the workflow could
+leave knowledge files uncommitted.
 
 `create-lesson` Tages-README refined (#84): the Aufgabe is now the first
 own `## Aufgabe` H2 section, never a list item. Two pending grading-skill
@@ -12,6 +18,11 @@ Continuous issue-awareness workflow continues to be observed.
 
 ## Completed (this cycle)
 
+- [x] #89 CLOSED 2026-09-28 — knowledge-persistence endet mit eigenem Commit + Push: Skill um
+      Pflichtschritt „Commit and Push" + Constraint erweitert; `issue-workflow`
+      (`commit`, `finish`, Continuous-Issue-Completion, Output Expectations)
+      und `commands/knowledge-persist.md` angeglichen; `docs/ai/`-Doku
+      aktualisiert; Test-Suite grün (70)
 - [x] create-lesson Aufgabe als erster `## Aufgabe`-Abschnitt (#84):
       Layout-Template, Verifikation, Nachziehen im Skill und die
       Classroom-Material-Konvention in `docs/ai/CONVENTIONS.md`
