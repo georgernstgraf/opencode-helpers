@@ -156,10 +156,13 @@ Use this mode to force an immediate checkpoint while the issue remains open
   - what remains
   - known risks, blockers, or follow-ups
 - Persist session knowledge by invoking the `knowledge-persistence` skill.
-  Note: knowledge-persistence never closes issues; it only adds comments
-  for traceability.
+  Note: knowledge-persistence **commits and pushes its own knowledge commit**
+  (with the issue reference) and never closes issues; it only adds comments for
+  traceability.
 - Review git status and staged/unstaged changes.
-- Create a commit that includes the issue number.
+- Create a commit that includes the issue number for any **remaining**
+  non-knowledge changes. Never create an empty commit — if knowledge-persistence
+  already committed everything, there is nothing to do here.
 - Push to the trunk line.
 - Keep the issue open.
 
@@ -173,16 +176,22 @@ Use this mode to force finalization and issue closure (e.g., "issue finish",
 - Comment on the issue with a final implementation report.
 - Persist all newly acquired session knowledge by also using the
   `knowledge-persistence` skill before finalizing the workflow.
-  Note: knowledge-persistence itself never closes issues. The issue
-  closure below is owned exclusively by this `finish` mode.
+  Note: knowledge-persistence **commits and pushes its own knowledge commit**
+  (with the issue reference); it never closes issues. The issue closure below is
+  owned exclusively by this `finish` mode.
 - Review git status and remaining changes.
-- Create the final commit including the issue number.
+- Create the final commit including the issue number for any **remaining**
+  non-knowledge changes. Never create an empty commit.
 - Push to the trunk line.
 - **Before closing the issue**, list its sub-issues via:
   `gh api repos/{owner}/{repo}/issues/{NUMBER}/sub_issues --jq '.[].number'`
   If any sub-issues remain open, the issue **must not** be closed. Report the
   open sub-issues and keep the parent open.
 - Close the issue with a short closing comment if helpful.
+- **Post-close knowledge follow-up:** because `STATE.md`/`HANDOFF.md` record the
+  *closed* state, run `knowledge-persistence` once more after closing — it ends
+  with its own commit + push, so the recorded closure reaches the trunk. This
+  second run is expected; the first (pre-close) run must not be skipped.
 
 ## Issue Completion (Dauerzustand)
 
@@ -200,6 +209,11 @@ Applies at any time, independent of the modes:
 - Before closing, comment on the issue with a final implementation
   report (persist session knowledge via `knowledge-persistence` when new
   knowledge exists).
+- Knowledge persistence is not finished until it is **committed and pushed**
+  (its own commit with the issue reference; SVN: `svn ci`). Because
+  `STATE.md`/`HANDOFF.md` describe the closed state, this usually means a
+  **follow-up knowledge commit after the close** — never leave the knowledge
+  files uncommitted/unpushed.
 - The final message to the user **MUST** state that the issue was closed and
   name its number (e.g. "Issue #123 closed"). A silent closure is not enough.
 - If any criterion is not met, do **not** close: report the status, state what
@@ -295,6 +309,7 @@ At the end of the workflow, report:
 - the issue number used or created
 - whether a comment was added
 - whether a commit was created, including its message
-- whether knowledge persistence was run
+- whether knowledge persistence was run, and the hash of its commit (and that
+  it was pushed)
 - the issue number and its final state: when the issue was closed, state this
   explicitly (e.g. "Issue #123 closed"); otherwise note that it remains open

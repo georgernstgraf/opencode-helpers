@@ -18,6 +18,12 @@ Use this skill at any checkpoint during or at the end of a productive
 session, or when explicitly asked to "save context", "persist knowledge",
 or "update knowledge file".
 
+Persisting to disk is **not** the end of the skill: **every persistence run
+finishes with its own commit and push** (SVN: `svn ci`) of the updated
+knowledge files, referencing the active issue. Knowledge that is written but
+not committed does not exist for the next agent — the run is only complete
+once the changes are on the trunk.
+
 ## Target Structure
 
 Ensure the following directory and files exist relative to the project root.
@@ -160,10 +166,28 @@ relocate it.
   only adds comments for traceability.
 - If no active issue is known, skip this step silently.
 
-### 8. Confirmation
+### 8. Commit and Push (mandatory)
 
-- After writing, list every file that was created or modified, and for each
-  show the number of entries added, updated, or removed.
+- **Git-Projekte:** Stage the knowledge files and create a commit that
+  references the active issue, e.g. `docs: persist knowledge (#42)`. Preserve
+  the repository's commit-message style, keep the issue reference, then push to
+  the trunk line. Never write an empty commit — if nothing changed, report
+  "nothing to persist" and stop.
+- If several commits are needed, that is fine; what is forbidden is leaving
+  knowledge changes uncommitted or unpushed.
+- **SVN-Projekte** (z. B. `~/svn/georg`, Deployed-Trees): Analogon ist ein
+  `svn ci` mit klarer deutscher Commit-Message.
+- The commit may land **after** an issue is closed (e.g. STATE.md/HANDOFF.md
+  record the closed state) — the knowledge commit is the follow-up that carries
+  those files to the trunk.
+- This skill still NEVER closes, reopens, or changes the state of an issue
+  (see step 7 and Constraints).
+
+### 9. Confirmation
+
+- After committing and pushing, list every file that was created or modified,
+  and for each show the number of entries added, updated, or removed.
+- State the commit hash and that it was pushed.
 
 ## File Templates and Content Rules
 
@@ -173,6 +197,9 @@ creating or overwriting it.
 
 ## Constraints
 
+- **Commit + push is part of persistence.** Every run ends on the trunk: a
+  commit with the active issue reference, pushed (Git) or `svn ci` (SVN).
+  Uncommitted/unpushed knowledge files violate this skill.
 - Write only verified facts from the session. Do not speculate.
 - Keep entries atomic: one fact, one bullet.
 - Active files: merge new entries, but DELETE superseded entries by
