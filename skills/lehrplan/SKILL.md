@@ -73,41 +73,42 @@ Die Welt ist zweigeteilt in zwei Ebenen mit eigenen Wurzeln im Repo-Root:
 
 | Ebene | Wurzel | Inhalt | Zuständig |
 |-------|--------|--------|-----------|
-| **Lehrplan-Ebene** (Gesetz + Planung) | `lehrplan/` | Gesetzesmaterial, Extrakte, METADATA, KM-Steckbriefe | **dieser Skill** |
-| **Unterrichtsebene** (Vorbereitung + Durchführung) | `unterricht/` | Lehrstoffverteilungen, Semesterpläne, Stunden-Ordner | **Unterricht-Skill (noch zu erstellen)** |
+| **Lehrplan-Ebene** (Gesetz + Planung) | `lehrplan/` | Gesetzesmaterial, Extrakte, METADATA, KM-Steckbriefe, KM-keyed Ressourcen, Lehrstoffverteilungen/Semesterpläne | **dieser Skill** |
+| **Unterrichtsebene** (Vorbereitung + Durchführung) | `unterricht/` | vorbereitete Einheiten (Prepared Lessons) | **`create-lesson`-Skill** |
 
-Der `/unterricht/`-Ordner am Repo-Root ist **flach** aufgebaut. Vorbereitete
-Einheiten-Ordner liegen **direkt** unter `unterricht/` und tragen das
-zugehörige Kompetenzmodul im Namen (`KM<#>-<NN>-<slug>` bzw. `SA-<NN>-<slug>`
-für schulautonome Teile; `<NN>` läuft pro KM). Die Planungs-Dateien eines
-Zweig-Fachs liegen in einem Unterordner `<ZWEIG>-<FACH>/`:
+Der `/unterricht/`-Ordner am Repo-Root enthält **nur vorbereitete Einheiten**.
+Sie liegen **flach** unter `unterricht/` und tragen das zugehörige
+Kompetenzmodul im Namen (`KM<#>-<NN>-<slug>` bzw. `SA-<NN>-<slug>` für
+schulautonome Teile; `<NN>` läuft pro KM). Planungs-Dateien (Einheiten,
+Semesterpläne) gehören **nicht** hierher, sondern auf die Lehrplan-Ebene
+(`lehrplan/<fach>-<zweig>/`). Terminierte Lektionen wandern in die
+Kohorten-Ordner am Repo-Root.
 
 ```
 unterricht/
-  <ZWEIG>-<FACH>/                 # GROSSBUCHSTABEN, z. B. HWII-INFI, WIT-INFI
-    jg2-einheiten.md              # Lehrstoffverteilung ("Einheiten") Jahrgang 2
-    jg3-einheiten.md
-    jg4-einheiten.md
-    jg4-semesterplan-ws.md        # Semesterplan Wintersemester
-    jg4-semesterplan-ss.md        # Semesterplan Sommersemester
   KM<#>-<NN>-<slug>/              # vorbereitete Einheit (KM-Lehrstoff)
   SA-<NN>-<slug>/                 # vorbereitete Einheit (schulautonom)
-  YYYY-MM-DD_thema/               # terminierte Einheit / Kohorten-Lektion
+
+<klasse>/YYYY-MM-DD__thema/       # Kohorten-Ablage am Repo-Root (terminierte Lektion)
 ```
 
-- Das `<ZWEIG>`-Kürzel folgt der Klassen-Postfix-Tabelle (siehe
+- Das `<ZWEIG>`-Kürzel der **Lehrplan-Ebene** folgt der
+  Klassen-Postfix-Tabelle (siehe
   [KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md)): `HWII`, `HWIT`, `AIF`, `KIF`, `CIF` usw.
 - Klein geschriebenes `jg<N>`-Präfix für alle Einheiten- und
   Semesterplan-Dateien — **einheitliches Schema, keine Ausnahmen**.
-- **Dokumentierte Ausnahme (GRG-WMC):** form-übergreifender Ordner
-  `unterricht/WMC/` statt `unterricht/<FORM>-WMC/` — WMC unterrichtet die
-  Formen AIF/KIF/CIF **gemeinsam** (dieselbe Anlage 1.9, gemischte Kohorten),
-  die Einheiten-Dateien (`jg1`/`jg2`) decken bewusst alle Formen eines
-  Jahrgangs ab. Die Abweichung wird per DECISIONS-Eintrag im Repo
-  gerechtfertigt und ist vom Konformitäts-Check nicht als Befund zu melden.
-- Das detaillierte Unterrichts-Layout (Stunden-Ordner-Inhalte, Materialien,
-  Hausübungen) gehört zum **zukünftigen Unterricht-Skill**; dieser Skill
-  legt hier nur die Lehrstoffverteilungen und Semesterpläne ab (Aufgabe 3)
+- **Kein `unterricht/<ZWEIG>-<FACH>/`-Ordner.** Die Kompetenzmodule sind
+  formunabhängig, deshalb braucht die Unterrichtsebene keine Zweig-Fach-Ebene
+  — die trägt allein die Lehrplan-Ebene.
+- **Dokumentierte Ausnahme (GRG-WMC):** WMC unterrichtet die Formen
+  AIF/KIF/CIF **gemeinsam** (dieselbe Anlage 1.9, gemischte Kohorten). Die
+  form-übergreifenden Planungsdateien (Einheiten/Semesterpläne, die bewusst
+  alle Formen eines Jahrgangs abdecken) dürfen deshalb per DECISIONS-Eintrag
+  **in einem** benannten Ort liegen, statt pro Form dupliziert zu werden; der
+  Konformitäts-Check meldet das nicht als Befund.
+- Das detaillierte Unterrichts-Layout (Prepared-Lesson-Inhalte, Materialien,
+  Aufgaben) gehört zum **`create-lesson`-Skill**; dieser Skill legt auf der
+  Lehrplan-Ebene nur die Lehrstoffverteilungen und Semesterpläne ab (Aufgabe 3)
   und meldet Altbestände als Befund (siehe Retrofit-Klausel).
 
 ## Repo-Konventionen
@@ -116,15 +117,18 @@ unterricht/
 > Das unten gezeigte Layout ist der **verbindliche Zielzustand** jedes
 > Unterrichts-Repos. Wann immer eine Session auf ein Repo trifft, das
 > davon abweicht (z. B. Lehrplan-Dateien unter `docs/lehrplan/`,
-> Klassenordner oder `kompetenzmodule/` im `lehrplan/`-Root ohne
-> Zweig-Ebene, `jgN-einheiten.md`-Sammeldateien unter `lehrplan/`,
-> Semesterpläne oder Stunden-Ordner unter `lehrplan/`), gilt: **melden als
-> Befund mit Migrationspflicht; Migration selbst nur auf ausdrücklichen
+> Klassenordner unter `lehrplan/` ohne Zweig-Ordner,
+> `unterricht/<ZWEIG>-<FACH>/`-Ordner, Planungsdateien unter `unterricht/`,
+> Stunden-Ordner unter `lehrplan/`), gilt: **melden als Befund mit
+> Migrationspflicht; Migration selbst nur auf ausdrücklichen
 > Nutzer-Wunsch.** Nur eine explizite, dokumentierte Nutzer-Entscheidung
-> (DECISIONS-Eintrag) kann eine Ausnahme rechtfertigen. **Einzige erlaubte
-> Abweichung** bleibt das dreischichtige `LEHRPLAN.md` als *Dateiformat*
-> (② Schuladaption und ③ Didaktik mitlegen) — die **Ablage** unter
-> `lehrplan/<fach>-<zweig>/` ist davon nicht berührt und bleibt Pflicht.
+> (DECISIONS-Eintrag) kann eine Ausnahme rechtfertigen. **Konform** sind
+> dagegen `kompetenzmodule/` und KM-keyed Ressourcen am `lehrplan/`-Root
+> (Fach-Ebene) sowie Semesterpläne unter `lehrplan/<fach>-<zweig>/`.
+> **Einzige erlaubte Abweichung** bleibt das dreischichtige `LEHRPLAN.md`
+> als *Dateiformat* (② Schuladaption und ③ Didaktik mitlegen) — die
+> **Ablage** unter `lehrplan/<fach>-<zweig>/` ist davon nicht berührt und
+> bleibt Pflicht.
 
 ### Fach-Repo (z. B. GRG-INFI)
 
@@ -135,22 +139,24 @@ lehrplan/
                                  #   Klassen-Zuordnung, Datei-Inventar
   RIS/                           # NUR Gesetzestext-PDFs (Rechtsinformationssystem)
     YYYY-MM-DD_<name>.pdf        # Anlagen/Novellen, ISO-Datum (Kundmachungsdatum)
+  kompetenzmodule/               # km<N>.md + README-Matrix — FACH-Ebene, weil die
+                                 #   Kompetenzmodule vom Zweig unabhängig sind
+  <fach-keyed-ressourcen>.md     # fakultativ: KM-keyed Ressourcen (Fach-Ebene)
+                                 #   (z. B. ressourcen-matrix.md, r4ds-abdeckung.md)
   <fach>-<zweig>/                # pro Zweig ein Ordner, klein: infi-hwii, infi-hwit
     LEHRPLAN.md                  # ① Komplett-Extrakt (oder dreischichtig ①②③) DIESES Zweigs
     RIS.md                       # Rechtsstand, Novellen-Historie, Schichten-Vergleich
     <FACH>_②.pdf                 # Schuladaption-PDF, falls vorhanden
-    kompetenzmodule/             # km<N>.md + README-Matrix — pro Zweig, weil die
-                                 #   KM-Nummerierung (KM3–KM9) zwischen Zweigen kollidiert
+    jg<N>-einheiten.md           # Lehrstoffverteilung ("Einheiten"), falls geführt
+    jg<N>-semesterplan-ws.md     # Semesterplan Wintersemester
+    jg<N>-semesterplan-ss.md     # Semesterplan Sommersemester
     <KLASSE>/                    # GROSSBUCHSTABEN, z. B. 4HWII
       <KLASSE>.lehrplan.md       # Klassen-relevanter Extrakt (jahrgangsweise)
 unterricht/                      # siehe "Abgrenzung zum Unterricht"
-  <ZWEIG>-<FACH>/                # z. B. HWII-INFI
-    jg<N>-einheiten.md
-    jg<N>-semesterplan-ws.md
-    jg<N>-semesterplan-ss.md
   KM<#>-<NN>-<slug>/             # vorbereitete Einheit (KM-Lehrstoff)
   SA-<NN>-<slug>/                # vorbereitete Einheit (schulautonom)
-  YYYY-MM-DD_thema/              # terminierte Einheit / Kohorten-Lektion
+
+<klasse>/YYYY-MM-DD__thema/       # Kohorten-Ablage am Repo-Root (terminierte Lektion)
 AGENTS.md                        # Repo-weite Agent-Regeln
 GLOSSAR.md                       # Domänen-Abkürzungen und Begriffe
 ```
@@ -163,31 +169,37 @@ Identisches Muster, nur mit mehreren Fächern/Zweigen nebeneinander:
 lehrplan/
   METADATA.md                    # deckt ALLE Anlagen/Fächer des Repos ab
   RIS/                           # Gesetzestext-PDFs (über alle Fächer geteilt)
+  kompetenzmodule/               # je Fach EINE KM-Steckbrief-Reihe (Fach-Ebene);
+                                 #   bei mehreren Fächern Unterordner je Fach
   infi-hwii/                     # jedes Fach-Zweig-Verzeichnis in sich geschlossen
   infi-hwit/
   swp-hwii/
 unterricht/
-  HWII-INFI/
-  HWIT-INFI/
-  HWII-SWP/
+  KM<#>-<NN>-<slug>/
+  SA-<NN>-<slug>/
 AGENTS.md
 GLOSSAR.md
 ```
 
 - Jedes `<fach>-<zweig>`-Verzeichnis ist in sich geschlossen: LEHRPLAN,
-  RIS, ②-PDF, KM-Steckbriefe und Klassen-Extrakte liegen beieinander;
-  Querverweise bleiben flach.
+  RIS, ②-PDF, Klassen-Extrakte und die Planung (Einheiten, Semesterpläne)
+  liegen beieinander; Querverweise bleiben flach.
+- `kompetenzmodule/` liegt auf **Fach-Ebene**. Bedient ein Repo mehrere
+  Fächer, bekommt jedes Fach seine eigene Reihe — in einem fach-benannten
+  Unterordner `kompetenzmodule/<fach>/` (sonst kollidieren die
+  KM-Nummern zwischen den Fächern).
 - **Dokumentierte Ausnahme (GRG-WMC):** wenn ein Fach mehrere Zweige/Formen
   mit **identischem** Lehrplanunterbau bedient (WMC: AIF/KIF/CIF, alle aus
-  Anlage 1.9), dürfen `LEHRPLAN.md`, `RIS.md` und `kompetenzmodule/`
-  **form-übergreifend im `lehrplan/`-Root** bleiben — pro-Form-Duplikate
+  Anlage 1.9), dürfen `LEHRPLAN.md` und `RIS.md` **form-übergreifend** in
+  EINEM benannten Zweig-Ordner liegen und die **Planungsdateien** (Einheiten,
+  Semesterpläne) **in einem** benannten Ort bleiben — pro-Form-Duplikate
   wären drift-gefährdete Kopien. Voraussetzung: DECISIONS-Eintrag im Repo;
-  der Konformitäts-Check meldet die Root-Lage dieser drei Dateien dann
-  nicht als Befund. Die Block-/Klassen-Ordner selbst wandern in die
-  `wmc-<form>/`-Ordner (`34AIF` → `wmc-aif/34AIF` usw.).
-- Die Planungs-Dateien (Einheiten, Semesterpläne) liegen **flach** als
-  `jg<N>-einheiten.md` bzw. `jg<N>-semesterplan_{ws,ss}.md` unter
-  `unterricht/<ZWEIG>-<FACH>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
+  der Konformitäts-Check meldet das nicht als Befund. Die Block-/Klassen-
+  Ordner selbst wandern in die `wmc-<form>/`-Ordner (`34AIF` →
+  `wmc-aif/34AIF` usw.).
+- Die Planungs-Dateien (Einheiten, Semesterpläne) liegen als
+  `jg<N>-einheiten.md` bzw. `jg<N>-semesterplan_{ws,ss}.md` in
+  `lehrplan/<fach>-<zweig>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
   Klassen-Label steht in `lehrplan/METADATA.md`.
 
 ### Ordner- und Datei-Benennung
@@ -198,9 +210,6 @@ GLOSSAR.md
   Alt-Ordner mit ausgeschriebenem Zweig-Kürzel (z. B. `infi-wii`,
   `infi-wit`) sind ein Befund mit Umbenennungsempfehlung
   (`infi-wii` → `infi-hwii`) — Umbenennung nur auf Nutzer-Wunsch.
-- `unterricht/<ZWEIG>-<FACH>/`: **GROSSBUCHSTABEN**, Bindestrich
-  (z. B. `HWII-INFI`). Reihenfolge bewusst anders als bei `lehrplan/`
-  (dort Fach-Zweig, hier Zweig-Fach) — beide Formen sind verbindlich.
 - Klassenordner: `<Stufe><Postfix>` in **GROSSBUCHSTABEN** (z. B.
   `4HWII`, `4HWIT`), **innerhalb** des `<fach>-<zweig>`-Ordners.
   Generische Labels decken Parallellklassen ab (`4HWIT` deckt
@@ -208,10 +217,10 @@ GLOSSAR.md
 - Einheiten-Ordner: `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
   `SA` = schulautonom; `<NN>` läuft pro KM) liegen **direkt** unter
   `unterricht/`; sobald der Unterrichtstermin fixiert ist, wandern die
-  Inhalte in die Kohorten-Ablage `YYYY-MM-DD_thema/`.
+  Inhalte in die Kohorten-Ablage am Repo-Root `YYYY-MM-DD__thema/`.
 - Einheiten/Semesterpläne: `jg<N>-einheiten.md` und
-  `jg<N>-semesterplan-{ws,ss}.md`, kleines `jg`, Unterstrich, flach unter
-  `unterricht/<ZWEIG>-<FACH>/`.
+  `jg<N>-semesterplan-{ws,ss}.md`, kleines `jg`, Unterstrich, in
+  `lehrplan/<fach>-<zweig>/`.
 - RIS-Ordner: `lehrplan/RIS/` — Großbuchstaben-Ausnahme (Abkürzung, wie
   Klassen-Labels); enthält **nur** RIS-Gesetzestext-PDFs.
 - PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO-8601-Datumspräfix).
@@ -322,15 +331,17 @@ laufen?":
 | Prüfpunkt | Konform, wenn |
 |-----------|---------------|
 | METADATA.md vollständig | Alle Skeleton-Abschnitte vorhanden und gefüllt (Rechtsgrundlage, RIS-Verweise, Änderungshistorie, Klassen-Zuordnung, Datei-Inventar) |
-| Zweig-Ebene vorhanden | Jeder unterrichtete Zweig hat ein `lehrplan/<fach>-<zweig>/`-Verzeichnis — flache Klassenordner direkt unter `lehrplan/` (Alt-Layout) sind ein Befund mit Migrationspflicht |
+| Zweig-Ebene vorhanden | Jeder unterrichtete Zweig hat ein `lehrplan/<fach>-<zweig>/`-Verzeichnis — flache Klassen-/Extrakt-Ordner direkt unter `lehrplan/` (Alt-Layout) sind ein Befund mit Migrationspflicht |
 | Komplett-Extrakt | `lehrplan/<fach>-<zweig>/LEHRPLAN.md` existiert pro Zweig, deckt alle Jahrgänge des Gegenstands in diesem Zweig ab |
 | Klassen-Extrakte | `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md` existiert für jeden Klassenordner |
+| KM-Steckbriefe (Fach-Ebene) | `lehrplan/kompetenzmodule/` (bzw. `kompetenzmodule/<fach>/` im Mehr-Fächer-Repo) liegt am Root — im `<fach>-<zweig>/`-Ordner wären sie ein Befund |
+| KM-keyed Ressourcen (Fach-Ebene) | `ressourcen-matrix.md`, `r4ds-abdeckung.md` o. Ä. liegen am `lehrplan/`-Root — im Zweig-Ordner wären sie ein Befund |
 | Klassen-Zuordnung | METADATA.md bildet jeden unterrichteten Jahrgang ↔ KM ↔ GROSSBUCHSTABEN-Klassenname (pro Zweig) ab |
 | Novellen-Check-Datum | METADATA.md dokumentiert die letzte RIS-Abfrage („RIS-Status abgefragt am …") und ihr Ergebnis |
 | RIS-Verzeichnis | Alle Gesetzestext-PDFs unter `lehrplan/RIS/` — PDFs im `lehrplan/`-Root sind ein Migrationsbefund |
 | Erläuterungen | KM-Überblicke und Lernziel-Erläuterungen in allen Extrakten vorhanden (siehe Aufgabe 2) |
-| Unterrichts-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen unter `unterricht/<ZWEIG>-<FACH>/` — Gleiches unter `lehrplan/` ist ein Migrationsbefund (Retrofit-Klausel) |
-| Einheiten-Ordner | Vorbereitete Ordner `<KM#/SA>-<NN>-<slug>/` liegen **direkt** unter `unterricht/` (KM-Präfix, `<NN>` pro KM); terminierte `YYYY-MM-DD_thema/` liegen in der Kohorten-Ablage. Unter `unterricht/<ZWEIG>-<FACH>/` oder `lehrplan/` ist das ein Befund (zuständig: create-lesson/Unterricht-Skill) |
+| Planungs-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen in `lehrplan/<fach>-<zweig>/`; unter `unterricht/` (Zweig-Fach-Ordner oder lose) sind sie ein Migrationsbefund (Retrofit-Klausel) |
+| Einheiten-Ordner | Vorbereitete Ordner `<KM#/SA>-<NN>-<slug>/` liegen **direkt** unter `unterricht/` (KM-Präfix, `<NN>` pro KM); terminierte Lektionen in der Kohorten-Ablage am Repo-Root `<klasse>/YYYY-MM-DD__thema/`. Ein `unterricht/<ZWEIG>-<FACH>/`-Ordner ist ein Befund (zuständig: `create-lesson`-Skill) |
 | Root-Klassenordner | Klein geschriebene Klassenordner am Repo-Root (z. B. `5ahwit/`) sind **konforme Kohorten-Einstiegspunkte** (Ablage pro Kohorte, Archivierung am Schuljahresende) — kein Befund; GROSSBUCHSTABEN-Klassenordner mit Lehrplan-Extrakten liegen unverändert unter `lehrplan/<fach>-<zweig>/` |
 
 Anschließend ausdrücklich feststellen: **„Der Skill muss noch ausgeführt
@@ -484,7 +495,7 @@ tatsächlich ist).
 
 Zweck: aus den extrahierten Lehrplänen eine konkrete Lehrstoffverteilung
 entwerfen — `jg<N>-einheiten.md` und `jg<N>-semesterplan-ws.md` bzw.
-`jg<N>-semesterplan-ss.md` unter `unterricht/<ZWEIG>-<FACH>/`. Dies ist
+`jg<N>-semesterplan-ss.md` in `lehrplan/<fach>-<zweig>/`. Dies ist
 ein **interaktives Protokoll**: der Skill entwirft, der Nutzer entscheidet.
 Nie eine finale Lehrstoffverteilung ohne den Nutzer-Review-Schritt
 schreiben.
@@ -496,7 +507,7 @@ Protokoll:
    - Klassen-Extrakt `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md`
      mit Erläuterungs-Ebene (die inhaltliche Wirbelsäule).
    - KM-Steckbriefe
-     `lehrplan/<fach>-<zweig>/kompetenzmodule/km<N>.md` (zur Kontextlektüre).
+     `lehrplan/kompetenzmodule/km<N>.md` (zur Kontextlektüre).
    - Zeitmodell aus `lehrplan/METADATA.md` (Wochenstunden/
      Doppelstunden pro Semester — bestimmt die Anzahl der UE).
    - Ressourcen-Matrix (z. B. `lehrplan/ressourcen-matrix.md`), falls
@@ -509,7 +520,7 @@ Protokoll:
 3. **Nutzer-Review (Pflichtschritt)**: Entwurf präsentieren und nach
    Bestätigung/Anpassungen fragen — Reihenfolge, Schwerpunkte, reservierte
    Slots. Erst fortfahren, wenn der Nutzer das Raster geprüft hat.
-4. **Ausarbeitung**: `unterricht/<ZWEIG>-<FACH>/jg<N>-einheiten.md` bzw.
+4. **Ausarbeitung**: `lehrplan/<fach>-<zweig>/jg<N>-einheiten.md` bzw.
    `jg<N>-semesterplan-ws.md` / `jg<N>-semesterplan-ss.md` schreiben,
    dem bestehenden Format im Repo folgend (UE-Tabellen nach thematischen
    Blöcken, Kopf mit Zeitmodell, Werkzeug, KM-Steckbrief- und
@@ -532,20 +543,20 @@ Protokoll:
 
 ### Retrofit-Klausel (bereits lehrplan-aktivierte Repos)
 
-In Repos, in denen der Skill **vor der Unterrichts-Trennung** gelaufen
-ist, liegen Altbestände unter `lehrplan/` — typischerweise:
+In Repos, die nach der früheren Trennung (Planung unter `unterricht/`)
+aufgesetzt wurden, liegen Altbestände **auf der Unterrichtsebene** —
+typischerweise:
 
-- `lehrplan/<KLASSE>/semesterplan-ws.md` / `semesterplan-ss.md`
-- `lehrplan/<KLASSE>/jg<N>-einheiten.md` (z. B. GRG-INFI:
-  `lehrplan/4HWII/jg4-einheiten.md`)
-- `NN-slug/`- und `YYYY-MM-DD_thema/`-Stunden-Ordner unter
-  `lehrplan/<KLASSE>/`
+- `unterricht/<ZWEIG>-<FACH>/jg<N>-semesterplan-ws.md` / `-ss.md`
+- `unterricht/<ZWEIG>-<FACH>/jg<N>-einheiten.md`
+- die ganze Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/`
+- `NN-slug/`- und `YYYY-MM-DD_thema/`-Stunden-Ordner unter `lehrplan/<KLASSE>/`
 
 Vorgehen beim Antreffen (Aufgabe A oder 3):
 
 1. **Melden, nicht handeln:** Altbestände als Migrationsbefund listen
    (Quelle → Ziel), z. B.
-   `lehrplan/4HWII/jg4-einheiten.md` → `unterricht/HWII-INFI/jg4-einheiten.md`.
+   `unterricht/HWII-INFI/jg4-einheiten.md` → `lehrplan/infi-hwii/jg4-einheiten.md`.
 2. Umbenennungen auf das **einheitliche `jg<N>`-Schema** mit einbeziehen
    (z. B. `semesterplan-ws.md` in einem 4HWII-Ordner →
    `jg4-semesterplan-ws.md`; abweichende Namen wie `JG3-einheiten.md` →
@@ -557,8 +568,8 @@ Vorgehen beim Antreffen (Aufgabe A oder 3):
    Semesterplänen auf die neuen Pfade prüfen und (auf Wunsch) anpassen.
 
 Die Stunden-Ordner (`NN-slug/`, `YYYY-MM-DD_thema/`) gehören inhaltlich
-zum **Unterricht-Skill** — ihr Umzug wird gemeldet und empfohlen, ihre
-Detailpflege liegt danach beim Unterricht-Skill.
+zum **`create-lesson`-Skill** — ihr Umzug wird gemeldet und empfohlen,
+ihre Detailpflege liegt danach beim `create-lesson`-Skill.
 
 ## Qualitätskriterien für Erläuterungen
 
@@ -574,10 +585,9 @@ generische RIS-Muster dort ergänzen.
 
 ## Explizit außerhalb des Scopes
 
-- **Stunden-Material, Präsentationen, Hausübungen** gehören zu anderen
-  Skills — der Unterricht-Skill (noch zu erstellen) ist für alles unter
-  `unterricht/<ZWEIG>-<FACH>/` außer den Einheiten- und Semesterplan-Dateien
-  zuständig; `homework` und `teach` für die jeweiligen Spezialfälle.
+- **Prepared Lessons, Präsentationen, Aufgaben** gehören zu anderen
+  Skills — der `create-lesson`-Skill ist für `unterricht/` zuständig;
+  `homework` und `teach` für die jeweiligen Spezialfälle.
 - **KM-Steckbriefe** (`kompetenzmodule/`) sind didaktische Autorenschaft;
   dieser Skill liest sie nur zur Kontextlektüre, schreibt sie nie um.
 - **Kein Auto-Commit.** Niemals committen. Commits folgen dem
@@ -604,7 +614,6 @@ generische RIS-Muster dort ergänzen.
 - Die Klassen-Zuordnungstabelle ([KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md))
   wird manuell gepflegt — vorschlagen, nie selbst editieren.
 - GROSSBUCHSTABEN-Klassennamen überall (Ordner, Extrakt-Dateien,
-  METADATA.md); Ausnahme: die Ordner `lehrplan/<fach>-<zweig>/` sind
-  klein, `unterricht/<ZWEIG>-<FACH>/` groß.
+  METADATA.md); Ausnahme: die Ordner `lehrplan/<fach>-<zweig>/` sind klein.
 - Repos ohne `lehrplan/`-Struktur: nur berichten, nichts anlegen oder
   migrieren ohne ausdrückliche Nutzer-Anweisung.

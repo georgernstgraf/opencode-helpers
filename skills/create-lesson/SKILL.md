@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder Teilen davon — den geplanten Einheiten im unterricht/-Ordner — eine Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder Teilen davon — den geplanten Einheiten im Semesterplan — eine Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -8,7 +8,7 @@ compatibility: opencode
 # Create-Lesson-Skill
 
 Richtet zu einem **Kompetenzmodul (KM) oder Teilen eines KM** — den geplanten
-Einheiten im `unterricht/`-Ordner — eine **Lesson** her: eine selbständige
+Einheiten im Semesterplan (`lehrplan/<fach>-<zweig>/`) — eine **Lesson** her: eine selbständige
 HTML-Seite für Schüler:innen mit Erklärung, interaktivem Quiz und integrierter
 **Aufgabe** am Lesson-Ende (Aufgabe = Mitarbeit). Der Skill arbeitet **in
 `unterricht/`** und legt dort **Prepared Lessons** ab; die Übernahme in den
@@ -33,13 +33,13 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 ## Grundregeln (nicht verhandelbar)
 
 1. **Anforderung ist das KM, nicht die Unterlage.** Was die Lesson lehren
-   muss, ergibt sich aus dem KM/der Ziel-UE im `unterricht/`-Plan. Der
+   muss, ergibt sich aus dem KM/der Ziel-UE im Semesterplan (`lehrplan/<fach>-<zweig>/`). Der
    vorhandene Bestand (`Unterlagen/`, frühere Lektionen) ist die *bisherige
    gelebte Praxis*: Der Skill prüft **kritisch, ob er das geforderte Material
    ausreichend abdeckt**, darf daraus borgen und kopieren — aber der Bestand
    ist **keine Obergrenze**. Deckt er nicht, ergänzt der Skill eigenständig.
 2. **Nie nachfragen.** Fehlende Angaben werden autonom aufgelöst, in dieser
-   Reihenfolge: (a) `unterricht/`-Plan + KM, (b) `Unterlagen/` und bestehende
+   Reihenfolge: (a) Semesterplan (`lehrplan/<fach>-<zweig>/`) + KM, (b) `Unterlagen/` und bestehende
    Lektionen, (c) PMM-Referenz. Einzige zulässige Rückfrage: fehlendes
    Bestellformat (KM/Ziel-UE/Thema).
 3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
@@ -62,9 +62,9 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
-1. **Plan/KM:** `unterricht/` — die UE-Zeile zum Ziel-KM/Teil-KM
-   finden (Lektüre-Anker, Ziel). `lehrplan/`-Ebene (KM-Steckbriefe) bei Bedarf
-   gegenlesen.
+1. **Plan/KM:** `lehrplan/<fach>-<zweig>/jg<N>-semesterplan-*.md` — die
+   UE-Zeile zum Ziel-KM/Teil-KM finden (Lektüre-Anker, Ziel). KM-Steckbriefe
+   (`lehrplan/kompetenzmodule/`) bei Bedarf gegenlesen.
 2. **Unterlagen (Coverage-Check):** themenspezifische `Unterlagen/`
    (Folien-PDF/PPTX, `.md`, Demos) + bestehende Lektionen lesen. Notieren, was
    sie lehren — und **was zur KM-Anforderung fehlt** (wird ergänzt).
@@ -81,7 +81,7 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
    Nächste freie Nummer + Start-Rotation der Quiz-Positionen daraus ablesen.
 
 Nichts ungefragt anlegen oder migrieren, außer es fehlt zum Bau (dann ergänzen,
-Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) `unterricht/`-Plan,
+Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) Semesterplan,
 (b) bestehenden Lektionen, (c) PMM-Referenz schließen.
 
 ## Bestellformat
