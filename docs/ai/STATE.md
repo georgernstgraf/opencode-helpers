@@ -4,6 +4,14 @@ Current status as of 2026-09-29.
 
 ## Current Focus
 
+`orchestration` (#95) hat Delegation auf die Drei-Phasen-Routine umgestellt
+(**Pre-flight** pull + Discovery-Scan zum Dispatch-Zeitpunkt / **Brief-Bausteine**
+Schritt-0-Pull, Selbst-Discovery, atomarer Abschluss, Prozess-Aufräumung /
+**Post-flight Sweep** unabhängig vom Task-Status) — Vorkehrung nach dem
+Quiz-Malheur (#94: stale base, vergröderte Dateiliste, „cancelled" mit
+unpushten Commits, stray-Testserver). Template:
+`skills/orchestration/delegation-brief.md`.
+
 `create-lesson` (#94) hat das Quiz auf **Begründung pro Option** umgestellt:
 kanonisches `data-grund`-Modell, Sofort-Feedback beim Radio-`change` ohne
 Prüf-Button, `.feedback` zeigt die Begründung der gewählten Option. Die
@@ -25,6 +33,11 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #95 CLOSED 2026-09-29 — orchestration: Delegations-Disziplin als
+      Drei-Phasen-Routine (Pre-flight/Brief-Bausteine/Post-flight Sweep) +
+      Fill-In-Template `delegation-brief.md` + PITFALLS-Cluster
+      (cancelled ≠ no-op, stray-Testserver); Vorkehrung nach dem
+      Quiz-Malheur (#94)
 - [x] #94 CLOSED 2026-09-29 — create-lesson: Quiz-Begründung pro Option
       (`data-grund`), Sofort-Feedback beim Radio-`change`, kein Prüf-Button;
       Skill-Schritt 6 + Verifikation 4; kanonische `assets/quiz.js` (byte-

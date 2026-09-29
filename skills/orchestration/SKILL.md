@@ -32,16 +32,38 @@ on diffs and debugging.
 ## Delegation
 
 One sub-issue per sub-agent. Run sub-agents sequentially unless their
-sub-issues touch disjoint file sets. Each delegation prompt carries a **context
-pointer** to the sub-issue plus only what the sub-agent cannot look up itself:
+sub-issues touch disjoint file sets. Delegation is a three-phase routine:
+**pre-flight → brief → post-flight** (template: [delegation-brief.md](./delegation-brief.md)).
 
-- the sub-issue number (for the commit reference),
-- the files to touch and the neighbouring pattern to follow,
-- the relevant `docs/ai/` conventions and pitfalls,
-- the exact verification/test command.
+**Pre-flight (orchestrator, immediately before dispatch):**
+- `git pull --ff-only` (SVN: `up`) in every target repo; resolve divergence
+  **before** delegating, never through the sub-agent.
+- Re-run the discovery scan **at dispatch time** (search pattern + expected
+  file count). Never reuse an older scan — repos can move during the session
+  (concurrent commits added quiz files nobody had on the list).
 
-Require the sub-agent to return: files changed, the exact commands run, and
-pass/fail per suite — or an explicit blocker.
+**Mandatory brief components (every delegation prompt):**
+- Step 0: `git pull --ff-only` in the target repo; on divergence or failure
+  **abort and report** — do not commit.
+- **Self-discovery over a fixed file list:** search pattern + expected count;
+  a list in the brief is a cross-check, not the truth.
+- **Atomic finish:** commit **and** push — or an explicit blocker; never
+  leave work committed-but-not-pushed.
+- Kill any server/process the agent started; nothing keeps running.
+- Report: files changed, exact commands, pushed SHAs, pass/fail per
+  verification — or the blocker. Plus only what the sub-agent cannot look up
+  itself: the sub-issue number (commit reference), the neighbouring pattern
+  to follow, the relevant `docs/ai/` conventions and pitfalls, and the exact
+  verification/test command.
+
+**Post-flight sweep (after the wave, regardless of task status):**
+- In every touched repo: `git status -sb` + `git log origin/main..HEAD`.
+  **"Task cancelled" does not mean "nothing happened"** — a cancelled agent
+  may already have committed (only not pushed). Check state, don't trust
+  status.
+- Find and kill stray processes (`ps`) — sub-agent verification servers.
+- Run an independent aggregate verification **against the pushed state** —
+  a green verification against a stale tree is worthless.
 
 ## Pointers
 
