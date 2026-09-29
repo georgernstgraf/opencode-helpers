@@ -83,6 +83,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `code-review` | Zweiachsige Review (Standards + Spec) per paralleler Sub-Agenten | Automatisch (model-invoked) |
 | `sync-upstream-skills` | Bringt transplantierte Skills auf den Stand des mattpocock-Upstreams | Sprachsteuerung: "sync skills" |
 | `lehrplan` | Unterrichts-Repo nach `lehrplan/`-Konvention einrichten: Gegenstand identifizieren, RIS-Sync mit Novellen-Check, Lehrplan jahresweise extrahieren | Sprachsteuerung: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
+| `morning-sync` | Morgenroutine auf der dell-Workstation: alle Git-Repos unter `~/repos` pullen, SVN syncen, opencode upgraden, Server neu starten | Sprachsteuerung: "morning sync", "Morgen-Sync" |
 
 ### Transplantierte Skills & Single-Source-Regel
 
@@ -247,6 +248,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 | `code-review` | Two-axis review (Standards + Spec) via parallel sub-agents | Automatic (model-invoked) |
 | `sync-upstream-skills` | Bring transplanted skills up to date from the mattpocock upstream | Natural language: "sync skills" |
 | `lehrplan` | Set up and maintain a teaching repo following the `lehrplan/` convention: identify the subject, RIS sync with amendment check, year-wise curriculum extraction | Natural language: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
+| `morning-sync` | Morning routine for the dell workstation: pull all Git repos under `~/repos`, sync SVN, upgrade opencode, restart the server | Natural language: "morning sync", "Morgen-Sync" |
 
 ### Transplanted Skills & Single-Source Rule
 

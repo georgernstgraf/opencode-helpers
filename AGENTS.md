@@ -105,6 +105,12 @@ The following skills have NO slash commands. Invoke them by natural language:
   "modellparameter aktualisieren", "neue Modelle in params aufnehmen"
   → load and execute the `model-params` skill
 
+**Morning Sync** — when the user says:
+  "morning sync", "Morgen-Sync", "sync everything", "Tagesstart",
+  "pull all repos and restart opencode"
+  → load and execute the `morning-sync` skill (gated: restarts
+    `opencode.service` only after a fully successful sync)
+
 ## Skill Source Rule
 
 This repo is the **single global skill source** (linked via `~/.config/opencode/skills`).
