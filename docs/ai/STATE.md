@@ -1,14 +1,14 @@
 # Project State
 
-Current status as of 2026-09-28.
+Current status as of 2026-09-29.
 
 ## Current Focus
 
-`knowledge-persistence` now always ends with its own commit + push (#89):
-`issue-workflow` (`commit`/`finish` + the continuous completion path) was aligned
-so the knowledge commit is expected, no empty commit follows it, and a post-close
-follow-up commit carries `STATE.md`/`HANDOFF.md`. Previously the workflow could
-leave knowledge files uncommitted.
+`lehrplan` (#92) trennt Fach-Ebene und Zweig-Ebene sauber: `kompetenzmodule/`
++ KM-keyed Ressourcen am `lehrplan/`-Root (Fach), Extrakt/Klassen-Extrakte/
+Planung in `lehrplan/<fach>-<zweig>/` (Zweig), `unterricht/` nur noch flache
+`KM<#>/SA`-Einheiten. Die Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/` entfällt;
+`create-lesson` bezieht den Plan aus `lehrplan/<fach>-<zweig>/`.
 
 `create-lesson` (#90) wurde umgebaut: KM-Anforderung statt Unterlagen-Obergrenze,
 Arbeitsort `unterricht/` mit `prepared-lessons/NN-slug.html`, kein Nachfragen,
@@ -18,6 +18,13 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #92 CLOSED 2026-09-29 — lehrplan: Fach-Ebene (`kompetenzmodule/` +
+      KM-keyed Ressourcen am Root) vs. Zweig-Ebene (`<fach>-<zweig>/` mit
+      Extrakt + Planung); `unterricht/` ohne Zweig-Fach-Ordner; Kollisions-
+      Behauptung entfernt, Restfall-Regel für Mehr-Fächer-Repos
+      (`kompetenzmodule/<fach>/`); WMC-Ausnahme um Planungsdateien erweitert;
+      Retrofit-Klausel invertiert; `create-lesson`-Planquelle angepasst;
+      Test-Suite grün (70)
 - [x] #89 CLOSED 2026-09-28 — knowledge-persistence endet mit eigenem Commit + Push: Skill um
       Pflichtschritt „Commit and Push" + Constraint erweitert; `issue-workflow`
       (`commit`, `finish`, Continuous-Issue-Completion, Output Expectations)

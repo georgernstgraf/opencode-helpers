@@ -45,4 +45,12 @@ Open tasks:
       nächster Gelegenheit auf die #90-Regeln angleichen (KM-Anforderung,
       `unterricht/prepared-lessons/`, Beamer-Boxen) — erst nach Rücksprache.
 
-Last updated: 2026-09-28.
+6. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
+      Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/` und ggf. `kompetenzmodule/`
+      im Zweig-Ordner. Betroffen u. a. GRG-INFI (`unterricht/HWII-INFI/`,
+      `infi-hwii/kompetenzmodule/`), GRG-WMC (`unterricht/WMC/` — dokumentierte
+      Ausnahme für form-übergreifende Planung), GRG-SWP. Pro Repo als Befund
+      melden und (nach Rücksprache) auf Fach-/Zweig-Ebene umstellen. Prüfen, ob
+      `kompetenzmodule/` je Fach ans `lehrplan/`-Root wandert.
+
+Last updated: 2026-09-29.
