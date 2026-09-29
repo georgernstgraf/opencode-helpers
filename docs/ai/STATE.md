@@ -4,6 +4,13 @@ Current status as of 2026-09-29.
 
 ## Current Focus
 
+`create-lesson` (#94) hat das Quiz auf **Begründung pro Option** umgestellt:
+kanonisches `data-grund`-Modell, Sofort-Feedback beim Radio-`change` ohne
+Prüf-Button, `.feedback` zeigt die Begründung der gewählten Option. Die
+Repo-Migration ist durch (PMM 9 Dateien/33 Fragen, WMC 10/47, INFI 6/36,
+SWP 3/6; 122 Fragen/427 Optionen verifiziert). Offen: stichprobenartiges
+Gegenlesen der redaktionell formulierten Begründungen.
+
 `lehrplan` (#92) trennt Fach-Ebene und Zweig-Ebene sauber: `kompetenzmodule/`
 + KM-keyed Ressourcen am `lehrplan/`-Root (Fach), Extrakt/Klassen-Extrakte/
 Planung in `lehrplan/<fach>-<zweig>/` (Zweig), `unterricht/` nur noch flache
@@ -18,6 +25,11 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #94 CLOSED 2026-09-29 — create-lesson: Quiz-Begründung pro Option
+      (`data-grund`), Sofort-Feedback beim Radio-`change`, kein Prüf-Button;
+      Skill-Schritt 6 + Verifikation 4; kanonische `assets/quiz.js` (byte-
+      identisch) + Markup in PMM/WMC/INFI/SWP migriert; 122 Fragen/427
+      Optionen semantisch geprüft (richtige Option „Richtig", übrige „Falsch")
 - [x] #92 CLOSED 2026-09-29 — lehrplan: Fach-Ebene (`kompetenzmodule/` +
       KM-keyed Ressourcen am Root) vs. Zweig-Ebene (`<fach>-<zweig>/` mit
       Extrakt + Planung); `unterricht/` ohne Zweig-Fach-Ordner; Kollisions-
