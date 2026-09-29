@@ -135,6 +135,15 @@ Ohne Bestellformat wird nicht gebaut — das ist die einzige zulässige Rückfra
    tatsächlich eingeführt wurde — kein Vorgriff auf Folge-UE, keine nur
    beiläufig genannten Begriffe. Markup:
    `<div class="quiz" data-loesung="N">` (zentrales `assets/quiz.js`).
+   Jede Antwortoption trägt eine **eigene Begründung** im Attribut
+   `data-grund` (`<input type="radio" name="qK" value="i" data-grund="…">`):
+   die richtige Option begründet, *warum* sie stimmt, jede falsche, *warum*
+   sie falsch ist; jede Begründung ist durch den Lesson-Text gedeckt. Die
+   Rückmeldung erscheint **sofort beim Wählen** (Radio-`change`), **kein**
+   separater „Prüfen"-Button: bei falscher Wahl nur die Begründung der
+   gewählten Option (erneut wählbar, jeder Fehlversuch begründet), erst bei
+   richtiger Wahl die richtige Begründung. Pro Frage ein eindeutiger
+   Radio-`name`.
 7. **Aufgabe:** Abschnitt **„Aufgabe"** direkt am Lesson-Ende anhängen
    (nach Zusammenfassung/Ausblick): stufenweise aus dem Lesson-Stoff gestuft,
    Vorhersage-Aufgabe zuerst, plus Abgabehinweis (Konvention der Klasse, z. B.
@@ -196,7 +205,11 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    Live-Server `serve.sh`), außer verlinkter Lektüre.
 4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
    tatsächliche Fragenzahl eingehalten; **jede Frage ist durch den
-   Lesson-Text gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff).
+   Lesson-Text gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff);
+   die Auswahl wertet **sofort** aus (kein Prüf-Button) und **jede Option
+   hat einen substanziellen, textgedeckten `data-grund`** (richtig wie
+   falsch) — Fehlwahl zeigt die Begründung genau dieser Option, richtige
+   Wahl die richtige Begründung.
 5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
    **und** Tages-README-Vorlage mit erstem eigenem `## Aufgabe`-Abschnitt (H2)
    und `## Housekeeping` zuletzt — Pflicht.
