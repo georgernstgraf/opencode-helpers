@@ -1,0 +1,36 @@
+{
+  "roots": [
+    { "type": "git", "path": "~/repos", "max_depth": 3 },
+    { "type": "svn", "path": "~/svn", "max_depth": 2 }
+  ],
+
+  "push": {
+    "allow_owners": [
+      "georgernstgraf",
+      "Die-Spengergasse",
+      "hoa-spg",
+      "cha-spg"
+    ],
+    "deny_paths": [
+      "~/repos/mattpocock",
+      "~/repos/no-remote",
+      "~/repos/non-git"
+    ],
+    "require_upstream": true
+  },
+
+  "commit": {
+    "never_commit_globs": [
+      "**/.env*",
+      "**/*.key",
+      "**/*.pem",
+      "**/id_rsa*"
+    ],
+    "max_review_files": 40
+  },
+
+  "host_steps": {
+    "opencode_upgrade": false,
+    "restart_service": false
+  }
+}

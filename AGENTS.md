@@ -105,11 +105,13 @@ The following skills have NO slash commands. Invoke them by natural language:
   "modellparameter aktualisieren", "neue Modelle in params aufnehmen"
   → load and execute the `model-params` skill
 
-**Morning Sync** — when the user says:
-  "morning sync", "Morgen-Sync", "sync everything", "Tagesstart",
-  "pull all repos and restart opencode"
-  → load and execute the `morning-sync` skill (gated: restarts
-    `opencode.service` only after a fully successful sync)
+**Repo Sync** — when the user says:
+  "repo sync", "morning sync", "Morgen-Sync", "sync everything", "Tagesstart",
+  "pull all repos", "commit and push everything"
+  → load and execute the `repo-sync` skill. The script only reports
+    repository state; the agent judges what to commit and what to push.
+    `opencode upgrade` and the `opencode.service` restart are opt-in host
+    steps (default off) and only run after a fully successful sync.
 
 ## Skill Source Rule
 

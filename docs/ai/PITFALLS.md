@@ -27,6 +27,17 @@ Read this file carefully before making changes in affected areas.
 - When extracting a section that contains a fenced code block with Markdown headings, promote heading levels fence-aware (track the ` ``` ` toggles) — a blanket `###`→`##` replace corrupts headings inside the template code block.
 - `tests/test_skill_links.py` scans every `](./…)` link in `skills/*/SKILL.md`, including links **inside fenced code blocks** — an illustrative example link like `[x](./lesson.html)` fails the guard. Write example paths as plain backticked text (`` `lesson.html` ``), not as Markdown links.
 
+## Repo Sync / Git
+
+- `repo-sync.sh` reports and nothing else: it never commits, never pushes, never `svn add`/`ci`. The commit and push decisions belong to the agent (Phase B/C of the skill). A script that can commit turns the report into a lie.
+- `~/bin/allgits-pull` is an `awk | sh` pipeline with **no error checking** — it cannot fail, so any "abort before the risky step" gate built on it is a no-op for Git. The old `morning-sync` shipped exactly that bug. Use the explicit loops in `repo-sync.sh` instead, and never reintroduce `allgits-pull` as a sync step.
+- `~/bin/svnkack.sh` must stay out of any sync: `svn commit -mm` commits with an **empty** log message, errors are unchecked (`cd ${DIR} || exit` only exits the subshell), and 3 of its 5 paths (`svn/Toolset`, `svn/sudokusolver`, and `svn/mexx` which has no `.svn`) no longer exist. Only `svn up` belongs in the script; the `svn ci` is an agent decision.
+- Never print an unredacted remote URL into a report or a log. `repo-sync.sh` masks `https://user:token@host` and `ghp_`/`gho_`/`github_pat_` tokens before output; keep it that way and do not bypass it with a manual `git remote -v`.
+- House style for remotes is `git@github.com:` (SSH). A `https://user:token@github.com/…` remote leaves the credential in `.git/config`. `cha-spg/pos-wmc-fachgruppe-inf-erw` was the last such outlier and was migrated 2026-09-30; with `credential.helper=store` the credential belongs in `~/.git-credentials` (mode `600`), never in the URL.
+- `systemctl --user restart opencode.service` **ends the opencode session that invoked it** (the service cgroup is torn down mid-tool-call). That is why `host_steps.restart_service` defaults to `false` in `skills/repo-sync/config.json`; enable it only when the full workstation routine is wanted, and keep it gated behind a clean sync.
+- A configured root that does not exist on the current host is a `WARN`, not an `ERROR` — `repo-sync` is meant to run on any host, and a root belonging to another machine must not make the run exit 1.
+- A repository with **no** remote is not a fetch failure; `repo-sync.sh` prints `--- no remote: fetch skipped` and does not count it as an error.
+
 ## SearXNG Backend
 
 - The public SearXNG instance is not open: nginx enforces HTTP Basic Auth on the whole vhost and the container port `8888` must stay published on `127.0.0.1` only. If `8888` is ever bound to `0.0.0.0` again, the API is reachable unauthenticated **bypassing nginx** (observed 2026-09-13: third-party Chinese-language queries hit `8888` directly, invisible in the nginx access log).
