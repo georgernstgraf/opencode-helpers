@@ -89,10 +89,33 @@ numbers. If the repository tracks issues, link the real one.
 
 **Leave it, and say why** in the report, when:
 
+- **another process is writing into the repository right now** — see below
 - the change mixes unrelated concerns and cannot be split without judgment
 - more than `commit.max_review_files` files changed — report, do not bulk-add
 - a file matches `commit.never_commit_globs` (secrets) — never stage those
 - the content is genuinely ambiguous: unfinished, or unclear what it is for
+
+### Check for a concurrent writer first
+
+The single most damaging commit this skill can make is one that snapshots work
+another agent is halfway through. Before committing a dirty repository, check
+whether it is still being written to:
+
+```sh
+find <repo> -newermt '-30 minutes' -not -path '*/.git/*' -printf '%TH:%TM %p\n'
+ps aux | grep -E 'opencode (attach|serve)|claude|codex' | grep -v grep
+```
+
+Fresh mtimes are normal for a repository you just worked on yourself, so compare
+against your own timeline rather than treating any recent file as suspect. But
+if a **second** opencode/agent session is running against the same tree, the
+changed files are work in progress: leave the repository alone and name it in the
+report. A half-written lesson that is missing its `praesentation.html` is worse
+in history than uncommitted — it is a broken artifact everyone will trust.
+
+This is a real occurrence, not a hypothetical: a concurrent `opencode attach`
+was generating GRG-PMM lessons while the sync ran, and the incomplete
+`KM7-02-chi-quadrat-test/` had to be skipped.
 
 Content types that are **not** a reason to hold back, when the repository
 already tracks them: PDFs, student submissions, CatchLog files, generated

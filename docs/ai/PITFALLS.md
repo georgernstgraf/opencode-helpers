@@ -37,6 +37,8 @@ Read this file carefully before making changes in affected areas.
 - `systemctl --user restart opencode.service` **ends the opencode session that invoked it** (the service cgroup is torn down mid-tool-call). That is why `host_steps.restart_service` defaults to `false` in `skills/repo-sync/config.json`; enable it only when the full workstation routine is wanted, and keep it gated behind a clean sync.
 - A configured root that does not exist on the current host is a `WARN`, not an `ERROR` — `repo-sync` is meant to run on any host, and a root belonging to another machine must not make the run exit 1.
 - A repository with **no** remote is not a fetch failure; `repo-sync.sh` prints `--- no remote: fetch skipped` and does not count it as an error.
+- A **second opencode session can be writing into a repository while the sync runs** (`opencode attach --dir=…` is a separate process on the same tree). Always `find <repo> -newermt '-30 minutes'` and check `ps` for other agent processes before committing a dirty repo: snapshotting half-written work is worse than leaving it dirty, because the history then contains an artifact that looks finished and is not. Observed 2026-09-30 in `georgernstgraf/GRG-PMM` (`KM7-02-chi-quadrat-test/` had `lesson.html` + `hausaufgabe.md` but no `praesentation.html` yet).
+- A repository can be **ahead and dirty at the same time**, and the remote may have moved in the meantime: `git pull --rebase` before pushing, otherwise the push is rejected as non-fast-forward (happened with `GRG-WMC` while a concurrent session pushed `opencode-helpers#94`).
 
 ## SearXNG Backend
 
