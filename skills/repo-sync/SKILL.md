@@ -53,9 +53,19 @@ works too. Full output is also written to
 `~/.local/state/repo-sync/latest.log` — read it if the in-session output was cut
 short by a restart.
 
-**If the script reported any `ERROR:` line, do not commit and do not push.** A
-failed fetch or `svn up` means the local view is stale, and a push on top of a
-stale view is how force-push accidents happen. Report the errors instead.
+An `ERROR:` line blocks **that repository only** — no commit, no push for it. A
+failed fetch or `svn up` means its local view is stale, and pushing on top of a
+stale view is how force-push accidents happen. The other repositories in the run
+are unaffected and must still be synced; one unreachable remote must not stall
+the other 74. The realistic case is a remote that has been deleted or renamed
+(`Repository not found`), which is a permanent condition for that repo alone.
+
+Two errors are **not** per-repository and do stop everything:
+
+- exit code **2** — the script could not start (unparsable config, missing tool).
+  Fix the configuration before doing anything else.
+- a `WARN: … root does not exist` line — that host simply has no such root;
+  the remaining roots still run.
 
 The report format is one `## <type> <path>` block per repository, then
 `key=value` lines (`owner`, `branch`, `upstream`, `ahead`, `behind`, `dirty`,
@@ -99,7 +109,7 @@ Push a repository only when **all** of these hold:
 4. the `fork-policy` skill does not apply to it (forks stay on feature branches)
 5. it is green: the repository's tests and lint pass, if it has any
 
-A `fetch` error in Phase A blocks this phase entirely.
+A `fetch` error in Phase A blocks **that repository**, not the run.
 
 `deny_paths` exists for two shapes of repository: a **pull-only foreign
 upstream** (`mattpocock/skills` — pushing there would corrupt a checkout the
