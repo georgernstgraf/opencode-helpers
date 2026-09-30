@@ -1,19 +1,23 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": "allow",
+  "permissions": [
+    { "action": "*", "resource": "*", "effect": "allow" }
+  ],
   "mcp": {
-    "searxng": {
-      "type": "local",
-      "command": [
-        "python3",
-        "/home/georg/repos/georgernstgraf/opencode-helpers/skills/searxng/scripts/opencode-searxng"
-      ],
-      "environment": {
-        "SEARXNG_PRIMARY": "http://10.8.0.16",
-        "SEARXNG_PRIMARY_AUTH": "",
-        "SEARXNG_FALLBACK": "https://searxng.claw.graf.priv.at",
-        "SEARXNG_FALLBACK_CRED_FILE": "{env:HOME}/.config/opencode/searxng.cred",
-        "SEARXNG_CHAIN": "gregor"
+    "servers": {
+      "searxng": {
+        "type": "local",
+        "command": [
+          "python3",
+          "/home/georg/repos/georgernstgraf/opencode-helpers/skills/searxng/scripts/opencode-searxng"
+        ],
+        "environment": {
+          "SEARXNG_PRIMARY": "http://10.8.0.16",
+          "SEARXNG_PRIMARY_AUTH": "",
+          "SEARXNG_FALLBACK": "https://searxng.claw.graf.priv.at",
+          "SEARXNG_FALLBACK_CRED_FILE": "{env:HOME}/.config/opencode/searxng.cred",
+          "SEARXNG_CHAIN": "gregor"
+        }
       }
     }
   }
