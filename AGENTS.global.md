@@ -64,7 +64,12 @@ The proactive commit/push and auto-close rules DO NOT apply when:
   `projectgrade`) — those skills forbid committing and must never be
   overridden,
 - working inside student repositories (grading targets stay untouched),
-- the user explicitly asks to hold changes back.
+- the user explicitly asks to hold changes back,
+- the session is a non-coding personal agent without a repository work
+  order (e.g. `coach`, workspace `~/coach`) — the issue-awareness,
+  proactive commit/push, and issue-completion rules never apply to such
+  agents; they never commit and work only in their own memory
+  directories.
 
 Knowledge files (`docs/ai/`) updates are part of the normal workflow and are
 committed like any other change under the rules above.
