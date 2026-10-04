@@ -14,7 +14,7 @@ Treat the current directory as a teaching workspace. The state of their learning
 - `MISSION.md`: A document capturing the _reason_ the user is interested in the topic. This should be used to ground all teaching. Use the format in [MISSION-FORMAT.md](./MISSION-FORMAT.md).
 - `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
 - `RESOURCES.md`: A list of resources which can be explored to ground your teaching in contextual knowledge, or to acquire knowledge and wisdom. Use the format in [RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md).
-- `./learning-records/*.md`: A directory of learning records, which capture what the user has learned. These are loosely equivalent to architectural decision records in software development - they capture non-obvious lessons and key insights that may need to be revised later, or drive future sessions. These should be used to calculate the zone of proximal development. They are titled `0001-<dash-case-name>.md`, where the number increments each time. Use the format in [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md).
+- `./learning-records/*.md`: A directory of learning records, which capture what the user has learned. These are loosely equivalent to architectural decision records in software development - they capture non-obvious lessons and key insights that may need to be revised later, or drive future sessions. These should be used to calculate the zone of proximal development. They are titled `01-<dash-case-name>.md` (two-digit), where the number increments each time. Use the format in [LEARNING-RECORD-FORMAT.md](./LEARNING-RECORD-FORMAT.md).
 - `./prepared-lessons/*.html`: A directory of lessons. A **lesson** is a single, self-contained HTML output that teaches one tightly-scoped thing tied to the mission. This is the primary unit of teaching in this workspace. (Dated/taught lessons may instead live in a dated folder, e.g. `YYYY-MM-DD__thema/lesson.html`.)
 - `assets/*` (repo root): Reusable **components** shared across the whole repository. See [Assets](#assets).
 - `NOTES.md`: A scratchpad for you to jot down user preferences, or working notes.
@@ -46,13 +46,29 @@ Fluency can give the user an illusory sense of mastery, but storage strength is 
 
 ## Lessons
 
-A lesson is the main thing you produce: the unit in which knowledge and skills reach the user. Each lesson is one self-contained HTML file, saved to `./prepared-lessons/` and titled `0001-<dash-case-name>.html` where the number increments each time.
+A lesson is the main thing you produce: the unit in which knowledge and skills reach the user. Each lesson is one self-contained HTML file, saved to `./prepared-lessons/` and titled `01-<dash-case-name>.html` where the number increments each time.
 
-**Numbering rule for classroom use:** Lessons built as classroom material
-(one school year per class holds at most ~40 lessons) use **two-digit**
-numbers (`01-<dash-case-name>.html`), counted per school year per class.
-Pre-existing four-digit self-study paths stay four-digit (grandfathered —
-never rename a running sequence with cross-references).
+**Numbering rule (two-digit):** Lessons and learning records use **two-digit**
+numbers (`01-<dash-case-name>.*`), zero-padded (`01` … `99`). For classroom
+material the count runs per school year per class (a year holds at most ~40
+lessons); for a self-study path it is simply that path's running sequence.
+When a sequence would pass `99`, rebuild the numbering. Renaming a running
+sequence is a deliberate migration: update *every* cross-reference (lesson
+navigation, maps/verlaufsmaps, index pages, plans, glossaries).
+
+## Formatting chat responses (no LaTeX)
+
+The user reads your conversational replies in a **terminal TUI that does not
+render LaTeX or MathJax**. Never use `$...$` or `$$...$$` in chat messages — it
+shows up as literal dollar signs and makes the math unreadable. Write math
+**inline in plain text / Unicode** instead, ideally inside a code span:
+
+- fractions: `` `10/200` ``, `` `n! / (k! · (n−k)!)` ``
+- relations & operators: `≈`, `≠`, `≤`, `≥`, `·`, `²`, `√`, `−`
+- one code span per formula, e.g. `` `P(X = 2) ≈ 0,197` ``
+
+This rule is about **chat replies**. The HTML lessons are rendered in a browser
+and may use whatever the shared `assets/` support.
 
 A lesson should be **beautiful**, with clean, readable typography and layout, since the user will return to these later to review. Think Tufte.
 

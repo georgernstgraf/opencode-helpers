@@ -1,6 +1,6 @@
 # Learning Record Format
 
-Learning records live in `./learning-records/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc. Create the directory lazily: only when the first record is written.
+Learning records live in `./learning-records/` and use sequential two-digit numbering: `01-slug.md`, `02-slug.md`, etc. Create the directory lazily: only when the first record is written.
 
 They are the teaching equivalent of ADRs: they capture non-obvious lessons, key insights, and stated prior knowledge that will steer future sessions. They are used to calculate the zone of proximal development.
 
