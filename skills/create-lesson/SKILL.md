@@ -59,6 +59,14 @@ deployt noch vom Navigator verlinkt.
 - Das Deployment läuft über `.github/workflows/pages.yml` und kopiert nur
   `index.html`, `assets/` und `unterricht/` (rsync) in die Site. Fehlt der
   Workflow, einmal nach dem Vorbild des Repos (bzw. GRG-INFI/GRG-PMM) anlegen.
+- **Prepared Lessons müssen in allen Auslieferungskontexten funktionieren** —
+  lokal über `./serve.sh`, im **VS-Code-Browser** (Simple Browser/Live Preview,
+  immer über die Server-URL, **nie** `file://`) **und** auf GitHub Pages unter
+  der Basis `/<repo>/`. Daraus folgen: Nicht-Asset-Links **relativ**; **kein
+  `<base>`**, **keine root-absoluten Pfade**; Assets nur über den generischen
+  Ahnen-Bootstrap (Root-Resolver, kein Repo-Name); **genau ein** Top-Level-
+  `assets/` (kein Dot-Ordner `.assets` — Pages überspringt diese; ggf.
+  `.nojekyll`); Badge-Basis aus `assets/site.js`.
 - **Referenzen liegen außerhalb des Deploys:** `GLOSSAR.md` (und weiteres
   Root-Nachschlagewerk) wird **nicht** mitdeployt. Links aus Lessons/Navigator
   darauf laufen daher über die **GitHub-URL** des Repos (siehe § Referenzmaterial).
@@ -155,11 +163,16 @@ gewinnt, nicht ein fester Name**:
 3. Ist keiner vorhanden: Default **`Beispielprojekte/`** anlegen und im
    `README.md`/`ARCHITECTURE.md` als Beispielprojekt-Ablage dokumentieren.
 
-Ein Beispielprojekt liegt dort als eigenständiger Ordner `<Ablage>/<slug>/`
-(eigene README, eigene Abhängigkeiten, für sich lauffähig und getestet). Die
-Lesson **verweist** darauf (relativer Link + ein Satz) und **dupliziert keinen
-Projektcode** — der Verweis steht im Lesson-Text bzw. in der Aufgabe, nicht als
-eingebettete Projektdatei.
+Ein Beispielprojekt liegt dort als eigenständiger Ordner
+**`<Ablage>/km<#>-<NN>-<slug>/`** — das **KM-Präfix trägt jeder Beispielordner**
+(z. B. `Beispielprojekte/km8-01-hono-formulare/`; `<#>` = KM, `<NN>` wie in der
+zugehörigen Lesson). Jeder Ordner hat eine eigene README, eigene Abhängigkeiten
+und ist für sich lauffähig und getestet. Die Lesson **verweist** darauf und
+**dupliziert keinen Projektcode** — der Verweis steht im Lesson-Text bzw. in der
+Aufgabe, nicht als eingebettete Projektdatei. Da die Beispielprojekt-Ablage
+**nicht** auf GitHub Pages liegt, erfolgt der Verweis aus der deployten Lesson
+per **GitHub-URL** (siehe § Lernplattform); die Tages-README-Vorlage darf relativ
+verweisen.
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
@@ -375,6 +388,12 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 12. **Lernplattform:** Die Lesson ist im Root-`index.html` verlinkt, der Link
     löst auf, und es gibt keine Verweise auf Kohorten-/Lehrplan-Ordner; der
     Pages-Workflow veröffentlicht nur `index.html`, `assets/` und `unterricht/`.
+13. **Drei-Kontext-Lauffähigkeit:** Die Lesson läuft **lokal** (`./serve.sh`),
+    im **VS-Code-Browser** (über die Server-URL, nicht `file://`) **und** unter
+    der **Pages-Basis** (deployte URL nach dem Push bzw. lokal `/<repo>/…`
+    simuliert) — Assets/Bootstrap, Badge, Quiz, Theme und Navigator-Link
+    funktionieren in allen Kontexten; kein `<base>`, kein root-absoluter Pfad,
+    kein `file://`.
 
 ## Nachziehen (gleicher Commit)
 
