@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -37,6 +37,24 @@ nicht zu einer Kohorte und nicht zu einer fest geplanten Unterrichtseinheit:
 Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 `<PREFIX>-<NN>-<slug>/`, Beamer-taugliche Code-Boxen, Stil-Leitfaden):
 `/home/georg/repos/georgernstgraf/GRG-PMM`.
+
+## Lernplattform: GitHub Pages & `index.html`
+
+**GitHub Pages ist die Lernplattform des Repos.** Veröffentlicht und verlinkt
+wird **ausschließlich `unterricht/`** — plus das zentrale `assets/` und der
+Navigator `index.html`. Alles andere ist **nicht** Teil der Lernplattform:
+Kohorten-Ordner, `lehrplan/`, `Unterlagen/`, Archiv-Ordner usw. werden weder
+deployt noch vom Navigator verlinkt.
+
+- Der Root-`index.html` ist der **Navigator** der Lernplattform. Er listet die
+  Prepared Lessons aus `unterricht/<PREFIX>-<NN>-<slug>/` — gruppiert nach
+  Jahrgang/KM — und verlinkt **nur** `unterricht/`-Ziele.
+- **Jede neu gebaute Lesson wird im selben Commit im `index.html` verlinkt**
+  (Titel + ein Satz „Worum geht's"). Bestehende Blöcke/Einträge ergänzen,
+  nicht umsortieren; fehlt der passende Block, einen anlegen.
+- Das Deployment läuft über `.github/workflows/pages.yml` und kopiert nur
+  `index.html`, `assets/` und `unterricht/` (rsync) in die Site. Fehlt der
+  Workflow, einmal nach dem Vorbild des Repos (bzw. GRG-INFI/GRG-PMM) anlegen.
 
 ## Abgrenzung zum Teach-Skill (wichtig, keine Duplikation)
 
@@ -137,6 +155,9 @@ eingebettete Projektdatei.
    Repos (außerhalb `unterricht/`)? Repo-Konvention bzw. vorhandenen Ordner
    ermitteln — siehe § Beispielprojekte. Nichts anlegen, was anders benannt
    schon besteht.
+8. **Navigator:** Root-`index.html` lesen — Aufbau (Jahrgangs-/KM-Blöcke) und
+   bestehende Einträge verstehen, um die neue Lesson korrekt einzureihen
+   (§ Lernplattform).
 
 Nichts ungefragt anlegen oder migrieren, außer es fehlt zum Bau (dann ergänzen,
 Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) Semesterplan,
@@ -156,7 +177,7 @@ gebacken). Beispiele:
 Ohne Bestellformat (mindestens KM + Thema) wird nicht gebaut — das ist die
 einzige zulässige Rückfrage.
 
-## Bauablauf (9 Schritte)
+## Bauablauf (10 Schritte)
 
 1. **Quelle grounden:** KM-Anforderung festhalten; `Unterlagen/` + frühere
    Lektionen als Quelle nutzen (borgen/kopieren erlaubt). **Lizenzregel:**
@@ -226,6 +247,10 @@ einzige zulässige Rückfrage.
    lauffähiges Projekt, liegt dieses in der **Beispielprojekt-Ablage des Repos**
    (§ Beispielprojekte). Die Lesson **verlinkt** es relativ und dupliziert
    keinen Projektcode.
+10. **Navigator-Eintrag (Lernplattform):** Die fertige Lesson im Root-
+    `index.html` verlinken — Titel + Ein-Zeiler unter dem passenden
+    Jahrgangs-/KM-Block. Nur `unterricht/`-Ziele, keine Kohorten-/Lehrplan-
+    Links (siehe § Lernplattform).
 
 ## Prepared Lessons (Ablage & Lebenszyklus)
 
@@ -306,11 +331,16 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
     `unterricht/<PREFIX>-<NN>-<slug>/` enthält nur HTML/Markdown (+ zentrale
     `assets/`); Beispielprojekte liegen in der Beispielprojekt-Ablage
     (§ Beispielprojekte) und sind dort für sich lauffähig (Tests grün).
+12. **Lernplattform:** Die Lesson ist im Root-`index.html` verlinkt, der Link
+    löst auf, und es gibt keine Verweise auf Kohorten-/Lehrplan-Ordner; der
+    Pages-Workflow veröffentlicht nur `index.html`, `assets/` und `unterricht/`.
 
 ## Nachziehen (gleicher Commit)
 
 - Tages-README-Vorlage nach § Tages-README (Aufgabe als erster
   `## Aufgabe`-Abschnitt (H2), Housekeeping-Block zuletzt).
+- Neue Lesson im Root-`index.html` verlinken (Lernplattform-Navigator) —
+  Pflicht im selben Commit, nur `unterricht/`-Ziele.
 - Neue Fachbegriffe ins Glossar (mit KM-Verweis; UE-Verweis nur, wenn
   tatsächlich zugeordnet).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).

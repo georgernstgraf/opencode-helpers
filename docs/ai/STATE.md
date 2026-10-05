@@ -4,6 +4,13 @@ Current status as of 2026-09-29.
 
 ## Current Focus
 
+`create-lesson` (#102) kennt jetzt die **Lernplattform-Regel**: GitHub Pages
+veröffentlicht/verlinkt **nur `unterricht/`** (+ zentrales `assets/` +
+Navigator `index.html`); Kohorten- und `lehrplan/`-Ordner sind nicht Teil der
+Lernplattform. Neue Lessons werden im selben Commit im Root-`index.html`
+verlinkt (neuer Bauablauf-Schritt 10, Präludium-8, Verifikation-12).
+Repo-Umsetzung folgt: GRG-PMM, GRG-WMC, GRG-SWP.
+
 `orchestration` (#95) hat Delegation auf die Drei-Phasen-Routine umgestellt
 (**Pre-flight** pull + Discovery-Scan zum Dispatch-Zeitpunkt / **Brief-Bausteine**
 Schritt-0-Pull, Selbst-Discovery, atomarer Abschluss, Prozess-Aufräumung /
@@ -33,6 +40,9 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #102 CLOSED 2026-10-05 — create-lesson: GitHub Pages als Lernplattform
+      (nur `unterricht/` deployt/verlinkt; neuer Bauablauf-Schritt 10 +
+      Präludium-8 + Verifikation-12 „index.html-Pflicht")
 - [x] #95 CLOSED 2026-09-29 — orchestration: Delegations-Disziplin als
       Drei-Phasen-Routine (Pre-flight/Brief-Bausteine/Post-flight Sweep) +
       Fill-In-Template `delegation-brief.md` + PITFALLS-Cluster
