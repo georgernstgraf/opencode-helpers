@@ -246,7 +246,13 @@ einzige zulässige Rückfrage.
    Ahnen-Verzeichnisse; Repo-Name nirgends im Code) mit `data-css`/`data-js`
    (Stylesheet + Theme + Quiz). Der Loader injiziert zusätzlich `assets/site.js`
    (Pages-Basis) und `assets/github-pages-link.js` (Badge „Auf GitHub Pages
-   ansehen", fixiert, `no-print`). Toggle-Button im Header. Default folgt
+   ansehen", fixiert, `no-print`). **Timing-Fallstrick:** `loader.js` injiziert
+   alle diese Skripte dynamisch (asynchron) — `DOMContentLoaded` ist beim
+   Ausführen oft schon vorbei. Init-Code (Quiz, Theme, Badge) muss deshalb bei
+   `document.readyState !== "loading"` **sofort starten**, sonst erst auf
+   `DOMContentLoaded` warten (Muster: `theme.js`, `github-pages-link.js`,
+   `quiz.js`); sonst bleiben Quiz/Toggle auf der Live-Seite ohne Funktion.
+   Toggle-Button im Header. Default folgt
    `prefers-color-scheme`, die Wahl per `localStorage` gemerkt, **Print immer
    hell**, kein CDN. Fehlt ein Baustein im zentralen `assets/`, einmal ergänzen
    — Reuse vor Duplikat. Seiten laufen über den Live-Server (`serve.sh`), nie
@@ -393,7 +399,9 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
     der **Pages-Basis** (deployte URL nach dem Push bzw. lokal `/<repo>/…`
     simuliert) — Assets/Bootstrap, Badge, Quiz, Theme und Navigator-Link
     funktionieren in allen Kontexten; kein `<base>`, kein root-absoluter Pfad,
-    kein `file://`.
+    kein `file://`. Das Quiz **klickbar** prüfen (Radio wählen → Begründung
+    erscheint): Lokal kann das Timing den `DOMContentLoaded`-Fallstrick
+    kaschieren, unter der Pages-Basis tritt er auf (siehe Bauablauf Schritt 4).
 
 ## Nachziehen (gleicher Commit)
 
