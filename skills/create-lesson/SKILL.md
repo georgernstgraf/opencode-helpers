@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Lektion und Präsentation in einem — Erklärung, Quiz, Aufgabe, beamer-tauglich) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -35,8 +35,12 @@ nicht zu einer Kohorte und nicht zu einer fest geplanten Unterrichtseinheit:
   und führt keine Kohorten-Statistik.
 
 Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
-`<PREFIX>-<NN>-<slug>/`, Beamer-taugliche Code-Boxen, Stil-Leitfaden):
+`<PREFIX>-<NN>-<slug>/`, Stil-Leitfaden):
 `/home/georg/repos/georgernstgraf/GRG-PMM`.
+**Hinweis:** PMM trennt teils `lesson.html` und `praesentation.html`
+(Reveal.js/CDN) — das ist die *alte* Praxis. Hier gilt **Lektion und
+Präsentation in einem** (Grundregel 6): **eine** HTML, kein Foliensatz,
+kein Framework/CDN.
 
 ## Lernplattform: GitHub Pages & `index.html`
 
@@ -102,8 +106,10 @@ ausschließlich Lesson-Ordner (Grundregel 3):
 3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
    `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
    `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
-   `praesentation.html` + `hausaufgabe.md` + `lesson.html` — **kein
-   lauffähiger Projektcode** (siehe § Beispielprojekte). **`unterricht/`
+   `lesson.html` + `hausaufgabe.md` (plus Tages-README-Vorlage, siehe
+   § Prepared Lessons) — **kein lauffähiger Projektcode** (siehe
+   § Beispielprojekte). Die `lesson.html` ist **zugleich die Präsentation**
+   (Grundregel 6): **kein** separater Foliensatz. **`unterricht/`
    enthält ausschließlich solche Lesson-Ordner** — *keine* weiteren Ordner
    (kein `reference/`, kein lesson-lokales `assets/`; das repo-weite
    `assets/` liegt im Repo-Root). Kohortenordner werden **nicht** direkt
@@ -115,8 +121,14 @@ ausschließlich Lesson-Ordner (Grundregel 3):
 5. **Vollständigkeit des KM.** Alle Wege/Konzepte des KM kommen vor (Beispiel
    CSS-Einbindung: `style`-Attribut, `<style>`-Block im HTML, verlinktes
    Stylesheet — alle drei).
-6. **Beamer-Tauglichkeit.** Code-Boxen sind **hell** (heller Grund, dunkle
-   Schrift), kontrastreich, ausreichend groß und umbruchfreundlich; **keine
+6. **Lektion und Präsentation in einem (Beamer).** Eine Lesson ist **zugleich
+   die Präsentation**: **eine** self-contained HTML, die im Unterricht am
+   Beamer Schritt für Schritt projiziert wird — **kein** separater
+   Foliensatz (`praesentation.html`), **kein** Folien-Framework/CDN. Daraus
+   folgt die Beamer-Tauglichkeit: projizierbare Grundschrift und Kontraste,
+   **ein Gedanke pro bildschirmgroßem Block** (abschnittsweise, nicht
+   Textwüste); Code-Boxen sind **hell** (heller Grund, dunkle Schrift),
+   kontrastreich, ausreichend groß und umbruchfreundlich; **keine
    schwarzen/dunklen Code-Boxen**. Erzeugen zentrale Assets die Boxen, wird
    das Asset an der zentralen Stelle korrigiert (nicht pro Lesson
    überschrieben).
@@ -259,8 +271,11 @@ einzige zulässige Rückfrage.
    Die Tages-README-Vorlage verweist darauf (z. B. „Aufgabe: Abschnitt am
    Lesson-Ende"). Existiert ein Aufgaben-Master im Repo, auf ihn verlinken
    statt duplizieren.
-8. **Beamer-Check & Code-Stil:** Code-Boxen hell und groß genug für den
-   Projektor (siehe Grundregel 6). Projekt-Konvention (z. B. `<-`, Snake_case,
+8. **Beamer-Check & Code-Stil (Lektion = Präsentation):** Die `lesson.html`
+   ist zugleich die Präsentation — projizierbare Grundschrift/Kontraste, ein
+   Gedanke pro bildschirmgroßem Block, keine dunklen Code-Boxen; Code
+   ausreichend groß und umbruchfreundlich (siehe Grundregel 6).
+   Projekt-Konvention (z. B. `<-`, Snake_case,
    natives Pipe); Output als Kommentar, Erklärung als Kommentar; Zeilen kurz
    halten.
 9. **Beispielprojekt-Verweis (nur wenn nötig):** Braucht die Lesson ein
@@ -277,8 +292,10 @@ einzige zulässige Rückfrage.
 **Prepared Lesson** (undatiert, vorbereitet, **kohortenagnostisch**) liegt
 **flach** in `unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
 `SA` = schulautonom; `<NN>` läuft pro KM) zusammen mit
-`praesentation.html` + `hausaufgabe.md` + `lesson.html` — **ausschließlich
-Unterrichtsmaterial, kein lauffähiger Projektcode** (§ Beispielprojekte). Dazu
+`lesson.html` + `hausaufgabe.md` — **ausschließlich
+Unterrichtsmaterial, kein lauffähiger Projektcode** (§ Beispielprojekte). Die
+`lesson.html` ist **zugleich die Präsentation** (Lektion und Präsentation in
+einem, Grundregel 6). Dazu
 gehört eine **Tages-README-Vorlage** `<PREFIX>-<NN>-<slug>.md` (Inhalt +
 `## Aufgabe` + `## Housekeeping`, siehe § Tages-README).
 
@@ -343,8 +360,10 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 7. Bootstrap + Badge: generische Inline-Bootstrap im `<head>` vorhanden und
    `assets/loader.js` erreichbar; der Badge erscheint und zeigt auf die
    kanonische Pages-URL. Alles über den Live-Server (`serve.sh`), nie `file://`.
-8. **Beamer:** keine dunklen Code-Boxen; Code ausreichend groß und
-   umbruchfreundlich.
+8. **Beamer (Lektion = Präsentation):** keine dunklen Code-Boxen; Code
+   ausreichend groß und umbruchfreundlich; projizierbare Grundschrift, ein
+   Gedanke pro bildschirmgroßem Block; die Lesson ist **ohne** separaten
+   Foliensatz am Beamer vorführbar.
 9. **Umfang:** die Lesson ist eine ganze Doppelstunde (90 min) — Pflicht.
 10. **KM-Vollständigkeit:** alle im KM geforderten Wege/Konzepte kommen vor.
 11. **Kein lauffähiger Code im Lesson-Ordner:**
@@ -372,7 +391,9 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Keine Semesterpläne entwerfen (lehrplan-Skill, Aufgabe 3).
 - Keine Lessons unterhalb der KM-Anforderung oder ohne Bezug zu KM/Unterlagen
   erfinden.
-- Keine Folien anlegen. Die Aufgabe gehört in die Lesson — ein separater
+- Keinen separaten Foliensatz anlegen. Die `lesson.html` **ist** die
+  Präsentation (Lektion und Präsentation in einem, Grundregel 6). Die Aufgabe
+  gehört in die Lesson — ein separater
   Aufgaben-Master entsteht nur, wenn die Repo-Konvention einen verlangt.
 - **Keine Kohorten-Verwaltung:** nicht in Kohortenordner schreiben, keine
   Lessons-Tabellen in Klassen-READMEs pflegen, keinen Lernfortschritt von
