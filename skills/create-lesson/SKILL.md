@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Erklärung, Quiz, Aufgabe) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -67,7 +67,8 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
    `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
    `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
-   `praesentation.html` + `hausaufgabe.md` + `lesson.html`. Kohortenordner
+   `praesentation.html` + `hausaufgabe.md` + `lesson.html` — **kein
+   lauffähiger Projektcode** (siehe § Beispielprojekte). Kohortenordner
    werden **nicht** direkt beschrieben — die Lehrperson kopiert die Lesson
    per Hand in den Datums-Ordner der Kohorte (siehe § Prepared Lessons).
 4. **Immer 90 Minuten.** Eine Lesson ist **immer** eine ganze Doppelstunde
@@ -81,6 +82,34 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
    schwarzen/dunklen Code-Boxen**. Erzeugen zentrale Assets die Boxen, wird
    das Asset an der zentralen Stelle korrigiert (nicht pro Lesson
    überschrieben).
+
+## Beispielprojekte (kein Code unter `unterricht/`)
+
+`unterricht/` ist **Unterrichtsmaterial-Ordner**: HTML, Markdown und die
+zentralen `assets/` — aber **kein lauffähiger Projektcode**. Code-Beispiele, die
+im `lesson.html` als Lehrmaterial *angezeigt* werden, sind erwünscht und
+bleiben erlaubt; verboten sind **lauffähige Projektdateien** (Scaffolds,
+`package.json`, Tests, Projekt-Datenbanken usw.), die man installieren und
+starten kann.
+
+Fertige Beispielprojekte gehören in die **Beispielprojekt-Ablage des Repos**,
+außerhalb von `unterricht/`. Die Ablage wird ermittelt — **die Repo-Konvention
+gewinnt, nicht ein fester Name**:
+
+1. Explizite Nennung in `AGENTS.md`, `README.md` oder
+   `docs/ai/ARCHITECTURE.md` (z. B. GRG-SWP: `Sample_Projects/`).
+2. Sonst ein vorhandener Top-Level-Ordner mit diesem Zweck — **auch abweichend
+   benannte**, etwa `Sample_Projects/`, `Beispielprojekte/`, `Beispiele/`,
+   `Projekte/`, `examples/`, `praxis/`, oder funktional gleichwertige Ablagen
+   (z. B. `Coole_Prisma_Schemas/`).
+3. Ist keiner vorhanden: Default **`Beispielprojekte/`** anlegen und im
+   `README.md`/`ARCHITECTURE.md` als Beispielprojekt-Ablage dokumentieren.
+
+Ein Beispielprojekt liegt dort als eigenständiger Ordner `<Ablage>/<slug>/`
+(eigene README, eigene Abhängigkeiten, für sich lauffähig und getestet). Die
+Lesson **verweist** darauf (relativer Link + ein Satz) und **dupliziert keinen
+Projektcode** — der Verweis steht im Lesson-Text bzw. in der Aufgabe, nicht als
+eingebettete Projektdatei.
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
@@ -104,6 +133,10 @@ Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
    `unterricht/` ablesen. Kohorten-READMEs (Lessons-Tabellen, Lernstände)
    werden **nicht** gelesen oder geschrieben — sie sind Sache der
    Lehrperson.
+7. **Beispielprojekt-Ablage:** Wo liegen die lauffähigen Beispielprojekte des
+   Repos (außerhalb `unterricht/`)? Repo-Konvention bzw. vorhandenen Ordner
+   ermitteln — siehe § Beispielprojekte. Nichts anlegen, was anders benannt
+   schon besteht.
 
 Nichts ungefragt anlegen oder migrieren, außer es fehlt zum Bau (dann ergänzen,
 Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) Semesterplan,
@@ -123,7 +156,7 @@ gebacken). Beispiele:
 Ohne Bestellformat (mindestens KM + Thema) wird nicht gebaut — das ist die
 einzige zulässige Rückfrage.
 
-## Bauablauf (8 Schritte)
+## Bauablauf (9 Schritte)
 
 1. **Quelle grounden:** KM-Anforderung festhalten; `Unterlagen/` + frühere
    Lektionen als Quelle nutzen (borgen/kopieren erlaubt). **Lizenzregel:**
@@ -189,15 +222,20 @@ einzige zulässige Rückfrage.
    Projektor (siehe Grundregel 6). Projekt-Konvention (z. B. `<-`, Snake_case,
    natives Pipe); Output als Kommentar, Erklärung als Kommentar; Zeilen kurz
    halten.
+9. **Beispielprojekt-Verweis (nur wenn nötig):** Braucht die Lesson ein
+   lauffähiges Projekt, liegt dieses in der **Beispielprojekt-Ablage des Repos**
+   (§ Beispielprojekte). Die Lesson **verlinkt** es relativ und dupliziert
+   keinen Projektcode.
 
 ## Prepared Lessons (Ablage & Lebenszyklus)
 
 **Prepared Lesson** (undatiert, vorbereitet, **kohortenagnostisch**) liegt
 **flach** in `unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
 `SA` = schulautonom; `<NN>` läuft pro KM) zusammen mit
-`praesentation.html` + `hausaufgabe.md` + `lesson.html`. Dazu gehört eine
-**Tages-README-Vorlage** `<PREFIX>-<NN>-<slug>.md` (Inhalt + `## Aufgabe` +
-`## Housekeeping`, siehe § Tages-README).
+`praesentation.html` + `hausaufgabe.md` + `lesson.html` — **ausschließlich
+Unterrichtsmaterial, kein lauffähiger Projektcode** (§ Beispielprojekte). Dazu
+gehört eine **Tages-README-Vorlage** `<PREFIX>-<NN>-<slug>.md` (Inhalt +
+`## Aufgabe` + `## Housekeeping`, siehe § Tages-README).
 
 **Übernahme in den Unterricht — ausschließlich manuell durch die Lehrperson:**
 
@@ -264,6 +302,10 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
    umbruchfreundlich.
 9. **Umfang:** die Lesson ist eine ganze Doppelstunde (90 min) — Pflicht.
 10. **KM-Vollständigkeit:** alle im KM geforderten Wege/Konzepte kommen vor.
+11. **Kein lauffähiger Code im Lesson-Ordner:**
+    `unterricht/<PREFIX>-<NN>-<slug>/` enthält nur HTML/Markdown (+ zentrale
+    `assets/`); Beispielprojekte liegen in der Beispielprojekt-Ablage
+    (§ Beispielprojekte) und sind dort für sich lauffähig (Tests grün).
 
 ## Nachziehen (gleicher Commit)
 
@@ -284,4 +326,7 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
   Lessons-Tabellen in Klassen-READMEs pflegen, keinen Lernfortschritt von
   Kohorten verfolgen. Lessons-Tabellen in Klassen-READMEs, Übernahme-Datum
   und Kohorten-Zuordnung führt ausschließlich die Lehrperson manuell.
+- Keine lauffähigen Beispielprojekte unter `unterricht/` anlegen oder dorthing
+  kopieren — sie gehören in die Beispielprojekt-Ablage des Repos
+  (§ Beispielprojekte).
 - Keine Selbstlern-Pfade (teach-Skill).
