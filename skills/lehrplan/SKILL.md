@@ -81,7 +81,7 @@ Sie liegen **flach** unter `unterricht/` und tragen das zugehörige
 Kompetenzmodul im Namen (`KM<#>-<NN>-<slug>` bzw. `SA-<NN>-<slug>` für
 schulautonome Teile; `<NN>` läuft pro KM). Planungs-Dateien (Einheiten,
 Semesterpläne) gehören **nicht** hierher, sondern auf die Lehrplan-Ebene
-(`lehrplan/<fach>-<zweig>/`). Terminierte Lektionen wandern in die
+(`lehrplan/<zweig-ordner>/`). Terminierte Lektionen wandern in die
 Kohorten-Ordner am Repo-Root.
 
 ```
@@ -124,11 +124,16 @@ unterricht/
 > Nutzer-Wunsch.** Nur eine explizite, dokumentierte Nutzer-Entscheidung
 > (DECISIONS-Eintrag) kann eine Ausnahme rechtfertigen. **Konform** sind
 > dagegen `kompetenzmodule/` und KM-keyed Ressourcen am `lehrplan/`-Root
-> (Fach-Ebene) sowie Semesterpläne unter `lehrplan/<fach>-<zweig>/`.
+> (Fach-Ebene) sowie Semesterpläne unter `lehrplan/<zweig-ordner>/`.
 > **Einzige erlaubte Abweichung** bleibt das dreischichtige `LEHRPLAN.md`
 > als *Dateiformat* (② Schuladaption und ③ Didaktik mitlegen) — die
-> **Ablage** unter `lehrplan/<fach>-<zweig>/` ist davon nicht berührt und
+> **Ablage** unter `lehrplan/<zweig-ordner>/` ist davon nicht berührt und
 > bleibt Pflicht.
+>
+> **Zweig-Ordner `<zweig-ordner>`:** im Fach-Repo `lehrplan/<zweig>/`
+> (z. B. `hwii` — das Fach ist bereits der Repo-Name, kein Präfix), im
+> Fachgruppen-Repo `lehrplan/<fach>-<zweig>/` (z. B. `infi-hwii`,
+> `swp-hwii`).
 
 ### Fach-Repo (z. B. GRG-INFI)
 
@@ -143,7 +148,8 @@ lehrplan/
                                  #   Kompetenzmodule vom Zweig unabhängig sind
   <fach-keyed-ressourcen>.md     # fakultativ: KM-keyed Ressourcen (Fach-Ebene)
                                  #   (z. B. ressourcen-matrix.md, r4ds-abdeckung.md)
-  <fach>-<zweig>/                # pro Zweig ein Ordner, klein: infi-hwii, infi-hwit
+  <zweig>/                       # pro Zweig ein Ordner, klein: hwii, hwit (Fach-Repo
+                                 #   OHNE Fach-Präfix – das Fach ist der Repo-Name)
     LEHRPLAN.md                  # ① Komplett-Extrakt (oder dreischichtig ①②③) DIESES Zweigs
     RIS.md                       # Rechtsstand, Novellen-Historie, Schichten-Vergleich
     <FACH>_②.pdf                 # Schuladaption-PDF, falls vorhanden
@@ -163,7 +169,9 @@ GLOSSAR.md                       # Domänen-Abkürzungen und Begriffe
 
 ### Fachgruppen-Repo (z. B. WI-Fachgruppe-Informatik)
 
-Identisches Muster, nur mit mehreren Fächern/Zweigen nebeneinander:
+Identisches Muster, nur mit mehreren Fächern/Zweigen nebeneinander. **Hier
+trägt jeder Zweig-Ordner das Fach-Präfix** (`<fach>-<zweig>`, z. B.
+`infi-hwii`) — im Fach-Repo dagegen nur `<zweig>` (siehe Beispiel oben):
 
 ```
 lehrplan/
@@ -181,9 +189,9 @@ AGENTS.md
 GLOSSAR.md
 ```
 
-- Jedes `<fach>-<zweig>`-Verzeichnis ist in sich geschlossen: LEHRPLAN,
-  RIS, ②-PDF, Klassen-Extrakte und die Planung (Einheiten, Semesterpläne)
-  liegen beieinander; Querverweise bleiben flach.
+- Jedes Zweig-Verzeichnis (`<zweig-ordner>`) ist in sich geschlossen:
+  LEHRPLAN, RIS, ②-PDF, Klassen-Extrakte und die Planung (Einheiten,
+  Semesterpläne) liegen beieinander; Querverweise bleiben flach.
 - `kompetenzmodule/` liegt auf **Fach-Ebene**. Bedient ein Repo mehrere
   Fächer, bekommt jedes Fach seine eigene Reihe — in einem fach-benannten
   Unterordner `kompetenzmodule/<fach>/` (sonst kollidieren die
@@ -199,19 +207,22 @@ GLOSSAR.md
   `wmc-aif/34AIF` usw.).
 - Die Planungs-Dateien (Einheiten, Semesterpläne) liegen als
   `jg<N>-einheiten.md` bzw. `jg<N>-semesterplan_{ws,ss}.md` in
-  `lehrplan/<fach>-<zweig>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
+  `lehrplan/<zweig-ordner>/`; die Zuordnung Jahrgang ↔ KM ↔ generisches
   Klassen-Label steht in `lehrplan/METADATA.md`.
 
 ### Ordner- und Datei-Benennung
 
-- `lehrplan/<fach>-<zweig>/`: **klein** geschrieben, Bindestrich
-  (z. B. `infi-hwii`). Das Zweig-Kürzel folgt der Klassen-Postfix-Tabelle
-  (`hwii`, `hwit`, `aif`, `kif`, `cif`). In Fachgruppen-Repos vorhandene
+- **Zweig-Ordner** `lehrplan/<zweig-ordner>/`: **klein** geschrieben,
+  Bindestrich. Im **Fach-Repo** trägt er **nur den Zweig** — `<zweig>`
+  (z. B. `hwii`, `hwit`), weil das Fach bereits der Repo-Name ist. Im
+  **Fachgruppen-Repo** trägt er das **Fach-Präfix** — `<fach>-<zweig>`
+  (z. B. `infi-hwii`, `swp-hwii`). Das Zweig-Kürzel folgt der
+  Klassen-Postfix-Tabelle (`hwii`, `hwit`, `aif`, `kif`, `cif`). Vorhandene
   Alt-Ordner mit ausgeschriebenem Zweig-Kürzel (z. B. `infi-wii`,
   `infi-wit`) sind ein Befund mit Umbenennungsempfehlung
   (`infi-wii` → `infi-hwii`) — Umbenennung nur auf Nutzer-Wunsch.
 - Klassenordner: `<Stufe><Postfix>` in **GROSSBUCHSTABEN** (z. B.
-  `4HWII`, `4HWIT`), **innerhalb** des `<fach>-<zweig>`-Ordners.
+  `4HWII`, `4HWIT`), **innerhalb** des Zweig-Ordners (`<zweig-ordner>`).
   Generische Labels decken Parallellklassen ab (`4HWIT` deckt
   4AHWIT/4BHWIT ab).
 - Einheiten-Ordner: `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
@@ -220,7 +231,7 @@ GLOSSAR.md
   Inhalte in die Kohorten-Ablage am Repo-Root `YYYY-MM-DD__thema/`.
 - Einheiten/Semesterpläne: `jg<N>-einheiten.md` und
   `jg<N>-semesterplan-{ws,ss}.md`, kleines `jg`, Unterstrich, in
-  `lehrplan/<fach>-<zweig>/`.
+  `lehrplan/<zweig-ordner>/`.
 - RIS-Ordner: `lehrplan/RIS/` — Großbuchstaben-Ausnahme (Abkürzung, wie
   Klassen-Labels); enthält **nur** RIS-Gesetzestext-PDFs.
 - PDFs: `RIS/YYYY-MM-DD_<name>.pdf` (ISO-8601-Datumspräfix).
@@ -232,7 +243,7 @@ GLOSSAR.md
   und hält den aktuell relevanten Inhalt (Arbeitsblätter, Abgaben,
   klassenbezogene Kommunikation) für genau diese Kohorte — archiviert wird
   am Schuljahresende. Nicht verwechseln mit den GROSSBUCHSTABEN-
-  Klassenordnern unter `lehrplan/<fach>-<zweig>/` (dort liegen die
+  Klassenordnern unter `lehrplan/<zweig-ordner>/` (dort liegen die
   Lehrplan-Extrakte, Klein- vs. Großschreibung markiert die Ebene:
   Root = Ablage/Kohorte, lehrplan/ = Gesetz/Extrakt).
 
@@ -273,7 +284,7 @@ Konsequenzen für den Skill:
 - **Aufgabe 2 (Extraktion)** extrahiert immer EINEN Gegenstand (einen
   Abschnitt) aus dem Zweig-Dokument — nie den ganzen Zweig. Bei einem
   Gegenstand in mehreren Zweigen (z. B. INFI) wird pro Zweig ein eigener
-  Extrakt im jeweiligen `lehrplan/<fach>-<zweig>/`-Ordner angelegt.
+  Extrakt im jeweiligen `lehrplan/<zweig-ordner>/`-Ordner angelegt.
 - Die Fetch-Strategie bleibt anlagen-basiert (NOR-Dokument pro Anlage,
   siehe RIS-Praxiswissen) — ein Zweig-Dokument wird einmal gefetcht und
   dient allen seinen Gegenständen.
@@ -316,8 +327,8 @@ Danach berichten:
   Anlage 1.28 der BGBl. II Nr. 262/2015), plus den Allgemeinen Teil
   (Anlage 1), falls referenziert.
 - **RIS-Verweise**: die in METADATA.md gespeicherten Links.
-- **Klassen**: vorgefundene Klassenordner (pro `<fach>-<zweig>`), via
-  Postfix-Tabelle auf Jahrgänge abgebildet.
+- **Klassen**: vorgefundene Klassenordner (pro Zweig-Ordner
+  `<zweig-ordner>`) — via Postfix-Tabelle auf Jahrgänge abgebildet.
 - **Lücken**: falls `lehrplan/METADATA.md` fehlt oder unvollständig ist,
   die Standardstruktur vorschlagen (siehe unten), bevor irgendetwas
   erstellt wird — und nur auf ausdrücklichen Nutzer-Wunsch erstellen.
@@ -331,18 +342,18 @@ laufen?":
 | Prüfpunkt | Konform, wenn |
 |-----------|---------------|
 | METADATA.md vollständig | Alle Skeleton-Abschnitte vorhanden und gefüllt (Rechtsgrundlage, RIS-Verweise, Änderungshistorie, Klassen-Zuordnung, Datei-Inventar) |
-| Zweig-Ebene vorhanden | Jeder unterrichtete Zweig hat ein `lehrplan/<fach>-<zweig>/`-Verzeichnis — flache Klassen-/Extrakt-Ordner direkt unter `lehrplan/` (Alt-Layout) sind ein Befund mit Migrationspflicht |
-| Komplett-Extrakt | `lehrplan/<fach>-<zweig>/LEHRPLAN.md` existiert pro Zweig, deckt alle Jahrgänge des Gegenstands in diesem Zweig ab |
-| Klassen-Extrakte | `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md` existiert für jeden Klassenordner |
-| KM-Steckbriefe (Fach-Ebene) | `lehrplan/kompetenzmodule/` (bzw. `kompetenzmodule/<fach>/` im Mehr-Fächer-Repo) liegt am Root — im `<fach>-<zweig>/`-Ordner wären sie ein Befund |
+| Zweig-Ebene vorhanden | Jeder unterrichtete Zweig hat ein `lehrplan/<zweig-ordner>/`-Verzeichnis — flache Klassen-/Extrakt-Ordner direkt unter `lehrplan/` (Alt-Layout) sind ein Befund mit Migrationspflicht |
+| Komplett-Extrakt | `lehrplan/<zweig-ordner>/LEHRPLAN.md` existiert pro Zweig, deckt alle Jahrgänge des Gegenstands in diesem Zweig ab |
+| Klassen-Extrakte | `lehrplan/<zweig-ordner>/<KLASSE>/<KLASSE>.lehrplan.md` existiert für jeden Klassenordner |
+| KM-Steckbriefe (Fach-Ebene) | `lehrplan/kompetenzmodule/` (bzw. `kompetenzmodule/<fach>/` im Mehr-Fächer-Repo) liegt am Root — im Zweig-Ordner (`<zweig-ordner>/`) wären sie ein Befund |
 | KM-keyed Ressourcen (Fach-Ebene) | `ressourcen-matrix.md`, `r4ds-abdeckung.md` o. Ä. liegen am `lehrplan/`-Root — im Zweig-Ordner wären sie ein Befund |
 | Klassen-Zuordnung | METADATA.md bildet jeden unterrichteten Jahrgang ↔ KM ↔ GROSSBUCHSTABEN-Klassenname (pro Zweig) ab |
 | Novellen-Check-Datum | METADATA.md dokumentiert die letzte RIS-Abfrage („RIS-Status abgefragt am …") und ihr Ergebnis |
 | RIS-Verzeichnis | Alle Gesetzestext-PDFs unter `lehrplan/RIS/` — PDFs im `lehrplan/`-Root sind ein Migrationsbefund |
 | Erläuterungen | KM-Überblicke und Lernziel-Erläuterungen in allen Extrakten vorhanden (siehe Aufgabe 2) |
-| Planungs-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen in `lehrplan/<fach>-<zweig>/`; unter `unterricht/` (Zweig-Fach-Ordner oder lose) sind sie ein Migrationsbefund (Retrofit-Klausel) |
+| Planungs-Ablage | Einheiten (`jg<N>-einheiten.md`) und Semesterpläne (`jg<N>-semesterplan-{ws,ss}.md`) liegen in `lehrplan/<zweig-ordner>/`; unter `unterricht/` (Zweig-Fach-Ordner oder lose) sind sie ein Migrationsbefund (Retrofit-Klausel) |
 | Einheiten-Ordner | Vorbereitete Ordner `<KM#/SA>-<NN>-<slug>/` liegen **direkt** unter `unterricht/` (KM-Präfix, `<NN>` pro KM); terminierte Lektionen in der Kohorten-Ablage am Repo-Root `<klasse>/YYYY-MM-DD__thema/`. Ein `unterricht/<ZWEIG>-<FACH>/`-Ordner ist ein Befund (zuständig: `create-lesson`-Skill) |
-| Root-Klassenordner | Klein geschriebene Klassenordner am Repo-Root (z. B. `5ahwit/`) sind **konforme Kohorten-Einstiegspunkte** (Ablage pro Kohorte, Archivierung am Schuljahresende) — kein Befund; GROSSBUCHSTABEN-Klassenordner mit Lehrplan-Extrakten liegen unverändert unter `lehrplan/<fach>-<zweig>/` |
+| Root-Klassenordner | Klein geschriebene Klassenordner am Repo-Root (z. B. `5ahwit/`) sind **konforme Kohorten-Einstiegspunkte** (Ablage pro Kohorte, Archivierung am Schuljahresende) — kein Befund; GROSSBUCHSTABEN-Klassenordner mit Lehrplan-Extrakten liegen unverändert unter `lehrplan/<zweig-ordner>/` |
 
 Anschließend ausdrücklich feststellen: **„Der Skill muss noch ausgeführt
 werden"** (Auflistung, welche Aufgaben 1/2/3 ausstehen) **oder „Der Skill
@@ -445,7 +456,7 @@ tatsächlich ist).
    (bevorzugt: aktueller konsolidierte-Fassung-Link in METADATA.md) oder
    aus dem gespeicherten PDF. Nur gefetchte Inhalte zitieren — nie
    Gesetzestext aus dem Gedächtnis rekonstruieren.
-2. **Komplett-Extrakt** — `lehrplan/<fach>-<zweig>/LEHRPLAN.md`:
+2. **Komplett-Extrakt** — `lehrplan/<zweig-ordner>/LEHRPLAN.md`:
    - Alle Jahrgänge des Gegenstands in diesem Zweig, in Reihenfolge
      (I.–V. Jahrgang).
    - Struktur: `## <Jahrgang>` → `### <Semester> — Kompetenzmodul <N>`
@@ -467,8 +478,8 @@ tatsächlich ist).
      hier"), falls in der Quelle vorhanden, klar als Annotation markiert.
    - Kopfzeile: Rechtsgrundlage, RIS-Link, Extraktionsdatum.
 3. **Klassen-Extrakte** — einer pro Klassenordner:
-   - Ziel: `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md`
-     (z. B. `lehrplan/infi-hwii/4HWII/4HWII.lehrplan.md`).
+   - Ziel: `lehrplan/<zweig-ordner>/<KLASSE>/<KLASSE>.lehrplan.md`
+     (z. B. `lehrplan/hwii/4HWII/4HWII.lehrplan.md`).
    - Inhalt: **nur** der klassenrelevante Jahrgang (z. B. IV. Jahrgang =
      KM 7 + KM 8 für eine 4.-Jahres-Klasse), also Bildungs- und
      Lehraufgabe + Lehrstoff ihrer Kompetenzmodule — **inklusive der
@@ -495,7 +506,7 @@ tatsächlich ist).
 
 Zweck: aus den extrahierten Lehrplänen eine konkrete Lehrstoffverteilung
 entwerfen — `jg<N>-einheiten.md` und `jg<N>-semesterplan-ws.md` bzw.
-`jg<N>-semesterplan-ss.md` in `lehrplan/<fach>-<zweig>/`. Dies ist
+`jg<N>-semesterplan-ss.md` in `lehrplan/<zweig-ordner>/`. Dies ist
 ein **interaktives Protokoll**: der Skill entwirft, der Nutzer entscheidet.
 Nie eine finale Lehrstoffverteilung ohne den Nutzer-Review-Schritt
 schreiben.
@@ -504,7 +515,7 @@ Protokoll:
 
 1. **Input-Check** (alles muss existieren; falls nicht, auf die fehlenden
    Aufgaben-1/2-Ausgaben hinweisen und stoppen):
-   - Klassen-Extrakt `lehrplan/<fach>-<zweig>/<KLASSE>/<KLASSE>.lehrplan.md`
+   - Klassen-Extrakt `lehrplan/<zweig-ordner>/<KLASSE>/<KLASSE>.lehrplan.md`
      mit Erläuterungs-Ebene (die inhaltliche Wirbelsäule).
    - KM-Steckbriefe
      `lehrplan/kompetenzmodule/km<N>.md` (zur Kontextlektüre).
@@ -520,7 +531,7 @@ Protokoll:
 3. **Nutzer-Review (Pflichtschritt)**: Entwurf präsentieren und nach
    Bestätigung/Anpassungen fragen — Reihenfolge, Schwerpunkte, reservierte
    Slots. Erst fortfahren, wenn der Nutzer das Raster geprüft hat.
-4. **Ausarbeitung**: `lehrplan/<fach>-<zweig>/jg<N>-einheiten.md` bzw.
+4. **Ausarbeitung**: `lehrplan/<zweig-ordner>/jg<N>-einheiten.md` bzw.
    `jg<N>-semesterplan-ws.md` / `jg<N>-semesterplan-ss.md` schreiben,
    dem bestehenden Format im Repo folgend (UE-Tabellen nach thematischen
    Blöcken, Kopf mit Zeitmodell, Werkzeug, KM-Steckbrief- und
@@ -556,7 +567,7 @@ Vorgehen beim Antreffen (Aufgabe A oder 3):
 
 1. **Melden, nicht handeln:** Altbestände als Migrationsbefund listen
    (Quelle → Ziel), z. B.
-   `unterricht/HWII-INFI/jg4-einheiten.md` → `lehrplan/infi-hwii/jg4-einheiten.md`.
+   `unterricht/HWII-INFI/jg4-einheiten.md` → `lehrplan/hwii/jg4-einheiten.md`.
 2. Umbenennungen auf das **einheitliche `jg<N>`-Schema** mit einbeziehen
    (z. B. `semesterplan-ws.md` in einem 4HWII-Ordner →
    `jg4-semesterplan-ws.md`; abweichende Namen wie `JG3-einheiten.md` →
@@ -614,6 +625,6 @@ generische RIS-Muster dort ergänzen.
 - Die Klassen-Zuordnungstabelle ([KLASSEN-ZUORDNUNG.md](./KLASSEN-ZUORDNUNG.md))
   wird manuell gepflegt — vorschlagen, nie selbst editieren.
 - GROSSBUCHSTABEN-Klassennamen überall (Ordner, Extrakt-Dateien,
-  METADATA.md); Ausnahme: die Ordner `lehrplan/<fach>-<zweig>/` sind klein.
+  METADATA.md); Ausnahme: die Ordner `lehrplan/<zweig-ordner>/` sind klein.
 - Repos ohne `lehrplan/`-Struktur: nur berichten, nichts anlegen oder
   migrieren ohne ausdrückliche Nutzer-Anweisung.

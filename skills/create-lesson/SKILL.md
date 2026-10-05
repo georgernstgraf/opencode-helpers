@@ -55,6 +55,23 @@ deployt noch vom Navigator verlinkt.
 - Das Deployment läuft über `.github/workflows/pages.yml` und kopiert nur
   `index.html`, `assets/` und `unterricht/` (rsync) in die Site. Fehlt der
   Workflow, einmal nach dem Vorbild des Repos (bzw. GRG-INFI/GRG-PMM) anlegen.
+- **Referenzen liegen außerhalb des Deploys:** `GLOSSAR.md` (und weiteres
+  Root-Nachschlagewerk) wird **nicht** mitdeployt. Links aus Lessons/Navigator
+  darauf laufen daher über die **GitHub-URL** des Repos (siehe § Referenzmaterial).
+
+## Referenzmaterial (nicht unter `unterricht/`)
+
+`unterricht/` ist **nicht** der Ort für Nachschlagewerke — dort liegen
+ausschließlich Lesson-Ordner (Grundregel 3):
+
+- **Glossar = `GLOSSAR.md` im Repo-Root.** Neue Fachbegriffe (mit KM-Verweis;
+  UE-Verweis nur, wenn tatsächlich zugeordnet) kommen dorthin.
+- **Weiteres repo-weites Nachschlagewerk** (z. B. ein SQL-Spickzettel) liegt
+  ebenfalls als eigene Markdown-Datei im **Repo-Root** — nie als `reference/`
+  unter `unterricht/`.
+- **Lesson-spezifische Checklisten** (z. B. eine Normalformen-Tabelle) bleiben
+  **in** der jeweiligen Lesson.
+- Auf Root-Referenzen wird per **GitHub-URL** verlinkt (siehe § Lernplattform).
 
 ## Abgrenzung zum Teach-Skill (wichtig, keine Duplikation)
 
@@ -86,9 +103,12 @@ deployt noch vom Navigator verlinkt.
    `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
    `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
    `praesentation.html` + `hausaufgabe.md` + `lesson.html` — **kein
-   lauffähiger Projektcode** (siehe § Beispielprojekte). Kohortenordner
-   werden **nicht** direkt beschrieben — die Lehrperson kopiert die Lesson
-   per Hand in den Datums-Ordner der Kohorte (siehe § Prepared Lessons).
+   lauffähiger Projektcode** (siehe § Beispielprojekte). **`unterricht/`
+   enthält ausschließlich solche Lesson-Ordner** — *keine* weiteren Ordner
+   (kein `reference/`, kein lesson-lokales `assets/`; das repo-weite
+   `assets/` liegt im Repo-Root). Kohortenordner werden **nicht** direkt
+   beschrieben — die Lehrperson kopiert die Lesson per Hand in den
+   Datums-Ordner der Kohorte (siehe § Prepared Lessons).
 4. **Immer 90 Minuten.** Eine Lesson ist **immer** eine ganze Doppelstunde
    (~90 min) — auch eine Wiederholung. Mehrere Aufbauschritte, Beispiele,
    Übungen, Quiz; nie eine 15-Minuten-Zusammenfassung.
@@ -133,7 +153,7 @@ eingebettete Projektdatei.
 
 1. **Plan/KM:** KM-Steckbriefe (`lehrplan/kompetenzmodule/`) zum Ziel-KM/Thema
    lesen (Lektüre-Anker, Ziel, Bildungs- und Lehraufgabe). Semesterpläne
-   (`lehrplan/<fach>-<zweig>/jg<N>-semesterplan-*.md`) nur als optionale
+   (`lehrplan/<zweig>/jg<N>-semesterplan-*.md`) nur als optionale
    Orientierung — **keine Direktzuordnung zu einer UE, keine Kohorte**.
 2. **Unterlagen (Coverage-Check):** themenspezifische `Unterlagen/`
    (Folien-PDF/PPTX, `.md`, Demos) + bestehende Lektionen lesen. Notieren, was
@@ -331,6 +351,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
     `unterricht/<PREFIX>-<NN>-<slug>/` enthält nur HTML/Markdown (+ zentrale
     `assets/`); Beispielprojekte liegen in der Beispielprojekt-Ablage
     (§ Beispielprojekte) und sind dort für sich lauffähig (Tests grün).
+    Unter `unterricht/` liegen **ausschließlich** Lesson-Ordner — kein
+    `reference/`, kein weiterer Hilfsordner (Grundregel 3).
 12. **Lernplattform:** Die Lesson ist im Root-`index.html` verlinkt, der Link
     löst auf, und es gibt keine Verweise auf Kohorten-/Lehrplan-Ordner; der
     Pages-Workflow veröffentlicht nur `index.html`, `assets/` und `unterricht/`.
@@ -341,8 +363,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
   `## Aufgabe`-Abschnitt (H2), Housekeeping-Block zuletzt).
 - Neue Lesson im Root-`index.html` verlinken (Lernplattform-Navigator) —
   Pflicht im selben Commit, nur `unterricht/`-Ziele.
-- Neue Fachbegriffe ins Glossar (mit KM-Verweis; UE-Verweis nur, wenn
-  tatsächlich zugeordnet).
+- Neue Fachbegriffe ins **Root-`GLOSSAR.md`** (mit KM-Verweis; UE-Verweis
+  nur, wenn tatsächlich zugeordnet).
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
 
 ## Was dieser Skill NICHT tut
