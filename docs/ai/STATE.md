@@ -1,8 +1,17 @@
 # Project State
 
-Current status as of 2026-09-29.
+Current status as of 2026-10-06.
 
 ## Current Focus
+
+`repo-sync` (#106) holt jetzt echtes Nachziehen: pro Git-Repo erst **alle**
+Remotes fetchen, **dann** `ahead`/`behind` messen, **dann** clean ausgecheckte
+Branches per `--ff-only` bzw. `rebase` an den Upstream anpassen (dirty/conflict
+unangetastet und gemeldet). Commit/Push bleiben Agentensache. Tote
+**Sekundär**-Remotes werden entfernt (`fetch.remove_dead_remotes`), nie der
+Upstream und nie der einzige Remote. Neue Report-Keys `diverged`/`fetched`/
+`pruned`/`pull`. Selbsttest `skills/repo-sync/scripts/test-repo-sync.sh` (23) +
+`tests/test_repo_sync.py` (Suite 83). SVN bleibt `svn up`.
 
 `create-lesson` (#102) kennt jetzt die **Lernplattform-Regel**: GitHub Pages
 veröffentlicht/verlinkt **nur `unterricht/`** (+ zentrales `assets/` +
@@ -39,6 +48,13 @@ Erste Anwendung: GRG-WMC auf zentrales `assets/` + selbst-geführte
 prepared-lessons umstellen.
 
 ## Completed (this cycle)
+
+- [x] #106 CLOSED 2026-10-06 — repo-sync: Remote-Stand am Ende des Laufs sauber
+      nachziehen (fetch aller Remotes vor der Messung, ff/rebase-Pull, dirty/
+      conflict unangetastet); tote Sekundär-Remotes werden entfernt (nie der
+      Upstream, nie der einzige); Report-Keys `diverged`/`fetched`/`pruned`/
+      `pull`; Selbsttest (23) + Python-Suite (83) grün; zwei Commits
+      (`8c81b9c`, `ddaa29d`)
 
 - [x] #102 CLOSED 2026-10-05 — create-lesson: GitHub Pages als Lernplattform
       (nur `unterricht/` deployt/verlinkt; neuer Bauablauf-Schritt 10 +

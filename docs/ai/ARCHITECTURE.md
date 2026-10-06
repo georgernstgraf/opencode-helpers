@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-09-14.
+Living structural map of the system as of 2026-10-06.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -39,16 +39,21 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 |--------|---------|
 | `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering |
 | `skills/searxng/searxng-search.sh` | Canonical search logic: prioritized engine chain against the SearXNG instance chain (`brave` → `google` → `mwmbl,searchmysite` → token-gated `braveapi`), returns JSON on stdout |
+| `skills/repo-sync/scripts/repo-sync.sh` | Multi-repo sync: fetch every remote, fast-forward/rebase clean checkouts onto their upstream, prune dead secondary remotes, `svn up`; never commits or pushes |
+| `skills/repo-sync/scripts/test-repo-sync.sh` | Shell self-test for `repo-sync.sh` against throwaway bare remotes/clones (23 checks; no real repository touched) |
 | `scripts/archive/` | Retired scripts (`opencode-searxng` legacy requests server, `opencode-ollama-sync`) — kept unregistered for reference |
 
 ## Tests (`tests/`)
 
 Hermetic, stdlib-only `unittest` suite for the repo's executable code. Run with
 `python3 -m unittest discover -s tests -v` — no network, no live instance.
+Skills whose logic is stateful also ship a standalone shell self-test next to
+the script (precedent: `skills/repo-sync/scripts/test-repo-sync.sh`).
 
 | File | Purpose |
 |------|---------|
 | `tests/searxng_mock.py` | In-process mock of the SearXNG JSON API plus a helper that points a temp copy of `searxng-search.sh` at it |
+| `tests/test_repo_sync.py` | `repo-sync.sh`: report keys, fetch/ff/rebase pull decisions, dead-remote pruning, credential redaction in report *and* log, exit codes, `max_depth`, svn status without committing |
 | `tests/test_searxng_search.py` | `searxng-search.sh` behavior: chain tiers (`brave`/`google`/free), the `< 3` token gate + merge/dedupe, explicit-engine/category bypass, preserved params, instance chain, first-responsive-instance reuse |
 | `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
 | `tests/test_skill_links.py` | Every `](./…)` link in a `skills/*/SKILL.md` resolves to an existing sibling file |

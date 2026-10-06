@@ -60,4 +60,4 @@ Open tasks:
       melden und (nach Rücksprache) auf Fach-/Zweig-Ebene umstellen. Prüfen, ob
       `kompetenzmodule/` je Fach ans `lehrplan/`-Root wandert.
 
-Last updated: 2026-09-29.
+Last updated: 2026-10-06.

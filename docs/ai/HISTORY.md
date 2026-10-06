@@ -54,3 +54,13 @@ Entries here are no longer active truth. Never delete from this file.
 - **Tradeoff**: Skill duplicates a small amount of delivery logic that a plugin would centralize; token handling is restricted to shell variables to avoid leaking secrets
 - **Origin**: docs/ai/DECISIONS.md
 - **Reason**: Removed — the current bot version attaches files directly through its UI, making the skill redundant.
+
+## 2026-09-30 (SUPERSEDED 2026-10-06, origin: DECISIONS.md, reason: repo-sync now fetches all remotes and catches branches up — see #106): repo-sync — the script reports, the agent decides (#96)
+- **Choice**: `repo-sync` ersetzte `morning-sync` (#93) und invertierte die Arbeitsteilung. `scripts/repo-sync.sh` war **fact collector only** — enumeriert die Roots aus einer versionierten `config.json`, läuft `git fetch` und `svn up`, meldet `owner`/`branch`/`upstream`/`ahead`/`behind`/`dirty` plus Porcelain-Status je Repo; committet/pusht nie. Der **Agent** urteilt (Phase B commit, Phase C push nach `push.allow_owners`/`deny_paths`/Upstream, Phase D Report). Die `~/bin`-Helfer wurden aus dem Sync entfernt: `allgits-pull` (fehlerfreies `awk | sh`, machte #93s Abbruch-Gate wirkungslos) und `svnkack.sh` (leere Commit-Message). `opencode upgrade`/`restart_service` wanderten hinter `host_steps` (beide default `false`).
+- **Reason**: Die nützliche Routine ist „sync my repos“, nicht „restart dell“. Uncommittete Arbeit ist eine Ermessensfrage — ein Skript kann nur `git add -A`, was die halbfertigen Commits und Secret-Leaks erzeugt, die die Commit-Policy verhindern will. Collect vs. decide zu trennen hält das Deterministische deterministisch.
+- **Considered**: `morning-sync` behalten und nur Pushen ergänzen (verworfen — Name/dell-Bindung irreführend); `morning-sync` als dünner Wrapper (verworfen); Skript committet alles per `git add -A` (verworfen); SSH/SVN-Hostprofil pro Host (verworfen).
+- **Tradeoff**: Der Skill ist ein Protokoll, die Korrektheit hing an der Agenten-Befolgung; Commit/Push nicht skript-garantiert; `tests/test_repo_sync.py` pinnte das Collector-Verhalten.
+- **Also**: Letzter `https://user:token@`-Remote (`cha-spg/pos-wmc-fachgruppe-inf-erw`) auf `git@github.com:` normalisiert. PDFs/CatchLog-Dateien bewusst **nicht** in `commit.never_commit_globs`.
+- **Issue**: #96
+- **Origin**: docs/ai/DECISIONS.md
+- **Reason**: Superseded by #106 — das Skript ist nicht mehr „fact collector only“: es fetcht alle Remotes und zieht clean ausgecheckte Branches per ff/rebase nach (und räumt tote Sekundär-Remotes auf). Die Commit-/Push-Freiheit aus #96 gilt weiter und ist im #106-Eintrag restated.
