@@ -42,6 +42,7 @@ fetch, or a failed pull. What to commit and what to push stays an agent decision
 | `commit.never_commit_globs[]` | Hard secrets that must never be staged. |
 | `commit.max_review_files` | Above this many changed files, do not commit blindly. |
 | `fetch.all_remotes` | Fetch every remote of a repo, not just `origin`. |
+| `fetch.remove_dead_remotes` | When true (default), remove a **secondary** remote whose repository no longer exists. Never removes the upstream remote or a repo's only remote. |
 | `pull.enabled` | When true (default), clean behind/diverged checkouts are caught up automatically. |
 | `pull.on_diverged` | `rebase` (default) replays the local-only commits onto the upstream; any other value leaves a diverged repo untouched. |
 | `pull.on_conflict` | `abort-and-report` (default) aborts a conflicting rebase and leaves the repo unchanged. |
@@ -64,7 +65,12 @@ short by a restart.
 For each git repository the script:
 
 1. fetches **every** remote (not just `origin`), so `fork`/`upstream` are current
-   too — with `GIT_TERMINAL_PROMPT=0`, a credential prompt can never block the run;
+   too — with `GIT_TERMINAL_PROMPT=0`, a credential prompt can never block the run.
+   A failed fetch of the upstream's remote is an `ERROR`; a failed fetch of a
+   **secondary** remote is a `WARN`, and when its repository no longer exists
+   ("Repository not found") the stale config entry is removed
+   (`fetch.remove_dead_remotes`) — never the upstream remote, never a repo's only
+   remote;
 2. measures `ahead`/`behind` against the branch's upstream **after** that fetch;
 3. catches the checked-out branch up **cleanly**:
    - clean and only behind → `git merge --ff-only <upstream>` → `pull=ff(n)`
@@ -80,7 +86,8 @@ An `ERROR:` line (failed fetch of the **upstream's** remote, a rebase conflict,
 a failed pull) blocks **that repository only** — no commit, no push for it. A
 **secondary** remote that no longer resolves (e.g. a deleted fork) is only a
 `WARN:` and never stops the catch-up, because it does not affect the tracked
-branch. The other repositories in the run are unaffected and must still be
+branch; when it is not the repo's only remote, its stale config entry is removed
+(`pruned=`). The other repositories in the run are unaffected and must still be
 synced; one unreachable remote must not stall the other 74.
 
 Two errors are **not** per-repository and do stop everything:
@@ -100,6 +107,7 @@ The report format is one `## <type> <path>` block per repository, then
 | `diverged` | `true` if the branch was ahead **and** behind when collected |
 | `dirty` | number of changed paths (the `--- status ---` block lists them) |
 | `fetched` | remotes fetched this run, comma-separated |
+| `pruned` | dead secondary remotes removed this run, comma-separated |
 | `pull` | `uptodate` \| `ff(n)` \| `rebase(n)` \| `skipped(<reason>)` \| `disabled` \| `conflict` \| `failed` |
 
 **A run is done only when nothing is left behind.** After Phase A every repo

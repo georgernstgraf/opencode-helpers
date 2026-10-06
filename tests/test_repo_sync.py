@@ -206,6 +206,26 @@ class RepoSyncTest(unittest.TestCase):
         self.assertIn("fetch origin failed", result.stdout)
         self.assertIn("failures=1", result.stdout)
 
+    def test_dead_secondary_remote_is_removed(self):
+        # A secondary remote whose repository no longer exists is dead weight.
+        path = self.make_repo("acme", "multi")
+        git(path, "remote", "add", "fork", os.path.join(self.tmp, "no-such.git"))
+
+        result = self.run_sync()
+        self.assertIn("removed dead remote fork", result.stdout)
+        remotes = git(path, "remote").split()
+        self.assertNotIn("fork", remotes)
+        self.assertIn("origin", remotes)
+
+    def test_dead_only_remote_is_not_removed(self):
+        # Never drop a repo's only remote: there would be nothing to fall back to.
+        url = os.path.join(self.tmp, "no-such.git")
+        path = self.make_repo("acme", "goneonly", remote_url=url, push=False)
+
+        result = self.run_sync()
+        self.assertIn("git fetch origin failed", result.stdout)
+        self.assertIn("origin", git(path, "remote").split())
+
     def test_owner_is_parsed_from_hosted_remote(self):
         cases = {
             "git@github.com:acme/ssh.git": "acme",
@@ -262,7 +282,7 @@ class RepoSyncTest(unittest.TestCase):
         path = os.path.join(ROOT, "skills", "repo-sync", "config.json")
         with open(path, encoding="utf-8") as fh:
             cfg = json.load(fh)
-        for key in ("roots", "push", "commit", "host_steps"):
+        for key in ("roots", "push", "commit", "fetch", "pull", "host_steps"):
             self.assertIn(key, cfg)
         for root in cfg["roots"]:
             self.assertEqual(set(root), {"type", "path", "max_depth"})

@@ -143,15 +143,31 @@ run_sync "$CASE" ',"pull":{"enabled":false}'
 assert "disabled: pull=disabled"    'pull=disabled'
 assert "disabled: behind stays 1"   'behind=1'
 
-printf '== dead secondary remote -> WARN, still synced ==\n'
+printf '== dead secondary remote -> removed, still synced ==\n'
 new_case multi
 remote_commit multi m.txt remote-m
 git -C "$WORK" remote add fork "$TMP/does-not-exist.git"
 run_sync "$CASE"
-assert          "multi: fork failure is a WARN" 'WARN: .*git fetch fork failed'
+assert          "multi: dead fork removed"      'removed dead remote fork'
 assert          "multi: upstream still pulled"  'pull=ff\(1\)'
 assert          "multi: behind=0"               'behind=0'
 assert_no_error "multi: no ERROR line"
+if git -C "$WORK" remote | grep -qx fork; then
+    bad "multi: dead fork removed from config"
+else
+    ok "multi: dead fork removed from config"
+fi
+
+printf '== dead ONLY remote -> kept, upstream is ERROR ==\n'
+new_case onlyremote
+git -C "$WORK" remote set-url origin "$TMP/does-not-exist.git"
+run_sync "$CASE"
+assert "onlyremote: upstream dead is ERROR" '^ERROR: .*git fetch origin failed'
+if git -C "$WORK" remote | grep -qx origin; then
+    ok "onlyremote: sole remote kept"
+else
+    bad "onlyremote: sole remote kept"
+fi
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

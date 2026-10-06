@@ -30,7 +30,8 @@
   },
 
   "fetch": {
-    "all_remotes": true
+    "all_remotes": true,
+    "remove_dead_remotes": true
   },
 
   "pull": {

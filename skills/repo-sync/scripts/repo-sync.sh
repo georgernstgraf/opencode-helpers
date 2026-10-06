@@ -19,8 +19,9 @@
 #
 # Report format: a "## <type> <path>" header per repository, followed by
 # key=value lines (branch, upstream, ahead, behind, diverged, dirty, fetched,
-# pull, remote) and an optional "--- status ---" block. Plain text on purpose,
-# so both the agent and the test suite can parse it without a JSON toolchain.
+# pruned, pull, remote) and an optional "--- status ---" block. Plain text on
+# purpose, so both the agent and the test suite can parse it without a JSON
+# toolchain.
 #
 # Exit codes: 0 = every configured repository was collected cleanly
 #             1 = at least one repository failed (see ERROR lines)
@@ -99,6 +100,13 @@ remote_owner() {
     printf '%s' "$1" | sed -E 's#^[^:]+://[^/]+/##; s#^[^:]+:##; s#/$##; s#\.git$##; s#[^/]+$##; s#/$##'
 }
 
+# True when a fetch failure means the repository is gone (permanent), as opposed
+# to offline/auth (transient). Matches GitHub/GitLab "Repository not found" and
+# git's "does not appear to be a git repository" for a missing path/ssh target.
+is_dead_remote_error() {
+    printf '%s' "$1" | grep -qiE 'repository not found|does not appear to be a git repository'
+}
+
 mkdir -p "$LOG_DIR" || die "cannot create log dir: $LOG_DIR"
 
 # Validate the config once, loudly. A config that cannot be parsed must not
@@ -110,6 +118,7 @@ fi
 # Sync policy. Missing keys fall back to these defaults, so an older config that
 # predates fetch/pull keys keeps working.
 ALL_REMOTES="$(cfg fetch.all_remotes)";  [ -n "$ALL_REMOTES" ] || ALL_REMOTES=true
+REMOVE_DEAD="$(cfg fetch.remove_dead_remotes)"; [ -n "$REMOVE_DEAD" ] || REMOVE_DEAD=true
 PULL_ENABLED="$(cfg pull.enabled)";      [ -n "$PULL_ENABLED" ] || PULL_ENABLED=true
 ON_DIVERGED="$(cfg pull.on_diverged)";   [ -n "$ON_DIVERGED" ] || ON_DIVERGED=rebase
 ON_CONFLICT="$(cfg pull.on_conflict)";   [ -n "$ON_CONFLICT" ] || ON_CONFLICT=abort-and-report
@@ -152,20 +161,40 @@ report_git() {
         # Fetch FIRST, so the ahead/behind below describe the remote as it is
         # now, not as of the previous run. A repo without any remote has nothing
         # to fetch. A failure of the upstream's remote is fatal for this repo (its
-        # view is stale); a failure of any other remote is only a WARN.
-        local fetched="" failed_remotes=" " r up_remote="${upstream%%/*}"
-        if [ -z "$(git -C "$dir" remote 2>/dev/null)" ]; then
+        # view is stale); a secondary remote whose repository no longer exists is
+        # dead weight and gets removed; any other failure is only a WARN.
+        local fetched="" pruned="" failed_remotes=" " r err remote_count
+        local up_remote="${upstream%%/*}"
+        remote_count="$(git -C "$dir" remote 2>/dev/null | wc -l | tr -d ' ')"
+        if [ "$remote_count" -eq 0 ]; then
             printf -- '--- no remote: fetch skipped\n'
         else
             while IFS= read -r r; do
                 [ -n "$r" ] || continue
                 [ "$ALL_REMOTES" = "true" ] || [ "$r" = "origin" ] || continue
-                if git -C "$dir" fetch --quiet "$r" 2>/dev/null; then
+                # LC_ALL=C is scoped to this call only: it makes git's error
+                # messages English (for the dead-remote match) without breaking
+                # `svn up`, which cannot handle non-ASCII names under a C locale.
+                if err="$(LC_ALL=C git -C "$dir" fetch --quiet "$r" 2>&1)"; then
                     fetched="${fetched:+$fetched,}$r"
                 else
                     failed_remotes="$failed_remotes$r "
                     if [ -n "$up_remote" ] && [ "$r" = "$up_remote" ]; then
                         note_error "$dir: git fetch $r failed (offline, auth, or remote gone?)"
+                    elif [ "$REMOVE_DEAD" = "true" ] && [ "$remote_count" -gt 1 ] \
+                         && is_dead_remote_error "$err"; then
+                        # The repository is gone and this is not the only remote,
+                        # so drop the stale config entry. Its (redacted) URL stays
+                        # in the log line for recovery.
+                        local rurl
+                        rurl="$(git -C "$dir" remote get-url "$r" 2>/dev/null || true)"
+                        if git -C "$dir" remote remove "$r" 2>/dev/null; then
+                            pruned="${pruned:+$pruned,}$r"
+                            printf 'WARN: %s: removed dead remote %s (<%s>)\n' \
+                                "$dir" "$r" "$(redact "$rurl")"
+                        else
+                            printf 'WARN: %s: git fetch %s failed - repository gone (remote could not be removed)\n' "$dir" "$r"
+                        fi
                     else
                         printf 'WARN: %s: git fetch %s failed (offline, auth, or remote gone?)\n' "$dir" "$r"
                     fi
@@ -229,6 +258,7 @@ report_git() {
         printf 'diverged=%s\n' "$diverged"
         printf 'dirty=%s\n' "$dirty"
         printf 'fetched=%s\n' "$fetched"
+        printf 'pruned=%s\n' "$pruned"
         printf 'pull=%s\n' "$pull"
         printf 'remote=%s\n' "$(redact "$remote")"
 
