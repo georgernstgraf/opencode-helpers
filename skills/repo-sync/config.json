@@ -29,6 +29,16 @@
     "max_review_files": 40
   },
 
+  "fetch": {
+    "all_remotes": true
+  },
+
+  "pull": {
+    "enabled": true,
+    "on_diverged": "rebase",
+    "on_conflict": "abort-and-report"
+  },
+
   "host_steps": {
     "opencode_upgrade": false,
     "restart_service": false

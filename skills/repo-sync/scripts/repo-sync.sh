@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 #
-# repo-sync.sh - collect the state of all configured working repositories.
+# repo-sync.sh - sync the state of all configured working repositories.
 #
-# This script deliberately does NOT commit, does NOT push and does NOT restart
-# anything. It gathers facts (dirty, ahead/behind, branch, upstream, svn status)
-# so the agent can decide what to do - see skills/repo-sync/SKILL.md.
+# Every git repo: fetch all remotes, then fast-forward or rebase the checked-out
+# branch onto its upstream when that is clean; dirty or conflicting repos are
+# left untouched and reported. Every svn working copy: `svn up`.
+# The script deliberately does NOT commit, does NOT push and does NOT restart
+# anything - those stay agent decisions, see skills/repo-sync/SKILL.md.
 #
 # The optional host steps (opencode upgrade, service restart) live behind
 # config.json "host_steps" and default to false. When enabled they run last and
@@ -16,7 +18,8 @@
 # Logs:   ${REPO_SYNC_LOG_DIR:-$HOME/.local/state/repo-sync}/<timestamp>.log
 #
 # Report format: a "## <type> <path>" header per repository, followed by
-# key=value lines and an optional "--- status ---" block. Plain text on purpose,
+# key=value lines (branch, upstream, ahead, behind, diverged, dirty, fetched,
+# pull, remote) and an optional "--- status ---" block. Plain text on purpose,
 # so both the agent and the test suite can parse it without a JSON toolchain.
 #
 # Exit codes: 0 = every configured repository was collected cleanly
@@ -24,6 +27,11 @@
 #             2 = the run could not start (bad config, missing tool)
 
 set -u
+
+# A sync must never block on an interactive credential prompt or an editor.
+export GIT_TERMINAL_PROMPT=0
+export GIT_EDITOR=true
+export GIT_SEQUENCE_EDITOR=true
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG="${REPO_SYNC_CONFIG:-$SKILL_DIR/config.json}"
@@ -99,6 +107,13 @@ if ! cfg roots >/dev/null 2>&1; then
     die "cannot parse $CONFIG (invalid JSON, or roots is not a list of objects)"
 fi
 
+# Sync policy. Missing keys fall back to these defaults, so an older config that
+# predates fetch/pull keys keeps working.
+ALL_REMOTES="$(cfg fetch.all_remotes)";  [ -n "$ALL_REMOTES" ] || ALL_REMOTES=true
+PULL_ENABLED="$(cfg pull.enabled)";      [ -n "$PULL_ENABLED" ] || PULL_ENABLED=true
+ON_DIVERGED="$(cfg pull.on_diverged)";   [ -n "$ON_DIVERGED" ] || ON_DIVERGED=rebase
+ON_CONFLICT="$(cfg pull.on_conflict)";   [ -n "$ON_CONFLICT" ] || ON_CONFLICT=abort-and-report
+
 LOG="$LOG_DIR/$(date +%Y%m%d-%H%M%S).log"
 ln -sfn "$LOG" "$LOG_DIR/latest.log"
 exec > >(tee -a "$LOG") 2>&1
@@ -125,7 +140,7 @@ report_git() {
         dir="${repo%/.git}"
         printf '\n## git %s\n' "$dir"
 
-        local branch upstream ahead behind dirty owner remote
+        local branch upstream remote owner
         branch="$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)" || {
             note_error "$dir: not a readable git work tree"
             continue
@@ -134,6 +149,31 @@ report_git() {
         remote="$(git -C "$dir" remote get-url origin 2>/dev/null || true)"
         owner="$(remote_owner "$remote")"
 
+        # Fetch FIRST, so the ahead/behind below describe the remote as it is
+        # now, not as of the previous run. A repo without any remote has nothing
+        # to fetch. A failure of the upstream's remote is fatal for this repo (its
+        # view is stale); a failure of any other remote is only a WARN.
+        local fetched="" failed_remotes=" " r up_remote="${upstream%%/*}"
+        if [ -z "$(git -C "$dir" remote 2>/dev/null)" ]; then
+            printf -- '--- no remote: fetch skipped\n'
+        else
+            while IFS= read -r r; do
+                [ -n "$r" ] || continue
+                [ "$ALL_REMOTES" = "true" ] || [ "$r" = "origin" ] || continue
+                if git -C "$dir" fetch --quiet "$r" 2>/dev/null; then
+                    fetched="${fetched:+$fetched,}$r"
+                else
+                    failed_remotes="$failed_remotes$r "
+                    if [ -n "$up_remote" ] && [ "$r" = "$up_remote" ]; then
+                        note_error "$dir: git fetch $r failed (offline, auth, or remote gone?)"
+                    else
+                        printf 'WARN: %s: git fetch %s failed (offline, auth, or remote gone?)\n' "$dir" "$r"
+                    fi
+                fi
+            done < <(git -C "$dir" remote 2>/dev/null)
+        fi
+
+        local ahead behind dirty
         ahead=0
         behind=0
         if [ -n "$upstream" ]; then
@@ -142,25 +182,59 @@ report_git() {
         fi
         dirty="$(git -C "$dir" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
 
+        # Catch the checked-out branch up to its upstream, cleanly: fast-forward
+        # when only behind, rebase the local-only commits when diverged. Anything
+        # not cleanly resolvable (dirty tree, conflicts) is left untouched.
+        local pull="uptodate" diverged="false"
+        if [ -z "$upstream" ]; then
+            pull="skipped(no-upstream)"
+        elif [ "$PULL_ENABLED" != "true" ]; then
+            pull="disabled"
+        elif [[ "$failed_remotes" == *" $up_remote "* ]]; then
+            pull="skipped(stale-view)"
+        elif [ "$ahead" -gt 0 ] && [ "$behind" -gt 0 ]; then
+            diverged="true"
+            if [ "$dirty" -gt 0 ]; then
+                pull="skipped(dirty)"
+            elif [ "$ON_DIVERGED" != "rebase" ]; then
+                pull="skipped(diverged)"
+            elif git -C "$dir" rebase "$upstream" >/dev/null 2>&1; then
+                pull="rebase($behind)"
+                ahead="$(git -C "$dir" rev-list --count "$upstream".."HEAD" 2>/dev/null || echo 0)"
+                behind="$(git -C "$dir" rev-list --count "HEAD".."$upstream" 2>/dev/null || echo 0)"
+            else
+                if [ "$ON_CONFLICT" = "abort-and-report" ]; then
+                    git -C "$dir" rebase --abort >/dev/null 2>&1 || true
+                fi
+                pull="conflict"
+                note_error "$dir: rebase onto $upstream conflicted and was left unchanged"
+            fi
+        elif [ "$behind" -gt 0 ]; then
+            if [ "$dirty" -gt 0 ]; then
+                pull="skipped(dirty)"
+            elif git -C "$dir" merge --ff-only "$upstream" >/dev/null 2>&1; then
+                pull="ff($behind)"
+                behind="$(git -C "$dir" rev-list --count "HEAD".."$upstream" 2>/dev/null || echo 0)"
+            else
+                pull="failed"
+                note_error "$dir: fast-forward to $upstream failed"
+            fi
+        fi
+
         printf 'owner=%s\n' "$owner"
         printf 'branch=%s\n' "$branch"
         printf 'upstream=%s\n' "$upstream"
         printf 'ahead=%s\n' "$ahead"
         printf 'behind=%s\n' "$behind"
+        printf 'diverged=%s\n' "$diverged"
         printf 'dirty=%s\n' "$dirty"
+        printf 'fetched=%s\n' "$fetched"
+        printf 'pull=%s\n' "$pull"
         printf 'remote=%s\n' "$(redact "$remote")"
 
         if [ "$dirty" -gt 0 ]; then
             printf -- '--- status ---\n'
             git -C "$dir" status --porcelain 2>/dev/null || note_error "$dir: git status failed"
-        fi
-
-        # Best-effort: an unreachable remote is a finding, not a crash of the run.
-        # A repo without any remote has nothing to fetch and is not an error.
-        if [ -z "$remote" ]; then
-            printf -- '--- no remote: fetch skipped\n'
-        elif ! git -C "$dir" fetch --quiet origin 2>/dev/null; then
-            note_error "$dir: git fetch origin failed (offline, auth, or remote gone?)"
         fi
     done < <(find "$root" -maxdepth "$depth" -type d -name .git 2>/dev/null | sort)
 }
