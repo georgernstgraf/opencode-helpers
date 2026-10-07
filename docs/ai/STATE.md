@@ -1,8 +1,19 @@
 # Project State
 
-Current status as of 2026-10-06.
+Current status as of 2026-10-07.
 
 ## Current Focus
+
+`codebase-audit` (#107) ist neu: user-invoked Skill
+(`skills/codebase-audit/{SKILL,AXES,TOOLS}.md`) für eine **einmalige
+Ganz-Repo-Bewertung über vier Achsen** (Security in-depth,
+Struktur/saubere Schichten, Kopplung/Verschränkung, Architektur/Deep
+Modules). **Werkzeuge zuerst** (Graph/SAST/CVE/Co-Change;
+Selbst-Installation bei Netz, sonst graceful degradation), **interaktive
+Steuerung** per `grilling` + interaktives Ranken, Report **nur im Chat**,
+Ergebnis **Epic + formal verlinkte Sub-Issues** (Sub-Issues-API aus
+`issue-workflow`). Große Repos: hierarchisches Fan-out. Der alte
+`/security`-Command ist entfernt.
 
 `repo-sync` (#106) holt jetzt echtes Nachziehen: pro Git-Repo erst **alle**
 Remotes fetchen, **dann** `ahead`/`behind` messen, **dann** clean ausgecheckte
@@ -49,6 +60,14 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #107 CLOSED 2026-10-07 — codebase-audit: neues user-invoked Skill für
+      Ganz-Repo-Audit über vier Achsen (Security in-depth, Struktur/Schichten,
+      Kopplung/Verschränkung, Architektur/Deep Modules); deterministische
+      Werkzeuge zuerst (Selbst-Installation bei Netz, sonst graceful
+      degradation), interaktive Steuerung per `grilling`, Report nur im Chat,
+      Epic + formal verlinkte Sub-Issues; `commands/security.md` entfernt;
+      README (DE+EN) + `docs/ai/ARCHITECTURE.md` angeglichen; Suite grün (83)
+      (`15fdd41`)
 - [x] #106 CLOSED 2026-10-06 — repo-sync: Remote-Stand am Ende des Laufs sauber
       nachziehen (fetch aller Remotes vor der Messung, ff/rebase-Pull, dirty/
       conflict unangetastet); tote Sekundär-Remotes werden entfernt (nie der
@@ -193,4 +212,6 @@ None
 Start with P4: for each skill, add a short "Done when" completion criterion and
 split the frontmatter `description` into clear trigger branches, without
 re-introducing moved reference material. Keep the link guard green
-(`python3 -m unittest discover -s tests -v`).
+(`python3 -m unittest discover -s tests -v`). `codebase-audit` (#107) already
+ships a `Done when` block and trigger-branch description — use it as the
+reference pattern.

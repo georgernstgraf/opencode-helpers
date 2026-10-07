@@ -76,6 +76,7 @@ Follow these without question. Do not deviate unless explicitly told.
 
 ## Development & Git Workflow
 
+- **Whole-repo audits** run through the `codebase-audit` skill: four axes (security in depth, structure/layers, coupling/entanglement, architecture/deep modules), deterministic tools first, interactive steering via `grilling`, then one epic with formally linked sub-issues.
 - **Trunk-Based Development (CRITICAL):** Do not create feature branches or pull requests in this repository. All changes must be committed and pushed directly to the `main` branch.
 - **Commit Messages with Issues:** When working on a specific issue, always include the issue number in the commit message (e.g., `feat: ... (#123)`).
 - **Continuous Issue Awareness:** At any point in a session the agent knows which issue it works under; unambiguous new topics get an issue without user interaction, ambiguous assignments are clarified first.
