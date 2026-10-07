@@ -30,7 +30,6 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `/knowledge-exam` | Generate a German mini-exam from Git history | `knowledge-exam` |
 | `/knowledge-persist` | Persist session context into docs/ai/ files | `knowledge-persistence` |
 | `/nextprompt` | Run `aitranscribe -q` and treat output as next instruction | none (external tool) |
-| `/security` | Generate a project security review report | none |
 | `/tmpissue` | Create a GitHub issue from /tmp/issue.md, then delete it | none (`gh` CLI) |
 
 ## Scripts
@@ -63,6 +62,7 @@ the script (precedent: `skills/repo-sync/scripts/test-repo-sync.sh`).
 | Skill | Purpose | Invocation |
 |-------|---------|------------|
 | `code-review` | Review changes since a fixed point along standards and spec axes via parallel sub-agents | Direct ("review since X") |
+| `codebase-audit` | One-shot whole-repo audit across four axes (security in depth, structure/layers, coupling/entanglement, architecture) via parallel sub-agents, ending in an epic with formally linked sub-issues | Natural language ("audit the codebase") |
 | `domain-modeling` | Build and sharpen a project's domain model (CONTEXT.md, ADRs) | Direct invocation |
 | `fork-policy` | Enforce clean-main branch policy on forked repositories | On-demand invocation |
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, homework discovery, bulk concurrency, German/UTF-8 rules, email body format, praise guidelines, reporting | Referenced by `repograde`, `knowledge-assessment`, `projectgrade` |
@@ -82,7 +82,7 @@ the script (precedent: `skills/repo-sync/scripts/test-repo-sync.sh`).
 | `teach` | Teach the user a new skill or concept | Direct invocation |
 | `lehrplan` | Austrian HTL teaching repos: Gegenstand identification incl. conformity check, RIS sync with Novellen-Check (NOR-Kopf method), year-wise curriculum extraction into `lehrplan/` | Natural language ("Unterricht", "RIS sync", "Lehrplan extrahieren") |
 
-Long reference material lives in sibling files next to a skill's `SKILL.md`, linked as `[X.md](./X.md)` and loaded only on demand: `grading-shared/EMAIL-EXAMPLES.md`, `knowledge-persistence/FILE-TEMPLATES.md`, `lehrplan/{KLASSEN-ZUORDNUNG,SPENGERGASSE-KLASSEN,RIS-PRAXIS,ERLAEUTERUNGS-QUALITAET}.md`, `repograde/REPORT-FORMAT.md`, `projectgrade/REPORT-FORMAT.md`. The links are guarded by `tests/test_skill_links.py`.
+Long reference material lives in sibling files next to a skill's `SKILL.md`, linked as `[X.md](./X.md)` and loaded only on demand: `codebase-audit/{AXES,TOOLS}.md`, `grading-shared/EMAIL-EXAMPLES.md`, `knowledge-persistence/FILE-TEMPLATES.md`, `lehrplan/{KLASSEN-ZUORDNUNG,SPENGERGASSE-KLASSEN,RIS-PRAXIS,ERLAEUTERUNGS-QUALITAET}.md`, `repograde/REPORT-FORMAT.md`, `projectgrade/REPORT-FORMAT.md`. The links are guarded by `tests/test_skill_links.py`.
 
 ## Knowledge Files (`docs/ai/`)
 

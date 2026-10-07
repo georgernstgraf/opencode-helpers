@@ -81,6 +81,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `domain-modeling` | Aktive Domänenmodell-Disziplin: Glossar schärfen, ADRs erfassen | Automatisch (model-invoked) |
 | `teach` | Mehrsession-Lern-Workspace mit Lessons, Referenzen, Lernjournal | Sprachsteuerung: "teach me …" |
 | `code-review` | Zweiachsige Review (Standards + Spec) per paralleler Sub-Agenten | Automatisch (model-invoked) |
+| `codebase-audit` | Ganz-Repo-Audit in einem Lauf über vier Achsen (Security in-depth, Struktur/Schichten, Kopplung/Verschränkung, Architektur/Deep Modules); parallele Sub-Agenten, interaktives Steuern, dann ein Epic + Sub-Issues | Sprachsteuerung: "audit the codebase", "Codebase-Audit" |
 | `sync-upstream-skills` | Bringt transplantierte Skills auf den Stand des mattpocock-Upstreams | Sprachsteuerung: "sync skills" |
 | `lehrplan` | Unterrichts-Repo nach `lehrplan/`-Konvention einrichten: Gegenstand identifizieren, RIS-Sync mit Novellen-Check, Lehrplan jahresweise extrahieren | Sprachsteuerung: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 | `repo-sync` | Synchronisiert alle konfigurierten Working Copies: Zustand sammeln (Skript), dann entscheidet der Agent, was committed und gepusht wird; `opencode upgrade` + Server-Restart als optionale Host-Schritte | Sprachsteuerung: "repo sync", "morning sync", "Tagesstart", "commit and push everything" |
@@ -102,7 +103,6 @@ Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `tea
 | `/knowledge-exam <klasse> <wochen> <prüfungsdatum>` | Generiert Mini-Schularbeit + Lösungen |
 | `/knowledge-persist` | Persistiert Session-Wissen in `docs/ai/` |
 | `/nextprompt` | Führt `aitranscribe -q` aus und nutzt Output als nächste Anweisung |
-| `/security <output>` | Erstellt Security-Audit-Report |
 | `/tmpissue` | Erstellt GitHub-Issue aus `/tmp/issue.md` |
 
 ### Natural Language Workflows (keine Slash-Kommandos)
@@ -246,6 +246,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 | `domain-modeling` | Active domain-model discipline: sharpen glossary, capture ADRs | Automatic (model-invoked) |
 | `teach` | Multi-session learning workspace with lessons, references, learning journal | Natural language: "teach me …" |
 | `code-review` | Two-axis review (Standards + Spec) via parallel sub-agents | Automatic (model-invoked) |
+| `codebase-audit` | One-shot whole-repo audit across four axes (security in depth, structure/layers, coupling/entanglement, architecture/deep modules); parallel sub-agents, interactive steering, then an epic + sub-issues | Natural language: "audit the codebase", "codebase audit" |
 | `sync-upstream-skills` | Bring transplanted skills up to date from the mattpocock upstream | Natural language: "sync skills" |
 | `lehrplan` | Set up and maintain a teaching repo following the `lehrplan/` convention: identify the subject, RIS sync with amendment check, year-wise curriculum extraction | Natural language: "Lehrplan auf Novellen prüfen", "RIS sync", "Lehrplan extrahieren" |
 | `repo-sync` | Syncs all configured working copies: the script collects repository state, then the agent decides what to commit and what to push; `opencode upgrade` + server restart are optional host steps | Natural language: "repo sync", "morning sync", "Tagesstart", "commit and push everything" |
@@ -267,7 +268,6 @@ Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach
 | `/knowledge-exam <class> <weeks> <exam-date>` | Generate mini-exam + solutions |
 | `/knowledge-persist` | Persist session knowledge into `docs/ai/` |
 | `/nextprompt` | Run `aitranscribe -q` and use output as next instruction |
-| `/security <output>` | Generate security audit report |
 | `/tmpissue` | Create GitHub issue from `/tmp/issue.md` |
 
 ### Natural Language Workflows (no slash commands)
