@@ -134,6 +134,16 @@ agent loader scans `{agent,agents}/**/*.md` recursively with `symlink: true`,
 so exactly **one `.md` file per agent** (any additional `.md` in the tree
 would become a phantom agent — no README.md inside `agents/`). The mattpocock upstream at `~/repos/mattpocock/skills` is **pull-only** — never linked live, never listed in an opencode `skills` array, no `~/.opencode/skills` symlink (that path is cwd-dependent and not v2-stable). One source per skill name; collisions are structurally impossible. Six skills are transplanted with opencode-native frontmatter (see `skills/sync-upstream-skills/mapping.json` for provenance). Use the `sync-upstream-skills` skill to re-apply upstream content changes while preserving the opencode frontmatter.
 
+## Shell Function Source Rule
+
+`dotfiles/bash_functions.sh` (repo root) is the **single source** of the
+shared, host-neutral shell functions and aliases (`oc*`, `su-*`, `git-acp`).
+Every host sources it from its `opencode-helpers` clone via `~/.bash_aliases`
+(path uses `$HOME`, so the same line works for `georg` and `grafg`). Edit it
+here, never in the clones or in `~/.bash_aliases`; host-specific aliases stay
+in the local `~/.bash_aliases`. **Never put secrets in it** — server passwords
+live in `~/.config/opencode/service.json`/`pass`.
+
 ## Repository
 
 - GitHub: `georgernstgraf/opencode-helpers`

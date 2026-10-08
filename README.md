@@ -30,6 +30,17 @@ Wir betreiben einen selbstgehosteten [SearXNG](https://searxng.claw.graf.priv.at
 
 - **`scripts/oc-models-report`** — tabellarischer Modellvergleich (`opencode models`): Fähigkeiten, Modalitäten, Preise, Kontext. Der Dump wird unter `~/.local/share/oc-models-report/` gecacht und automatisch erneuert, sobald er älter als 12 Stunden ist (`--refresh` erzwingt, `--file` parst einen gegebenen Dump). Aufruf: `oc-models-report [--provider ID] [--sort KEY] [-r] <substring> …` — Substring-Filter matchen provider/id/name/family sowie den gerenderten Kostenwert (z. B. `free`); `--provider` schränkt exakt (case-insensitive) auf einen Provider ein und ist kombinierbar (`--provider openrouter opus`), unbekannte Provider sind ein Fehler. `--sort KEY` ordnet die Treffer (Standard `model`; sonst `provider`, `in`, `out`, `cost`/`$`/`mtok`, `ctx`, `params`/`param`/`size`) aufsteigend, `-r`/`--reverse` kehrt um. Die `PARAM`-Spalte zeigt die Parameterzahl (`70B`, `397B/17B`, `~275B` bei Schätzung, `–` unbekannt) aus der kuratierten `scripts/model-params.json` (Override `--params PATH` oder `$OC_MODELS_REPORT_PARAMS`); `--params-missing` listet Modelle ohne Eintrag, `--sort params` sortiert Unbekannte ans Ende. Pflege über den repo-lokalen Skill `model-params` (via Symlink in `~/bin`).
 
+### 🧩 Shell-Funktionen (`dotfiles/`)
+
+`dotfiles/bash_functions.sh` ist die **gemeinsame, hostneutrale Quelle** der Shell-Funktionen und -Aliase (`oc*`, `su-*`, `git-acp`). Jede `~/.bash_aliases` sourct sie mit Guard direkt aus dem Clone (Pfad via `$HOME`, damit er für `georg` und `grafg` passt):
+
+```sh
+[ -f "$HOME/repos/georgernstgraf/opencode-helpers/dotfiles/bash_functions.sh" ] && \
+  . "$HOME/repos/georgernstgraf/opencode-helpers/dotfiles/bash_functions.sh"
+```
+
+Host-Spezifisches (lokale Aliase, abweichende Ports) bleibt in der jeweiligen `~/.bash_aliases`; **keine Secrets** (Server-Passwörter aus `service.json`/pass). Updates verteilen sich über `git pull` im Clone.
+
 ### Struktur
 
 ```
@@ -39,6 +50,7 @@ opencode-helpers/
 ├── skills/              # Workflow-Skills (die eigentliche Logik)
 ├── docs/ai/             # Knowledge-Persistence-Dateien
 ├── scripts/             # Utility-Skripte (z.B. MCP-Server)
+├── dotfiles/            # Gemeinsame Shell-Funktionen (alle Hosts, via ~/.bash_aliases)
 ├── tests/               # Hermetische Tests (stdlib unittest, lokaler Mock)
 ├── AGENTS.md            # Agents-Konfiguration (dieses Projekt)
 ├── AGENTS.template.md   # Vorlage für andere Projekte
@@ -195,6 +207,17 @@ We run a self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch in
 
 - **`scripts/oc-models-report`** — tabular model comparison (`opencode models`): capabilities, modalities, pricing, context. The dump is cached under `~/.local/share/oc-models-report/` and auto-regenerated when older than 12 hours (`--refresh` forces it, `--file` parses a given dump). Usage: `oc-models-report [--provider ID] [--sort KEY] [-r] <substring> …` — substrings match provider/id/name/family plus the rendered cost value (e.g. `free`); `--provider` restricts exactly (case-insensitive) to one provider and combines (`--provider openrouter opus`), unknown providers are an error. `--sort KEY` orders the hits (default `model`; also `provider`, `in`, `out`, `cost`/`$`/`mtok`, `ctx`, `params`/`param`/`size`) ascending, `-r`/`--reverse` flips that. The `PARAM` column shows the parameter count (`70B`, `397B/17B`, `~275B` when estimated, `–` unknown) from the curated `scripts/model-params.json` (override `--params PATH` or `$OC_MODELS_REPORT_PARAMS`); `--params-missing` lists models without an entry and `--sort params` sorts unknowns last. Maintained via the repo-local `model-params` skill (via symlink in `~/bin`).
 
+### 🧩 Shell Functions (`dotfiles/`)
+
+`dotfiles/bash_functions.sh` is the **shared, host-neutral source** of the shell functions and aliases (`oc*`, `su-*`, `git-acp`). Every `~/.bash_aliases` sources it with a guard straight from the clone (path via `$HOME`, so it fits both `georg` and `grafg`):
+
+```sh
+[ -f "$HOME/repos/georgernstgraf/opencode-helpers/dotfiles/bash_functions.sh" ] && \
+  . "$HOME/repos/georgernstgraf/opencode-helpers/dotfiles/bash_functions.sh"
+```
+
+Host-specific bits (local aliases, different ports) stay in the respective `~/.bash_aliases`; **no secrets** (server passwords come from `service.json`/pass). Updates propagate via `git pull` in the clone.
+
 ### Structure
 
 ```
@@ -204,6 +227,7 @@ opencode-helpers/
 ├── skills/              # Workflow skills (actual logic)
 ├── docs/ai/             # Knowledge persistence files
 ├── scripts/             # Utility scripts (e.g., MCP server)
+├── dotfiles/            # Shared shell functions (all hosts, via ~/.bash_aliases)
 ├── tests/               # Hermetic tests (stdlib unittest, local mock)
 ├── AGENTS.md            # Agent config (this project)
 ├── AGENTS.template.md   # Template for other projects
