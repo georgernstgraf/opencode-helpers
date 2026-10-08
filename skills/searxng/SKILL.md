@@ -21,16 +21,23 @@ Three layers, bottom-up:
 `searxng-search.sh` walks a strict chain for **general** searches and stops at
 the first tier that returns results (default profile):
 
-1. `brave` — free HTML scraper
-2. `google` — free HTML scraper
+1. `bing` — free HTML scraper
+2. `yahoo` — free HTML scraper
 3. `mwmbl,searchmysite` — free, small-index last resort
 4. `braveapi` — paid API, queried **only** when tiers 1–2 failed *and* the
    tier-3 free result has fewer than `FALLBACK_MIN_RESULTS` (3) hits
 
+> **Why not `brave`/`google`?** As of 2026-10-08 both are upstream-broken,
+> independent of the egress IP: `brave` answers `429` and the `google` engine
+> still calls the retired `/wml/search` endpoint (`HTTP 403`, searxng#5867).
+> `bing` and `yahoo` were the only general engines that worked on every tested
+> egress IP (VPS, school, residential). `brave`/`google` stay enabled
+> server-side for a future upstream fix, but are no longer in the chain.
+
 ### Chain profiles and instance overlay (`env.sample`)
 
 - `SEARXNG_CHAIN=gregor` selects the school-instance profile:
-  `google` → `brave` → `braveapi` with **no** free tier
+  `bing` → `yahoo` → `braveapi` with **no** free tier
   (tier 3 is the API, ungated).
 - `SEARXNG_PRIMARY` replaces the built-in instance list,
   `SEARXNG_FALLBACK` appends a second instance. Each instance carries its
@@ -45,15 +52,15 @@ A tier "fails" when the engine is suspended (`unresponsive_engines`) or returns
 0 results. When `braveapi` runs, its results are merged **ahead of** the free
 tier-3 results, deduplicated by URL.
 
-> **`brave` is the only engine that serves normal results.** `google`,
+> **`bing` is the only engine that serves normal results.** `yahoo`,
 > `mwmbl,searchmysite` and `braveapi` are *fallback-only*: each runs only when
-> the preceding tier comes back empty. `google` therefore deliberately never
+> the preceding tier comes back empty. `yahoo` therefore deliberately never
 > appears in an ordinary result set — it is reached solely inside the fallback
-> chain, or when a caller passes `engines=google` explicitly. Its absence from
+> chain, or when a caller passes `engines=yahoo` explicitly. Its absence from
 > default results is by design, not a fault.
 
-- The answer carries `engine_used` (`brave`/`google`/`braveapi`/`mwmbl`/
-  `searchmysite`/`none`), `fallback_used` (`engine_used != "brave"`), `tried`
+- The answer carries `engine_used` (`bing`/`yahoo`/`braveapi`/`mwmbl`/
+  `searchmysite`/`none`), `fallback_used` (`engine_used != "bing"`), `tried`
   (engines actually attempted) and `unresponsive_engines` (union, for diagnosis).
 - An explicit `engines=` list **disables** the chain (caller intent wins), and
   the chain applies to general searches only — not to
@@ -67,9 +74,12 @@ tier-3 results, deduplicated by URL.
 ## Backend Egress (deployment detail)
 
 Search quality and which engines are usable depend on the SearXNG instance's
-outgoing traffic, not on this skill. The backend currently egresses via a
-school IP; if **every** engine returns 0 results, the backend proxy/VPN is the
-likely cause — not the skill or the MCP server.
+outgoing traffic, not on this skill. The public claw instance egresses through a
+tinyproxy on host **think** (`10.8.0.4:1080`, residential IP) because the raw
+VPS IP is blocked by most search engines; the separate gregor instance egresses
+from the school network. If **every** engine returns 0 results, the backend
+proxy/VPN is the likely cause — not the skill or the MCP server. A single
+engine failing (e.g. `google` 403) is an engine/upstream issue, not egress.
 
 Deployment specifics (proxy host, VPN topology, `settings.yml` proxy setup,
 failure modes, egress verification) are operational and host-specific. They are
@@ -93,28 +103,29 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 ## Available Engines
 
 Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.yml`).
-Last verified 2026-09-12.
+Last verified 2026-10-08.
 
 ### General Web Search
-Chain order for general searches: `brave` → `google` → `mwmbl,searchmysite` →
+Chain order for general searches: `bing` → `yahoo` → `mwmbl,searchmysite` →
 (`braveapi`, gated on < 3 free hits).
-- `brave` — **primary general engine** (HTML scraper). Occasionally rate-limit
-  suspended; revives automatically.
-- `google` — **fallback tier 2 only** (HTML scraper; works via the backend's
-  school-IP egress; see above). Never a default result engine: reached only when
-  `brave` returns nothing, or via explicit `engines=google`. Can be
-  CAPTCHA-suspended.
+- `bing` — **primary general engine** (HTML scraper; server-side `disabled:
+  false` needed). Works on all tested egress IPs.
+- `yahoo` — **fallback tier 2 only** (HTML scraper). Never a default result
+  engine: reached only when `bing` returns nothing, or via explicit
+  `engines=yahoo`.
+- `brave` — kept enabled for a future upstream fix, **not** in the chain
+  (currently `429`).
+- `google` — kept enabled for a future upstream fix, **not** in the chain
+  (engine calls the retired `/wml/search`, `HTTP 403`, searxng#5867).
 - `mwmbl` — Mwmbl (small index). Free last-resort before spending Brave quota:
   short/common queries give relevant results, long-tail queries often return 0.
-- `searchmysite` — Indie websites. Same free last-resort tier as `mwmbl`.
+- `searchmysite` — Indie websites. Same free last-resort tier as `mwmbl`
+  (currently `403`/access denied).
 - `braveapi` — Brave Search API (independent index, paid). **Token-gated**: excluded
-  from normal instance searches and queried automatically only when `brave` and
-  `google` both fail *and* the free tier-3 result is weak (< 3 hits), or
+  from normal instance searches and queried automatically only when `bing` and
+  `yahoo` both fail *and* the free tier-3 result is weak (< 3 hits), or
   explicitly via `engines=braveapi`. Suspended when its quota is exhausted;
   revives automatically after top-up.
-
-> **Removed engines:** `bing` web and `yahoo`. Do not re-add without
-> re-testing — removal rationale is in `docs/ai/PITFALLS.md`.
 
 ### Knowledge / IT
 - `wikipedia` — Wikipedia (with infobox)
@@ -129,7 +140,8 @@ Chain order for general searches: `brave` → `google` → `mwmbl,searchmysite` 
 - `hackernews` — Hacker News
 
 > **Blocked / not usable** (Captcha, 403, or connection resets):
-> `mojeek`, `startpage`, `qwant`, `yep`, `ecosia`, `duckduckgo`.
+> `mojeek`, `startpage`, `qwant`, `yep`, `ecosia`, `duckduckgo`,
+> `brave` (429), `google` (403, searxng#5867).
 > Public fallback instances (`etsi.me`, `baresearch.org`) no longer serve
 > `format=json` to anonymous clients (429 / anti-bot challenge).
 > `google news` is untested on the current backend — test before enabling.

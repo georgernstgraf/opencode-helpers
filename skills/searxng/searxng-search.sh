@@ -3,17 +3,20 @@
 #
 # The default general search walks a strict chain, stopping at the first tier
 # that returns results:
-#   1. brave             (free HTML scraper) -- the ONLY default result engine
-#   2. google            (free HTML scraper)
+#   1. bing              (free HTML scraper) -- the ONLY default result engine
+#   2. yahoo             (free HTML scraper)
 #   3. mwmbl,searchmysite (free, small indices)
 #   4. braveapi          (paid API) -- queried ONLY when tiers 1-2 failed AND
 #                        the tier-3 free result is weak (< FALLBACK_MIN_RESULTS).
 # Tiers 2-4 are fallback-only: they run only when the preceding tier is empty,
-# so google deliberately never appears in normal results (only via the fallback
-# chain, or an explicit `engines=google`). The `< 3` gate protects the Brave API
+# so yahoo deliberately never appears in normal results (only via the fallback
+# chain, or an explicit `engines=yahoo`). The `< 3` gate protects the Brave API
 # token. When braveapi runs, its results are merged ahead of the free tier-3
 # results (URL-deduplicated). An explicit `engines=` argument bypasses the chain.
-# Profiles: SEARXNG_CHAIN=gregor walks google -> brave -> braveapi with no
+# NOTE (2026-10-08): brave -> 429 and google -> HTTP 403 are upstream-broken
+# (google's engine still calls the retired /wml/search endpoint, searxng#5867),
+# so the chain is built on bing/yahoo, which work on every tested egress IP.
+# Profiles: SEARXNG_CHAIN=gregor walks bing -> yahoo -> braveapi with no
 # free tier (school instance). Instances and per-instance auth come from
 # SEARXNG_PRIMARY[/_AUTH]/SEARXNG_FALLBACK[/_AUTH] (see env.sample).
 
@@ -99,16 +102,16 @@ auth_args_for() {
 
 # Strict chain: free scrapers first, then the free last-resort tier, then the
 # paid API gated on a weak free result.
-CHAIN_PRIMARY="brave"
-CHAIN_SECONDARY="google"
+CHAIN_PRIMARY="bing"
+CHAIN_SECONDARY="yahoo"
 FREE_FALLBACK="mwmbl,searchmysite"
 FALLBACK_ENGINE="braveapi"
 FALLBACK_MIN_RESULTS=3
 # Chain profile (see env.sample): "gregor" serves the Gregor school instance
-# as google -> brave -> braveapi with no free last-resort tier.
+# as bing -> yahoo -> braveapi with no free last-resort tier.
 if [[ "${SEARXNG_CHAIN:-default}" == "gregor" ]]; then
-    CHAIN_PRIMARY="google"
-    CHAIN_SECONDARY="brave"
+    CHAIN_PRIMARY="bing"
+    CHAIN_SECONDARY="yahoo"
     FREE_FALLBACK=""
 fi
 EMPTY_JSON='{"number_of_results":0,"results":[]}'
@@ -247,7 +250,7 @@ collect_unresponsive() {
 }
 
 # Emit one response as the tool's JSON envelope.
-# $1 = response JSON, $2 = instance, $3 = deciding engine ("brave"/"google"/
+# $1 = response JSON, $2 = instance, $3 = deciding engine ("bing"/"yahoo"/
 #      "braveapi"/"mwmbl"/"searchmysite"/"none"), $4 = fallback used (true/false),
 # $5 = tried engines (JSON array), $6 = unresponsive engines (JSON array).
 emit() {
@@ -309,7 +312,7 @@ EOF
     exit 0
 fi
 
-# --- Tier 1: brave (free scraper) -------------------------------------------
+# --- Tier 1: bing (free scraper) --------------------------------------------
 run_query "&engines=${CHAIN_PRIMARY}${CHAIN_PARAMS}" 1
 PRIMARY_JSON="$R_JSON"
 ACTIVE_INSTANCE="$R_INSTANCE"
@@ -335,7 +338,7 @@ if [[ "$(engine_hits "$PRIMARY_JSON" "$CHAIN_PRIMARY")" -gt 0 ]]; then
     exit 0
 fi
 
-# --- Tier 2: google (free scraper) ------------------------------------------
+# --- Tier 2: yahoo (free scraper) -------------------------------------------
 run_query "&engines=${CHAIN_SECONDARY}${CHAIN_PARAMS}" 1 "$ACTIVE_INSTANCE" "$FOLLOWUP_TIMEOUT"
 SECOND_JSON="$R_JSON"
 if [[ -n "$R_INSTANCE" ]]; then ACTIVE_INSTANCE="$R_INSTANCE"; fi

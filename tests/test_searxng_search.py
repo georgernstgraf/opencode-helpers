@@ -16,11 +16,11 @@ from searxng_mock import result_item
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "skills" / "searxng" / "searxng-search.sh"
 
-BRAVE = [result_item("Brave 1", "https://example.com/a", "brave")]
-GOOGLE = [
-    result_item("Google 1", "https://g.com/1", "google"),
-    result_item("Google 2", "https://g.com/2", "google"),
-    result_item("Google 3", "https://g.com/3", "google"),
+BING = [result_item("Bing 1", "https://example.com/a", "bing")]
+YAHOO = [
+    result_item("Yahoo 1", "https://g.com/1", "yahoo"),
+    result_item("Yahoo 2", "https://g.com/2", "yahoo"),
+    result_item("Yahoo 3", "https://g.com/3", "yahoo"),
 ]
 FREE_TWO = [
     result_item("Mwmbl 1", "https://example.com/a", "mwmbl"),
@@ -71,40 +71,40 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         return json.loads(proc.stdout)
 
-    # --- Tier 1: brave ------------------------------------------------------
-    def test_brave_results_stop_the_chain(self):
-        mock = self._mock(engine_results={"brave": BRAVE, "google": GOOGLE})
+    # --- Tier 1: bing -------------------------------------------------------
+    def test_bing_results_stop_the_chain(self):
+        mock = self._mock(engine_results={"bing": BING, "yahoo": YAHOO})
         script = self._script_for(mock.url)
 
-        out = self._run(script, "bravecase")
+        out = self._run(script, "bingcase")
 
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertFalse(out["fallback_used"])
-        self.assertEqual(out["tried"], ["brave"])
-        self.assertEqual([r["engine"] for r in out["results"]], ["brave"])
+        self.assertEqual(out["tried"], ["bing"])
+        self.assertEqual([r["engine"] for r in out["results"]], ["bing"])
         self.assertEqual(len(mock.requests), 1)
-        self.assertEqual(mock.requests[0]["engines"], "brave")
+        self.assertEqual(mock.requests[0]["engines"], "bing")
 
-    def test_brave_suspended_falls_back_to_google(self):
-        mock = self._mock(engine_results={"google": GOOGLE}, unresponsive=["brave"])
+    def test_bing_suspended_falls_back_to_yahoo(self):
+        mock = self._mock(engine_results={"yahoo": YAHOO}, unresponsive=["bing"])
         script = self._script_for(mock.url)
 
         out = self._run(script, "suspendcase")
 
-        self.assertEqual(out["engine_used"], "google")
+        self.assertEqual(out["engine_used"], "yahoo")
         self.assertTrue(out["fallback_used"])
-        self.assertEqual(out["tried"], ["brave", "google"])
-        self.assertEqual({r["engine"] for r in out["results"]}, {"google"})
-        self.assertEqual([r["engines"] for r in mock.requests], ["brave", "google"])
-        self.assertEqual(out["unresponsive_engines"], [["brave", "Suspended: test"]])
+        self.assertEqual(out["tried"], ["bing", "yahoo"])
+        self.assertEqual({r["engine"] for r in out["results"]}, {"yahoo"})
+        self.assertEqual([r["engines"] for r in mock.requests], ["bing", "yahoo"])
+        self.assertEqual(out["unresponsive_engines"], [["bing", "Suspended: test"]])
 
-    def test_brave_empty_falls_back_to_google(self):
-        mock = self._mock(engine_results={"google": GOOGLE})
+    def test_bing_empty_falls_back_to_yahoo(self):
+        mock = self._mock(engine_results={"yahoo": YAHOO})
         script = self._script_for(mock.url)
 
-        out = self._run(script, "emptybravecase")
+        out = self._run(script, "emptybingcase")
 
-        self.assertEqual(out["engine_used"], "google")
+        self.assertEqual(out["engine_used"], "yahoo")
         self.assertEqual(len(mock.requests), 2)
 
     # --- Tier 3/4: free last resort and the token gate ----------------------
@@ -116,7 +116,7 @@ class SearxngSearchTest(unittest.TestCase):
 
         self.assertEqual(out["engine_used"], "mwmbl")
         self.assertTrue(out["fallback_used"])
-        self.assertEqual(out["tried"], ["brave", "google", "mwmbl", "searchmysite"])
+        self.assertEqual(out["tried"], ["bing", "yahoo", "mwmbl", "searchmysite"])
         self.assertEqual(len(out["results"]), 3)
         # No braveapi request was made (token conserved).
         self.assertNotIn("braveapi", [r["engines"] for r in mock.requests])
@@ -133,7 +133,7 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(out["engine_used"], "braveapi")
         self.assertTrue(out["fallback_used"])
         self.assertEqual(
-            out["tried"], ["brave", "google", "mwmbl", "searchmysite", "braveapi"]
+            out["tried"], ["bing", "yahoo", "mwmbl", "searchmysite", "braveapi"]
         )
         # Brave API first, then the free results, duplicate URL collapsed.
         self.assertEqual(
@@ -171,7 +171,7 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(out["engine_used"], "none")
         self.assertEqual(out["results"], [])
         self.assertEqual(
-            out["tried"], ["brave", "google", "mwmbl", "searchmysite", "braveapi"]
+            out["tried"], ["bing", "yahoo", "mwmbl", "searchmysite", "braveapi"]
         )
         self.assertEqual(len(mock.requests), 4)
 
@@ -180,7 +180,7 @@ class SearxngSearchTest(unittest.TestCase):
         # must not crash and must still be able to escalate to braveapi.
         mock = self._mock(
             engine_results={"braveapi": API_RESULTS},
-            unresponsive=["brave", "google"],
+            unresponsive=["bing", "yahoo"],
             broken_engines=["mwmbl", "searchmysite"],
         )
         script = self._script_for(mock.url)
@@ -192,7 +192,7 @@ class SearxngSearchTest(unittest.TestCase):
 
     def test_broken_free_tier_and_braveapi_emit_empty(self):
         mock = self._mock(
-            unresponsive=["brave", "google"],
+            unresponsive=["bing", "yahoo"],
             broken_engines=["mwmbl", "searchmysite", "braveapi"],
         )
         script = self._script_for(mock.url)
@@ -229,7 +229,7 @@ class SearxngSearchTest(unittest.TestCase):
 
     # --- Fidelity -----------------------------------------------------------
     def test_chain_preserves_time_range_safesearch_language(self):
-        mock = self._mock(engine_results={"google": GOOGLE}, unresponsive=["brave"])
+        mock = self._mock(engine_results={"yahoo": YAHOO}, unresponsive=["bing"])
         script = self._script_for(mock.url)
 
         out = self._run(script, "weakcase", "de", "1", "general", "", "week", "1")
@@ -242,101 +242,101 @@ class SearxngSearchTest(unittest.TestCase):
             self.assertEqual(req["language"], "de")
 
     def test_tier_one_falls_through_the_instance_chain(self):
-        broken = self._mock(unresponsive=["brave"])
-        healthy = self._mock(engine_results={"brave": BRAVE})
+        broken = self._mock(unresponsive=["bing"])
+        healthy = self._mock(engine_results={"bing": BING})
         script = self._script_for(broken.url, healthy.url)
 
         out = self._run(script, "chaincase")
 
         self.assertEqual(out["instance"], healthy.url)
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertFalse(out["fallback_used"])
         self.assertEqual(len(broken.requests), 1)
         self.assertEqual(len(healthy.requests), 1)
 
     def test_later_tiers_reuse_first_responsive_instance(self):
-        primary = self._mock(engine_results={"google": [result_item("G", "https://g.com/1", "google")]})
-        secondary = self._mock(engine_results={"google": [result_item("G", "https://g.com/2", "google")]})
+        primary = self._mock(engine_results={"yahoo": [result_item("Y", "https://g.com/1", "yahoo")]})
+        secondary = self._mock(engine_results={"yahoo": [result_item("Y", "https://g.com/2", "yahoo")]})
         script = self._script_for(primary.url, secondary.url)
 
         out = self._run(script, "weakcase")
 
         self.assertEqual(out["instance"], primary.url)
-        self.assertEqual(out["engine_used"], "google")
-        self.assertEqual(len(primary.requests), 2)  # brave, then google
-        self.assertEqual(len(secondary.requests), 1)  # brave tier only
+        self.assertEqual(out["engine_used"], "yahoo")
+        self.assertEqual(len(primary.requests), 2)  # bing, then yahoo
+        self.assertEqual(len(secondary.requests), 1)  # bing tier only
 
     # --- SEARXNG_PRIMARY / SEARXNG_FALLBACK env override ----------------------
     def test_primary_env_replaces_instance_list(self):
-        primary = self._mock(engine_results={"brave": BRAVE})
-        secondary = self._mock(engine_results={"brave": BRAVE})
+        primary = self._mock(engine_results={"bing": BING})
+        secondary = self._mock(engine_results={"bing": BING})
         env = {"SEARXNG_PRIMARY": primary.url, "SEARXNG_FALLBACK": secondary.url}
 
-        out = self._run_env(str(SCRIPT), env, "bravecase")
+        out = self._run_env(str(SCRIPT), env, "bingcase")
 
         self.assertEqual(out["instance"], primary.url)
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertEqual(len(primary.requests), 1)
         self.assertEqual(len(secondary.requests), 0)
 
     def test_fallback_env_used_when_primary_fails(self):
-        primary = self._mock(unresponsive=["brave"])
-        secondary = self._mock(engine_results={"brave": BRAVE})
+        primary = self._mock(unresponsive=["bing"])
+        secondary = self._mock(engine_results={"bing": BING})
         env = {"SEARXNG_PRIMARY": primary.url, "SEARXNG_FALLBACK": secondary.url}
 
         out = self._run_env(str(SCRIPT), env, "chaincase")
 
         self.assertEqual(out["instance"], secondary.url)
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertEqual(len(primary.requests), 1)
         self.assertEqual(len(secondary.requests), 1)
 
     def test_explicit_empty_auth_sends_no_credentials(self):
         import base64
 
-        mock = self._mock(engine_results={"brave": BRAVE})
+        mock = self._mock(engine_results={"bing": BING})
         env = {
             "SEARXNG_PRIMARY": mock.url,
             "SEARXNG_PRIMARY_AUTH": "",
             "SEARXNG_AUTH": "user:pass",
         }
 
-        out = self._run_env(str(SCRIPT), env, "bravecase")
+        out = self._run_env(str(SCRIPT), env, "bingcase")
 
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertEqual(mock.requests[0]["authorization"], "")
 
     def test_shared_auth_reaches_primary_without_override(self):
         import base64
 
-        mock = self._mock(engine_results={"brave": BRAVE})
+        mock = self._mock(engine_results={"bing": BING})
         env = {
             "SEARXNG_PRIMARY": mock.url,
             "SEARXNG_AUTH": "user:pass",
         }
 
-        out = self._run_env(str(SCRIPT), env, "bravecase")
+        out = self._run_env(str(SCRIPT), env, "bingcase")
 
-        self.assertEqual(out["engine_used"], "brave")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertEqual(
             mock.requests[0]["authorization"],
             "Basic " + base64.b64encode(b"user:pass").decode(),
         )
 
     # --- SEARXNG_CHAIN=gregor profile -----------------------------------------
-    def test_gregor_chain_starts_with_google(self):
-        mock = self._mock(engine_results={"google": GOOGLE})
+    def test_gregor_chain_starts_with_bing(self):
+        mock = self._mock(engine_results={"bing": BING})
         env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
 
-        out = self._run_env(str(SCRIPT), env, "bravecase")
+        out = self._run_env(str(SCRIPT), env, "bingcase")
 
-        self.assertEqual(out["engine_used"], "google")
+        self.assertEqual(out["engine_used"], "bing")
         self.assertFalse(out["fallback_used"])
-        self.assertEqual(out["tried"], ["google"])
+        self.assertEqual(out["tried"], ["bing"])
         self.assertEqual(len(mock.requests), 1)
-        self.assertEqual(mock.requests[0]["engines"], "google")
+        self.assertEqual(mock.requests[0]["engines"], "bing")
 
-    def test_gregor_chain_falls_back_to_brave_then_braveapi(self):
+    def test_gregor_chain_falls_back_to_yahoo_then_braveapi(self):
         mock = self._mock(engine_results={"braveapi": API_RESULTS})
         env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
 
@@ -344,7 +344,7 @@ class SearxngSearchTest(unittest.TestCase):
 
         self.assertEqual(out["engine_used"], "braveapi")
         self.assertTrue(out["fallback_used"])
-        self.assertEqual(out["tried"], ["google", "brave", "braveapi"])
+        self.assertEqual(out["tried"], ["bing", "yahoo", "braveapi"])
         # No free-tier request: the gregor profile skips mwmbl/searchmysite.
         self.assertNotIn(
             "mwmbl", [r["engines"] for r in mock.requests]

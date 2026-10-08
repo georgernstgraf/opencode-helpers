@@ -61,8 +61,8 @@ class OpenCodeSearxngTest(unittest.TestCase):
 
     def test_tools_call_runs_chain_end_to_end(self):
         mock = searxng_mock.MockSearxng(
-            engine_results={"google": [searxng_mock.result_item("G", "https://g.com/1", "google")]},
-            unresponsive=["brave"],
+            engine_results={"yahoo": [searxng_mock.result_item("Y", "https://y.com/1", "yahoo")]},
+            unresponsive=["bing"],
         ).start()
         self.addCleanup(mock.stop)
         server = self._temp_server(mock.url)
@@ -80,8 +80,8 @@ class OpenCodeSearxngTest(unittest.TestCase):
         )
         payload = json.loads(out[0]["result"]["content"][0]["text"])
         self.assertTrue(payload["fallback_used"])
-        self.assertEqual(payload["engine_used"], "google")
-        self.assertIn("google", {r["engine"] for r in payload["results"]})
+        self.assertEqual(payload["engine_used"], "yahoo")
+        self.assertIn("yahoo", {r["engine"] for r in payload["results"]})
 
     def test_tools_call_explicit_engines_bypasses_chain(self):
         mock = searxng_mock.MockSearxng(
