@@ -41,6 +41,21 @@ workflows below.
 - SVN working copies: the analogue is frequent, clear `svn ci` with a
   descriptive German commit message.
 
+## Headless Agent Jobs
+
+- Any unattended opencode run (systemd timer, cron, CI, scripted
+  `opencode run`) MUST pin its model explicitly:
+  `opencode run --model <provider>/<model>[#variant] …`.
+- Never rely on the configured default or on opencode's fallback: without an
+  explicit `--model`, opencode V2 uses the **newest available catalog model**,
+  which drifts silently on every catalog update (cost and quality risk).
+  Verified 2026-10-11: the offers job ran on `opencode-go/claude-haiku-5-5`
+  purely because it was the newest entry (KI-Kustodiat issue #33).
+- The `#variant` (e.g. `#high`) can only be set on the command line — the root
+  `model` config key cannot retain one.
+- Pin the agent too (`--agent <id>`) when the job depends on a specific system
+  prompt or permission set.
+
 ## Issue Completion
 
 - When the agent believes the issue's goal is fully implemented, it **closes
