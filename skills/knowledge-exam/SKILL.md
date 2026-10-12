@@ -22,6 +22,23 @@ The generated exam and solution files MUST be written in natural German with
 proper UTF-8 umlauts (ä, ö, ü, ß). 
 Never use English for the exam questions or solutions.
 
+## Target Repository: the private `-T` exam repo (MANDATORY)
+
+Knowledge-check exam and solution files must be written into the teacher's
+**private test/exam repository** — the sibling repo named `<subject>-T`
+(e.g. `GRG-PMM-T` for `GRG-PMM`). **Never write them into the public
+teaching repo.**
+
+Before generating files:
+
+1. Locate the `-T` repo on disk (typically `~/repos/<owner>/<subject>-T`);
+   if it does not exist, stop and ask the user.
+2. Verify it is up to date (`git fetch && git status -sb`).
+3. Read the target repo's `AGENTS.md` — it defines repo-specific conventions:
+   file naming (`knowledge_<klasse>_<date>.md` + `_solutions.md`), class
+   folder layout (flat vs. dated subfolder, cohort suffixes like `4ahwit-x`),
+   and the formelle Anrede rule (Du vs. Sie per class).
+
 ## Inputs
 
 - `class`: target class folder name.
@@ -39,9 +56,12 @@ Never use English for the exam questions or solutions.
 
 - **Mandatory exam-date parameter**: If `exam-date` is not provided, abort
   immediately with an error message explaining that this parameter is required.
-- Confirm that a folder matching `class` exists in the current working tree.
-- If the folder does not exist, stop immediately and report that the class name
-  appears to be invalid.
+- Confirm that a folder matching `class` exists in the **target `-T`
+  repository** (see "Target Repository" section above), not in the teaching
+  repo. If the folder does not exist, it may need to be created there —
+  check the repo's AGENTS.md conventions first.
+- If the class folder cannot be located or the target repo is missing, stop
+  immediately and report that the class name appears to be invalid.
 - **Resolve exam-date to ISO format**:
   - If `exam-date` is an ISO date (YYYY-MM-DD), use it as-is.
   - If `exam-date` is `today`, compute today's ISO date.
