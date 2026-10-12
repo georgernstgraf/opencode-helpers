@@ -686,6 +686,16 @@ Resolution (first match wins):
    "HTML-Grundlagen (2026-09-22)") is a cross-check signal. On conflict, the
    provenance/wu date wins and the conflict MUST be reported to the user —
    never silently resolved.
+7. **Same-day renames (preparation case)**: when the folder was renamed on
+   the SAME day it was created (e.g. created as `2026-09-29_css-basics` and
+   renamed in the same commit to `2026-10_XX_css-basics`), the folder was
+   prepared during that UE for a LATER UE — the oldest-name date is the
+   preparation date, NOT the assignment date. In that case the assignment
+   date comes from a dated cohort README section documenting the UE (e.g.
+   `## 2026-10-06__css`) or from the wu termine, and the ambiguity MUST be
+   reported. Note: lesson material may be DELETED after being moved into
+   `unterricht/` — the cohort README reference section remains the
+   assignment source (Reference Pattern applies).
 
 ### wu Termine Integration (MANDATORY)
 
