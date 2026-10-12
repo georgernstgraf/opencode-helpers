@@ -21,12 +21,29 @@ with a trailing ":free" stripped, then resolved through the aliases map. A
 missing file is fine (all counts show "–"); a malformed file is a stderr
 warning. --params-missing lists the keys that still lack an entry.
 
-The model list is cached at ~/.local/share/oc-models-report/models-verbose.txt
-($XDG_DATA_HOME respected) and regenerated via `opencode models --verbose`
-whenever it is missing or older than 12 hours. Internal overrides (mainly for
-tests): OC_MODELS_REPORT_CACHE_DIR, OC_MODELS_REPORT_MAX_AGE (seconds),
-OC_MODELS_REPORT_CMD (command line to run instead of `opencode models
---verbose`).
+Model data is collected from the OpenCode V2 API via
+`opencode api get /api/model` (the shared background service is discovered
+automatically) and cached as the raw JSON response at
+~/.local/share/oc-models-report/models-api.json ($XDG_DATA_HOME respected),
+regenerated whenever it is missing or older than 12 hours. Internal
+overrides (mainly for tests): OC_MODELS_REPORT_CACHE_DIR,
+OC_MODELS_REPORT_MAX_AGE (seconds), OC_MODELS_REPORT_CMD (command line to
+run instead of `opencode api get /api/model`).
+
+Dump files passed via --file may alternatively use the legacy format of the
+retired `opencode models --verbose` collector: `provider/id` header lines
+followed by an indented JSON block per model (old capability schema).
+
+Columns: REA (reasoning, derived — see below), TOOL (tool calls), VAR
+(number of variants), STATUS (act/beta/alph/depr), plus per-modality in/out
+flags TXT IMG AUD VID PDF.
+
+REA derivation: the API no longer carries a reasoning flag per model, so it
+is inferred from a `compatibility.reasoningField`, any variant with
+`settings.reasoning`, any effort-named variant (low/medium/high/xhigh/max/
+minimal/thinking), or a "thinking" model id/name. Models without any of
+these signals (e.g. inherently reasoning models without variants) may show
+"–" where the old dump still showed "✓".
 
 Zero external dependencies (Python 3 stdlib only).
 """
@@ -46,9 +63,13 @@ import time
 HDR = re.compile(r"^([A-Za-z0-9_.-]+/.+?)\s*$")
 
 APP = "oc-models-report"
-CACHE_FILE = "models-verbose.txt"
+CACHE_FILE = "models-api.json"
 PARAMS_FILE = "model-params.json"
 DEFAULT_MAX_AGE = 12 * 3600
+
+MODS = ("text", "image", "audio", "video", "pdf")
+EFFORT_VARIANTS = {"low", "medium", "high", "xhigh", "max", "minimal", "thinking"}
+STATUS_ABBREV = {"active": "act", "beta": "beta", "alpha": "alph", "deprecated": "depr"}
 
 SORT_ALIASES = {
     "model": "model",
@@ -92,7 +113,7 @@ def collect_cmd():
     override = os.environ.get("OC_MODELS_REPORT_CMD")
     if override:
         return shlex.split(override)
-    return [shutil.which("opencode") or "opencode", "models", "--verbose"]
+    return [shutil.which("opencode") or "opencode", "api", "get", "/api/model"]
 
 
 def default_params_path():
@@ -172,26 +193,33 @@ def needs_refresh(path, force, age_limit):
 
 
 def collect(path, cmd):
-    """Run the collect command and atomically store its stdout at path."""
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-    except FileNotFoundError:
-        raise RuntimeError(f"command not found: {cmd[0]}")
-    except subprocess.TimeoutExpired:
-        raise RuntimeError(f"command timed out: {' '.join(cmd)}")
-    if proc.returncode != 0:
-        detail = proc.stderr.strip().splitlines()
-        raise RuntimeError(
-            f"{' '.join(cmd)} failed (exit {proc.returncode})"
-            + (f": {detail[-1]}" if detail else "")
-        )
+    """Run the collect command and atomically store its stdout at path.
+
+    stdout is written straight into the temp file instead of a pipe:
+    piping the `opencode api` response races the CLI's exit and truncates
+    it at pipe-buffer boundaries (observed 256/384 KiB of ~477 KiB); a
+    regular file always receives the complete response.
+    """
     os.makedirs(os.path.dirname(path), exist_ok=True)
     fd, tmp = tempfile.mkstemp(
-        dir=os.path.dirname(path), prefix=".models-verbose.", suffix=".tmp"
+        dir=os.path.dirname(path), prefix=".models-api.", suffix=".tmp"
     )
     try:
-        with os.fdopen(fd, "w") as fh:
-            fh.write(proc.stdout)
+        try:
+            with os.fdopen(fd, "w") as fh:
+                proc = subprocess.run(
+                    cmd, stdout=fh, stderr=subprocess.PIPE, text=True, timeout=300
+                )
+        except FileNotFoundError:
+            raise RuntimeError(f"command not found: {cmd[0]}")
+        except subprocess.TimeoutExpired:
+            raise RuntimeError(f"command timed out: {' '.join(cmd)}")
+        if proc.returncode != 0:
+            detail = (proc.stderr or "").strip().splitlines()
+            raise RuntimeError(
+                f"{' '.join(cmd)} failed (exit {proc.returncode})"
+                + (f": {detail[-1]}" if detail else "")
+            )
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -216,30 +244,129 @@ def ensure_dump(path, force, age_limit):
     return True
 
 
+# --- normalization -----------------------------------------------------------
+
+
+def modmap(v):
+    """Normalize input/output modality data to {modality: bool}."""
+    if isinstance(v, dict):  # legacy: {"text": true, ...}
+        return {m: bool(v.get(m)) for m in MODS}
+    if isinstance(v, list):  # V2 API: ["text", "image", ...]
+        seen = {x for x in v if isinstance(x, str)}
+        return {m: m in seen for m in MODS}
+    return {m: False for m in MODS}
+
+
+def base_cost(cost):
+    """Return the base-tier {input, output} dict from legacy or V2 cost data."""
+    if isinstance(cost, list) and cost:
+        cost = cost[0]  # first element = base tier (no context threshold)
+    return cost if isinstance(cost, dict) else {}
+
+
+def is_reasoning(e):
+    """Derive the reasoning flag from V2 API data (see module docstring)."""
+    if (e.get("compatibility") or {}).get("reasoningField"):
+        return True
+    name = f"{e.get('id', '')} {e.get('name', '')}".lower()
+    if "thinking" in name:
+        return True
+    for v in e.get("variants") or []:
+        if not isinstance(v, dict):
+            continue
+        if (v.get("settings") or {}).get("reasoning"):
+            return True
+        if v.get("id") in EFFORT_VARIANTS:
+            return True
+    return False
+
+
+def count_variants(variants):
+    if isinstance(variants, (list, dict)):
+        return len(variants)
+    return 0
+
+
+def normalize(e, qid=None):
+    """Normalize a legacy or V2 API model entry into the internal record."""
+    if qid is None:  # V2 API entry: id carries no provider prefix
+        prov = e.get("providerID", "")
+        qid = f"{prov}/{e.get('id', '')}" if prov else e.get("id", "")
+    cost = base_cost(e.get("cost"))
+    caps = e.get("capabilities") or {}
+    return {
+        "qid": qid,
+        "providerID": e.get("providerID", "") or qid.split("/", 1)[0],
+        "name": e.get("name", ""),
+        "family": e.get("family", ""),
+        "cost_in": float(cost.get("input") or 0),
+        "cost_out": float(cost.get("output") or 0),
+        "ctx": int((e.get("limit") or {}).get("context") or 0),
+        "reasoning": bool(caps.get("reasoning")) or is_reasoning(e),
+        "toolcall": bool(caps.get("toolcall")) or bool(caps.get("tools")),
+        "in": modmap(caps.get("input")),
+        "out": modmap(caps.get("output")),
+        "variants": count_variants(e.get("variants")),
+        "status": e.get("status", "") or "",
+    }
+
+
 def load_models(path):
+    """Return (qid, record) pairs from a dump file (V2 API or legacy format)."""
+    with open(path) as fh:
+        raw = fh.read()
+    api = load_api_dump(raw)
+    if api is not None:
+        return api
+    legacy = load_legacy_dump(raw)
+    if not legacy:
+        print(f"warning: no models parsed from dump {path}", file=sys.stderr)
+    return legacy
+
+
+def load_api_dump(raw):
+    """Parse the raw `opencode api get /api/model` response; None if not one."""
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    entries = data.get("data") if isinstance(data, dict) else None
+    if not isinstance(entries, list):
+        return None
+    records = [normalize(e) for e in entries if isinstance(e, dict)]
+    return [(rec["qid"], rec) for rec in records]
+
+
+def load_legacy_dump(raw):
+    """Parse the old `opencode models --verbose` dump format."""
     models = []
     current_id = None
     buf = []
-    with open(path) as fh:
-        for line in fh:
-            m = HDR.match(line)
-            if m:
-                if current_id is not None:
-                    _emit(models, current_id, buf)
-                current_id = m.group(1)
-                buf = []
-            elif current_id is not None:
-                buf.append(line)
+    for line in raw.splitlines(keepends=True):
+        m = HDR.match(line)
+        if m:
+            if current_id is not None:
+                _emit(models, current_id, buf)
+            current_id = m.group(1)
+            buf = []
+        elif current_id is not None:
+            buf.append(line)
     if current_id is not None:
         _emit(models, current_id, buf)
     return models
 
 
-def _emit(models, current_id, buf):
+def _emit(models, qid, buf):
     try:
-        models.append((current_id, json.loads("".join(buf))))
+        entry = json.loads("".join(buf))
     except json.JSONDecodeError:
-        print(f"warning: skipping truncated/invalid model block '{current_id}'", file=sys.stderr)
+        print(f"warning: skipping truncated/invalid model block '{qid}'", file=sys.stderr)
+        return
+    rec = normalize(entry, qid=qid)
+    models.append((rec["qid"], rec))
+
+
+# --- reporting ---------------------------------------------------------------
 
 
 def fmt_money(v):
@@ -248,8 +375,8 @@ def fmt_money(v):
     return ("%.3f" % v).rstrip("0").rstrip(".")
 
 
-def fmt_cost(c):
-    i, o = c.get("input", 0), c.get("output", 0)
+def fmt_cost(rec):
+    i, o = rec["cost_in"], rec["cost_out"]
     if i == 0 and o == 0:
         return "free"
     return f"{fmt_money(i)}/{fmt_money(o)}"
@@ -273,25 +400,33 @@ def flag(b):
     return "✓" if b else "–"
 
 
+def fmt_variants(n):
+    return str(n) if n else "–"
+
+
+def fmt_status(s):
+    if not s:
+        return "–"
+    return STATUS_ABBREV.get(s, s[:4])
+
+
 def modcell(inb, outb):
     return flag(inb) + flag(outb)
 
 
 def matches(rec, filters):
-    _, data = rec
-    prov = data.get("providerID", "")
-    id_, name, family = data["id"], data.get("name", ""), data.get("family", "")
-    cost = fmt_cost(data.get("cost", {}))
-    hay = f"{prov} {id_} {name} {family} {cost}".lower()
+    _, n = rec
+    cost = fmt_cost(n)
+    hay = f"{n['providerID']} {n['qid']} {n['name']} {n['family']} {cost}".lower()
     return any(a.lower() in hay for a in filters)
 
 
 def select_provider(models, provider):
     """Return models of provider (exact, case-insensitive) or None if unknown."""
     target = provider.lower()
-    if target not in {r[1].get("providerID", "").lower() for r in models}:
+    if target not in {r[1]["providerID"].lower() for r in models}:
         return None
-    return [r for r in models if r[1].get("providerID", "").lower() == target]
+    return [r for r in models if r[1]["providerID"].lower() == target]
 
 
 def normalize_sort(name):
@@ -300,22 +435,21 @@ def normalize_sort(name):
 
 
 def sort_value(key, rec, params):
-    _, d = rec
-    cost = d.get("cost", {})
+    _, n = rec
     if key == "provider":
-        return d.get("providerID", "").lower()
+        return n["providerID"].lower()
     if key == "in":
-        return cost.get("input", 0)
+        return n["cost_in"]
     if key == "out":
-        return cost.get("output", 0)
+        return n["cost_out"]
     if key == "cost":
-        return cost.get("input", 0) + cost.get("output", 0)
+        return n["cost_in"] + n["cost_out"]
     if key == "ctx":
-        return d.get("limit", {}).get("context", 0)
+        return n["ctx"]
     if key == "params":
         entry = lookup_params(params, rec[0])
         return entry.get("total") if entry and entry.get("total") is not None else None
-    return rec[0].lower()
+    return n["qid"].lower()
 
 
 def sort_models(hits, key, reverse, params=None):
@@ -348,8 +482,8 @@ def parse_args(argv):
         prog="oc-models-report",
         description=(
             "Report capabilities/pricing of opencode models matching the given "
-            "substrings. The model list is cached and auto-refreshed when older "
-            "than 12 hours."
+            "substrings. Model data is collected via the OpenCode API and cached "
+            "(auto-refresh when older than 12 hours)."
         ),
     )
     p.add_argument("filters", metavar="substring", nargs="*",
@@ -386,12 +520,12 @@ def parse_args(argv):
 def report_params_missing(hits, params):
     """Print the distinct keys in hits that lack a parameter entry."""
     missing = {}
-    for qid, d in hits:
-        if lookup_params(params, qid) is not None:
+    for _, n in hits:
+        if lookup_params(params, n["qid"]) is not None:
             continue
-        key = params_key(qid)
-        provs, _ = missing.setdefault(key, (set(), qid))
-        provs.add(d.get("providerID", ""))
+        key = params_key(n["qid"])
+        provs, _ = missing.setdefault(key, (set(), n["qid"]))
+        provs.add(n["providerID"])
     if not missing:
         print("no missing parameter entries")
         return 0
@@ -448,7 +582,7 @@ def main(argv):
     cost_w = 11
     ctx_w = 6
     param_w = 12
-    flagcols = [("REA", 3), ("TOOL", 4), ("TMP", 3), ("ATT", 3)]
+    flagcols = [("REA", 3), ("TOOL", 4), ("VAR", 3), ("STATUS", 6)]
     modcols = [("TXT", 3), ("IMG", 4), ("AUD", 4), ("VID", 4), ("PDF", 4)]
     term = shutil.get_terminal_size(fallback=(100, 24)).columns
     flag_w = sum(w for _, w in flagcols) + len(flagcols) - 1
@@ -463,30 +597,19 @@ def main(argv):
     )
     print(hdr)
     print("-" * len(hdr))
-    for qid, d in hits:
-        caps = d.get("capabilities", {})
-        inn = caps.get("input", {})
-        out = caps.get("output", {})
-        flagvals = [
-            flag(caps.get("reasoning")),
-            flag(caps.get("toolcall")),
-            flag(caps.get("temperature")),
-            flag(caps.get("attachment")),
-        ]
-        modvals = [
-            modcell(inn.get("text"), out.get("text")),
-            modcell(inn.get("image"), out.get("image")),
-            modcell(inn.get("audio"), out.get("audio")),
-            modcell(inn.get("video"), out.get("video")),
-            modcell(inn.get("pdf"), out.get("pdf")),
-        ]
+    for qid, n in hits:
         line = (
-            f"{fmt_model(qid, W):<{W}} {fmt_cost(d.get('cost', {})):<{cost_w}} "
-            f"{fmt_ctx(d.get('limit', {}).get('context', 0)):<{ctx_w}} "
+            f"{fmt_model(qid, W):<{W}} {fmt_cost(n):<{cost_w}} "
+            f"{fmt_ctx(n['ctx']):<{ctx_w}} "
             f"{fmt_params(lookup_params(params, qid)):<{param_w}} "
-            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(flagvals, flagcols))
+            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(
+                (flag(n["reasoning"]), flag(n["toolcall"]),
+                 fmt_variants(n["variants"]), fmt_status(n["status"])),
+                flagcols))
             + "  "
-            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(modvals, modcols))
+            + " ".join(f"{v:<{w}}" for v, (_, w) in zip(
+                (modcell(n["in"][m], n["out"][m]) for m in MODS),
+                modcols))
         )
         print(line)
     print(f"\n{len(hits)} match(es) for: {desc}")
