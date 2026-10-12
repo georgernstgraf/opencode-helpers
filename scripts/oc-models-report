@@ -39,9 +39,9 @@ Columns: REA (reasoning, derived — see below), TOOL (tool calls), VAR
 flags TXT IMG AUD VID PDF.
 
 REA derivation: the API no longer carries a reasoning flag per model, so it
-is inferred from a `compatibility.reasoningField`, any variant with
-`settings.reasoning`, any effort-named variant (low/medium/high/xhigh/max/
-minimal/thinking), or a "thinking" model id/name. Models without any of
+is inferred from a `compatibility.reasoningField`, any variant other than
+the neutral "none"/"default" (robust against future effort levels), or a
+"thinking" model id/name. Models without any of
 these signals (e.g. inherently reasoning models without variants) may show
 "–" where the old dump still showed "✓".
 
@@ -68,7 +68,9 @@ PARAMS_FILE = "model-params.json"
 DEFAULT_MAX_AGE = 12 * 3600
 
 MODS = ("text", "image", "audio", "video", "pdf")
-EFFORT_VARIANTS = {"low", "medium", "high", "xhigh", "max", "minimal", "thinking"}
+# neutral variant names that carry no reasoning signal; every other variant
+# id is treated as a reasoning/effort level (future-proof, e.g. "ultracode")
+NON_EFFORT_VARIANTS = {"none", "default"}
 STATUS_ABBREV = {"active": "act", "beta": "beta", "alpha": "alph", "deprecated": "depr"}
 
 SORT_ALIASES = {
@@ -265,7 +267,12 @@ def base_cost(cost):
 
 
 def is_reasoning(e):
-    """Derive the reasoning flag from V2 API data (see module docstring)."""
+    """Derive the reasoning flag from V2 API data (see module docstring).
+
+    Robust rule: any variant other than the neutral "none"/"default" counts
+    as a reasoning/effort level, so future levels (e.g. "ultracode") are
+    detected without maintaining a name list.
+    """
     if (e.get("compatibility") or {}).get("reasoningField"):
         return True
     name = f"{e.get('id', '')} {e.get('name', '')}".lower()
@@ -276,7 +283,7 @@ def is_reasoning(e):
             continue
         if (v.get("settings") or {}).get("reasoning"):
             return True
-        if v.get("id") in EFFORT_VARIANTS:
+        if v.get("id") and v["id"] not in NON_EFFORT_VARIANTS:
             return True
     return False
 
