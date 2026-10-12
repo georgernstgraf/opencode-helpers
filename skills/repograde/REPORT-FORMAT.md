@@ -163,6 +163,16 @@ The Endbewertung is calculated as `round(sum(effective_scores) / (N × 100) × 1
 This section MUST also include one short concluding paragraph that explains
 why the final result is appropriate.
 
+### No-Repository Reports (Broken Name-Symlink)
+
+When the student has no repository (broken name-symlink — see `grading-shared`
+Broken Name-Symlinks), the report KEEPS the mandatory structure above. Every
+section explicitly states that no repository was submitted and no evidence is
+available ("kein Repository — keine Evidence"); no commit-based content is
+invented. The scoring table lists ALL assignments with `—` and Effective 0%.
+The Endbewertung section states `Erreichte Punkte: 0 / [N × 100]` and
+`Endbewertung: 0/100 (0%)`.
+
 ### Standardization Rules for Subagents
 
 In bulk mode, every subagent MUST follow these normalization rules:

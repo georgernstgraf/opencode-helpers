@@ -546,7 +546,7 @@ termine (see Deadline Calculation).
 Scan `_class/` for subdirectories matching `<YYYY-MM-DD>_<topic>`,
 `<YYYY-MM-DD>__<topic>` (create-lesson convention, double underscore), or an
 ambiguous `<YYYY-MM>_<X>_<topic>` form (e.g. `2026-10_XX_css-basics`) whose
-date is resolved via Git (see Git Date Resolution below).
+date is resolved via Git (see Git Folder Provenance Resolution below).
 
 For each matching directory, check for assignment content in this order:
 
@@ -558,9 +558,9 @@ For each matching directory, check for assignment content in this order:
    If the legacy section states "Keine Hausübung", skip this lesson.
 
 When a file is found:
-- Extract the date directly from the directory name when it is a full
-  `YYYY-MM-DD` (e.g., `2026-03-21_promises` → date `2026-03-21`). No German
-  date parsing needed.
+- Extract the date from the directory name — a full `YYYY-MM-DD` is the
+  CANDIDATE assignment date, subject to the Git Folder Provenance check below
+  (a renamed folder keeps the date of its OLDEST name).
 - Extract the topic from the directory name and/or the file content.
 - Read the file content for assignment details.
 - Add to the assignment list: `(iso_date, topic, content)`.
@@ -651,19 +651,41 @@ Scan the CWD itself for subdirectories matching `<YYYY-MM-DD>_<topic>` that
 contain assignment content (same file search order as Source 2, including the
 Reference Pattern). Apply Future Lesson Exclusion identically.
 
-### Git Date Resolution (ambiguous folder names)
+### Git Folder Provenance Resolution
 
-When a per-lesson folder name does not carry a full `YYYY-MM-DD` date (e.g.
-`2026-10_XX_css-basics`):
+A lesson folder's NAME is not a reliable assignment date: folders may be
+RENAMED forward (e.g. a folder created as `2026-09-22_html-basics` renamed to
+`2026-09-29_html-basics` when the next UE approached). The assignment date
+MUST therefore be resolved from the folder's Git provenance.
 
-1. Run git inside the `_class` target repository (the teaching repo):
+**Pitfall (CRITICAL):** Never trust `git log --diff-filter=A` on the current
+path alone — renamed files register as `A` at the new path. Always use rename
+detection (`-M` / `--follow`).
+
+Resolution (first match wins):
+
+1. **Reconstruct the name history** (run inside the `_class` target repo):
    ```bash
-   git log --diff-filter=A --date=iso --format=%ad -- <folder-relative-path>
+   git log -M --name-status --date=iso --format='%h %ad' --diff-filter=AR \
+       -- <klasse>/<current-folder>*
    ```
-2. The assignment date is the DATE PART of the oldest commit that added files
-   in that folder.
-3. Snap that commit date via the wu termine: the assignment date is the
-   latest lesson date that is ≤ the commit date (see wu Termine Integration).
+2. **Rename found**: the name history is `oldest-name → … → current-name`.
+   The assignment date is the date encoded in the OLDEST name of that chain
+   (e.g. `2026-09-22_html-basics` → assignment date 2026-09-22). The rename
+   commit date itself is NEVER the assignment date.
+3. **No rename, full `YYYY-MM-DD` in the current name**: that date is the
+   assignment date.
+4. **No rename, ambiguous name** (e.g. `2026-10_XX_css-basics`): the
+   assignment date is the DATE PART of the oldest commit that added files in
+   the folder.
+5. **wu validation (all cases)**: the resolved date must be a real lesson
+   date from the wu termine; snap if needed (latest lesson date ≤ resolved
+   date). If both the current name date and the provenance date are real
+   lesson dates, the provenance date (oldest name) wins.
+6. **README cross-check**: a lesson date declared in the Tages-README (e.g.
+   "HTML-Grundlagen (2026-09-22)") is a cross-check signal. On conflict, the
+   provenance/wu date wins and the conflict MUST be reported to the user —
+   never silently resolved.
 
 ### wu Termine Integration (MANDATORY)
 
@@ -696,8 +718,8 @@ not-yet-held lessons. Their assignments MUST NOT be included in the unified
 assignment list.
 
 1. Determine today's date: `date +%Y-%m-%d`
-2. For each per-lesson directory, extract `<YYYY-MM-DD>` from the name
-   (resolving ambiguous names via Git Date Resolution first).
+2. For each per-lesson directory, resolve the assignment date via Git Folder
+   Provenance Resolution.
 3. If `lesson_date > today`, skip this directory entirely.
 4. Do NOT include its assignment, regardless of whether an assignment section
    exists in the file.
@@ -727,7 +749,9 @@ creating or preparing assignments:
    reference to a Prepared Lesson (`unterricht/<PREFIX>-<NN>-<slug>/`).
 3. Ambiguous folder names like `YYYY-MM_XX_<topic>` are allowed; the date is
    resolved via the teaching repo's Git history and snapped to a wu lesson
-   date.
+   date. Renaming a lesson folder forward is also fine — the discovery
+   attributes the date of the OLDEST name in the folder's Git history and
+   reports the rename.
 4. **Deadline**: state a concrete date ("Abgabe per Push bis 2026-10-13
    00:00") or "bis zur nächsten UE" (resolved via wu). Vague formulations
    that wu cannot resolve are not acceptable.
@@ -743,9 +767,9 @@ creating or preparing assignments:
 
 1. Full `YYYY-MM-DD` in the lesson folder name → that date is the assignment
    date.
-2. Ambiguous folder name (e.g. `2026-10_XX_css-basics`) → Git Date Resolution
-   (oldest commit adding the folder), snapped via wu to the latest lesson
-   date ≤ commit date.
+2. Ambiguous or renamed folder name (e.g. `2026-10_XX_css-basics`,
+   `2026-09-29_html-basics` renamed from `2026-09-22_html-basics`) → Git
+   Folder Provenance Resolution, snapped via wu to a real lesson date.
 3. Cohort README dated section → the heading date.
 
 The assignment date MUST correspond to an actual lesson date from
@@ -791,7 +815,7 @@ git log --after="$DEADLINE" --oneline
 | Latest relevant commit | Classification | Factor | Meaning |
 |------------------------|----------------|--------|---------|
 | ≤ DEADLINE             | pünktlich      | 1.0    | Full points possible |
-| > DEADLINE             | verspätet      | 0.75   | 25% penalty on achieved quality |
+| > DEADLINE             | verspätet      | 0.75   | 25% penalty on achieved quality, regardless of how late |
 | No commits             | fehlend        | —      | 0 points for this assignment |
 
 ### Deadline in Reports
@@ -831,6 +855,8 @@ When enumerating:
    candidate for grading — only the target directory is graded.
 2. Use the symlink's name for student identification.
 3. Follow the symlink to find the actual repository for git operations.
+4. If the symlink is BROKEN (target does not exist), it is NOT skipped and
+   NOT an error — see Broken Name-Symlinks (Missing Repository) below.
 
 ### Concurrency
 
@@ -944,6 +970,25 @@ Keep email length reasonably consistent across students. Do not omit one of the
 paragraph groups above simply because a repository is weaker or stronger; if
 evidence is limited, say so briefly and continue with the same structure.
 
+For students WITHOUT a repository (broken name-symlink), see the
+Missing Repository Emphasis below — that variant replaces paragraph groups
+3-6.
+
+### Missing Repository Emphasis (No-Repo Cases)
+
+For a student whose repository is missing (broken name-symlink — see Broken
+Name-Symlinks), the email body consists of: greeting, automatic assessment
+disclaimer, then the emphasis paragraph as the FIRST content paragraph
+(adapted to the address style), a short consequences paragraph, and the
+closing. The emphasis paragraph wording:
+
+- Informal: `Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.`
+- Formal: `Zu Ihrem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe Ihres Repositories ist keine positive Beurteilung möglich. Senden Sie mir bitte UMGEHEND den URL Ihres GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.`
+
+Follow with one short paragraph stating that all assignments in the grading
+period currently count 0% and that the final result is
+`Endbewertung: 0/100 (0%)`.
+
 ### Structure for Knowledge-Check Emails
 
 Used by `knowledge-assessment` skill. Same plain-text rule applies.
@@ -1047,6 +1092,38 @@ use the symlink name to identify the student.
 If no name-based symlinks exist in the CWD, use the student directory name
 directly as the identifier. Apply the standard Name Parsing from Repository
 Basename rule to extract first and last name.
+
+## Broken Name-Symlinks (Missing Repository)
+
+A name-based symlink whose target does NOT exist (broken symlink, detected
+with `[ -L "$entry" ] && [ ! -e "$entry" ]`) means: **the student has not yet
+submitted the URL of their assignment repository.** (The conventional
+placeholder target name is `KEIN-GITHUB-REPO`, but ANY missing target
+qualifies — not just that exact name.)
+
+### Protocol
+
+1. **Do NOT stop and do NOT skip.** A broken name-symlink is a valid grading
+   case, not an error. Bulk grading continues; the student is graded as a
+   no-repository case.
+2. **Evaluation**: no repository → no evidence → ALL assignments are rated
+   0% (Quality `—`, Factor `—`, Effective 0%) and the final result is
+   `Endbewertung: 0/100`.
+3. **Outputs (bulk mode)**: the student receives a normal `<name>_grading.md`
+   (mandatory structure per the consuming skill's report format, every
+   section explicitly stating that no repository exists and no evidence is
+   available) and a `<name>_email.json`. They appear in `GRADINGS.md` with
+   0/100 and in the aggregated `EMAIL.json`.
+4. **Email lookup**: proceed with the normal database lookup (by name). The
+   standard Missing Email Address Handling applies unchanged.
+5. **Email emphasis (MANDATORY)**: the email body MUST prominently state that
+   submitting the repository URL is REQUIRED for a positive assessment — see
+   Missing Repository Emphasis under Email Body Format.
+6. **Single-repo mode**: when the explicitly provided repository path is a
+   broken symlink, apply the same treatment (no-repo grading report +
+   emphasis email) instead of stopping.
+7. **No git commands** are run for these students (nothing to pull or
+   inspect); the Pre-Grading Verification is skipped for them.
 
 ## Output Expectations
 

@@ -1,6 +1,7 @@
 # Grading Email Body Examples
 
-Worked examples of the two assignment-grading email bodies. The structure they
+Worked examples of the assignment-grading email bodies and of the
+no-repository variant. The structure they
 follow is defined in `SKILL.md` under **Email Body Format**; use these as shape
 references, not as text to copy verbatim.
 
@@ -117,6 +118,26 @@ Unterschiede der JOIN-Typen noch sicherer anwenden kannst, wird die
 Qualität der Lösungen deutlich steigen.
 
 Endbewertung: 68/100 (68%)
+
+Lieben Gruß,
+
+   Georg Graf
+```
+
+## Example: No-Repository Email Body (Broken Name-Symlink)
+
+```
+Lieber Khalil,
+
+im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.
+
+Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.
+
+Alle im Bewertungszeitraum aufgegebenen Aufgaben zählen derzeit mit 0%. Die Endbewertung liegt daher bei 0/100 (0%). Jede einzelne Aufgabe lässt sich nachholen, sobald dein Repository vorliegt.
+
+Ganz wichtig bleibt: Der erste Schritt ist der Repo-Link. Ohne ihn kann ich keinerlei Arbeit von dir sehen und bewerten.
+
+Endbewertung: 0/100 (0%)
 
 Lieben Gruß,
 

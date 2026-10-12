@@ -65,7 +65,9 @@ an error.
 The CWD contains student Git repositories as subdirectories. These may be
 structured as `STUDENT_DIR/INNER_PROJECT/.git` (two levels deep). The CWD may
 also contain name-based symlinks (e.g., `Lastname Firstname -> STUDENT_ID`)
-that provide the student's real name.
+that provide the student's real name. A BROKEN name-symlink (target does not
+exist) means the student has not yet submitted their repository URL — see
+`grading-shared` Broken Name-Symlinks (Missing Repository).
 
 Follow `grading-shared` Repository Structure Discovery (Inner Git Repository
 Discovery) before running any git commands. Use `grading-shared` Student Name
@@ -168,7 +170,10 @@ Protocol:
 1. Discover student repositories following `grading-shared` Repository Structure
    Discovery, Student Name Resolution via Symlinks, and Bulk Grading Protocol
    directory exclusion rules. Each student repo's git working directory may be
-   one level deeper than the student directory.
+   one level deeper than the student directory. Broken name-symlinks are NOT
+   an error and NOT skipped: they mark students without a submitted
+   repository URL and are graded as no-repository cases (see No-Repository
+   Students below).
 2. Follow the `grading-shared` Bulk Grading Protocol for concurrency (default
    max 5, ~3 second delay between runs).
 3. Each subagent writes only `<basename>_grading.md` plus
@@ -185,6 +190,22 @@ Protocol:
    - If a date filter is active, also generate `CLASS.md` in German.
    - Aggregate per-repo `*_email.json` files into shared `EMAIL.json`
      following `grading-shared` rules, including JSON Escaping Rules.
+
+### 3. No-Repository Students (Broken Name-Symlinks)
+
+A broken name-symlink in the CWD marks a student who has not yet submitted
+their repository URL. Per `grading-shared` Broken Name-Symlinks (Missing
+Repository):
+
+1. Treat the student as a normal grading case (never stop, never skip).
+2. Grade without evidence: ALL assignments 0%, `Endbewertung: 0/100`.
+3. Generate `<name>_grading.md` (mandatory structure, every section
+   explicitly stating "kein Repository — keine Evidence") and a
+   `<name>_email.json` whose body follows the Missing Repository Emphasis
+   variant: the URL submission is REQUIRED for a positive assessment.
+4. Include the student in `GRADINGS.md` (0/100) and in the shared
+   `EMAIL.json`.
+5. Skip all git commands and the Pre-Grading Verification for these students.
 
 ## Assignment Matching
 
@@ -300,7 +321,11 @@ die Endbewertung ein (fehlende Aufgaben sind bereits mit 0% eingerechnet).
 
 - **No assignments in period**: Report clearly, grade based on available work only.
 - **Empty repository**: Alle Aufgaben 0% → Endbewertung 0/100.
-- **Late submissions**: Automatic 0.75 factor applied; noted explicitly in every
+- **Broken name-symlink (kein Repository)**: alle Aufgaben 0% → Endbewertung
+  0/100; E-Mail mit Missing Repository Emphasis (Pflicht) — siehe
+  `grading-shared` Broken Name-Symlinks.
+- **Late submissions**: Automatic 0.75 factor applied REGARDLESS of how late
+  the submission is (no graduated penalty); noted explicitly in every
   relevant row of the scoring table.
 - **Deadline**: gemäß `grading-shared` Deadline Calculation — nächste UE nach
   dem Aufgabendatum (via wu) bzw. eine explizite Deadline im Aufgabetext.
@@ -411,7 +436,9 @@ scoring paragraphs clearly communicate code quality, missing work, lateness,
 and the final result. The per-assignment Quality%, Factor, and Effective score
 MUST all be visible per the Scoring Table format.
 
-Do not vary this structure between students.
+Do not vary this structure between students. For students WITHOUT a
+repository (broken name-symlink), the Missing Repository Emphasis variant
+replaces paragraph groups 3–6 (see `grading-shared` Email Body Format).
 
 ## Constraints
 
@@ -423,6 +450,8 @@ Do not vary this structure between students.
 - All grading content follows `grading-shared` rules (German, second-person,
   UTF-8 umlauts, email structure, email body format, missing email handling).
 - In single-repo mode, stop if no assignment source is found.
+- In single-repo mode, a provided repository path that is a broken symlink is
+  graded as a no-repository case (see No-Repository Students), not an error.
 - In single-repo mode, never write `INDIVIDUAL.md`, `CLASS.md`, or shared
   `EMAIL.json`.
 - In bulk mode, generate `GRADINGS.md` after all per-repo grading is complete.
