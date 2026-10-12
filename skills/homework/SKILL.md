@@ -46,6 +46,36 @@ descriptions.
 
 ## Protocol
 
+### 0. Kohorten-Auflösung (Multi-Kohorten-Modus)
+
+Wird der Skill für mehrere Kohorten auf einmal gerufen, identifiziert der
+User die Kohorten meist per **WebUntis-Lesson-ID** (Tool `wu`, Repo
+`webuntis-cli`): `<KLASSE>/<FACH>` — z. B. `3AHWII/SWP1x`, `4AHWIT/PMMx`,
+`3AHWII/INFIx`, `3AAIF/WMC_1`, `5AHWIT/PMM`. Auflösung in Repo +
+Klassenordner (Stand 2026-10-12, vor Ausführung mit `wu klasse <ID> faecher`
+verifizieren — Fächerkürzel ändern sich mit dem Schuljahr):
+
+| WebUntis-ID | Fach-Repo (in `georgernstgraf/`) | Klassenordner |
+|---|---|---|
+| `3AHWII/SWP1x` | `GRG-SWP` | `3ahwii/` |
+| `3AHWII/INFIx` | `GRG-INFI` | `3ahwii/` |
+| `4AHWIT/PMMx` / `PMMy` | `GRG-PMM` | `4ahwit-x/` / `4ahwit-y/` |
+| `5AHWIT/PMM` | `GRG-PMM` | `5ahwit/` |
+| `3AAIF/WMC_1` / `3CAIF/WMC_1` | `GRG-WMC` | `3aaif/` / `3caif/` |
+
+Regeln für den Multi-Kohorten-Lauf:
+- Der Discovery-Zeitfenster-Check (24 h) gilt pro Kohorte **relativ**:
+  liegen die letzten Stunden länger zurück, ist die **jüngste datierte
+  Lesson** das Target; bei Mehrdeutigkeit den User fragen.
+- Die Aufgabe liegt nicht immer im Kohortenordner: Tages-READMEs (`## HÜ`,
+  `## Aufgabe`), Kohorten-README-Verlauf und Prepared Lessons
+  (`unterricht/<PREFIX>-<NN>-<slug>/hausaufgabe.md`) sind gleichwertige
+  Evidenzquellen. Existiert zur Lesson kein Datumsordner, entweder einen
+  anlegen (nur bei klarer Evidenz) oder den README-Eintrag direkt auf die
+  Prepared Lesson zeigen lassen (Vorbild: `GRG-WMC/3aaif/README.md`).
+- Kein Duplizieren kanonischer Aufgabentexte: liegt die Aufgabe bereits
+  kanonisch in `unterricht/`, genügt der Index-Eintrag mit Link.
+
 ### 1. Discover Current Lesson Directory
 
 - Run `git log --since="24 hours ago" --name-only --diff-filter=A` and
