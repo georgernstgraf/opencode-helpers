@@ -1,27 +1,38 @@
 ---
 name: homework
-description: Generate per-lesson homework files from recent class Git history and teaching material
+description: Generate per-lesson assignment files (Aufgabe.md) from recent class Git history and teaching material, and keep the canonical assignment list in the cohort README current
 license: MIT
 compatibility: opencode
 metadata:
   category: education
-  output: homework-file
+  output: assignment-file
 ---
 
-# Homework Skill
+# Homework Skill (Aufgaben)
 
 ## Purpose
 
-This skill generates a per-lesson `Hausübung.md` homework file inside the
-current lesson directory of a class folder. The user invokes it from inside the
-class folder (e.g., `~/repos/2ahwii/`) at the end of a lesson. No arguments
-are needed.
+This skill generates a per-lesson `Aufgabe.md` assignment file inside the
+current lesson directory of a class folder and keeps the **canonical
+assignment list** in the cohort README current (retrofit). The user invokes it
+from inside the class folder (e.g., `~/repos/2ahwii/`) at the end of a lesson.
+No arguments are needed.
+
+## Terminology (CRITICAL)
+
+- The canonical term is **Aufgabe** (plural: Aufgaben). Files, sections, and
+  user-visible text use "Aufgabe" — never "Hausübung", "HÜ", or "homework".
+- **Übung** is NOT an Aufgabe: Übungen (e.g. "Jetzt du!") are in-class
+  Mitarbeits-Elemente and are never written as assignments.
+- `Hausübung.md` / `Hausübungen.md` are legacy artifacts from earlier school
+  years. This skill never creates them; it recognizes and preserves them
+  when encountered.
 
 ## Output Language: MANDATORY GERMAN
 
-The generated exercises and content inside `Hausübung.md` MUST be written in 
-natural German with proper UTF-8 umlauts (ä, ö, ü, ß). 
-Never use English for the exercise descriptions.
+The generated content inside `Aufgabe.md` MUST be written in natural German
+with proper UTF-8 umlauts (ä, ö, ü, ß). Never use English for the assignment
+descriptions.
 
 ## Invocation Context
 
@@ -29,8 +40,9 @@ Never use English for the exercise descriptions.
 - The class folder contains lesson directories named `<ISO-date>_<topic>`
   (e.g., `2026-03-21_promises`, `2026-04-01_async-await`).
 - The skill auto-detects the current lesson directory from recent Git activity.
-- No slash command is required. The user tells the agent to "generate homework"
-  or similar, and the agent loads this skill directly.
+- No slash command is required. The user tells the agent to "generate
+  homework" / "Aufgabe generieren" or similar, and the agent loads this skill
+  directly.
 
 ## Protocol
 
@@ -49,6 +61,13 @@ Never use English for the exercise descriptions.
 
 - Read all files inside the identified lesson directory: `README.md`, code
   examples, exercise sheets, and any other content files.
+- **Reference pattern**: if the lesson `README.md` contains an `## Aufgabe`
+  section that is a REFERENCE to a prepared lesson (a lesson id matching
+  `<PREFIX>-<NN>-<slug>` and/or a link into `unterricht/`), resolve it:
+  read the prepared lesson folder
+  `<repo-root>/unterricht/<PREFIX>-<NN>-<slug>/` (`aufgabe.md`, legacy
+  `hausaufgabe.md`, Tages-README template, or the lesson's `## Aufgabe`
+  section) and use that content as the task text.
 - Scan all source files for web URLs. Fetch and read each URL to extract
   relevant topic content.
 - Include uncommitted changes — the teacher may have just created or edited
@@ -67,14 +86,15 @@ Before writing, display the following to the user:
 - **Sources found**: list of files read, commits analyzed, and URLs fetched.
 - **Topics deduced**: the teaching topics logically inferred from the sources,
   with a brief explanation of how each topic was derived.
-- **Target file**: the full path of the `Hausübung.md` to be created or updated.
+- **Target file**: the full path of the `Aufgabe.md` to be created or updated.
 
 Then proceed immediately without waiting for confirmation.
 
-### 4. Generate or Update Homework File
+### 4. Generate or Update Assignment File
 
-- Create `<lesson-dir>/Hausübung.md` if it does not exist.
-- If it already exists, read it and enrich rather than overwriting.
+- Create `<lesson-dir>/Aufgabe.md` if it does not exist.
+- If an existing `Aufgabe.md` (or legacy `Hausübung.md`) is present, read it
+  and enrich rather than overwriting. Never rename or delete legacy files.
 - Write 2-4 focused, practical exercises that reinforce the key concepts
   covered in the lesson.
 - Each exercise should be specific enough that a student can complete it
@@ -82,18 +102,43 @@ Then proceed immediately without waiting for confirmation.
 - Format as clean Markdown with a topic heading and numbered exercises.
 - Write in natural German with proper UTF-8 umlauts.
 
-### 5. Confirm
+### 5. Retrofit the Canonical Assignment List (MANDATORY)
+
+After writing `Aufgabe.md`, keep the cohort README's canonical assignment
+list current:
+
+1. Locate the cohort README (`README.md` in the class folder root).
+2. Look for a `## Aufgaben` section near the top. If it is missing, create it
+   as the FIRST section (before all other content) with a one-line lead-in
+   such as "Kanonische Liste aller Aufgaben — Details im jeweiligen
+   Tagesordner."
+3. Check whether an entry for this lesson already exists (same ISO date).
+4. If missing, ADD one spare bullet line — one sentence or a few words, plus
+   a relative link to the lesson directory:
+
+   ```markdown
+   - 2026-10-13: Kurzbeschreibung der Aufgabe → [2026-10-13_thema/](./2026-10-13_thema/)
+   ```
+
+5. Insert the entry in ascending date order. Never reorder, reword, or delete
+   existing entries.
+6. The list is an INDEX only — never copy the full task text into the cohort
+   README.
+
+### 6. Confirm
 
 - Show the user what was created or updated.
-- Report the file path and the number of exercises added or changed.
+- Report the file path, the number of exercises added or changed, and whether
+  the canonical list entry was added or already existed.
 
-## Homework Evidence
+## Assignment Evidence
 
-Only create homework entries when repository evidence supports that an
+Only create assignment entries when repository evidence supports that an
 assignment is appropriate. Concrete examples of valid evidence:
 
-- The lesson README or notes mention "Hausübung", "Übung", "Aufgaben", or
-  "homework".
+- The lesson README or notes mention "Aufgabe", "Aufgaben", or a prepared
+  lesson reference (Legacy sources may say "Hausübung" or "Übung" — treat
+  "Aufgabe"/explicit assignment instructions as authoritative).
 - Exercise files with starter code, TODO comments, or incomplete
   implementations were created during the lesson.
 - The teacher's notes or commit messages reference an assignment.
@@ -101,23 +146,28 @@ assignment is appropriate. Concrete examples of valid evidence:
   naturally follow from what was taught.
 
 If the source material reveals the lesson topic but nothing suggests an
-assignment was intended, omit the homework entry and report this to the user.
+assignment was intended, omit the assignment entry and report this to the
+user.
 
 ## Constraints
 
 - Never create, update, or reference `Hausübungen.md` (plural/cumulative).
-  This skill only produces per-lesson `Hausübung.md` files.
+  This skill only produces per-lesson `Aufgabe.md` files.
 - Never commit generated changes. Leave files on disk for the user to review.
-- Preserve existing homework entries when enriching an existing file.
+- Preserve existing assignment entries when enriching an existing file.
+- The canonical list retrofit writes ONLY to the cohort README's
+  `## Aufgaben` section (create if missing) — never touch other README
+  content.
 - Write natural German. Do not replace umlauts with transliterations (`ae`,
   `oe`, `ue`) unless the source material explicitly requires that form.
-- Group commits from the same teaching session into one homework entry.
+- Group commits from the same teaching session into one assignment entry.
 - Do not fabricate dates, details, or exercises not supported by the source
   material.
 
 ## Output Expectations
 
-- A created or updated `Hausübung.md` inside the target lesson directory.
+- A created or updated `Aufgabe.md` inside the target lesson directory.
+- A current canonical `## Aufgaben` list entry in the cohort README.
 - 2-4 exercises written in German.
 - A plan summary displayed to the user showing sources, deduced topics, and
   target file.

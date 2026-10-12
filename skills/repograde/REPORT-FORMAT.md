@@ -8,7 +8,7 @@ reports, plus the standardization rules for subagents.
 Reports MUST follow `grading-shared` Reporting Protocol (in German) and additionally include:
 
 - If date-filtered: clear indication of the cutoff date.
-- **Hausübungs-Abdeckung section**: Complete list of all assigned homeworks
+- **Aufgaben-Abdeckung section**: Complete list of all assigned assignments
   with completion status and Abdeckungsquote percentage.
 - **Weighted final evaluation**: Base score x completion ratio.
 - Final evaluation with `Endbewertung: XX/100` (the weighted score, not base).
@@ -27,7 +27,7 @@ sections in exactly this order:
 
 ## Pünktlichkeit der Abgaben
 
-## Hausübungs-Abdeckung
+## Aufgaben-Abdeckung
 
 ## Codequalität
 
@@ -50,7 +50,7 @@ This section MUST state:
 
 - whether all commits or only commits from a cutoff date onwards were graded,
 - the grading period in plain German,
-- the number of relevant homework assignments in the grading period,
+- the number of relevant assignments in the grading period,
 - whether the repository contained enough evidence for a confident assessment.
 
 Target length: 2-4 sentences.
@@ -72,34 +72,34 @@ so explicitly and provide the best evidence-based approximation.
 
 #### `## Pünktlichkeit der Abgaben`
 
-This section MUST cover every homework assignment in the grading period.
-For each homework, state the concrete deadline date (calculated per
+This section MUST cover every assignment in the grading period.
+For each assignment, state the concrete deadline date (calculated per
 `grading-shared` Deadline Calculation) and classify as one of:
 
 - `pünktlich` — latest relevant commit ≤ deadline (YYYY-MM-DDT00:00:00)
 - `verspätet` — latest relevant commit > deadline
 - `nicht erkennbar abgegeben` — no relevant commits found
 
-Use one bullet per homework. Include the deadline timestamp and the date of
+Use one bullet per assignment. Include the deadline timestamp and the date of
 the latest relevant commit as evidence. Keep each bullet to 1-2 sentences.
 
-Example: `HÜ1 (23.2.): pünktlich — letzter Commit am 1.3. ≤ Deadline 2.3. 00:00`
+Example: `Aufgabe 1 (23.2.): pünktlich — letzter Commit am 1.3. ≤ Deadline 2.3. 00:00`
 
-#### `## Hausübungs-Abdeckung`
+#### `## Aufgaben-Abdeckung`
 
-This section MUST list all relevant homework assignments and state for each
+This section MUST list all relevant assignments and state for each
 whether the work was completed, partially completed, or missing.
 
-For each homework, include:
+For each assignment, include:
 
-- short homework label/topic,
+- short assignment label/topic,
 - status (`erfüllt`, `teilweise erfüllt`, `fehlend`),
 - one short evidence-based explanation.
 
 This section MUST end with:
 
 - `Abdeckungsquote: XX%`
-- `Abgedeckte Hausübungen: X von Y`
+- `Abgedeckte Aufgaben: X von Y`
 
 #### `## Codequalität`
 
@@ -146,7 +146,7 @@ from the observed repository evidence.
 
 #### `## Endbewertung`
 
-This section MUST contain the Scoring Table as defined in Per-Homework
+This section MUST contain the Scoring Table as defined in Per-Assignment
 Scoring (see above), followed by:
 
 ```
@@ -154,9 +154,9 @@ Erreichte Punkte: [sum] / [N × 100]
 Endbewertung: [XX]/100 ([XX]%)
 ```
 
-The scoring table MUST list ALL homework assignments in the grading period
+The scoring table MUST list ALL assignments in the grading period
 with their individual Quality, Factor, and Effective score. Use `—` for
-missing homeworks (Quality and Effective = 0%).
+missing assignments (Quality and Effective = 0%).
 
 The Endbewertung is calculated as `round(sum(effective_scores) / (N × 100) × 100)`.
 

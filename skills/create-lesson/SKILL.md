@@ -114,7 +114,7 @@ ausschließlich Lesson-Ordner (Grundregel 3):
 3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
    `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
    `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
-   `lesson.html` + `hausaufgabe.md` (plus Tages-README-Vorlage, siehe
+   `lesson.html` + `aufgabe.md` (plus Tages-README-Vorlage, siehe
    § Prepared Lessons) — **kein lauffähiger Projektcode** (siehe
    § Beispielprojekte). Die `lesson.html` ist **zugleich die Präsentation**
    (Grundregel 6): **kein** separater Foliensatz. **`unterricht/`
@@ -311,7 +311,7 @@ einzige zulässige Rückfrage.
 **Prepared Lesson** (undatiert, vorbereitet, **kohortenagnostisch**) liegt
 **flach** in `unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
 `SA` = schulautonom; `<NN>` läuft pro KM) zusammen mit
-`lesson.html` + `hausaufgabe.md` — **ausschließlich
+`lesson.html` + `aufgabe.md` — **ausschließlich
 Unterrichtsmaterial, kein lauffähiger Projektcode** (§ Beispielprojekte). Die
 `lesson.html` ist **zugleich die Präsentation** (Lektion und Präsentation in
 einem, Grundregel 6). Dazu

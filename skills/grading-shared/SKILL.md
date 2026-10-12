@@ -132,16 +132,16 @@ Lieben Gruß,
 
 ### Automatic Assessment Disclaimers
 
-Every grading email body MUST include a disclaimer paragraph directly below the greeting. The wording depends on the class's address style (Formal/Informal) and the assessment type (Homework/Projects vs. Knowledge-Checks):
+Every grading email body MUST include a disclaimer paragraph directly below the greeting. The wording depends on the class's address style (Formal/Informal) and the assessment type (Assignments/Projects vs. Knowledge-Checks):
 
 **Formal Address (Sie):**
-- **Homework / Projects / General (Leistungsfeststellung):**
+- **Assignments / Projects / General (Leistungsfeststellung):**
   `Im Folgenden finden Sie die automatische Beurteilung Ihrer Leistungsfeststellung. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.`
 - **Knowledge-Checks / Mini-Exams (Knowledge-Check):**
   `Im Folgenden finden Sie die automatische Beurteilung Ihres Knowledge-Checks. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.`
 
 **Informal Address (Du):**
-- **Homework / Projects / General (Leistungsfeststellung):**
+- **Assignments / Projects / General (Leistungsfeststellung):**
   `Im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.`
 - **Knowledge-Checks / Mini-Exams (Knowledge-Check):**
   `Im Folgenden findest du die automatische Beurteilung deines Knowledge-Checks. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.`
@@ -238,7 +238,7 @@ judgment. The following rules apply to every grading skill (`repograde`,
 For every student submission, the agent has access to the following inputs and
 must base its evaluation exclusively on them:
 
-1. **Task instructions** — the homework description, exam questions, or project
+1. **Task instructions** — the assignment description (Aufgabe), exam questions, or project
    requirements that define what was asked of the student.
 2. **Expected solutions** — the reference solution or answer key against which
    student work is compared.
@@ -491,62 +491,106 @@ For each student repository, determine the correct Git working directory:
                        ^^^^^^^^^^ Git working directory (where git commands run)
 ```
 
-## Homework Discovery Protocol
+## Assignment Discovery Protocol (Aufgaben-Discovery)
 
-Shared homework source discovery for `repograde` and `projectgrade`.
-Homework assignments may exist in multiple locations. The grading skill MUST
-discover and merge all sources into a unified homework list before matching
+Shared assignment source discovery for `repograde` and `projectgrade`.
+Assignments (Aufgaben) may exist in multiple locations. The grading skill MUST
+discover and merge all sources into a unified assignment list before matching
 against student commits.
 
-### Source 1: `_class` Symlink (Preferred)
+### Terminology (CRITICAL)
 
-Check for a `_class` symlink in the CWD. If it exists, follow it and look for
-homework inside the linked class folder.
+- The canonical term is **Aufgabe** (plural: **Aufgaben**). All user-visible
+  content uses "Aufgabe 1", "Aufgabe 2", … spelled out — never "Hausübung",
+  "HÜ", or "homework".
+- **Übung** is NOT an Aufgabe. Übungen (e.g. "Jetzt du!") are in-class
+  Mitarbeits-Elemente and MUST never appear in the assignment list.
+- The word **Hausübung** is legacy vocabulary. It is recognized only inside
+  legacy sources (see below) and never used in new output.
 
-#### 1a: Legacy Cumulative File
+### Source 1: Cohort README (via `_class` Symlink, Preferred)
 
-Check for `Hausübungen.md` inside `_class/` (may also be a symbolic link;
-follow symlinks when reading).
+Check for a `_class` symlink in the CWD. If it exists, follow it and read the
+cohort README (`README.md`) inside the linked class folder.
 
-If found, parse it using the Semantic Date Extraction rules below.
+#### 1a: Canonical Assignment List
 
-#### 1b: Per-Lesson Files inside `_class`
+Look for a `## Aufgaben` section near the top of the cohort README. It is a
+spare bullet-list index with one line per assignment:
 
-Scan `_class/` for subdirectories matching the pattern `<YYYY-MM-DD>_<topic>`.
-For each matching directory, check for homework content in these files
-(in order of preference):
+```markdown
+## Aufgaben
 
-1. `Hausübung.md` — dedicated homework file (legacy format)
-2. `Angabe_HÜ.md` — detailed homework specification
-3. `README.md` — lesson plan containing a homework section
+- 2026-09-29: Seite dekorieren (CSS) → [2026-10_XX_css-basics/](./2026-10_XX_css-basics/)
+```
+
+Parse each bullet as `(iso_date, short_description, optional_relative_link)`:
+
+- Resolve relative links against the cohort README directory; the link target
+  is a lesson folder (Tagesordner) whose assignment content is read from there
+  (see Source 2). The list is an INDEX only — the task text lives in the
+  lesson folder, never in the list itself.
+- Entries without a link are matched by date/topic against the other sources.
+- Grading is read-only: if the canonical list is missing, do NOT create it.
+  Report its absence as a note.
+
+#### 1b: Dated Sections in the Cohort README
+
+Sections with `## YYYY-MM-DD` headings may contain assignment text directly.
+Extract the date from the heading and the assignment content from the section
+body. Relative deadlines ("bis nächste Woche 00:00") are resolved via the wu
+termine (see Deadline Calculation).
+
+### Source 2: Per-Lesson Folders inside `_class`
+
+Scan `_class/` for subdirectories matching `<YYYY-MM-DD>_<topic>`,
+`<YYYY-MM-DD>__<topic>` (create-lesson convention, double underscore), or an
+ambiguous `<YYYY-MM>_<X>_<topic>` form (e.g. `2026-10_XX_css-basics`) whose
+date is resolved via Git (see Git Date Resolution below).
+
+For each matching directory, check for assignment content in this order:
+
+1. `Aufgabe.md` — dedicated assignment file (canonical)
+2. `README.md` — Tages-README with an assignment section under the heading
+   `## Aufgabe` or `## 📝 Aufgabe`
+3. Legacy files (data from earlier school years only): `Hausübung.md`,
+   `Angabe_HÜ.md`, or a README section under `## Hausübung` / `## 📝 Hausübung`.
+   If the legacy section states "Keine Hausübung", skip this lesson.
 
 When a file is found:
-- Extract the date directly from the directory name (e.g., `2026-03-21_promises`
-  → date `2026-03-21`). No German date parsing needed.
+- Extract the date directly from the directory name when it is a full
+  `YYYY-MM-DD` (e.g., `2026-03-21_promises` → date `2026-03-21`). No German
+  date parsing needed.
 - Extract the topic from the directory name and/or the file content.
-- For `README.md`, locate the homework section under one of these headings:
-  `## 📝 Hausübung`, `## Hausübung`, or `## 📝 Hausübung`.
-  If the section states "Keine Hausübung" (no homework), skip this lesson.
 - Read the file content for assignment details.
-- Add to the homework list: `(iso_date, topic, content)`.
+- Add to the assignment list: `(iso_date, topic, content)`.
 
-#### 1c: Future Lesson Exclusion
+#### Reference Pattern (Indirection to a Prepared Lesson)
 
-Per-lesson directories with a date in the future represent prepared but
-not-yet-held lessons. Their homework assignments MUST NOT be included in
-the unified homework list.
+The `## Aufgabe` section of a Tages-README may be a REFERENCE rather than task
+text, for example: "Wir haben Lesson `KM3-03-css-basics` gemacht, die Aufgabe
+ist die Aufgabe von dort." Detection: a lesson reference matching
+`<PREFIX>-<NN>-<slug>` and/or a relative link into `unterricht/`.
 
-1. Determine today's date: `date +%Y-%m-%d`
-2. For each per-lesson directory, extract `<YYYY-MM-DD>` from the name.
-3. If `lesson_date > today`, skip this directory entirely.
-4. Do NOT include its homework, regardless of whether a homework section
-   exists in the file.
+Resolution:
 
-### Source 2: Legacy File in CWD
+1. Resolve the lesson folder relative to the teaching-repo root:
+   `<repo-root>/unterricht/<PREFIX>-<NN>-<slug>/` (from a cohort folder one
+   level below the repo root this is `../unterricht/…`, from two levels
+   `../../unterricht/…`).
+2. Read the assignment content from that folder in this order: `aufgabe.md`,
+   `hausaufgabe.md` (legacy), the Tages-README template
+   (`<PREFIX>-<NN>-<slug>.md`), or the `## Aufgabe` section of the lesson.
+3. Assignment date and deadline stay cohort-side (folder name / Git / wu);
+   only the CONTENT is resolved remotely. An explicit deadline found in the
+   referenced content still wins (see Deadline Calculation).
 
-Check for a `Hausübungen.md` file directly in the CWD (may be a symbolic link;
-follow symlinks when reading). This is the old symlink-to-single-file approach.
-If found, parse it using the Semantic Date Extraction rules below.
+### Source 3: Legacy Cumulative File
+
+Check for a `Hausübungen.md` file directly in the CWD or inside `_class/`
+(may be a symbolic link; follow symlinks when reading). This is the legacy
+single-file approach from earlier school years. If found, parse it using the
+Semantic Date Extraction rules below.
 
 #### Semantic Date Extraction
 
@@ -560,14 +604,14 @@ Many agents fail at this step because they:
 
 Required steps:
 
-1. **Read the ENTIRE file** — do not stop after the first homework entry.
+1. **Read the ENTIRE file** — do not stop after the first assignment entry.
 2. **Extract ALL date references** from:
    - Headings: `## Hausübung vom 18. Februar`
    - Inline dates: `Abgabe bis 25. Februar`
    - Date ranges: `Zeitraum: 10.-18. März`
    - Relative dates: `nächste Woche`, `in 2 Wochen` (convert to absolute)
 3. **Normalize ALL dates to ISO format** (YYYY-MM-DD).
-4. **Build a homework list**: `[(iso_date, topic, content), ...]`.
+4. **Build an assignment list**: `[(iso_date, topic, content), ...]`.
 
 Date patterns to recognize:
 
@@ -596,43 +640,141 @@ with commit dates.
 **Common Failure Pattern (AVOID THIS):**
 ```
 ❌ WRONG: Read Hausübungen.md, see first entry is "vom 18. Februar",
-         requested date is 2026-02-10, conclude "no matching homework"
+         requested date is 2026-02-10, conclude "no matching assignment"
 ✅ CORRECT: Parse ALL entries, find "vom 10. Februar" (matches),
             "vom 18. Februar" (after cutoff), "vom 25. Februar" (after cutoff)
 ```
 
-### Source 3: Per-Lesson Files in CWD
+### Source 4: Per-Lesson Files in CWD
 
 Scan the CWD itself for subdirectories matching `<YYYY-MM-DD>_<topic>` that
-contain homework content (same file search order as Source 1b: `Hausübung.md`,
-`Angabe_HÜ.md`, `README.md`). Apply Future Lesson Exclusion (1c) identically.
+contain assignment content (same file search order as Source 2, including the
+Reference Pattern). Apply Future Lesson Exclusion identically.
+
+### Git Date Resolution (ambiguous folder names)
+
+When a per-lesson folder name does not carry a full `YYYY-MM-DD` date (e.g.
+`2026-10_XX_css-basics`):
+
+1. Run git inside the `_class` target repository (the teaching repo):
+   ```bash
+   git log --diff-filter=A --date=iso --format=%ad -- <folder-relative-path>
+   ```
+2. The assignment date is the DATE PART of the oldest commit that added files
+   in that folder.
+3. Snap that commit date via the wu termine: the assignment date is the
+   latest lesson date that is ≤ the commit date (see wu Termine Integration).
+
+### wu Termine Integration (MANDATORY)
+
+Derive the lesson address from the `_class` symlink target
+`…/GRG-<FACH>/<klasse>/` as `wu lesson <klasse>/<fach>` (e.g.
+`_class -> GRG-WMC/3aaif` → `wu lesson 3aaif/wmc`). Query the termine:
+
+```bash
+wu lesson 3aaif/wmc termine --json
+```
+
+The termine list is used to:
+
+1. **Snap dates**: map git commit dates to real lesson dates (latest lesson
+   date ≤ commit date).
+2. **Compute deadlines**: deadline = next DISTINCT lesson date strictly after
+   the assignment date, at 00:00 (duplicate slots on one date count once;
+   holidays are respected automatically).
+3. **Resolve relative deadlines** ("bis nächste Woche", "bis zur nächsten UE").
+
+**Failure rule (CRITICAL):** If `wu` is not installed, fails, or returns no
+termine, STOP IMMEDIATELY with a German error message (e.g. "wu liefert keine
+Termine — Aufgabendaten und Deadlines können nicht aufgelöst werden."). Never
+guess dates or deadlines.
+
+### Future Lesson Exclusion
+
+Per-lesson directories with a date in the future represent prepared but
+not-yet-held lessons. Their assignments MUST NOT be included in the unified
+assignment list.
+
+1. Determine today's date: `date +%Y-%m-%d`
+2. For each per-lesson directory, extract `<YYYY-MM-DD>` from the name
+   (resolving ambiguous names via Git Date Resolution first).
+3. If `lesson_date > today`, skip this directory entirely.
+4. Do NOT include its assignment, regardless of whether an assignment section
+   exists in the file.
 
 ### Merging All Sources
 
-1. Collect homework entries from all sources into a single unified list.
-2. If multiple sources contain an entry for the same date, prefer the per-lesson
-   file over the legacy cumulative file. This is expected to be rare.
+1. Collect assignment entries from all sources into a single unified list.
+2. If multiple sources describe the same assignment, prefer the per-lesson
+   file content over the canonical list index and over the legacy cumulative
+   file.
 3. Sort the unified list by date.
-4. If no source provides any homework entries, report this to the user and grade
-   based on available work only.
+4. If no source provides any assignment entries, report this to the user and
+   grade based on available work only.
+
+## Aufgaben-Ablage-Ordnung (Order to Keep When Giving Assignments)
+
+This section documents the expected repository layout. Keep to it when
+creating or preparing assignments:
+
+1. **Kohorten-README** (`<klasse>/README.md`): carry a spare canonical
+   `## Aufgaben` bullet list near the top — one line per assignment with ISO
+   date, a few words, and a relative link to the Tagesordner. The list is an
+   index only; the task text lives in the lesson folder.
+2. **Tagesordner** (`<klasse>/YYYY-MM-DD_<topic>/`; the create-lesson double
+   underscore `YYYY-MM-DD__<topic>` is also accepted): contains `Aufgabe.md`
+   or a `README.md` with an `## Aufgabe` section — full task text or a
+   reference to a Prepared Lesson (`unterricht/<PREFIX>-<NN>-<slug>/`).
+3. Ambiguous folder names like `YYYY-MM_XX_<topic>` are allowed; the date is
+   resolved via the teaching repo's Git history and snapped to a wu lesson
+   date.
+4. **Deadline**: state a concrete date ("Abgabe per Push bis 2026-10-13
+   00:00") or "bis zur nächsten UE" (resolved via wu). Vague formulations
+   that wu cannot resolve are not acceptable.
+5. Prepared but not-yet-held lessons (future dates) may already exist; they
+   are excluded automatically until the date arrives.
+6. Assignments NEVER go into a student repository.
+7. The word "Übung" marks in-class exercises, never assignments. Do not use
+   "Hausübung" for new content.
 
 ## Deadline Calculation
 
+### Determining the Assignment Date
+
+1. Full `YYYY-MM-DD` in the lesson folder name → that date is the assignment
+   date.
+2. Ambiguous folder name (e.g. `2026-10_XX_css-basics`) → Git Date Resolution
+   (oldest commit adding the folder), snapped via wu to the latest lesson
+   date ≤ commit date.
+3. Cohort README dated section → the heading date.
+
+The assignment date MUST correspond to an actual lesson date from
+`wu lesson <klasse>/<fach> termine --json`.
+
 ### Determining the Deadline
 
-Homework is due at 00:00 on the same weekday one week after the lesson.
-Since all lessons in a given course fall on the same weekday, the deadline is
-always:
+Precedence:
 
-```
-deadline = lesson_date + 7 days, at 00:00:00
-```
+1. **Explicit deadline in the assignment text** (e.g. "Abgabe per Push bis
+   2026-09-29 00:00") ALWAYS wins. Parse ISO (`YYYY-MM-DD`) and German dates.
+2. **Otherwise**: deadline = next DISTINCT lesson date strictly after the
+   assignment date, at 00:00:00, taken from the wu termine. Duplicate slots
+   on the same date count once; this automatically respects holidays
+   (e.g. assignment 2026-10-13 → deadline 2026-10-20T00:00:00 when 10-13 is
+   followed by 10-20).
+3. **Relative deadlines** ("bis nächste Woche", "bis zur nächsten UE") are
+   resolved to the next lesson date at 00:00 via the wu termine.
 
-Subagents MUST use shell date arithmetic for reliable calculation:
+Subagents MUST take the deadline from the wu output (or an explicit deadline
+in the assignment text) and MUST use shell date arithmetic only for
+formatting, never for guessing:
 
 ```bash
-DEADLINE=$(date -d "2026-02-23 +7 days" +%Y-%m-%dT00:00:00)
+wu lesson 3aaif/wmc termine --json
 ```
+
+**Failure rule:** If wu is unavailable or returns no termine, STOP IMMEDIATELY
+with a German error message. Never fall back to a fixed "+7 days" guess.
 
 ### Commit Filtering by Deadline
 
@@ -650,11 +792,11 @@ git log --after="$DEADLINE" --oneline
 |------------------------|----------------|--------|---------|
 | ≤ DEADLINE             | pünktlich      | 1.0    | Full points possible |
 | > DEADLINE             | verspätet      | 0.75   | 25% penalty on achieved quality |
-| No commits             | fehlend        | —      | 0 points for this homework |
+| No commits             | fehlend        | —      | 0 points for this assignment |
 
 ### Deadline in Reports
 
-Reports MUST mention the concrete deadline for each homework, including the
+Reports MUST mention the concrete deadline for each assignment, including the
 exact `YYYY-MM-DDT00:00:00` timestamp and whether the student's latest
 relevant commit fell before or after it.
 
@@ -665,7 +807,7 @@ Shared concurrency and directory handling for `repograde` bulk mode.
 ### Directory Exclusion
 
 When enumerating student repositories, **exclude**:
-- `_class` (homework symlink)
+- `_class` (assignment symlink)
 - Any directory starting with `_` (underscore prefix)
 - Any directory starting with `.` (dot prefix)
 - Any regular files (not directories and not symlinks)
@@ -748,7 +890,7 @@ help illustrate a grading point.
 - Code blocks with backtick fences for short source-code snippets.
 - Natural German text with UTF-8 umlauts (ä, ö, ü, ß).
 
-### Structure for Homework Grading Emails
+### Structure for Assignment Grading Emails
 
 Used by `repograde` skill (single-repo and bulk mode). The email body follows
 this exact paragraph order:
@@ -758,8 +900,8 @@ this exact paragraph order:
 2. **Automatic assessment disclaimer** — per Automatic Assessment Disclaimers section above.
 
 3. **Opening sentence** (address style dependent):
-   - Formal: `Ich habe Ihre Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
-   - Informal: `Ich habe deine Hausübungen, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Formal: `Ich habe Ihre Aufgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Informal: `Ich habe deine Aufgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
    - Dates in German long format (e.g., "18. Februar 2026", "4. März 2026").
 
 3. **Commit summary** — Two to three sentences summarizing the commits
@@ -767,26 +909,27 @@ this exact paragraph order:
    Mention overall activity, approximate number of substantive commits,
    and any notable patterns (gaps, bursts, consistent work).
 
-4. **Homework overview** — A concise list of all homework assignments,
+4. **Assignment overview** — A concise list of all assignments,
    each in one to two sentences. Format:
 
    ```
-   HÜ1: [Topic/content summary in 1-2 sentences]
-   HÜ2: [Topic/content summary in 1-2 sentences]
+   Aufgabe 1: [Topic/content summary in 1-2 sentences]
+   Aufgabe 2: [Topic/content summary in 1-2 sentences]
    ```
 
-   Use "HÜ" as abbreviation for "Hausübung". Number sequentially.
+   Use "Aufgabe" spelled out with a sequential number. Never abbreviate
+   (no "HÜ", no "A1").
 
-5. **Per-homework evaluation** — For each homework assignment, provide
+5. **Per-assignment evaluation** — For each assignment, provide
    a detailed discussion and evaluation on a 0–100% scale. Each evaluation
    is a separate paragraph covering:
    - What the student did well.
    - What was missing or could be improved.
    - Specific technical observations (with code snippets where helpful).
-   - A percentage rating for that individual homework.
+   - A percentage rating for that individual assignment.
 
 6. **Coverage / timeliness summary** — One short paragraph summarizing overall
-   homework coverage and whether submissions were on time, late, partial, or
+   assignment coverage and whether submissions were on time, late, partial, or
    missing where relevant.
 
 7. **Recommendations and praise** — A warm, genuine paragraph with
@@ -818,7 +961,7 @@ Used by `knowledge-assessment` skill. Same plain-text rule applies.
 4. **Question-by-question analysis** — Plain text paragraphs discussing
    strengths and weaknesses in specific questions.
 
-5. **Recommendations and praise** — Same guidelines as homework emails.
+5. **Recommendations and praise** — Same guidelines as assignment emails.
 
 6. **Solutions note** — `Ich habe die Datei mit den korrekten Lösungen in das Git-Repository hochgeladen.`
 
@@ -846,7 +989,7 @@ something well, state it matter-of-factly.
 
 ### Examples
 
-Worked formal and informal homework email bodies are in
+Worked formal and informal assignment email bodies are in
 [EMAIL-EXAMPLES.md](./EMAIL-EXAMPLES.md). Use them as shape references, not as
 text to copy verbatim.
 
@@ -863,7 +1006,7 @@ text per the Email Body Format section above.
 Reports should include, where applicable:
 
 - repository overview
-- homework-by-homework summary
+- assignment-by-assignment summary
 - topic coverage
 - per-commit technical analysis
 - non-main branch activity

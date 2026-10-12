@@ -19,7 +19,8 @@ commenting, quality), pull request activity (creation, reviews, merging), and
 further measurable contributions (wiki, CI/CD, testing, documentation, project
 management).
 
-Unlike `repograde`, this skill does NOT use homework assignments or `Hausübungen.md`.
+Unlike `repograde`, this skill does NOT use assignments (Aufgaben) or the
+assignment discovery sources.
 Student identification is derived exclusively from Git commit email addresses,
 then mapped to student names via the uploadthing database.
 
@@ -37,7 +38,7 @@ repository analysis protocol, and reporting protocol.
 ## Differences from repograde
 
 - Invoked from INSIDE the project Git repository (not from a local folder).
-- No `Hausübungen.md` required (project grading, not homework).
+- No assignment discovery required (project grading, not per-lesson assignments).
 - Evaluates GitHub Issues participation and Pull Request activity.
 - Student identification from Git commit emails only.
 - Issue quality, PR reviews, and collaboration factor into grading.
