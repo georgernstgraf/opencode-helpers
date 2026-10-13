@@ -36,7 +36,8 @@ followed by an indented JSON block per model (old capability schema).
 
 Columns: REA (reasoning, derived — see below), TOOL (tool calls), VAR
 (number of variants), STATUS (act/beta/alph/depr), plus per-modality in/out
-flags TXT IMG AUD VID PDF.
+flags TXT IMG AUD VID PDF. The report footer states when the data was
+collected ("data as of", from the dump file's mtime) and how old it is.
 
 REA derivation: the API no longer carries a reasoning flag per model, so it
 is inferred from a `compatibility.reasoningField`, any variant other than
@@ -49,6 +50,7 @@ Zero external dependencies (Python 3 stdlib only).
 """
 
 import argparse
+import datetime
 import functools
 import json
 import os
@@ -417,6 +419,17 @@ def fmt_status(s):
     return STATUS_ABBREV.get(s, s[:4])
 
 
+def as_of_line(path):
+    """'data as of <YYYY-MM-DD HH:MM> (<h>h old)' from the dump file's mtime."""
+    try:
+        ts = os.path.getmtime(path)
+    except OSError:
+        return "data as of unknown (dump mtime unavailable)"
+    stamp = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
+    age_h = max(0.0, time.time() - ts) / 3600
+    return f"data as of {stamp} ({age_h:.1f}h old)"
+
+
 def modcell(inb, outb):
     return flag(inb) + flag(outb)
 
@@ -620,6 +633,7 @@ def main(argv):
         )
         print(line)
     print(f"\n{len(hits)} match(es) for: {desc}")
+    print(as_of_line(path))
     return 0
 
 
