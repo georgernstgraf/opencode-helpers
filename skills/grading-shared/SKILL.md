@@ -521,15 +521,17 @@ spare bullet-list index with one line per assignment:
 ```markdown
 ## Aufgaben
 
-- 2026-09-29: Seite dekorieren (CSS) → [2026-10_XX_css-basics/](./2026-10_XX_css-basics/)
+- 2026-09-29: Seite dekorieren (CSS) → `2026-10_XX_css-basics/`
 ```
 
 Parse each bullet as `(iso_date, short_description, optional_relative_link)`:
 
-- Resolve relative links against the cohort README directory; the link target
-  is a lesson folder (Tagesordner) whose assignment content is read from there
-  (see Source 2). The list is an INDEX only — the task text lives in the
-  lesson folder, never in the list itself.
+- A relative link on the bullet is a **Markdown link** whose target is the
+  lesson folder path relative to the cohort README directory, e.g. the bullet
+  above may equivalently carry `[2026-10_XX_css-basics/](2026-10_XX_css-basics/)`;
+  the link target is a lesson folder (Tagesordner) whose assignment content is
+  read from there (see Source 2). The list is an INDEX only — the task text
+  lives in the lesson folder, never in the list itself.
 - Entries without a link are matched by date/topic against the other sources.
 - Grading is read-only: if the canonical list is missing, do NOT create it.
   Report its absence as a note.

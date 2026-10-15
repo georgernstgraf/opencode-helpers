@@ -144,10 +144,11 @@ list current:
    Tagesordner."
 3. Check whether an entry for this lesson already exists (same ISO date).
 4. If missing, ADD one spare bullet line — one sentence or a few words, plus
-   a relative link to the lesson directory:
+   a relative link to the lesson directory (a Markdown link whose target is
+   the lesson directory path relative to the cohort README):
 
    ```markdown
-   - 2026-10-13: Kurzbeschreibung der Aufgabe → [2026-10-13_thema/](./2026-10-13_thema/)
+   - 2026-10-13: Kurzbeschreibung der Aufgabe → `2026-10-13_thema/`
    ```
 
 5. Insert the entry in ascending date order. Never reorder, reword, or delete
