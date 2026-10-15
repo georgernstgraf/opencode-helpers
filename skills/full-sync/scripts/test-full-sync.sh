@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# test-repo-sync.sh - self-test for repo-sync.sh.
+# test-full-sync.sh - self-test for full-sync.sh.
 #
 # Builds throwaway bare remotes and clones in a temp dir, then checks the pull
 # decisions the skill makes: uptodate, behind -> fast-forward, diverged ->
 # rebase, dirty -> skip, no upstream -> skip, and pull disabled. Nothing outside
 # the temp dir is touched.
 #
-# Usage: scripts/test-repo-sync.sh
+# Usage: scripts/test-full-sync.sh
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_SYNC="$SCRIPT_DIR/repo-sync.sh"
-[ -x "$REPO_SYNC" ] || { printf 'not executable: %s\n' "$REPO_SYNC" >&2; exit 2; }
+FULL_SYNC="$SCRIPT_DIR/full-sync.sh"
+[ -x "$FULL_SYNC" ] || { printf 'not executable: %s\n' "$FULL_SYNC" >&2; exit 2; }
 command -v git >/dev/null 2>&1 || { printf 'git is required\n' >&2; exit 2; }
 
 TMP="$(mktemp -d)"
@@ -56,8 +56,8 @@ run_sync() {
     local root="$1" extra="${2:-}"
     printf '{"roots":[{"type":"git","path":"%s","max_depth":2}]%s}\n' "$root" "$extra" \
         > "$TMP/config.json"
-    REPO_SYNC_CONFIG="$TMP/config.json" REPO_SYNC_LOG_DIR="$TMP/log" \
-        "$REPO_SYNC" > "$TMP/out" 2>&1 || true
+    FULL_SYNC_CONFIG="$TMP/config.json" FULL_SYNC_LOG_DIR="$TMP/log" \
+        "$FULL_SYNC" > "$TMP/out" 2>&1 || true
 }
 
 # new_case <name> - create bare remote + clone; sets CASE, REMOTE, WORK.

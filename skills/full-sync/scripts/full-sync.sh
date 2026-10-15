@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
 #
-# repo-sync.sh - sync the state of all configured working repositories.
+# full-sync.sh - sync the state of all configured working repositories, and
+#                bring the host itself up to date on request.
 #
-# Every git repo: fetch all remotes, then fast-forward or rebase the checked-out
-# branch onto its upstream when that is clean; dirty or conflicting repos are
-# left untouched and reported. Every svn working copy: `svn up`.
-# The script deliberately does NOT commit, does NOT push and does NOT restart
-# anything - those stay agent decisions, see skills/repo-sync/SKILL.md.
+# Default run: every git repo: fetch all remotes, then fast-forward or rebase
+# the checked-out branch onto its upstream when that is clean; dirty or
+# conflicting repos are left untouched and reported. Every svn working copy:
+# `svn up`. The script deliberately does NOT commit and does NOT push - those
+# stay agent decisions, see skills/full-sync/SKILL.md.
 #
-# The optional host steps (opencode upgrade, service restart) live behind
-# config.json "host_steps" and default to false. When enabled they run last and
-# only if no earlier step failed. A service restart ends the calling opencode
-# session, so it is never part of a default run.
+# `full-sync.sh --host-steps` runs the host refresh INSTEAD of the repo sync:
+# apt update + apt upgrade, then a restart of the configured user services
+# (opencode.service and the OpenCode Telegram bots - opencode.service upgrades
+# itself via ExecStartPre and the bots run `npx ...@latest`, so a plain restart
+# alone picks up the newest versions), then a reboot when
+# /var/run/reboot-required says one is pending. It refuses to run when the most
+# recent sync report was not clean, and it must be the LAST step of a run: the
+# service restart ends the calling opencode session.
 #
-# Usage:  repo-sync.sh
-# Config: ${REPO_SYNC_CONFIG:-<skill dir>/config.json}
-# Logs:   ${REPO_SYNC_LOG_DIR:-$HOME/.local/state/repo-sync}/<timestamp>.log
+# Usage:  full-sync.sh [--host-steps]
+# Config: ${FULL_SYNC_CONFIG:-<skill dir>/config.json}
+# Logs:   ${FULL_SYNC_LOG_DIR:-$HOME/.local/state/full-sync}/<timestamp>.log
 #
 # Report format: a "## <type> <path>" header per repository, followed by
 # key=value lines (branch, upstream, ahead, behind, diverged, dirty, fetched,
 # pruned, pull, remote) and an optional "--- status ---" block. Plain text on
 # purpose, so both the agent and the test suite can parse it without a JSON
-# toolchain.
+# toolchain. A --host-steps run prints "== host steps ==" plus one line per
+# step and `failures=N`.
 #
-# Exit codes: 0 = every configured repository was collected cleanly
-#             1 = at least one repository failed (see ERROR lines)
-#             2 = the run could not start (bad config, missing tool)
+# Exit codes: 0 = every configured repository was collected cleanly (or, with
+#               --host-steps, every host step succeeded)
+#             1 = at least one repository or host step failed (see ERROR lines)
+#             2 = the run could not start (bad config, missing tool, bad usage)
 
 set -u
 
@@ -35,10 +42,18 @@ export GIT_EDITOR=true
 export GIT_SEQUENCE_EDITOR=true
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG="${REPO_SYNC_CONFIG:-$SKILL_DIR/config.json}"
-LOG_DIR="${REPO_SYNC_LOG_DIR:-$HOME/.local/state/repo-sync}"
+CONFIG="${FULL_SYNC_CONFIG:-$SKILL_DIR/config.json}"
+LOG_DIR="${FULL_SYNC_LOG_DIR:-$HOME/.local/state/full-sync}"
 
 die() { printf 'ERROR: %s\n' "$1" >&2; exit 2; }
+
+MODE="sync"
+if [ $# -gt 0 ]; then
+    case "$1" in
+        --host-steps) MODE="host-steps" ;;
+        *) die "usage: $(basename "$0") [--host-steps]" ;;
+    esac
+fi
 
 [ -f "$CONFIG" ] || die "config not found: $CONFIG"
 command -v python3 >/dev/null 2>&1 || die "python3 is required to read $CONFIG"
@@ -124,6 +139,12 @@ ON_DIVERGED="$(cfg pull.on_diverged)";   [ -n "$ON_DIVERGED" ] || ON_DIVERGED=re
 ON_CONFLICT="$(cfg pull.on_conflict)";   [ -n "$ON_CONFLICT" ] || ON_CONFLICT=abort-and-report
 
 LOG="$LOG_DIR/$(date +%Y%m%d-%H%M%S).log"
+# A --host-steps run is gated on the most recent SYNC report, so capture its
+# verdict before latest.log is repointed to this run's own log.
+LAST_FAILS=""
+if [ "$MODE" = "host-steps" ] && [ -f "$LOG_DIR/latest.log" ]; then
+    LAST_FAILS="$(grep -h '^failures=' "$LOG_DIR/latest.log" 2>/dev/null | tail -1 | cut -d= -f2)"
+fi
 ln -sfn "$LOG" "$LOG_DIR/latest.log"
 exec > >(tee -a "$LOG") 2>&1
 
@@ -138,6 +159,95 @@ note_error() {
 # different host should not turn every run red.
 warn_missing_root() {
     printf 'WARN: %s root does not exist on this host, skipped: %s\n' "$1" "$2"
+}
+
+# ------------------------------------------------------------- host steps --
+# There is no separate "opencode upgrade" step: opencode.service runs
+# `opencode upgrade --method curl` as ExecStartPre on every start, and the
+# OpenCode Telegram bots run `npx ...@latest` - a plain restart picks up the
+# newest versions on both, so the manual upgrade call is gone for good.
+
+# Expand one host_steps.services entry (exact unit name or glob) to user
+# service units. Prefer loaded units; fall back to installed unit files so a
+# stopped-but-enabled unit is still restarted.
+resolve_units() {
+    local units
+    units="$(systemctl --user list-units --type=service --all --no-legend --plain -- "$1" 2>/dev/null \
+        | awk '$2 == "loaded" {print $1}')"
+    if [ -z "$units" ]; then
+        units="$(systemctl --user list-unit-files --type=service --no-legend --plain -- "$1" 2>/dev/null \
+            | awk '{print $1}')"
+    fi
+    printf '%s\n' "$units"
+}
+
+host_steps() {
+    printf '\n== host steps ==\n'
+
+    # Gate: the agent runs this AFTER its commit/push judgment, but only for a
+    # run whose sync report was clean. The verdict comes from the previous
+    # run's log (captured before this run repointed latest.log).
+    if [ "$LAST_FAILS" != "0" ]; then
+        note_error "host steps refuse to run: the most recent sync report was not clean (failures=${LAST_FAILS:-none}) - fix the sync first"
+        return 1
+    fi
+
+    if [ "$(cfg host_steps.system_upgrade)" = "true" ]; then
+        printf '\n==> apt update && apt upgrade\n'
+        if ! command -v apt-get >/dev/null 2>&1; then
+            note_error "system upgrade skipped: apt-get not found (non-Debian host?)"
+        elif ! sudo -n true 2>/dev/null; then
+            note_error "system upgrade skipped: passwordless sudo not available"
+        else
+            export DEBIAN_FRONTEND=noninteractive
+            if sudo -n apt-get -q update \
+               && sudo -n apt-get -q -y \
+                    -o Dpkg::Options::=--force-confdef \
+                    -o Dpkg::Options::=--force-confold \
+                    upgrade; then
+                printf 'system-upgrade=ok\n'
+            else
+                note_error "apt update/upgrade failed"
+            fi
+        fi
+    fi
+
+    # Reboot pending? Then the service restarts are skipped on purpose: the
+    # units come back fresh after the reboot anyway.
+    local reboot_required="false"
+    [ -f /var/run/reboot-required ] && reboot_required="true"
+
+    if [ "$(cfg host_steps.restart_services)" = "true" ]; then
+        if [ "$reboot_required" = "true" ] \
+           && [ "$(cfg host_steps.reboot_if_required)" = "true" ]; then
+            printf '\n==> reboot pending - skipping service restarts (they come back fresh after the reboot)\n'
+        else
+            local pattern units unit
+            while IFS= read -r pattern; do
+                [ -n "$pattern" ] || continue
+                units="$(resolve_units "$pattern")"
+                if [ -z "$units" ]; then
+                    # host_steps.services is shared across hosts; a unit that
+                    # does not exist here is a fact about the host, not an error.
+                    printf 'WARN: no user unit matches %s on this host, skipped\n' "$pattern"
+                    continue
+                fi
+                while IFS= read -r unit; do
+                    [ -n "$unit" ] || continue
+                    printf '\n==> restarting %s (this may end the current opencode session)\n' "$unit"
+                    systemctl --user restart "$unit" || note_error "restart of $unit failed"
+                done <<< "$units"
+            done < <(cfg host_steps.services)
+        fi
+    fi
+
+    printf '\nreboot-required=%s\n' "$reboot_required"
+    if [ "$(cfg host_steps.reboot_if_required)" = "true" ] && [ "$reboot_required" = "true" ]; then
+        printf '==> rebooting NOW (this run, the session and the machine end here)\n'
+        sudo -n systemctl reboot || note_error "reboot failed"
+    elif [ "$reboot_required" = "true" ]; then
+        printf 'WARN: reboot required, but host_steps.reboot_if_required is false\n'
+    fi
 }
 
 # ---------------------------------------------------------------- git roots --
@@ -298,8 +408,16 @@ report_svn() {
 }
 
 # --------------------------------------------------------------------- main --
-printf 'repo-sync report (config: %s)\n' "$CONFIG"
+printf 'full-sync report (config: %s)\n' "$CONFIG"
 printf 'log: %s\n' "$LOG"
+
+if [ "$MODE" = "host-steps" ]; then
+    host_steps || true
+    printf '\n== summary ==\n'
+    printf 'failures=%s\n' "$FAILURES"
+    [ "$FAILURES" -eq 0 ] || exit 1
+    exit 0
+fi
 
 while IFS=$'\t' read -r rtype rpath rdepth; do
     [ -n "${rtype:-}" ] || continue
@@ -317,23 +435,7 @@ printf '\n== summary ==\n'
 printf 'failures=%s\n' "$FAILURES"
 [ "$FAILURES" -eq 0 ] || exit 1
 
-# --------------------------------------------------------- optional host steps --
-# Off by default. A service restart ends the calling opencode session, so it is
-# only ever reached when explicitly enabled AND every sync step succeeded.
-if [ "$(cfg host_steps.opencode_upgrade)" = "true" ]; then
-    printf '\n==> opencode upgrade\n'
-    OPENCODE="$HOME/.opencode/bin/opencode"
-    if [ -x "$OPENCODE" ]; then
-        "$OPENCODE" upgrade || note_error "opencode upgrade failed"
-    else
-        note_error "$OPENCODE not found or not executable"
-    fi
-fi
-
-if [ "$(cfg host_steps.restart_service)" = "true" ]; then
-    printf '\n==> restarting opencode.service (this ends the current opencode session)\n'
-    systemctl --user restart opencode.service || note_error "service restart failed"
-fi
-
-[ "$FAILURES" -eq 0 ] || exit 1
+# The host steps are a separate invocation (`full-sync.sh --host-steps`) that
+# the agent runs AFTER its commit/push judgment - a service restart inside this
+# run would end the session before Phase B/C could happen.
 exit 0

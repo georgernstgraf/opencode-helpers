@@ -15,14 +15,20 @@ Ergebnis **Epic + formal verlinkte Sub-Issues** (Sub-Issues-API aus
 `issue-workflow`). Große Repos: hierarchisches Fan-out. Der alte
 `/security`-Command ist entfernt.
 
-`repo-sync` (#106) holt jetzt echtes Nachziehen: pro Git-Repo erst **alle**
-Remotes fetchen, **dann** `ahead`/`behind` messen, **dann** clean ausgecheckte
-Branches per `--ff-only` bzw. `rebase` an den Upstream anpassen (dirty/conflict
-unangetastet und gemeldet). Commit/Push bleiben Agentensache. Tote
-**Sekundär**-Remotes werden entfernt (`fetch.remove_dead_remotes`), nie der
-Upstream und nie der einzige Remote. Neue Report-Keys `diverged`/`fetched`/
-`pruned`/`pull`. Selbsttest `skills/repo-sync/scripts/test-repo-sync.sh` (23) +
-`tests/test_repo_sync.py` (Suite 83). SVN bleibt `svn up`.
+`full-sync` (ehemals `repo-sync`, #106) holt jetzt echtes Nachziehen: pro
+Git-Repo erst **alle** Remotes fetchen, **dann** `ahead`/`behind` messen, **dann**
+clean ausgecheckte Branches per `--ff-only` bzw. `rebase` an den Upstream
+anpassen (dirty/conflict unangetastet und gemeldet). Commit/Push bleiben
+Agentensache. Tote **Sekundär**-Remotes werden entfernt
+(`fetch.remove_dead_remotes`), nie der Upstream und nie der einzige Remote.
+Neue Report-Keys `diverged`/`fetched`/`pruned`/`pull`. Selbsttest
+`skills/full-sync/scripts/test-full-sync.sh` (23) + `tests/test_full_sync.py`
+(16). SVN bleibt `svn up`. Neu (2026-10-15): Host-Schritte sind fixer Teil des
+Laufs — `apt update/upgrade`, Restart von `opencode.service` + `oc-tg-bot-*`
+(die upgraden sich beim Restart selbst via `ExecStartPre`/`npx@latest`, kein
+manueller `opencode upgrade` mehr), Reboot wenn `/var/run/reboot-required`
+gesetzt ist — als separater Aufruf `full-sync.sh --host-steps` NACH dem
+Commit/Push-Judgment, gategt auf sauberen Sync-Report.
 
 `create-lesson` (#102) kennt jetzt die **Lernplattform-Regel**: GitHub Pages
 veröffentlicht/verlinkt **nur `unterricht/`** (+ zentrales `assets/` +

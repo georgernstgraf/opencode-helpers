@@ -1,4 +1,4 @@
-"""Hermetic tests for skills/repo-sync/scripts/repo-sync.sh.
+"""Hermetic tests for skills/full-sync/scripts/full-sync.sh.
 
 The script is run as a subprocess against a throwaway HOME containing a
 fixture tree: local bare repositories used as `origin` (so `git fetch` works
@@ -13,7 +13,7 @@ import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCRIPT = os.path.join(ROOT, "skills", "repo-sync", "scripts", "repo-sync.sh")
+SCRIPT = os.path.join(ROOT, "skills", "full-sync", "scripts", "full-sync.sh")
 
 CONFIG = """\
 {
@@ -30,7 +30,12 @@ CONFIG = """\
     "never_commit_globs": ["**/.env*", "**/*.key"],
     "max_review_files": 40
   },
-  "host_steps": { "opencode_upgrade": false, "restart_service": false }
+  "host_steps": {
+    "system_upgrade": false,
+    "restart_services": false,
+    "reboot_if_required": false,
+    "services": ["opencode.service", "oc-tg-bot-*"]
+  }
 }
 """
 
@@ -48,9 +53,9 @@ def git(repo, *args):
     ).stdout.strip()
 
 
-class RepoSyncTest(unittest.TestCase):
+class FullSyncTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="repo-sync-test-")
+        self.tmp = tempfile.mkdtemp(prefix="full-sync-test-")
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.home = os.path.join(self.tmp, "home")
         self.remotes = os.path.join(self.tmp, "remotes")
@@ -70,6 +75,29 @@ class RepoSyncTest(unittest.TestCase):
             GIT_CONFIG_GLOBAL=os.path.join(self.tmp, "gitconfig"),
             GIT_CONFIG_NOSYSTEM="1",
         )
+        # The module-level git() helper runs with the ambient environment, so
+        # the test identity has to live there too: GIT_CONFIG_GLOBAL points at
+        # a nonexistent file, so git would find no user.name and `git commit`
+        # would die with "Author identity unknown".
+        self._saved_env = {
+            k: os.environ.get(k)
+            for k in ("GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL",
+                      "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL")
+        }
+        os.environ.update(
+            GIT_AUTHOR_NAME="t",
+            GIT_AUTHOR_EMAIL="t@example.invalid",
+            GIT_COMMITTER_NAME="t",
+            GIT_COMMITTER_EMAIL="t@example.invalid",
+        )
+        self.addCleanup(self._restore_env)
+
+    def _restore_env(self):
+        for key, value in self._saved_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
     # ------------------------------------------------------------ fixtures --
 
@@ -104,12 +132,12 @@ class RepoSyncTest(unittest.TestCase):
 
     # -------------------------------------------------------------- runner --
 
-    def run_sync(self):
+    def run_sync(self, *args):
         env = dict(self.git_env)
-        env["REPO_SYNC_CONFIG"] = self.config
-        env["REPO_SYNC_LOG_DIR"] = os.path.join(self.tmp, "log")
+        env["FULL_SYNC_CONFIG"] = self.config
+        env["FULL_SYNC_LOG_DIR"] = os.path.join(self.tmp, "log")
         return subprocess.run(
-            ("bash", SCRIPT),
+            ("bash", SCRIPT) + args,
             capture_output=True,
             text=True,
             env=env,
@@ -279,25 +307,67 @@ class RepoSyncTest(unittest.TestCase):
 
     def test_shipped_config_is_valid_json_with_known_shape(self):
         import json
-        path = os.path.join(ROOT, "skills", "repo-sync", "config.json")
+        path = os.path.join(ROOT, "skills", "full-sync", "config.json")
         with open(path, encoding="utf-8") as fh:
             cfg = json.load(fh)
         for key in ("roots", "push", "commit", "fetch", "pull", "host_steps"):
             self.assertIn(key, cfg)
         for root in cfg["roots"]:
             self.assertEqual(set(root), {"type", "path", "max_depth"})
-        for key in ("opencode_upgrade", "restart_service"):
+        # The host steps are part of every full-sync run: apt update/upgrade,
+        # restart of opencode.service + the Telegram bots, reboot when pending.
+        for key in ("system_upgrade", "restart_services",
+                    "reboot_if_required", "services"):
             self.assertIn(key, cfg["host_steps"])
-        # A restart ends the calling session, so it must be opt-in.
-        self.assertFalse(cfg["host_steps"]["restart_service"])
-        self.assertFalse(cfg["host_steps"]["opencode_upgrade"])
+        self.assertTrue(cfg["host_steps"]["system_upgrade"])
+        self.assertTrue(cfg["host_steps"]["restart_services"])
+        self.assertTrue(cfg["host_steps"]["reboot_if_required"])
+        self.assertIn("opencode.service", cfg["host_steps"]["services"])
+
+    # ---------------------------------------------------------- host steps --
+
+    def test_host_steps_refuse_without_clean_sync_report(self):
+        # --host-steps must never run on top of a failed or missing sync run.
+        result = self.run_sync("--host-steps")
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("== host steps ==", result.stdout)
+        self.assertIn("host steps refuse to run", result.stdout)
+
+    def test_host_steps_run_after_clean_sync(self):
+        # A clean sync report unlocks the host steps; with every step disabled
+        # in the config the run must succeed without touching the system.
+        self.make_repo("acme", "clean")
+        self.assertEqual(self.run_sync().returncode, 0)
+        with open(self.config, "w", encoding="utf-8") as fh:
+            fh.write('{"roots": [], "host_steps": {"system_upgrade": false,'
+                     ' "restart_services": false, "reboot_if_required": false,'
+                     ' "services": []}}')
+        result = self.run_sync("--host-steps")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("== host steps ==", result.stdout)
+        self.assertNotIn("ERROR", result.stdout)
+
+    def test_host_steps_warn_on_missing_service(self):
+        # A configured service that does not exist on this host is a WARN, not
+        # an error - the services list is shared across hosts.
+        self.make_repo("acme", "clean")
+        self.assertEqual(self.run_sync().returncode, 0)
+        with open(self.config, "w", encoding="utf-8") as fh:
+            fh.write('{"roots": [], "host_steps": {"system_upgrade": false,'
+                     ' "restart_services": true, "reboot_if_required": false,'
+                     ' "services": ["definitely-no-such-unit-*"]}}')
+        result = self.run_sync("--host-steps")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("no user unit matches definitely-no-such-unit-*",
+                      result.stdout)
+        self.assertNotIn("ERROR", result.stdout)
 
 
 @unittest.skipUnless(shutil.which("svnadmin") and shutil.which("svn"),
                      "subversion tools not available")
-class RepoSyncSvnTest(unittest.TestCase):
+class FullSyncSvnTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="repo-sync-svn-")
+        self.tmp = tempfile.mkdtemp(prefix="full-sync-svn-")
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.home = os.path.join(self.tmp, "home")
         os.makedirs(os.path.join(self.home, "svn"))
@@ -315,8 +385,8 @@ class RepoSyncSvnTest(unittest.TestCase):
             fh.write(CONFIG)
 
     def run_sync(self):
-        env = dict(os.environ, HOME=self.home, REPO_SYNC_CONFIG=self.config,
-                   REPO_SYNC_LOG_DIR=os.path.join(self.tmp, "log"))
+        env = dict(os.environ, HOME=self.home, FULL_SYNC_CONFIG=self.config,
+                   FULL_SYNC_LOG_DIR=os.path.join(self.tmp, "log"))
         return subprocess.run(("bash", SCRIPT), capture_output=True, text=True, env=env)
 
     def test_svn_status_is_reported_without_committing(self):

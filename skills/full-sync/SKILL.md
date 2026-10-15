@@ -1,6 +1,6 @@
 ---
-name: repo-sync
-description: "Sync all working repositories: pull, let the agent decide what uncommitted work to commit and what to push, and optionally upgrade opencode and restart the server. Use when the user says 'repo sync', 'morning sync', 'Morgen-Sync', 'Tagesstart', 'sync everything', 'pull all repos', 'commit and push everything', or wants the daily sync routine."
+name: full-sync
+description: "Full sync routine: pull all working repositories, let the agent decide what uncommitted work to commit and what to push, then bring the host up to date — apt update/upgrade, restart of opencode.service and the OpenCode Telegram bots (they upgrade themselves on restart), and a reboot when one is pending. Use when the user says 'full sync', 'Voll-Sync', 'repo sync', 'morning sync', 'Morgen-Sync', 'Tagesstart', 'sync everything', 'pull all repos', 'commit and push everything', or wants the daily sync routine."
 license: MIT
 compatibility: opencode
 metadata:
@@ -8,26 +8,46 @@ metadata:
   scope: multi-repo
 ---
 
-# Repo Sync
+# Full Sync
 
-Synchronize every configured working repository. The goal of a run: **when it
-ends, every repository is on the state of its upstream** — fast-forwarded or
-rebased where that is clean. The bundled script does the fetch and the clean
-catch-up; the **agent makes the commit and push decisions**. The script never
-commits, never pushes, never restarts anything.
+Synchronize every configured working repository **and the host itself**. The
+goal of a run: when it ends, every repository is on the state of its upstream —
+fast-forwarded or rebased where that is clean — and the host has current
+packages and current opencode services. The bundled script does the fetch, the
+clean catch-up and the host refresh; the **agent makes the commit and push
+decisions**. The script never commits, never pushes.
 
 ```
-fetch + catch up  ->  judge each repo  ->  commit / push  ->  report
-   (script)             (agent)             (agent)          (agent)
+fetch + catch up  ->  judge each repo  ->  commit / push  ->  host steps  ->  report
+   (script)             (agent)             (agent)            (script)        (agent)
 ```
 
 ## The one rule
 
 **The script fetches and catches up; the agent decides commits and pushes.**
-`scripts/repo-sync.sh` fetches every remote, fast-forwards or rebases clean
+`scripts/full-sync.sh` fetches every remote, fast-forwards or rebases clean
 checkouts onto their upstream, and reports dirty counts, ahead/behind, branches
 and upstreams. It exits non-zero if any repository failed — a conflict, a failed
 fetch, or a failed pull. What to commit and what to push stays an agent decision.
+
+**The host steps are a second invocation, and they come last.**
+`scripts/full-sync.sh --host-steps` refreshes the host (apt, services, reboot).
+It runs only after Phase B/C are done — a service restart ends the calling
+opencode session, so a restart inside the sync run would kill the session before
+the commit/push judgment could happen. It refuses to run when the most recent
+sync report was not clean (`failures != 0`).
+
+## No manual opencode upgrade — ever
+
+There is no `opencode upgrade` step in this skill, and none is needed:
+
+- `opencode.service` runs `opencode upgrade --method curl` as `ExecStartPre`
+  on every start, so a restart picks up the newest version.
+- The OpenCode Telegram bots (`oc-tg-bot-*`) run `npx @grinev/opencode-telegram-bot@latest`,
+  so a restart picks up the newest bot version.
+
+A manual upgrade call before a restart is redundant. If opencode seems stale,
+the answer is a service restart, not an upgrade call.
 
 ## Config
 
@@ -46,7 +66,10 @@ fetch, or a failed pull. What to commit and what to push stays an agent decision
 | `pull.enabled` | When true (default), clean behind/diverged checkouts are caught up automatically. |
 | `pull.on_diverged` | `rebase` (default) replays the local-only commits onto the upstream; any other value leaves a diverged repo untouched. |
 | `pull.on_conflict` | `abort-and-report` (default) aborts a conflicting rebase and leaves the repo unchanged. |
-| `host_steps.*` | `opencode_upgrade`, `restart_service` — both `false` by default. |
+| `host_steps.system_upgrade` | `apt update` + `apt upgrade` (non-interactive, passwordless sudo required; `false` on non-Debian hosts would only ERROR). |
+| `host_steps.restart_services` | Restart the user services from `host_steps.services` — skipped when a reboot is pending anyway. |
+| `host_steps.services[]` | Exact unit names or globs (`oc-tg-bot-*`). A unit that does not exist on the current host is a `WARN`, not an error — the list is shared across hosts. |
+| `host_steps.reboot_if_required` | When true and `/var/run/reboot-required` exists, reboot at the very end. When a reboot is pending but this is false, a `WARN` is printed. |
 
 `max_depth` is the depth **of the VCS directory**, not the repository: for
 `~/repos/<owner>/<repo>/.git` that is `3`, for `~/svn/<wc>/.svn` it is `2`.
@@ -54,12 +77,12 @@ fetch, or a failed pull. What to commit and what to push stays an agent decision
 ## Phase A — Fetch & catch up
 
 ```sh
-"$HOME/.config/opencode/skills/repo-sync/scripts/repo-sync.sh"
+"$HOME/.config/opencode/skills/full-sync/scripts/full-sync.sh"
 ```
 
-Resolves through the symlink; `~/repos/georgernstgraf/opencode-helpers/skills/repo-sync/scripts/repo-sync.sh`
+Resolves through the symlink; `~/repos/georgernstgraf/opencode-helpers/skills/full-sync/scripts/full-sync.sh`
 works too. Full output is also written to
-`~/.local/state/repo-sync/latest.log` — read it if the in-session output was cut
+`~/.local/state/full-sync/latest.log` — read it if the in-session output was cut
 short by a restart.
 
 For each git repository the script:
@@ -92,8 +115,8 @@ synced; one unreachable remote must not stall the other 74.
 
 Two errors are **not** per-repository and do stop everything:
 
-- exit code **2** — the script could not start (unparsable config, missing tool).
-  Fix the configuration before doing anything else.
+- exit code **2** — the script could not start (unparsable config, missing tool,
+  bad usage). Fix the configuration before doing anything else.
 - a `WARN: … root does not exist` line — that host simply has no such root;
   the remaining roots still run.
 
@@ -162,8 +185,8 @@ was generating GRG-PMM lessons while the sync ran, and the incomplete
 `KM7-02-chi-quadrat-test/` had to be skipped.
 
 Content types that are **not** a reason to hold back, when the repository
-already tracks them: PDFs, student submissions, CatchLog files, generated
-output. `matura-diplom-koll` tracks 110 PDFs and commits them deliberately —
+already tracks them: PDFs, student submissions, CatchLog files, generated output.
+`matura-diplom-koll` tracks 110 PDFs and commits them deliberately —
 matching the repository's existing practice is the correct default.
 
 After committing, a repo that Phase A skipped with `pull=skipped(dirty)` may
@@ -190,11 +213,45 @@ user only mirrors) and **local-only clones** (`no-remote/`, `non-git/`).
 Non-default branches are not a reason to hold back. If the owner is allowed and
 the branch has an upstream, the branch is the user's own work and is pushed.
 
-## Phase D — Report
+## Phase D — Host steps (always, and last)
+
+After Phase B/C — never before, never instead — run:
+
+```sh
+"$HOME/.config/opencode/skills/full-sync/scripts/full-sync.sh" --host-steps
+```
+
+The host steps are a **fixed part of every full-sync run** (`host_steps.*` are
+`true` in the shipped config), but they live in their own invocation so the
+commit/push judgment survives the service restart. The script refuses to run
+when the most recent sync report was not clean, so a broken sync can never be
+papered over by a host refresh.
+
+In order:
+
+1. **System update** — `sudo apt-get update` && `sudo apt-get upgrade -y`
+   (non-interactive, `--force-confold` for conffiles). Requires passwordless
+   sudo; without it the step is an `ERROR`, not a silent skip.
+2. **Service restart** — every unit in `host_steps.services` (globs allowed;
+   `opencode.service`, `oc-tg-bot-*` on gregor). A unit missing on the current
+   host is a `WARN`. **Restarting `opencode.service` ends the calling opencode
+   session** — the client reconnects. When a reboot is pending anyway, the
+   restarts are skipped: the units come back fresh after the reboot.
+3. **Reboot** — when `/var/run/reboot-required` exists (freshly set by apt or
+   left over), the host reboots at the very end. This ends the run, the session
+   and the machine; whatever still needs saying must be in the final report
+   text or the log **before** this point.
+
+Report lines to carry into Phase E: `system-upgrade=ok`, `reboot-required=true|false`,
+plus one `==> restarting <unit>` line per restarted service.
+
+## Phase E — Report
 
 Always close with a table, then a "left alone" section listing every
 repository you deliberately did not touch, with the reason. Silent omission
-makes a partial sync look like a complete one.
+makes a partial sync look like a complete one. **Compose and send the report
+BEFORE the `--host-steps` invocation** — a session that dies with the service
+restart takes an unsent report with it; the log path is the fallback.
 
 ```
 | Repository | Action | Commit | Push |
@@ -204,29 +261,18 @@ makes a partial sync look like a complete one.
 | someorg/repo | left alone | — | no — 40+ files changed, needs review |
 ```
 
-Name the log path so the user can read the raw report afterwards.
-
-## Optional host steps
-
-`host_steps` are **off** by default. Enable them per run, or permanently in
-`config.json`, only when the user asks for the full workstation routine.
-
-- `opencode_upgrade` — `opencode upgrade`
-- `restart_service` — `systemctl --user restart opencode.service`
-
-**A service restart ends the calling opencode session.** The tool call is killed
-as the service cgroup is torn down. That is why it is not a default step, and
-why the script still gates it: it runs only when every earlier step succeeded,
-so a failed sync leaves the session alive to report the error. Full output is in
-`~/.local/state/repo-sync/latest.log` precisely because the in-session output is
-lost across a restart.
+Name the log path so the user can read the raw report afterwards, and state
+what the host steps did (packages, services, reboot).
 
 ## Self-test
 
-`scripts/test-repo-sync.sh` builds throwaway bare remotes and clones in a temp
+`scripts/test-full-sync.sh` builds throwaway bare remotes and clones in a temp
 dir and checks every pull decision (uptodate, behind → ff, diverged → rebase,
 dirty → skip, no upstream, pull disabled). Run it after any change to the fetch
 or pull logic; it must stay green and it never touches a real repository.
+Hermetic `unittest` coverage lives in `tests/test_full_sync.py` — it also pins
+the `--host-steps` gate (refuses after a failed sync) and the shipped config
+shape.
 
 ## Pitfalls
 
@@ -244,3 +290,15 @@ or pull logic; it must stay green and it never touches a real repository.
 - **Do not reintroduce `~/bin/svnkack.sh`.** It commits with an empty message
   (`svn commit -mm`), never checks errors, and 3 of its 5 paths no longer exist.
   SVN commits are an agent decision, same as Git.
+- **Host steps are a separate invocation, after Phase B/C.** `--host-steps`
+  restarts user services and ends the calling opencode session; a restart inside
+  the sync run would kill the session before the commit/push judgment. The gate
+  (refuses when the last sync report was not clean) is a backstop, not a license
+  to skip the judgment.
+- **No manual `opencode upgrade`.** `opencode.service` upgrades itself via
+  `ExecStartPre`, the Telegram bots run `npx ...@latest` — a restart alone picks
+  up the newest versions. A manual upgrade call is redundant and hides real
+  restart problems.
+- **A pending reboot skips the service restarts on purpose** — the units come
+  back fresh after the reboot; restarting them first would be wasted work and a
+  second surprise restart.

@@ -105,13 +105,16 @@ The following skills have NO slash commands. Invoke them by natural language:
   "modellparameter aktualisieren", "neue Modelle in params aufnehmen"
   → load and execute the `model-params` skill
 
-**Repo Sync** — when the user says:
-  "repo sync", "morning sync", "Morgen-Sync", "sync everything", "Tagesstart",
-  "pull all repos", "commit and push everything"
-  → load and execute the `repo-sync` skill. The script only reports
+**Full Sync** — when the user says:
+  "full sync", "Voll-Sync", "repo sync", "morning sync", "Morgen-Sync",
+  "sync everything", "Tagesstart", "pull all repos", "commit and push everything"
+  → load and execute the `full-sync` skill. The script only reports
     repository state; the agent judges what to commit and what to push.
-    `opencode upgrade` and the `opencode.service` restart are opt-in host
-    steps (default off) and only run after a fully successful sync.
+    Host steps (`apt update/upgrade`, restart of `opencode.service` + the
+    Telegram bots, reboot when pending) are a separate `--host-steps`
+    invocation that always runs AFTER the commit/push judgment — the restart
+    ends the calling session. There is no manual `opencode upgrade`: the
+    service upgrades itself via `ExecStartPre`, the bots via `npx …@latest`.
 
 ## Skill Source Rule
 

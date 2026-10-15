@@ -41,7 +41,12 @@
   },
 
   "host_steps": {
-    "opencode_upgrade": false,
-    "restart_service": false
+    "system_upgrade": true,
+    "restart_services": true,
+    "reboot_if_required": true,
+    "services": [
+      "opencode.service",
+      "oc-tg-bot-*"
+    ]
   }
 }
