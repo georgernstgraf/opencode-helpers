@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-10-06.
+Living structural map of the system as of 2026-10-17.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -108,6 +108,35 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 - `skills/searxng/searxng-search.sh` prioritized chain: for general searches it stops at the first tier that returns results — `brave`, then `google`, then the free `mwmbl,searchmysite`, and finally `engines=braveapi` **only** when `brave` and `google` both failed and the free tier yielded fewer than 3 hits. `brave` is the **only** engine that serves normal results; `google`, the free tier and `braveapi` are **fallback-only**. `braveapi` results are merged ahead of the free results (URL-deduplicated); the answer carries `engine_used`/`fallback_used`/`tried`/`unresponsive_engines`. An explicit `engines=` argument bypasses the chain. `braveapi` is `disabled: true` in the instance so it is excluded from normal searches (the `< 3` gate protects its paid token).
 - SearXNG access control: the public vhost requires **HTTP Basic Auth** (shared secret in `/etc/nginx/searxng.htpasswd`) for both UI and API, and nginx applies `limit_req`/`limit_conn`. The container port `8888` is published only on `127.0.0.1`, so the instance is reachable solely through nginx. `/robots.txt` is served **without** auth (`location = /robots.txt`, `Disallow: /`) and every response carries `X-Robots-Tag: noindex, nofollow, noarchive` (the backend's own `X-Robots-Tag` is hidden with `proxy_hide_header`). The vhost logs to dedicated files (`/var/log/nginx/searxng.access.log`, custom `searxng` format incl. `rt=`, and `searxng.error.log`) rather than the shared `access.log`. Clients authenticate by reading `~/.config/opencode/searxng.cred` (or `$SEARXNG_AUTH`) in `searxng-search.sh`. Intended clients: claw, think, dell.
 - Think MCP deployment (`~/.config/opencode/opencode.json`, `mcp.searxng.environment`, #74): `SEARXNG_PRIMARY=http://10.8.0.16` (Gregor school instance — VPN `tun0`, port 80, no auth) with `SEARXNG_CHAIN=gregor` (`google` → `brave` → `braveapi`, no free tier); `SEARXNG_FALLBACK=https://searxng.claw.graf.priv.at` authenticated via `SEARXNG_FALLBACK_CRED_FILE` (`~/.config/opencode/searxng.cred`). The repo `opencode.json` carries the same block as a secret-free placeholder template. Purpose/rollout: Gregor is the school's **agentic** search instance — think live, dell replication next, then student agents (see DECISIONS.md 2026-09-17); no browser-UI role for student use.
+
+## Host Services: OpenCode Server & Telegram Bot
+
+Every host runs OpenCode V2 as a **user** systemd unit (templates:
+`dotfiles/systemd/user/`, install notes next to them):
+
+- `opencode.service` → `opencode serve --service` (`ExecStartPre` auto-upgrade,
+  `Restart=on-failure`, `UMask=0077`). The server binds **`127.0.0.1` only** and
+  is password-protected (HTTP Basic Auth, user `opencode`, password in
+  `~/.config/opencode/service.json`; `opencode service get password`). Port:
+  host-pinned via `opencode service set port` or the V2 default `49374`.
+- `oc-tg-bot-<host>.service` → one Telegram bot per host
+  (`npx @grinev/opencode-telegram-bot@latest`), app home
+  `OPENCODE_TELEGRAM_HOME=~/.config/oc-tg-bot-<host>` (`.env` mode 600,
+  `settings.json`, `logs/`), `Restart=always`. Access is gated by
+  `TELEGRAM_ALLOWED_USER_ID`; voice prompts are transcribed via Groq
+  (`STT_MODEL=whisper-large-v3`, quality-first — see DECISIONS.md 2026-10-17).
+
+`sudo loginctl enable-linger "$USER"` is **mandatory** on every host, otherwise
+the units never start after a reboot or without an open login. The shared shell
+layer (`dotfiles/bash_functions.sh`) addresses exactly these unit names
+(`oc-restart`, `su-*`), and the `full-sync` host steps restart
+`opencode.service` plus the `oc-tg-bot-*` units (both upgrade themselves on
+restart: `opencode upgrade` in `ExecStartPre`, `npx …@latest` for the bot).
+
+| Host | Server | Bot | Notes |
+|------|--------|-----|-------|
+| gregor | `127.0.0.1:4096` (pinned) | `oc-tg-bot-gregor` | reference setup |
+| kik | `127.0.0.1:49374` (V2 default) | `oc-tg-bot-kik` (`@schurlix_kik_bot`) | installed 2026-10-17 (#111) |
 
 ## SearXNG Egress
 

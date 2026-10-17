@@ -1,8 +1,18 @@
 # Project State
 
-Current status as of 2026-10-07.
+Current status as of 2026-10-17.
 
 ## Current Focus
+
+Host-Services sind seit 2026-10-17 versioniert und auf `kik` umgesetzt (#111):
+`dotfiles/systemd/user/{opencode,oc-tg-bot}.service` als Vorlagen für den
+OpenCode-V2-Server (nur `127.0.0.1`, Basic-Auth-Passwort aus
+`~/.config/opencode/service.json`) und je Host einen eigenen Telegram-Bot.
+kik läuft jetzt mit `opencode.service` (V2-Default-Port `49374`) +
+`oc-tg-bot-kik.service` (`@schurlix_kik_bot`), Linger aktiviert; gregor bleibt
+Referenz (Port-Pin `4096`). STT ist auf beiden Hosts `whisper-large-v3`
+(non-turbo, quality-first). Offen (optional): Units + STT-Wert auf die übrigen
+Bot-Hosts (think/dell/claw) nachziehen.
 
 `codebase-audit` (#107) ist neu: user-invoked Skill
 (`skills/codebase-audit/{SKILL,AXES,TOOLS}.md`) für eine **einmalige
@@ -66,6 +76,13 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #111 2026-10-17 — Host-Services: `dotfiles/systemd/user/` (Vorlagen
+      `opencode.service` mit `%h`, `oc-tg-bot.service` mit `<HOST>`/
+      `<NODE_BIN_DIR>`-Platzhaltern, README) + Host-Abschnitt in
+      `ARCHITECTURE.md`; auf `kik` installiert (Linger, `opencode.service` auf
+      dem V2-Default `49374`, `oc-tg-bot-kik.service`/`@schurlix_kik_bot`,
+      `.env` Mode 600, Übergabe vom ad-hoc-Server); gregor-STT auf
+      `whisper-large-v3` gezogen; DECISIONS (Units, STT quality-first)
 - [x] #107 CLOSED 2026-10-07 — codebase-audit: neues user-invoked Skill für
       Ganz-Repo-Audit über vier Achsen (Security in-depth, Struktur/Schichten,
       Kopplung/Verschränkung, Architektur/Deep Modules); deterministische

@@ -92,3 +92,20 @@ Read this file carefully before making changes in affected areas.
 - OpenClaw-specific configuration (agent binding, Telegram groups, memory settings) belongs in OpenClaw's channel config, not in `AGENTS.md` or other project files.
 - Project `AGENTS.md` should contain only project-relevant instructions and conventions.
 - Searching for "latest" technologies or software versions (e.g., "Gemma 4") without a `time_range` or exact quoting (`"Gemma 4"`) often returns irrelevant legacy documentation due to higher domain authority of old sites (e.g., Firefox 4, MDN). Always check if a time filter is needed for brand-new topics.
+
+## Test Suite on Hosts Without a Git Identity in a Fresh `HOME`
+
+`tests/test_full_sync.py` builds throwaway repositories under a **redirected
+`HOME`** (`/tmp/full-sync-test-*/home`) and runs real `git commit`. On a host
+whose `~/.gitconfig` holds the identity (`kik`, 2026-10-17: 9 errors
+`CalledProcessError … commit … exit status 128`, `fatal: empty ident name
+(for <user@host>)`) the redirected HOME has no identity and git refuses to
+commit. The suite is fine — the environment is not:
+
+```sh
+GIT_AUTHOR_NAME=Test GIT_AUTHOR_EMAIL=test@example.com \
+GIT_COMMITTER_NAME=Test GIT_COMMITTER_EMAIL=test@example.com \
+python3 -m unittest discover -s tests   # → OK (skipped=1)
+```
+
+Do not "fix" the tests for this; export the identity variables for the run.

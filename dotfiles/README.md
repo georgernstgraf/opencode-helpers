@@ -29,3 +29,15 @@ In der jeweiligen `~/.bash_aliases` (interaktive Shells):
   lokale `~/.bash_aliases`, nicht hierher.
 - **Keine Secrets** — Server-Passwörter kommen aus `service.json`/`pass`.
 - Updates verteilen sich über `git pull` im Clone.
+
+## `systemd/user/`
+
+Vorlagen für die userbezogenen Units, die auf jedem Host laufen:
+`opencode.service` (OpenCode-V2-Server, nur `127.0.0.1`, Passwort aus
+`~/.config/opencode/service.json`) und `oc-tg-bot.service` (OpenCode-
+Telegram-Bot, ein eigener Bot je Host). Kein Auto-Deploy: pro Host kopieren,
+Platzhalter (`<HOST>`, `<NODE_BIN_DIR>`) ersetzen, `sudo loginctl
+enable-linger "$USER"` setzen (sonst kein Start nach Reboot/ohne Login).
+Details und Installationsablauf: [`systemd/user/README.md`](systemd/user/README.md).
+Keine Secrets in den Units — Bot-Token und Server-Passwort liegen in der
+lokalen `~/.config/oc-tg-bot-<host>/.env` (Mode 600).

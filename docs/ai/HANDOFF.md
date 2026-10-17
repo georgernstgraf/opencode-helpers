@@ -60,4 +60,12 @@ Open tasks:
       melden und (nach Rücksprache) auf Fach-/Zweig-Ebene umstellen. Prüfen, ob
       `kompetenzmodule/` je Fach ans `lehrplan/`-Root wandert.
 
-Last updated: 2026-10-07.
+Last updated: 2026-10-17.
+
+8. [ ] Host-Services nachziehen (#111): Die Unit-Vorlagen
+      (`dotfiles/systemd/user/`) sind erst auf `kik` und `gregor` im Einsatz.
+      Prüfen, ob `think`/`dell`/`claw` ebenfalls `opencode.service` +
+      `oc-tg-bot-<host>.service` als **user** Units betreiben (inkl.
+      `loginctl enable-linger`) und ob deren Bot-`.env` noch
+      `STT_MODEL=whisper-large-v3-turbo` führt — der Wert gehört auf
+      `whisper-large-v3` (DECISIONS.md 2026-10-17).

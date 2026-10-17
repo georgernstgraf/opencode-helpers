@@ -464,3 +464,19 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: Knowledge in den bestehenden Code-Commit falten (verworfen — STATE/HANDOFF entstehen zwangsläufig nach dem Close); nur im `finish`-Modus committen (verworfen — der Dauerzustand-Pfad persistiert ebenso).
 - **Tradeoff**: Zwei Commits pro Finish (Code/Doku + Knowledge-Follow-up) sind normal; der Agent muss einen leeren Commit erkennen und unterlassen. `knowledge-persistence` schließt weiterhin **nie** Issues — nur `issue-workflow`.
 - **Issue**: #89
+
+## 2026-10-17: OpenCode-Server + Telegram-Bot als user systemd services (#111)
+
+- **Choice**: Auf jedem Host laufen der OpenCode-V2-Server (`opencode.service`, `opencode serve --service`, nur `127.0.0.1`, Basic-Auth-Passwort aus `~/.config/opencode/service.json`) und je Host ein eigener Telegram-Bot (`oc-tg-bot-<host>.service`, `npx @grinev/opencode-telegram-bot@latest`, App-Home `~/.config/oc-tg-bot-<host>`) als **userbezogene** systemd-Units. Die Vorlagen liegen versioniert in `dotfiles/systemd/user/`; `sudo loginctl enable-linger "$USER"` ist Pflichtbestandteil der Installation. Umgesetzt für `kik` (V2-Default-Port `49374`) analog zum Referenz-Host `gregor` (Port-Pin `4096`).
+- **Reason**: Bis dahin lief der kik-Server als ad-hoc-Prozess, der weder Reboot noch Logout überlebte; `dotfiles/bash_functions.sh` (`oc-restart`, `su-*`) adressierte eine `opencode.service`, die es auf kik noch gar nicht gab. Die Unit-Vorlagen im Repo verhindern, dass die Konfiguration nur auf dem jeweiligen Host existiert (bis dahin war sie nirgends versioniert).
+- **Considered**: `/etc/systemd/system`-Units mit `User=`-Direktive (verworfen — user services brauchen kein root, laufen mit dem Nutzer-Home und sind über `systemctl --user`/`su-*` bedienbar); Upstream-Doc-Setup mit globalem npm-Install (verworfen — `npx` mit gepinntem `OPENCODE_TELEGRAM_HOME` genügt und folgt dem Bestand); `ExecStartPre=rm settings.json` von gregor mitkopieren (verworfen — verwirft Bot-Einstellungen, Pinned Message und Session-Cache bei jedem Restart); Port `4096` auch auf kik (verworfen — der V2-Default `49374` ist bereits registriert und der Bot-Default für V2 passt dazu).
+- **Tradeoff**: `npx @latest` und `opencode upgrade` in `ExecStartPre` ziehen bei jedem Start Updates — bewusst (headless Hosts), birgt aber das Risiko, dass ein Restart eine neue Version aktiviert. Node-Pfade in `Environment=PATH` sind nvm-versionsspezifisch und bleiben damit hostspezifisch (Platzhalter in der Vorlage).
+- **Issue**: #111
+
+## 2026-10-17: STT quality-first — `whisper-large-v3` statt `-turbo` auf allen Bot-Hosts (#111)
+
+- **Choice**: Die Telegram-Bots transkribieren Voice-Nachrichten über Groq mit `STT_MODEL=whisper-large-v3`; `whisper-large-v3-turbo` wird nicht mehr verwendet (gregor lief noch auf turbo und wurde mitgezogen).
+- **Reason**: Quality-first — für Diktate in Schul- und Repo-Arbeit zählt die Erkennungsqualität mehr als die Latenz; die Latenz wird clientseitig gelöst (gleiche Linie wie KI-Kustodiat-intern#1). Beide Modelle sind bei Groq verfügbar (`/openai/v1/models`) und mit dem Bot-Key abrufbar (per API verifiziert), der Wechsel ist eine `.env`-Zeile plus Bot-Restart.
+- **Considered**: turbo als Default behalten (verworfen — Qualität); Modell pro Host unterschiedlich (verworfen — Hosts sollen gleich sein); Modell zentral konfigurieren (verworfen — es gibt keinen zentralen Ort, die Bot-`.env` ist der einzige).
+- **Tradeoff**: Etwas höhere Transkriptions-Latenz. Neue Hosts müssen den Wert bewusst setzen — der Unit-Template-Kommentar (`dotfiles/systemd/user/oc-tg-bot.service`) nennt ihn deshalb explizit.
+- **Issue**: #111

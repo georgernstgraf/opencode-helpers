@@ -1,0 +1,47 @@
+# opencode-helpers — dotfiles/systemd/user/oc-tg-bot.service
+# Vorlage: OpenCode-Telegram-Bot als userbezogene systemd-Unit.
+# Je Host eine Instanz mit eigenem Telegram-Bot-Token (BotFather) — der Token
+# wird NIE geteilt und liegt nur in der lokalen Bot-.env.
+#
+# Installation (Beispiel Host kik):
+#   mkdir -p ~/.config/oc-tg-bot-kik                      # Mode 700
+#   $EDITOR ~/.config/oc-tg-bot-kik/.env                  # Mode 600, Keys s. u.
+#   cp dotfiles/systemd/user/oc-tg-bot.service \
+#      ~/.config/systemd/user/oc-tg-bot-kik.service       # <HOST> → kik
+#   # <NODE_BIN_DIR> = $(dirname "$(which node)")  (nvm-Pfad, versionsabhängig —
+#   #                 deshalb pro Host einsetzen, nicht aus dem Repo erwartbar)
+#   sudo loginctl enable-linger "$USER"
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now oc-tg-bot-kik.service
+#
+# Voraussetzungen: node >= 22.14 (%NODE_BIN_DIR%/npx), laufender
+# opencode.service, Port aus OPENCODE_API_URL = Port des Servers
+# (Default V2: http://127.0.0.1:49374).
+#
+# .env-Keys (Secrets nur lokal, Mode 600 — nie ins Repo):
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_ALLOWED_USER_ID (Whitelist, @userinfobot)
+#   OPENCODE_SERVER_VERSION=v2
+#   OPENCODE_API_URL, OPENCODE_SERVER_USERNAME=opencode
+#   OPENCODE_SERVER_PASSWORD     ← opencode service get password
+#   OPENCODE_MODEL_PROVIDER, OPENCODE_MODEL_ID, LOG_LEVEL, BOT_LOCALE
+#   STT_API_URL, STT_API_KEY, STT_MODEL=whisper-large-v3 (Groq, quality-first:
+#   non-turbo — Voice-Transkription, siehe DECISIONS.md 2026-10-17)
+#
+# OPENCODE_TELEGRAM_HOME (<appHome>) enthält .env, settings.json und logs/.
+# Bewusst KEIN `ExecStartPre=rm settings.json`: das verwirft Bot-Einstellungen,
+# Pinned Message und Session-Cache bei jedem Neustart.
+
+[Unit]
+Description=OpenCode Telegram Bot (<HOST>)
+After=network-online.target opencode.service
+Wants=network-online.target
+
+[Service]
+Environment=OPENCODE_TELEGRAM_HOME=%h/.config/oc-tg-bot-<HOST>
+Environment=PATH=<NODE_BIN_DIR>:/usr/bin:/bin
+ExecStart=<NODE_BIN_DIR>/npx -y @grinev/opencode-telegram-bot@latest
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=default.target

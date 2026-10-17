@@ -1,0 +1,43 @@
+# opencode-helpers — dotfiles/systemd/user/opencode.service
+# Vorlage: OpenCode-V2-Background-Service als userbezogene systemd-Unit.
+#
+# Installation (je Host, Nutzer georg/grafg):
+#   mkdir -p ~/.config/systemd/user
+#   cp dotfiles/systemd/user/opencode.service ~/.config/systemd/user/
+#   sudo loginctl enable-linger "$USER"   # PFLICHT: sonst startet die Unit
+#                                         # weder nach Reboot noch ohne Login
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now opencode.service
+#
+# `%h` ist das Home des Users (systemd-Specifier) — die Unit ist damit für
+# georg und grafg identisch. Host/Port/Passwort stehen NICHT in der Unit,
+# sondern in ~/.config/opencode/service.json:
+#   opencode service get password            # Passwort (Basic-Auth, User=opencode)
+#   opencode service set hostname 127.0.0.1  # optionaler Port-Pin
+#   opencode service set port 4096           # ohne Pin: V2-Default 49374
+#
+# Voraussetzung: Standalone-Installation unter %h/.opencode/bin/opencode
+# (curl-Methode). Der Bot-Client (oc-tg-bot.service) verbindet sich mit
+# OPENCODE_API_URL auf genau diesen Port — Port-Änderungen dort mitziehen.
+#
+# UMask=0077: Der Service legt Session-/Log-/Service-Dateien nur für den
+# Eigentümer an (Konvention der Geheimnis-Hygiene, vgl. claw). Kein Nachteil
+# auf Einzelnutzer-Hosts; ein zweiter Nutzer kann den Server nicht lesen.
+
+[Unit]
+Description=OpenCode V2 Server (background service)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+UMask=0077
+WorkingDirectory=%h
+ExecStartPre=-%h/.opencode/bin/opencode upgrade --method curl
+TimeoutStartSec=300
+ExecStart=%h/.opencode/bin/opencode serve --service
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
