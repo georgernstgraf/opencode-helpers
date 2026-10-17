@@ -25,6 +25,11 @@ systemctl --user enable --now opencode.service oc-tg-bot-<HOST>.service
 
 - **`enable-linger` ist Pflicht**: ohne Lingering startet der User-Manager die
   Units weder nach einem Reboot noch, wenn kein Login offen ist.
+- **PATH**: Units (und `systemd-run`-Hilfsskripte) erben den interaktiven
+  Shell-PATH **nicht** — `~/.opencode/bin` kommt aus `~/.bashrc`, nicht aus dem
+  User-Manager. `opencode`, `npx`, `journalctl` … gehören in Unit-Skripten
+  absolut aufgerufen, sonst `command not found` (real passiert 2026-10-17 bei
+  der Übergabe des kik-Servers an die Unit).
 - **Port**: ohne Pin nutzt V2 den Default `127.0.0.1:49374`; ein Pin geschieht
   host-lokal über `opencode service set hostname|port` (nicht in der Unit).
 - **Passwort**: `opencode service get password`. Basic-Auth-Nutzername ist
