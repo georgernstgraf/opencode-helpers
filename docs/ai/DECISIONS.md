@@ -457,6 +457,13 @@ Each entry documents WHAT was decided and WHY.
 - **Origin**: Recherche einmalig über HF-API (`safetensors.total`), OpenRouter (`hugging_face_id`), Vendor-Docs und Artificial Analysis; Skill hält den Ablauf für neue Modelle reproduzierbar.
 - **Issue**: #88
 
+## 2026-10-19: SearXNG-Skill instanz-neutral (#112)
+- **Choice**: `searxng-search.sh` ships no endpoints and no credentials: `SEARXNG_PRIMARY` is **required** (clear config-error envelope otherwise), `SEARXNG_FALLBACK` optional; auth per instance only (`_AUTH` direct value — set-but-empty = no auth — or `_CRED_FILE`). The built-in instance list (`claw` + dead public fallbacks `etsi.me`/`baresearch.org`) and the shared `$SEARXNG_AUTH`/`~/.config/opencode/searxng.cred` default are removed. Chain profile `gregor` renamed to `strict` (legacy alias accepted until host overlays migrate). SKILL.md and the MCP tool description carry no domain/URL; deployment specifics point at the instance host's repository. Tests now inject env assignments instead of patching the `INSTANCES` literal.
+- **Reason**: The skill runs on private hosts (→ private claw instance) and school hosts (→ school gregor instance, owner repo `Die-Spengergasse/KI-Kustodiat` #36). A hardcoded private domain leaked into school agents; a shared credential default risked sending private credentials to any instance; cross-instance fallbacks were the very entanglement being removed.
+- **Considered**: Keeping claw as built-in default (rejected — leaks the private domain into school contexts); per-skill profiles as example files (rejected — instance knowledge belongs to the host, not the portable skill); keeping the shared cred default (rejected — implicit credential spray).
+- **Tradeoff**: Hosts without an overlay now fail loudly instead of silently using a default; per-instance auth is more config, but explicit. `SEARXNG_AUTH` env var and `searxng.cred` fallback semantics are gone — existing overlays using `_CRED_FILE` are unaffected.
+- **Issue**: #112
+
 ## 2026-09-28: knowledge-persistence endet immer mit eigenem Commit + Push (#89)
 
 - **Choice**: `knowledge-persistence` schreibt die `docs/ai/`-Dateien und **committet + pusht sie danach zwingend** in einem eigenen Commit mit Issue-Referenz (`docs: persist knowledge (#N)`; SVN: `svn ci`). `issue-workflow` wurde angeglichen: `commit`/`finish` erzeugen danach keinen leeren Commit mehr und erwarten einen **Post-Close-Follow-up-Commit**, weil `STATE.md`/`HANDOFF.md` den geschlossenen Zustand protokollieren. `commands/knowledge-persist.md` nennt den Commit+Push ebenfalls.

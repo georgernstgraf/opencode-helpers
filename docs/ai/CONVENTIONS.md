@@ -15,7 +15,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Lesson directories inside class folders live directly as `<YYYY-MM-DD>__<topic>/` with `lesson.html` + `README.md` (e.g., `2026-09-25__r-kennzahlen-und-verteilungen`); create-lesson never uses a separate `lessons/` folder (existing such folders are legacy).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
 - MCP servers live inside the skill that owns them (`skills/<name>/scripts/`); `opencode.json` references the server by absolute path — no `~/bin` indirection.
-- Shared skills and scripts must use host-independent service URLs (e.g., `https://searxng.claw.graf.priv.at`), never host-local endpoints like `localhost` ports.
+- Shared skills and scripts ship **no service endpoints and no credentials** — instance selection, endpoints and auth come exclusively from host-local overlays (e.g. `mcp.searxng.environment` in each host's `opencode.json`; see `skills/searxng/env.sample`). Never hardcode a domain, URL or credential default in shared code.
 
 ## Classroom Material (create-lesson)
 

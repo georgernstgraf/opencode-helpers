@@ -1,10 +1,12 @@
 # Project State
 
-Current status as of 2026-10-17.
+Current status as of 2026-10-19.
 
 ## Current Focus
 
-Host-Services sind seit 2026-10-17 versioniert und auf `kik` umgesetzt (#111):
+SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
+
+Davor (#111): Host-Services sind seit 2026-10-17 versioniert und auf `kik` umgesetzt:
 `dotfiles/systemd/user/{opencode,oc-tg-bot}.service` als Vorlagen für den
 OpenCode-V2-Server (nur `127.0.0.1`, Basic-Auth-Passwort aus
 `~/.config/opencode/service.json`) und je Host einen eigenen Telegram-Bot.
