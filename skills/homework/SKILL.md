@@ -139,9 +139,10 @@ list current:
 
 1. Locate the cohort README (`README.md` in the class folder root).
 2. Look for a `## Aufgaben` section near the top. If it is missing, create it
-   as the FIRST section (before all other content) with a one-line lead-in
-   such as "Kanonische Liste aller Aufgaben — Details im jeweiligen
-   Tagesordner."
+   as the FIRST section (before all other content) — heading and entries only,
+   **no lead-in line**: the list starts directly with the newest entry.
+   If an existing section carries a lead-in line (e.g. "Kanonische Liste aller
+   Aufgaben …"), remove it and keep the entries.
 3. Check whether an entry for this lesson already exists (same ISO date).
 4. If missing, ADD one spare bullet line — one sentence or a few words, plus
    a relative link to the lesson directory (a Markdown link whose target is
@@ -151,8 +152,9 @@ list current:
    - 2026-10-13: Kurzbeschreibung der Aufgabe → `2026-10-13_thema/`
    ```
 
-5. Insert the entry in ascending date order. Never reorder, reword, or delete
-   existing entries.
+5. Insert the entry at the **top** of the list: the list runs **newest first**
+   (descending ISO date). Never reword or delete existing entries. A list that
+   still runs oldest-first gets flipped once, whole, in the same pass.
 6. The list is an INDEX only — never copy the full task text into the cohort
    README.
 
