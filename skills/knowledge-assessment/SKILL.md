@@ -36,7 +36,11 @@ grading files. The repository-based skills (`repograde`, `projectgrade`) are the
 ones that use Git; their rules are unchanged.
 
 The skill grades student submissions located in the current working directory
-alongside knowledge-check solution files.
+alongside knowledge-check solution files. **The solution files
+(`knowledge_<klasse>_<date>_solutions.md`) live in the teacher's private
+`<subject>-T` exam repo** (sibling of the teaching repo, see the
+`knowledge-exam` skill) — never in the public teaching repo. If they are not
+present in the current working directory, ask the user for their location.
 
 ## Inputs
 

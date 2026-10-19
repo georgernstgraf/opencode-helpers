@@ -1,6 +1,6 @@
 ---
 name: knowledge-exam
-description: Generate German knowledge-check exams and solution files from class Git history
+description: Generate German knowledge-check exams and solution files from the taught material (class Git history + WebUntis Lehrstoff)
 license: MIT
 compatibility: opencode
 metadata:
@@ -13,7 +13,8 @@ metadata:
 ## Purpose
 
 This skill creates a German knowledge-check exam for a specific class folder
-based on recent Git history. Use it when asked to generate a mini-exam from the
+based on the taught material (class Git history, cohort directories and the
+WebUntis Lehrstoff record). Use it when asked to generate a mini-exam from the
 material covered in class.
 
 ## Output Language: MANDATORY GERMAN
@@ -39,10 +40,31 @@ Before generating files:
    folder layout (flat vs. dated subfolder, cohort suffixes like `4ahwit-x`),
    and the formelle Anrede rule (Du vs. Sie per class).
 
+Additional rules (discovered in practice):
+
+- **Prüfungs-Angaben gehören IMMER ins `-T`-Repo** — Knowledge-Checks, PLFs
+  und sonstige Prüfungsangaben, niemals ins öffentliche Teaching-Repo.
+  HÜ-/Aufgaben-Dateien (`Aufgabe.md` im Klassenordner) sind *keine*
+  Prüfungs-Angaben: sie bleiben im Teaching-Repo, damit Schüler:innen sie
+  per Clone erreichen (homework-Workflow).
+- **Fehlender Kohorten-Ordner im `-T`-Repo ist normal** bei Semesterstart
+  (neues SJ: alte `4aaif/`-artige Ordner liegen noch flach im Root, die
+  neuen `3aaif/` etc. existieren noch nicht). In diesem Fall den Ordner
+  nach den `-T`-AGENTS.md-Konventionen anlegen — nicht abbrechen.
+- **Der Zug ist im Klassennamen kodiert** (`3aaif` vs. `3caif`, bzw.
+  `3ahwii`-artige Kürzel) — keine künstlichen Zusatz-Suffixe erfinden
+  (`-x`, `-a` o. ä.), außer das `-T`-AGENTS.md verlangt sie explizit
+  (z. B. bei mehreren parallelen Gruppen derselben Klasse).
+
 ## Inputs
 
 - `class`: target class folder name.
-- `weeks`: number of weeks of Git history to analyze.
+- `fach`: (optional) WebUntis-Fachkürzel für den Lehrstoff-Abgleich, z. B.
+  `WMC_1`. Wird es weggelassen, über `wu klasse <KLASSE> --details` auflösen
+  (Suche nach dem eigenen Fach); schlägt das fehl, ohne WebUntis weiterarbeiten.
+- `weeks`: (optional) Begrenzung der Git-Historie des Kohorten-Ordners als
+  Zeitanker (Schritt 3); der Prüf-Umfang kommt primär aus WebUntis-Lehrstoff
+  und Kohorten-READMEs.
 - `exam-date`: (mandatory) the planned exam date, must be either:
   - An ISO date (YYYY-MM-DD format).
   - The literal `today`.
@@ -60,8 +82,9 @@ Before generating files:
   repository** (see "Target Repository" section above), not in the teaching
   repo. If the folder does not exist, it may need to be created there —
   check the repo's AGENTS.md conventions first.
-- If the class folder cannot be located or the target repo is missing, stop
-  immediately and report that the class name appears to be invalid.
+- If the `-T` repo cannot be located, stop and ask the user. If only the
+  **class folder** is missing, that is normal at semester start — create it
+  (see "Target Repository" above), do not abort.
 - **Resolve exam-date to ISO format**:
   - If `exam-date` is an ISO date (YYYY-MM-DD), use it as-is.
   - If `exam-date` is `today`, compute today's ISO date.
@@ -79,14 +102,36 @@ Before generating files:
   - If the user declines, ask for specific counts before continuing.
 - Do NOT ask for confirmation when at least one count was explicitly provided.
 
-### 3. Inspect Source Material
+### 3. Stoffbasis: Kohorten-Dir, Lessons & WebUntis-Abgleich
 
-- Analyze Git commits from the last `weeks` weeks that changed files inside the
-  class folder.
-- Treat minimal commits as lecture anchors rather than complete coverage; infer
-  the broader classroom context from the changed material in those commits.
-- Review the changed files as needed to understand the topics that were likely
-  taught.
+Der Prüf-Umfang ist definiert durch **was tatsächlich unterrichtet wurde** —
+nicht durch den Semesterplan. Drei Quellen, in dieser Reihenfolge gewichtet:
+
+1. **WebUntis (Authoritäts-Quelle):** `wu lesson <KLASSE>/<FACH> termine
+   --mit-lehrstoff` (z. B. `wu lesson 3AAIF/WMC_1 termine --mit-lehrstoff`)
+   liefert alle Termine mit eingetragenem Lehrstoff. Achtung: bei langen
+   Listen großzügigen Timeout setzen. Der Lehrstoff **fence**t den Prüf-Umfang:
+   Fragen dürfen nichts abdecken, was dort nie aufgetaucht ist (z. B. Formulare
+   in 3caif ja, in 3aaif nein — Stoffstand strikt kohorenscharf).
+2. **Kohorten-Dir im Teaching-Repo:** datierte Tagesordner
+   (`YYYY-MM-DD[_]thema/`) mit READMEs, Lesson-Dateien, Demos und
+   Aufgabe-Dateien. Die READMEs spiegeln den realen Stoffstand inkl.
+   Abgaben und Ausnahmen.
+3. **Referenzierte Materialien:** Prepared Lessons (`unterricht/<PREFIX>-NN-*`),
+   Beispielprojekte und Unterlagen, soweit sie von den Kohorten-READMEs
+   verlinkt sind — dort steht die Stofftiefe für Detailfragen.
+
+Ergänzend: Git-Historie des Kohorten-Ordners als Zeitanker
+(`git log --since=<start> -- <kohorte>`), um den unterrichteten Zeitraum
+abzugrenzen. Minimal-Commits sind Stunden-Anker, keine vollständige Abdeckung.
+
+- Taucht bei erledigten Terminen **kein Lehrstoff** auf (Status „offen"),
+  dem User melden; `wu lesson … lehrstoff eintragen` nur auf expliziten
+  Wunsch (Text via `--text-datei` wegen Umlauten, beide parallelen
+  Termin-IDs je Datum beschreiben, vorher `--testlauf`).
+- **Mehrere Kohorten gleichzeitig?** Pro Kohorte einen eigenen Subagenten
+  mit identischem Format-Spec spawnen (parallel) und danach zentral
+  gegenlesen.
 
 ### 4. Generate Exam Files
 
@@ -110,8 +155,40 @@ Before generating files:
 - Create `knowledge_<class>_<isodate>_solutions.md` in the same folder.
 - Keep the student-facing exam and the solution file separate.
 - Do not include the solutions in the student-facing exam file.
+- Solution layout per MC question: which options are correct (z. B.
+  „Richtig: a ☑, b ☑, c ☐, d ☑") **plus** ein Satz Begründung je Option —
+  die Markierungen müssen mit den Erklärungen übereinstimmen (Abweichung
+  zwischen Header-Zeile und ✔/✘-Erklärungen war schon ein echter Fehler).
+- Solution layout per free-form question: Musterlösung + Wertungs-Skizze,
+  deren Teilschritte **exakt** auf die Frage-Punkte (Standard 15 P) summieren.
+- The solution file is teacher-facing: kein Schüler-Footer (Name/Datum-Felder,
+  „Gutes Gelingen") am Ende.
 
-### 6. Constraints
+### 6. Quality Gate (vor der Übergabe, Pflicht)
+
+Vor der Ablieferung beide Dateien systematisch prüfen — jedes dieser
+Kriterien ist in der Praxis schon verletzt worden:
+
+- **Rater-Sicherheit:** Option a) darf nicht (fast) immer die richtige sein.
+  Bei erkennbaren Mustern rotieren: wahre Option mit einer falschen Position
+  tauschen (Text wandert, Lösungsmarkierung wandert mit). Faustregel: blindes
+  Ankreuzen (z. B. „immer a+b+c") darf nicht mehr als ~70 % bringen.
+  Falsche Optionen über die Positionen a–d verteilen, nicht geballt auf d).
+  Die Anzahl korrekter Optionen je Frage mischen (nicht alle Fragen mit
+  „3 richtige").
+- **Wertung:** MC = 4 P; Summen der Freitext-Wertungs-Skizzen = Frage-Punkte;
+  Gesamtpunkte in Header und Footer identisch.
+- **Konsistenz Exam↔Solutions:** Fragennummerierung, Titel, Reihenfolge und
+  Optionentexte deckungsgleich; Markierungen passend zur Option-Reihenfolge
+  (skriptbasiert prüfbar).
+- **Keine Duplikate:** derselbe Fakt (oder dieselbe Rechnung mit denselben
+  Zahlen) nicht doppelt prüfen — weder MC↔MC noch MC↔Freitext.
+- **Sprache:** durchgehend Du/Sie laut `-T`-AGENTS.md, echte Umlaute,
+  kein Englisch in Fragen; Fachbegriffe nur, wenn sie unterrichtet wurden
+  (z. B. einen unbehandelten Spec-Term vermeiden und das Verhalten stattdessen
+  als beobachtbares Ergebnis abfragen).
+
+### 7. Constraints
 
 - Do not commit any generated files, EVER. The teacher will add them manually
   after the exam is over.
