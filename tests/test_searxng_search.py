@@ -292,13 +292,10 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(len(secondary.requests), 1)
 
     def test_explicit_empty_auth_sends_no_credentials(self):
-        import base64
-
         mock = self._mock(engine_results={"bing": BING})
         env = {
             "SEARXNG_PRIMARY": mock.url,
             "SEARXNG_PRIMARY_AUTH": "",
-            "SEARXNG_AUTH": "user:pass",
         }
 
         out = self._run_env(str(SCRIPT), env, "bingcase")
@@ -306,13 +303,18 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(out["engine_used"], "bing")
         self.assertEqual(mock.requests[0]["authorization"], "")
 
-    def test_shared_auth_reaches_primary_without_override(self):
+    def test_cred_file_auth_reaches_primary(self):
         import base64
+        import tempfile
 
         mock = self._mock(engine_results={"bing": BING})
+        with tempfile.NamedTemporaryFile("w", suffix=".cred", delete=False) as fh:
+            fh.write("user:pass\n")
+            cred_path = fh.name
+        self.addCleanup(lambda: Path(cred_path).unlink(missing_ok=True))
         env = {
             "SEARXNG_PRIMARY": mock.url,
-            "SEARXNG_AUTH": "user:pass",
+            "SEARXNG_PRIMARY_CRED_FILE": cred_path,
         }
 
         out = self._run_env(str(SCRIPT), env, "bingcase")
@@ -323,10 +325,25 @@ class SearxngSearchTest(unittest.TestCase):
             "Basic " + base64.b64encode(b"user:pass").decode(),
         )
 
-    # --- SEARXNG_CHAIN=gregor profile -----------------------------------------
-    def test_gregor_chain_starts_with_bing(self):
+    def test_unset_auth_sends_no_credentials(self):
         mock = self._mock(engine_results={"bing": BING})
-        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
+        env = {"SEARXNG_PRIMARY": mock.url}
+
+        out = self._run_env(str(SCRIPT), env, "bingcase")
+
+        self.assertEqual(out["engine_used"], "bing")
+        self.assertEqual(mock.requests[0]["authorization"], "")
+
+    def test_missing_primary_reports_configuration_error(self):
+        out = self._run_env(str(SCRIPT), {}, "somequery")
+
+        self.assertFalse(out["success"])
+        self.assertIn("No SearXNG instance configured", out["error"])
+
+    # --- SEARXNG_CHAIN=strict profile -----------------------------------------
+    def test_strict_chain_starts_with_bing(self):
+        mock = self._mock(engine_results={"bing": BING})
+        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "strict"}
 
         out = self._run_env(str(SCRIPT), env, "bingcase")
 
@@ -336,20 +353,29 @@ class SearxngSearchTest(unittest.TestCase):
         self.assertEqual(len(mock.requests), 1)
         self.assertEqual(mock.requests[0]["engines"], "bing")
 
-    def test_gregor_chain_falls_back_to_yahoo_then_braveapi(self):
+    def test_strict_chain_falls_back_to_yahoo_then_braveapi(self):
         mock = self._mock(engine_results={"braveapi": API_RESULTS})
-        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
+        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "strict"}
 
         out = self._run_env(str(SCRIPT), env, "weakcase")
 
         self.assertEqual(out["engine_used"], "braveapi")
         self.assertTrue(out["fallback_used"])
         self.assertEqual(out["tried"], ["bing", "yahoo", "braveapi"])
-        # No free-tier request: the gregor profile skips mwmbl/searchmysite.
+        # No free-tier request: the strict profile skips mwmbl/searchmysite.
         self.assertNotIn(
             "mwmbl", [r["engines"] for r in mock.requests]
         )
         self.assertEqual(len(mock.requests), 3)
+
+    def test_gregor_alias_maps_to_strict_profile(self):
+        mock = self._mock(engine_results={"braveapi": API_RESULTS})
+        env = {"SEARXNG_PRIMARY": mock.url, "SEARXNG_CHAIN": "gregor"}
+
+        out = self._run_env(str(SCRIPT), env, "weakcase")
+
+        self.assertEqual(out["engine_used"], "braveapi")
+        self.assertEqual(out["tried"], ["bing", "yahoo", "braveapi"])
 
 
 if __name__ == "__main__":

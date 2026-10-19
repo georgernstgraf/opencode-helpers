@@ -16,48 +16,22 @@
 # NOTE (2026-10-08): brave -> 429 and google -> HTTP 403 are upstream-broken
 # (google's engine still calls the retired /wml/search endpoint, searxng#5867),
 # so the chain is built on bing/yahoo, which work on every tested egress IP.
-# Profiles: SEARXNG_CHAIN=gregor walks bing -> yahoo -> braveapi with no
-# free tier (school instance). Instances and per-instance auth come from
-# SEARXNG_PRIMARY[/_AUTH]/SEARXNG_FALLBACK[/_AUTH] (see env.sample).
+# Profiles: SEARXNG_CHAIN=strict walks bing -> yahoo -> braveapi with no free
+# tier. Instances and per-instance auth are entirely host-provided via
+# SEARXNG_PRIMARY[/_AUTH|_CRED_FILE]/SEARXNG_FALLBACK[/_AUTH|_CRED_FILE]
+# (see env.sample) -- this script ships no endpoints and no credentials.
 
 set -e
-
-# Instance chain - public primary, then public fallbacks.
-# No localhost entry: the skill runs on multiple hosts; only the SearXNG
-# host itself would resolve localhost:8888.
-#
-# Env overrides (see env.sample): SEARXNG_PRIMARY replaces the whole list;
-# SEARXNG_FALLBACK appends a second instance. Each instance has its own
-# auth (SEARXNG_PRIMARY_AUTH / SEARXNG_FALLBACK_AUTH as "user:password",
-# or SEARXNG_PRIMARY_CRED_FILE / SEARXNG_FALLBACK_CRED_FILE pointing at a
-# file with that format); empty means the shared default below.
-INSTANCES=(
-    "https://searxng.claw.graf.priv.at"
-    "https://etsi.me"
-    "https://baresearch.org"
-)
 
 TIMEOUT=20
 FOLLOWUP_TIMEOUT=12
 MAX_RESULTS=10
 USER_AGENT="opencode-searxng/1.4"
 
-# Optional shared-secret auth for the public instance (HTTP Basic, enforced at
-# nginx). Read from $SEARXNG_AUTH or ~/.config/opencode/searxng.cred as
-# "user:password"; when absent, requests are sent unauthenticated.
-# This is the DEFAULT used for every instance without a per-instance override.
-AUTH="${SEARXNG_AUTH:-}"
-if [[ -z "$AUTH" && -r "${HOME}/.config/opencode/searxng.cred" ]]; then
-    AUTH="$(head -n1 "${HOME}/.config/opencode/searxng.cred")"
-fi
-CURL_AUTH=()
-if [[ -n "$AUTH" ]]; then
-    CURL_AUTH=(--user "$AUTH")
-fi
-
-# Resolve one per-instance auth value. Set-but-empty direct value means
-# "no auth for this instance"; unset direct/file values mean "use the
-# shared CURL_AUTH default" (sentinel __SHARED__).
+# Resolve one per-instance auth value: the direct _AUTH value when the
+# variable is set (set-but-empty means "no auth for this instance"),
+# else the first line of _CRED_FILE when it is set and readable, else
+# no auth.
 resolve_instance_auth() {
     local dref="$1" fref="$2"
     if [[ -v $dref ]]; then
@@ -65,37 +39,45 @@ resolve_instance_auth() {
     elif [[ -v $fref && -n "${!fref}" && -r "${!fref}" ]]; then
         head -n1 "${!fref}"
     else
-        printf '__SHARED__'
+        printf ''
     fi
 }
 
-INSTANCE_AUTHS=()
-if [[ -n "${SEARXNG_PRIMARY:-}" ]]; then
-    INSTANCES=("$SEARXNG_PRIMARY")
-    INSTANCE_AUTHS=(
-        "$(resolve_instance_auth SEARXNG_PRIMARY_AUTH SEARXNG_PRIMARY_CRED_FILE)"
+# Instance configuration - entirely host-provided. The skill ships NO
+# endpoints and NO credentials: SEARXNG_PRIMARY is required, SEARXNG_FALLBACK
+# is optional and tried in order. Each instance carries its own auth
+# (SEARXNG_PRIMARY_AUTH / SEARXNG_FALLBACK_AUTH as "user:password", or
+# SEARXNG_PRIMARY_CRED_FILE / SEARXNG_FALLBACK_CRED_FILE pointing at a file
+# with that format; the first line is used). Set-but-empty _AUTH means
+# "no auth for this instance"; an unset _AUTH/_CRED_FILE pair also means
+# no auth. There is deliberately no shared default credential.
+if [[ -z "${SEARXNG_PRIMARY:-}" ]]; then
+    cat <<EOF
+{
+    "success": false,
+    "error": "No SearXNG instance configured",
+    "suggestion": "Set SEARXNG_PRIMARY (and optionally SEARXNG_FALLBACK) in this host's opencode.json mcp.searxng.environment or shell profile - see skills/searxng/env.sample"
+}
+EOF
+    exit 0
+fi
+INSTANCES=("$SEARXNG_PRIMARY")
+INSTANCE_AUTHS=(
+    "$(resolve_instance_auth SEARXNG_PRIMARY_AUTH SEARXNG_PRIMARY_CRED_FILE)"
+)
+if [[ -n "${SEARXNG_FALLBACK:-}" ]]; then
+    INSTANCES+=("$SEARXNG_FALLBACK")
+    INSTANCE_AUTHS+=(
+        "$(resolve_instance_auth SEARXNG_FALLBACK_AUTH SEARXNG_FALLBACK_CRED_FILE)"
     )
-    if [[ -n "${SEARXNG_FALLBACK:-}" ]]; then
-        INSTANCES+=("$SEARXNG_FALLBACK")
-        INSTANCE_AUTHS+=(
-            "$(resolve_instance_auth SEARXNG_FALLBACK_AUTH SEARXNG_FALLBACK_CRED_FILE)"
-        )
-    fi
 fi
 
 # Curl auth args for instance $1 (index into INSTANCES): the per-instance
-# value when set, no auth when explicitly emptied, otherwise the shared
-# default. Result in $AUTH_ARGS.
+# value when non-empty, no auth otherwise. Result in $AUTH_ARGS.
 auth_args_for() {
-    # No colon in ${..-..}: an explicitly emptied entry means "no auth",
-    # only a missing entry falls back to the shared default.
-    local idx="$1" per="${INSTANCE_AUTHS[$idx]-__SHARED__}"
+    local idx="$1" per="${INSTANCE_AUTHS[$idx]-}"
     AUTH_ARGS=()
-    if [[ "$per" == "__SHARED__" ]]; then
-        if [[ "${#CURL_AUTH[@]}" -gt 0 ]]; then
-            AUTH_ARGS=("${CURL_AUTH[@]}")
-        fi
-    elif [[ -n "$per" ]]; then
+    if [[ -n "$per" ]]; then
         AUTH_ARGS=(--user "$per")
     fi
 }
@@ -107,9 +89,10 @@ CHAIN_SECONDARY="yahoo"
 FREE_FALLBACK="mwmbl,searchmysite"
 FALLBACK_ENGINE="braveapi"
 FALLBACK_MIN_RESULTS=3
-# Chain profile (see env.sample): "gregor" serves the Gregor school instance
-# as bing -> yahoo -> braveapi with no free last-resort tier.
-if [[ "${SEARXNG_CHAIN:-default}" == "gregor" ]]; then
+# Chain profile (see env.sample): "strict" skips the free last-resort tier
+# (bing -> yahoo -> braveapi only). The legacy value "gregor" is accepted as
+# a deprecated alias until every host overlay is migrated, then removed.
+if [[ "${SEARXNG_CHAIN:-default}" == "strict" || "${SEARXNG_CHAIN:-default}" == "gregor" ]]; then
     CHAIN_PRIMARY="bing"
     CHAIN_SECONDARY="yahoo"
     FREE_FALLBACK=""

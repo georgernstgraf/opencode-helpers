@@ -1,20 +1,48 @@
 ---
 name: searxng
-description: "Search the web using local SearXNG instance. Use when: user asks to search the web, find information, or look something up. Self-hosted at searxng.claw.graf.priv.at."
+description: "Search the web using a configured self-hosted SearXNG instance. Use when: user asks to search the web, find information, or look something up."
 metadata: { "openclaw": { "emoji": "🔍" } }
 ---
 
 # SearXNG Web Search Skill
 
-Search the web using self-hosted SearXNG at `searxng.claw.graf.priv.at`.
+Search the web using self-hosted SearXNG instances. **This skill is
+instance-neutral**: it ships no endpoints and no credentials. Which instance(s)
+it queries is decided entirely by the host's environment overlay (see
+`env.sample` and the "Environment contract" section below). Deployment
+specifics of any concrete instance (host, network path, auth setup, engine
+matrix) are documented in that host's own repository — not here.
 
 ## Architecture
 
 Three layers, bottom-up:
 
-1. **SearXNG instance** — self-hosted at `https://searxng.claw.graf.priv.at/search` (nginx → `localhost:8888` on the SearXNG host). JSON API: `?q=QUERY&format=json`.
-2. **`searxng-search.sh`** — canonical search logic. Plain bash script that `curl`s the JSON API, returns JSON on stdout. Primary instance is the public URL `searxng.claw.graf.priv.at` (works on every host — only the SearXNG host itself would resolve `localhost:8888`); the historical public mirrors (`etsi.me`, `baresearch.org`) no longer serve `format=json` to anonymous clients (see below). Usable standalone: `./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
-3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
+1. **SearXNG instance(s)** — self-hosted, host-specific. The JSON API is
+   `GET <instance>/search?q=QUERY&format=json`.
+2. **`searxng-search.sh`** — canonical search logic. Plain bash script that
+   `curl`s the JSON API, returns JSON on stdout. Usable standalone:
+   `SEARXNG_PRIMARY=... ./searxng-search.sh "query" [lang] [page] [category] [engines] [time_range] [safesearch]`.
+3. **`skills/searxng/scripts/opencode-searxng`** — thin MCP stdio server (Python 3, stdlib only). Speaks JSON-RPC 2.0 over stdin/stdout, exposes one tool `search`, and shells out to `searxng-search.sh`. Registered in the host's `~/.config/opencode/opencode.json` under `mcp.searxng`, so OpenCode exposes it as the **`searxng_search`** tool.
+
+## Environment contract (instance selection and auth)
+
+| Variable | Meaning |
+|---|---|
+| `SEARXNG_PRIMARY` | **Required.** Base URL of the primary instance. Without it the script reports a configuration error instead of querying anything. |
+| `SEARXNG_FALLBACK` | Optional second instance, tried in order when the primary yields nothing usable. |
+| `SEARXNG_PRIMARY_AUTH` / `SEARXNG_FALLBACK_AUTH` | HTTP Basic credentials for that instance as `user:password`. Set-but-empty means "no auth for this instance". |
+| `SEARXNG_PRIMARY_CRED_FILE` / `SEARXNG_FALLBACK_CRED_FILE` | Path to a file whose first line holds `user:password` (mode `600`). |
+| `SEARXNG_CHAIN` | Engine-chain profile: `default` or `strict` (see below). |
+
+Rules:
+
+- There is **no shared default credential** and no built-in instance list.
+  An instance without `_AUTH`/`_CRED_FILE` is queried unauthenticated.
+- Real credentials live in host-local overlays only — never in this repo.
+  Copy `skills/searxng/env.sample` as the starting point.
+- The `run_query` loop walks the instance chain (primary first) and accepts
+  the first instance that returns a usable answer; `instance` in the result
+  envelope names the instance that actually served the query.
 
 ## Prioritized Engine Chain with a Token Gate
 
@@ -27,26 +55,19 @@ the first tier that returns results (default profile):
 4. `braveapi` — paid API, queried **only** when tiers 1–2 failed *and* the
    tier-3 free result has fewer than `FALLBACK_MIN_RESULTS` (3) hits
 
+### Chain profile `strict` (env.sample)
+
+`SEARXNG_CHAIN=strict` skips the free last-resort tier:
+`bing` → `yahoo` → `braveapi` (tier 3 is the API, ungated). The legacy
+profile value `gregor` is accepted as a deprecated alias only until every
+host overlay is migrated, then it will be removed.
+
 > **Why not `brave`/`google`?** As of 2026-10-08 both are upstream-broken,
 > independent of the egress IP: `brave` answers `429` and the `google` engine
 > still calls the retired `/wml/search` endpoint (`HTTP 403`, searxng#5867).
 > `bing` and `yahoo` were the only general engines that worked on every tested
 > egress IP (VPS, school, residential). `brave`/`google` stay enabled
 > server-side for a future upstream fix, but are no longer in the chain.
-
-### Chain profiles and instance overlay (`env.sample`)
-
-- `SEARXNG_CHAIN=gregor` selects the school-instance profile:
-  `bing` → `yahoo` → `braveapi` with **no** free tier
-  (tier 3 is the API, ungated).
-- `SEARXNG_PRIMARY` replaces the built-in instance list,
-  `SEARXNG_FALLBACK` appends a second instance. Each instance carries its
-  own auth (`SEARXNG_PRIMARY_AUTH` / `SEARXNG_FALLBACK_AUTH` as
-  `user:password`, or `..._CRED_FILE` pointing at such a file); empty means
-  no auth for that instance. Unset variables keep the built-in public chain
-  with the shared `$SEARXNG_AUTH` / `searxng.cred` default.
-- Real credentials live in private overlays only — never in this repo.
-  Copy `skills/searxng/env.sample` as the starting point.
 
 A tier "fails" when the engine is suspended (`unresponsive_engines`) or returns
 0 results. When `braveapi` runs, its results are merged **ahead of** the free
@@ -74,17 +95,12 @@ tier-3 results, deduplicated by URL.
 ## Backend Egress (deployment detail)
 
 Search quality and which engines are usable depend on the SearXNG instance's
-outgoing traffic, not on this skill. The public claw instance egresses through a
-tinyproxy on host **think** (`10.8.0.4:1080`, residential IP) because the raw
-VPS IP is blocked by most search engines; the separate gregor instance egresses
-from the school network. If **every** engine returns 0 results, the backend
-proxy/VPN is the likely cause — not the skill or the MCP server. A single
-engine failing (e.g. `google` 403) is an engine/upstream issue, not egress.
-
-Deployment specifics (proxy host, VPN topology, `settings.yml` proxy setup,
-failure modes, egress verification) are operational and host-specific. They are
-documented in `opencode-helpers` under `docs/ai/ARCHITECTURE.md` and
-`docs/ai/PITFALLS.md`, not here — this skill is portable across hosts.
+outgoing traffic, not on this skill. If **every** engine returns 0 results,
+the instance's egress path is the likely cause — not the skill or the MCP
+server. A single engine failing (e.g. `google` 403) is an engine/upstream
+issue, not egress. Egress topology, engine matrices and failure modes are
+operational and host-specific: they live in the instance host's repository,
+not here — this skill is portable across hosts.
 
 ## MCP Tool: `searxng_search`
 
@@ -96,106 +112,18 @@ Exposed by the `skills/searxng/scripts/opencode-searxng` stdio server. Prompt wi
 | `category` | string | no | `general`, `images`, `news`, `it`, `science`; default `general` |
 | `engines` | string | no | Comma-separated engine list (e.g. `wikipedia,github`); overrides `category` and disables the engine chain |
 | `time_range` | string | no | `day`, `week`, `month`, `year` — use for recent topics |
-| `language` | string | no | Language code (`en`, `de`, `auto`); default `en` |
+| `language` | string | no | Language code (`en`, `de`, `fr`, `auto`); default `en` |
 | `pageno` | integer | no | Results page (1-indexed); default `1` |
 | `safesearch` | integer | no | `0` (off), `1` (moderate), `2` (strict) |
 
-## Available Engines
+## SearXNG Instance (generic)
 
-Engines enabled on the instance (`keep_only` in `/opt/searxng/searxng/settings.yml`).
-Last verified 2026-10-08.
+- **Web UI:** `<instance-base-url>/`
+- **API:** `<instance-base-url>/search?q=QUERY&format=json`
 
-### General Web Search
-Chain order for general searches: `bing` → `yahoo` → `mwmbl,searchmysite` →
-(`braveapi`, gated on < 3 free hits).
-- `bing` — **primary general engine** (HTML scraper; server-side `disabled:
-  false` needed). Works on all tested egress IPs.
-- `yahoo` — **fallback tier 2 only** (HTML scraper). Never a default result
-  engine: reached only when `bing` returns nothing, or via explicit
-  `engines=yahoo`.
-- `brave` — kept enabled for a future upstream fix, **not** in the chain
-  (currently `429`).
-- `google` — kept enabled for a future upstream fix, **not** in the chain
-  (engine calls the retired `/wml/search`, `HTTP 403`, searxng#5867).
-- `mwmbl` — Mwmbl (small index). Free last-resort before spending Brave quota:
-  short/common queries give relevant results, long-tail queries often return 0.
-- `searchmysite` — Indie websites. Same free last-resort tier as `mwmbl`
-  (currently `403`/access denied).
-- `braveapi` — Brave Search API (independent index, paid). **Token-gated**: excluded
-  from normal instance searches and queried automatically only when `bing` and
-  `yahoo` both fail *and* the free tier-3 result is weak (< 3 hits), or
-  explicitly via `engines=braveapi`. Suspended when its quota is exhausted;
-  revives automatically after top-up.
-
-### Knowledge / IT
-- `wikipedia` — Wikipedia (with infobox)
-- `arxiv` — Scientific papers
-- `github`, `github code` — GitHub repos and code search
-- `npm`, `lib.rs` — Package registries
-- `docker hub`, `arch linux wiki`, `gentoo` — Tech resources
-
-### News
-- `bing news` — Bing News (separate scraper from the removed `bing` web engine)
-- `duckduckgo news` — DuckDuckGo News
-- `hackernews` — Hacker News
-
-> **Blocked / not usable** (Captcha, 403, or connection resets):
-> `mojeek`, `startpage`, `qwant`, `yep`, `ecosia`, `duckduckgo`,
-> `brave` (429), `google` (403, searxng#5867).
-> Public fallback instances (`etsi.me`, `baresearch.org`) no longer serve
-> `format=json` to anonymous clients (429 / anti-bot challenge).
-> `google news` is untested on the current backend — test before enabling.
-
-## SearXNG Instance
-
-- **Web UI:** https://searxng.claw.graf.priv.at/
-- **API:** https://searxng.claw.graf.priv.at/search?q=QUERY&format=json
-
-## Access Control (shared secret)
-
-The public instance is **not open**: nginx enforces HTTP Basic Auth on the whole
-vhost (UI and API), and SearXNG's port `8888` is bound to `127.0.0.1` only, so the
-instance cannot be reached except through nginx. Intended clients are claw,
-think and dell.
-
-- `searxng-search.sh` reads the credential from `$SEARXNG_AUTH` or
-  `~/.config/opencode/searxng.cred` (format `user:password`, mode `600`) and
-  sends it as Basic auth. Without a credential the request is unauthenticated
-  and nginx answers `401`.
-- Deploy the credential file (mode `600`) on each client host; never commit it.
-- The credential is served by the `searxng` htpasswd file at
-  `/etc/nginx/searxng.htpasswd` on the instance host. Rate limiting
-  (`limit_req`) is also enforced there.
-- The vhost logs to its **own** files — `/var/log/nginx/searxng.access.log`
-  (custom `searxng` format with `rt=$request_time`) and
-  `/var/log/nginx/searxng.error.log` — so Basic-Auth rejections (`401`) and
-  rate-limit hits (`429`) are measurable and the shared `access.log` stays free
-  of SearXNG traffic. Rotation is covered by the existing
-  `/etc/logrotate.d/nginx` glob. Config: `/etc/nginx/sites-available/searxng.claw.graf.priv.at`.
-- `/robots.txt` is deliberately served **without auth** (`location = /robots.txt`)
-  as `User-agent: *` / `Disallow: /`, and every response carries
-  `X-Robots-Tag: noindex, nofollow, noarchive`, so crawlers are explicitly told
-  not to index the private instance. The backend's own `X-Robots-Tag` is
-  suppressed with `proxy_hide_header` to keep a single header.
-
-## Docker Management
-
-> These commands run on the **SearXNG host** (where nginx proxies to `localhost:8888`), not necessarily the machine running OpenCode.
-
-```bash
-# Check status
-docker ps
-
-# View logs
-docker logs searxng
-
-# Restart
-cd /opt/searxng && docker compose restart
-
-# Stop / Start
-cd /opt/searxng && docker compose down
-cd /opt/searxng && docker compose up -d
-```
+Concrete instance URLs, access-control setups (Basic Auth, rate limiting,
+noindex policy) and Docker management commands are host-specific deployment
+knowledge — see the instance host's repository documentation.
 
 ## Memory Usage
 

@@ -15,7 +15,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-INSTANCES_RE = re.compile(r"INSTANCES=\(\n(?:.*\n)*?\)")
+SET_E_RE = re.compile(r"^set -e$", re.MULTILINE)
 
 
 def result_item(title, url, engine):
@@ -30,11 +30,21 @@ def result_item(title, url, engine):
 
 
 def patch_script_instances(script_text, instance_urls):
-    """Return `script_text` with its INSTANCES array replaced by `instance_urls`."""
-    block = "INSTANCES=(\n" + "".join('    "{0}"\n'.format(u) for u in instance_urls) + ")\n"
-    patched, count = INSTANCES_RE.subn(block, script_text, count=1)
+    """Return `script_text` with `instance_urls` injected as the instance chain.
+
+    The script takes its instances from the SEARXNG_PRIMARY/SEARXNG_FALLBACK
+    environment, so the injection happens as shell assignments right after the
+    `set -e` anchor (before the script reads them)."""
+    if not 1 <= len(instance_urls) <= 2:
+        raise RuntimeError("patch_script_instances needs 1 or 2 instance URLs")
+    lines = ['SEARXNG_PRIMARY="{0}"'.format(instance_urls[0])]
+    if len(instance_urls) == 2:
+        lines.append('SEARXNG_FALLBACK="{0}"'.format(instance_urls[1]))
+    patched, count = SET_E_RE.subn(
+        "set -e\n" + "\n".join(lines), script_text, count=1
+    )
     if count != 1:
-        raise RuntimeError("INSTANCES block not found in searxng-search.sh")
+        raise RuntimeError("'set -e' anchor not found in searxng-search.sh")
     return patched
 
 
