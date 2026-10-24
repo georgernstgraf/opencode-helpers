@@ -26,6 +26,8 @@ The transcript is the only evidence of what was said. Everything serves **fideli
 
 9. **Report.** Changes by category, including the Betreuungsprotokoll entry when made, the **corrections log** (each Kontextfix as `falsch → richtig`), every flag with location and reason, open questions, and convention violations (e.g. a filename missing the topic slug — propose the rename, let the user decide). Done when the user can verify the risky spots from the report alone, without re-reading the transcript. The Protokoll is a draft until the human signs it.
 
+10. **Freigabe gate.** Ask exactly **„Freigegeben?“** and wait, explicitly telling the user they may manually edit the Protokoll and Betreuungsprotokoll before answering. The first commit happens only after approval. On changes or “no”, re-read the files to capture manual edits, apply the requested corrections, rerun the structure/global/write steps as needed, report again, and ask again. On **“yes”**, re-read the final diff, run the repository's checks, commit and push following the repository's rules (issue reference via `issue-workflow` when required), and close the associated protocol issue with a completion comment; close a pre-existing broader issue only when its own completion criteria are met. On **“not yet”**, leave the draft uncommitted and the issue open as an explicit user decision. Done when the approved state is committed and pushed and the issue state matches the user's decision.
+
 ## Cleanup checklist
 
 - Punctuation, sentence boundaries, capitalization.
