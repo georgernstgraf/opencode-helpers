@@ -8,7 +8,7 @@ Turn a raw Whisper meeting transcript into a **Protokoll**, edited in place: the
 
 The transcript is the only evidence of what was said. Everything serves **fidelity**: nothing invented, nothing substantive dropped, and nothing silent — every change is either a logged correction or a flag.
 
-1. **Recon.** Read the whole file once. Detect: language, speaker situation (none / generic labels / names in text), and whether the file is already processed (structured Protokoll header present → offer refinement instead of re-processing, and stop). Check the target directory for an existing convention — a `README.md` or sibling protocol defines heading names, file naming, and structure; **the local convention overrides** [`TEMPLATE.md`](TEMPLATE.md). Build the two working artifacts in context (no files): a **topic map** — topics in spoken order, reconstructed when there was no agenda — and a **glossary** — canonical spelling of every person, project, tool, and technical term, since Whisper renders the same name three different ways; the transcript often defines a term itself ("Absort … heißt Update, wenn vorhanden, Insert, wenn nicht" → _upsert_). Then one exchange with the user: missing metadata (date, participants, title) and, when speaker names matter, a roster or permission to infer. Done when topic map, glossary, and metadata exist or are explicitly marked open.
+1. **Recon.** Read the whole file once. Detect: language, speaker situation (none / generic labels / names in text), and whether the file is already processed (structured Protokoll header present → offer refinement instead of re-processing, and stop). Check the target directory for an existing convention — a `README.md` or sibling protocol defines heading names, file naming, and structure; **the local convention overrides** [`TEMPLATE.md`](TEMPLATE.md). Detect an existing Betreuungsprotokoll (often `docs/Betreuung.md`, possibly linked by the convention) and repository visibility (public or unknown → the DSGVO rule below). Build the two working artifacts in context (no files): a **topic map** — topics in spoken order, reconstructed when there was no agenda — and a **glossary** — canonical spelling of every person, project, tool, and technical term, since Whisper renders the same name three different ways; the transcript often defines a term itself ("Absort … heißt Update, wenn vorhanden, Insert, wenn nicht" → _upsert_). Then one exchange with the user: missing metadata (date, participants, title) and, when speaker names matter, a roster or permission to infer. Done when topic map, glossary, and metadata exist or are explicitly marked open.
 
 2. **Recovery path.** If the file is git-tracked with a clean working tree, git is the backup. Otherwise copy the file to `<name>.orig.md` first. Done when a recovery path provably exists before any write.
 
@@ -16,13 +16,15 @@ The transcript is the only evidence of what was said. Everything serves **fideli
 
 4. **Cleanup.** Repair the transcription, not the speech, per the checklist below. Done when every section is clean and every change is logged or flagged.
 
-5. **Structure.** Rebuild the file following the local convention or [`TEMPLATE.md`](TEMPLATE.md): header with the provenance line ("Maschinell aus einem Whisper-Transkript vorbereitet; Freigabe ausstehend"), then Extrakt, then Verlauf. Every Extrakt line is traceable to transcript text; a missing deadline becomes `[? offen]`, never invented. Done when the file matches the structure and nothing from the transcript is unaccounted for.
+5. **Structure.** Rebuild the file following the local convention or [`TEMPLATE.md`](TEMPLATE.md): header with the provenance line ("Maschinell aus einem Whisper-Transkript vorbereitet; Freigabe ausstehend"), then Extrakt, then Verlauf, with the DSGVO rule applied. Every Extrakt line is traceable to transcript text; a missing deadline becomes `[? offen]`, never invented. Done when the file matches the structure and nothing from the transcript is unaccounted for.
 
 6. **Global pass.** Enforce the glossary everywhere; sweep the flags (every marker has a reason, none orphaned); consistent tense and formatting. Done when a grep for the flag marker lists exactly the flags the report will carry.
 
-7. **Write in place.** Same path, no new files except the `.orig.md` from step 2. Done when the file on disk is the Protokoll.
+7. **Write in place.** Same path, no new files except the `.orig.md` from step 2; the only additional edit is the existing Betreuungsprotokoll in step 8. Done when the file on disk is the Protokoll.
 
-8. **Report.** Changes by category, the **corrections log** (each Kontextfix as `falsch → richtig`), every flag with location and reason, open questions, and convention violations (e.g. a filename missing the topic slug — propose the rename, let the user decide). Done when the user can verify the risky spots from the report alone, without re-reading the transcript. The Protokoll is a draft until the human signs it.
+8. **Betreuungsprotokoll (conditional).** If a Betreuungsprotokoll exists, update it in its own style: date, participants, main topics, and duration only when stated or reliably inferable — otherwise omit the duration rather than inventing it. Never create a new one. When refining an already processed meeting, update its entry instead of duplicating it. Done when the existing log carries exactly one entry for this meeting.
+
+9. **Report.** Changes by category, including the Betreuungsprotokoll entry when made, the **corrections log** (each Kontextfix as `falsch → richtig`), every flag with location and reason, open questions, and convention violations (e.g. a filename missing the topic slug — propose the rename, let the user decide). Done when the user can verify the risky spots from the report alone, without re-reading the transcript. The Protokoll is a draft until the human signs it.
 
 ## Cleanup checklist
 
@@ -36,6 +38,10 @@ The transcript is the only evidence of what was said. Everything serves **fideli
 ## Flags
 
 One uniform, greppable marker: `[? <reason>]`, with the nearest timestamp when the transcript has one. Use for: word artifacts with no confident reading, doubts in the protected categories, suspected **Whisper hallucinations** — plausible sentences over silence, repeated boilerplate — which are flagged, never silently kept or dropped, uncertain speaker attributions, and missing deadlines.
+
+## Privacy (DSGVO)
+
+In public repositories — and whenever visibility is unknown — identify people by first name plus role; keep surnames out of the Protokoll and the Betreuungsprotokoll. This applies to attendees, absent people, and external contacts, regardless of what the transcript or older files contain. Use a role when a first name is ambiguous ("BOKU-Technik", "DSAI-Lehrer"); surname-bearing handles are not a workaround.
 
 ## Speakers
 
