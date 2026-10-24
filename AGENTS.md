@@ -105,6 +105,12 @@ The following skills have NO slash commands. Invoke them by natural language:
   "modellparameter aktualisieren", "neue Modelle in params aufnehmen"
   → load and execute the `model-params` skill
 
+**Protokoll** — when the user says:
+  "protokoll", "Protokoll erstellen", "Protokoll schreiben",
+  "Transkript aufräumen", "clean up the transcript",
+  "meeting protocol"
+  → load and execute the `protokoll` skill
+
 **Full Sync** — when the user says:
   "full sync", "Voll-Sync", "repo sync", "morning sync", "Morgen-Sync",
   "sync everything", "Tagesstart", "pull all repos", "commit and push everything"
