@@ -1,16 +1,24 @@
 Open tasks:
 
-1. [ ] **`deepseek-search`-Rollout (neu 2026-10-25):** think ist umgestellt
+1. [ ] **`deepseek-search`-Rollout (neu 2026-10-25):** **think** ist umgestellt
       (Host-Overlay `mcp.deepseek.environment` mit `DEEPSEEK_SEARCH_API_KEY_FILE`,
       `mcp.searxng` dort entfernt, Key-Datei `~/.config/opencode/deepseek.key`
-      mode 600). Offen: **claw** und **elite** gleichziehen (Key-Datei + Overlay,
-      `mcp.searxng` raus, `opencode.service` restart, echte Suche + ein
-      erzwungener 402 als Fallback-Probe); **Schul-Hosts** (gregor/dell/kik)
-      bleiben bewusst ohne Key auf `searxng_search` — nach `git pull` prüfen,
-      dass die Suche dort unverändert funktioniert und dass
-      `metadata.opencode/autoinvoke` die Skills korrekt ausblendet.
-      elite: `deepseek.key` in `svn:ignore` von
-      `EDV/Deployed/elite/home/georg/.config/opencode/` aufnehmen (SVN-Seite).
+      mode 600). **claw** ebenfalls (Key aus der eigenen `auth.json`, lokale
+      Instanz `http://127.0.0.1:8888`, `SEARXNG_CHAIN=default` inkl.
+      `braveapi`, Server via `opencode reload` neu geladen, Config in SVN r7669
+      von claw committet). **Schul-Hosts** (gregor/dell/kik) bleiben bewusst
+      ohne Key auf `searxng_search` — gregor/kik geprüft, unverändert grün.
+      Offen: **elite** (Key-Datei + Overlay, `mcp.searxng` raus,
+      `opencode.service` restart, echte Suche + erzwungener 402;
+      `deepseek.key` in `svn:ignore` von
+      `EDV/Deployed/elite/home/georg/.config/opencode/` aufnehmen) und **dell**
+      (Overlay prüfen).
+      Nebenbefund claw: dort läuft der georg-Server (PID auf :62764) in einem
+      verwaisten Session-Scope (seit 2026-10-17, keine systemd-Unit) — bei
+      Gelegenheit die Unit-Vorlage aus `dotfiles/systemd/user/` installieren
+      + `loginctl enable-linger georg` (wie think/kik), damit er Reboots
+      übersteht. Außerdem läuft auf claw ein fremder `opencode serve` des Users
+      `sami` auf :60490 (21 Tage alt) — nicht unserer.
 
 2. [ ] Quiz-Begründungen gegenlesen (#94): Die Sub-Agents haben in PMM/WMC/
       INFI/SWP pro Antwortoption `data-grund`-Begründungen verfasst (teils
