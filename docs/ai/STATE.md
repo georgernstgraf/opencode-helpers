@@ -20,6 +20,15 @@ strukturell, weil es nur eine Credential-Quelle (Host-Overlay) gibt.
 `tests/test_deepseek_search_mcp.py` (15 Fälle, hermetisch); Suite 107 Tests
 grün. Nebenbei repariert: `tests/test_oc_models_report.py` zeigte noch auf die
 retirierte Cache-Datei `models-verbose.txt` (3 rote Tests seit `fb0b767`).
+**Host-Rollout:** think umgestellt (Key-Datei + `mcp.deepseek`, `mcp.searxng`
+ dort entfernt, echte Suche und erzwungener 402-Fallback verifiziert);
+ gregor/kik auf `ad64a50` gezogen und geprüft — bestehende `searxng_search`
+ funktioniert unverändert (gregor: bing/10, kik: bing/10), der neue Server
+ läuft dort keylos als `provider: searxng` mit
+ `providers_unavailable: ["deepseek"]`. Auf kik entfernt: das ungenutzte
+ `~/.config/opencode/searxng.cred` (User `searxng` = private claw-Credential,
+ von keiner Config referenziert) — Schul-Hosts tragen damit keine privaten
+ Credentials mehr. Offen: claw und elite.
 
 Davor: SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
 
