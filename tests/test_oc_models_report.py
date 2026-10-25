@@ -128,7 +128,7 @@ class OcModelsReportTest(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.cachedir = os.path.join(self.tmp.name, "cache")
-        self.cachefile = os.path.join(self.cachedir, "models-verbose.txt")
+        self.cachefile = os.path.join(self.cachedir, "models-api.json")
 
     def run_main(self, argv):
         out, err = io.StringIO(), io.StringIO()
