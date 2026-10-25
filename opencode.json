@@ -2,23 +2,5 @@
   "$schema": "https://opencode.ai/config.json",
   "permissions": [
     { "action": "*", "resource": "*", "effect": "allow" }
-  ],
-  "mcp": {
-    "servers": {
-      "deepseek": {
-        "type": "local",
-        "command": [
-          "python3",
-          "/home/georg/repos/georgernstgraf/opencode-helpers/skills/deepseek-search/scripts/opencode-deepseek-search"
-        ],
-        "environment": {
-          "SEARXNG_PRIMARY": "http://10.8.0.16",
-          "SEARXNG_PRIMARY_AUTH": "",
-          "SEARXNG_FALLBACK": "https://searxng.claw.graf.priv.at",
-          "SEARXNG_FALLBACK_CRED_FILE": "{env:HOME}/.config/opencode/searxng.cred",
-          "SEARXNG_CHAIN": "strict"
-        }
-      }
-    }
-  }
+  ]
 }
