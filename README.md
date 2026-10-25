@@ -17,14 +17,15 @@ Das Repository richtet sich an:
 
 Alle Skills und Kommandos werden von anderen Projekten mittels **symbolischer Links** eingebunden — kein Fork, kein Copy-Paste.
 
-### 🔍 SearXNG — Eigener Suchserver
+### 🔍 Websuche — DeepSeek Search API + eigener SearXNG-Server
 
-Wir betreiben einen selbstgehosteten [SearXNG](https://searxng.claw.graf.priv.at/)-Metasuchserver:
-- **Metasearch** über Brave, Wikipedia, GitHub, Hacker News, ArXiv u.v.m.
-- **Datenschutzfreundlich** — keine Weitergabe an Google/Bing
-- **MCP-Server** in `skills/searxng/scripts/opencode-searxng` — ein JSON-RPC-Wrapper, der SearXNG als opencode-Tool verfügbar macht
-- **Konfiguriert in `opencode.json`** — alle Agenten (chat, build, plan) haben Zugriff auf das `searxng_search`-Tool
-- **Parameter**: Kategorie (general/images/news/it/science), Zeitfilter (day/week/month/year), Engine-Auswahl, Sprachfilter, Safe Search
+Die Suche hat eine **Provider-Kette**, die pro Host konfiguriert wird:
+- **DeepSeek Search API** (primär, wo ein Key liegt) — strukturierte Treffer mit modelllesbarem `summary`, Publikationsdatum und Authority-Stufe
+- **Selbstgehosteter [SearXNG](https://searxng.claw.graf.priv.at/)-Metasuchserver** als Fallback — Metasearch über Brave, Wikipedia, GitHub, Hacker News, ArXiv u.v.m., datenschutzfreundlich, keine Weitergabe an Google/Bing
+- **Skill `deepseek-search`** (das einzige beworbene Such-Skill) mit dem MCP-Server `skills/deepseek-search/scripts/opencode-deepseek-search` → Tool `deepseek_search`
+- **Ohne DeepSeek-Key** (z. B. auf Schul-Hosts) läuft die Kette rein über SearXNG — strukturell, nicht per Zufall; Keys liegen ausschließlich in Host-Overlays
+- **Der `searxng`-Skill** bleibt als Backend-Handbuch (Engine-Kette, Instanz-Vertrag, Diagnose) und ist per `@searxng` ladbar, aber nicht mehr beworben
+- **Parameter**: Trefferzahl (1–50), `need_content`, Sprache, Zeitfilter (day/week/month/year), `site:`/`after:`/`before:`-Operatoren; SearXNG-only: Kategorie, Engine-Auswahl, Paginierung, Safe Search
 
 ### 🛠 Utility-Skripte
 
@@ -86,7 +87,8 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 | `repograde` | Benotet Schüler-Repos (einzeln oder Bulk) | Direkter Skill-Aufruf |
 | `fork-policy` | Erzwingt Clean-Main-Branch-Policy auf Forks | On-Demand Skill-Aufruf |
 | `orchestration` | Koordiniert große, sitzungsübergreifende Arbeit: Sub-Issues, Delegation an Sub-Agenten, hartes Test-Gate (scope-gated) | Sprachsteuerung / direkter Aufruf |
-| `searxng` | Websuche über lokale SearXNG-Instanz | Automatisch via `available_skills` geladen (kein Befehl nötig) |
+| `deepseek-search` | Websuche über die DeepSeek Search API mit SearXNG-Fallback (ohne Key: nur SearXNG) — das beworbene Such-Skill | Automatisch via `available_skills` geladen (kein Befehl nötig) |
+| `searxng` | Backend-Handbuch der SearXNG-Engine-Kette (Instanzen, Tiers, Diagnose) | Nicht beworben; per `@searxng` ladbar |
 | `grill-me` | Relentlesses Interview zum Schärfen eines Plans/Designs (stateless) | Sprachsteuerung: "grill me", "grill this plan" |
 | `grilling` | Die wiederverwendbare Interview-Schleife hinter grill-me/grill-with-docs | Automatisch (model-invoked) |
 | `grill-with-docs` | Wie grill-me, baut zusätzlich `CONTEXT.md` und ADRs auf | Sprachsteuerung |
@@ -100,7 +102,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 
 ### Transplantierte Skills & Single-Source-Regel
 
-Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) wurden aus [mattpocock/skills](https://github.com/mattpocock/skills) transplantiert und mit opencode-nativem Frontmatter versehen (Claude-spezifische Felder wie `disable-model-invocation` werden zu `slash: true` oder weggelassen; `license: MIT` für Attribution). Upstream-Provenienz steht in `skills/sync-upstream-skills/mapping.json`.
+Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) wurden aus [mattpocock/skills](https://github.com/mattpocock/skills) transplantiert und mit opencode-nativem Frontmatter versehen (Claude-spezifisches `disable-model-invocation` wird zu `metadata.opencode/autoinvoke: false` oder weggelassen — `slash: true` ist in OpenCode 2 wirkungslos; `license: MIT` für Attribution). Upstream-Provenienz steht in `skills/sync-upstream-skills/mapping.json`.
 
 **Single-Source-Regel:** Dieses Repo ist die einzige globale Skill-Quelle (verlinkt via `~/.config/opencode/skills`). Matts Repo (`~/repos/mattpocock/skills`) ist **pull-only** — nie live verlinkt, nie in der opencode-`skills`-Array-Konfiguration. Kein `~/.opencode/skills`-Symlink (cwd-abhängig und nicht v2-stabil). So gibt es pro Skill-Namen genau eine Quelle, Kollisionen sind strukturell ausgeschlossen.
 
@@ -194,14 +196,15 @@ Target audience:
 
 All skills and commands are consumed by other projects via **symbolic links** — no forking, no copy-paste.
 
-### 🔍 SearXNG — Self-Hosted Search Server
+### 🔍 Web Search — DeepSeek Search API + Self-Hosted SearXNG
 
-We run a self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch instance:
-- **Metasearch** across Brave, Wikipedia, GitHub, Hacker News, ArXiv, and more
-- **Privacy-friendly** — no data sent to Google/Bing
-- **MCP server** in `skills/searxng/scripts/opencode-searxng` — a JSON-RPC wrapper exposing SearXNG as an opencode tool
-- **Configured in `opencode.json`** — all agents (chat, build, plan) have access to the `searxng_search` tool
-- **Parameters**: category (general/images/news/it/science), time filter (day/week/month/year), engine selection, language filter, safe search
+Search is a **provider chain** configured per host:
+- **DeepSeek Search API** (primary where a key is present) — structured hits with a model-readable `summary`, publication date and authority tier
+- **Self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch** as the fallback — Brave, Wikipedia, GitHub, Hacker News, ArXiv and more, privacy-friendly, nothing sent to Google/Bing
+- **Skill `deepseek-search`** (the only advertised search skill) with the MCP server `skills/deepseek-search/scripts/opencode-deepseek-search` → tool `deepseek_search`
+- **Without a DeepSeek key** (e.g. on school hosts) the chain runs on SearXNG only — structurally, not by accident; keys live exclusively in host overlays
+- The **`searxng` skill** remains as the backend manual (engine chain, instance contract, diagnostics), loadable via `@searxng` but no longer advertised
+- **Parameters**: result count (1–50), `need_content`, language, time filter (day/week/month/year), `site:`/`after:`/`before:` operators; SearXNG-only: category, engine selection, pagination, safe search
 
 ### 🛠 Utility Scripts
 
@@ -263,7 +266,8 @@ is a flat `agents/<name>.md` file (filename = agent name).
 | `repograde` | Grade student repos (single or bulk) | Direct skill invocation |
 | `fork-policy` | Enforce clean-main branch policy on forks | On-demand skill invocation |
 | `orchestration` | Scope-gated coordination for large work: sub-issues, sub-agent delegation, hard test gate | Natural language / direct invocation |
-| `searxng` | Web search via local SearXNG instance | Loaded automatically via `available_skills` (no command needed) |
+| `deepseek-search` | Web search via the DeepSeek Search API with a SearXNG fallback (no key: SearXNG only) — the advertised search skill | Loaded automatically via `available_skills` (no command needed) |
+| `searxng` | Backend manual for the SearXNG engine chain (instances, tiers, diagnostics) | Not advertised; loadable via `@searxng` |
 | `grill-me` | Relentless interview to sharpen a plan/design (stateless) | Natural language: "grill me", "grill this plan" |
 | `grilling` | The reusable interview loop behind grill-me/grill-with-docs | Automatic (model-invoked) |
 | `grill-with-docs` | Like grill-me, additionally builds `CONTEXT.md` and ADRs | Natural language |
@@ -277,7 +281,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 
 ### Transplanted Skills & Single-Source Rule
 
-Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) are transplanted from [mattpocock/skills](https://github.com/mattpocock/skills) and given opencode-native frontmatter (Claude-specific fields like `disable-model-invocation` become `slash: true` or are dropped; `license: MIT` for attribution). Upstream provenance is recorded in `skills/sync-upstream-skills/mapping.json`.
+Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach`, `code-review`) are transplanted from [mattpocock/skills](https://github.com/mattpocock/skills) and given opencode-native frontmatter (Claude-specific `disable-model-invocation` becomes `metadata.opencode/autoinvoke: false` or is dropped — `slash: true` is inert in OpenCode 2; `license: MIT` for attribution). Upstream provenance is recorded in `skills/sync-upstream-skills/mapping.json`.
 
 **Single-source rule:** This repo is the only global skill source (linked via `~/.config/opencode/skills`). Matt's repo (`~/repos/mattpocock/skills`) is **pull-only** — never linked live, never listed in an opencode `skills` array. No `~/.opencode/skills` symlink (cwd-dependent and not v2-stable). One source per skill name means collisions are structurally impossible.
 

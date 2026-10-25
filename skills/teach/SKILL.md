@@ -1,7 +1,7 @@
 ---
 name: teach
 description: Teach the user a new skill or concept, within this workspace.
-slash: true
+metadata: { "opencode/autoinvoke": false }
 license: MIT
 ---
 

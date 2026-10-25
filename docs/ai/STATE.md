@@ -1,10 +1,27 @@
 # Project State
 
-Current status as of 2026-10-19.
+Current status as of 2026-10-25.
 
 ## Current Focus
 
-SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
+Suche hat jetzt ein **Rückgrat**: neuer Skill `deepseek-search` (MCP-Server
+`skills/deepseek-search/scripts/opencode-deepseek-search`, Server-ID
+`deepseek`, Tool `deepseek_search`) mit der **DeepSeek Search API** als
+Primär-Provider und der unveränderten SearXNG-Engine-Kette als Fallback.
+Fallback bei 402/408/429/5xx/Netzwerk/leerem `results`, kein Retry bei
+400/401/403/404; `engines`/`category`/`pageno>1`/`safesearch` routen direkt zu
+SearXNG. Ohne DeepSeek-Key (Schul-Hosts) läuft die Kette rein über SearXNG —
+strukturell, weil es nur eine Credential-Quelle (Host-Overlay) gibt.
+`skills/searxng` ist dadurch **Backend-Handbuch** und nicht mehr beworben
+(`metadata.opencode/autoinvoke: false`); die bisher wirkungslosen
+`slash: true`-Felder in `grill-me`, `grill-with-docs`, `teach`,
+`codebase-audit` sind auf dasselbe Feld umgestellt, Guard
+`tests/test_skill_frontmatter.py`. Tests: `tests/deepseek_search_mock.py` +
+`tests/test_deepseek_search_mcp.py` (15 Fälle, hermetisch); Suite 107 Tests
+grün. Nebenbei repariert: `tests/test_oc_models_report.py` zeigte noch auf die
+retirierte Cache-Datei `models-verbose.txt` (3 rote Tests seit `fb0b767`).
+
+Davor: SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
 
 Davor (#111): Host-Services sind seit 2026-10-17 versioniert und auf `kik` umgesetzt:
 `dotfiles/systemd/user/{opencode,oc-tg-bot}.service` als Vorlagen für den

@@ -1,0 +1,671 @@
+#!/usr/bin/env python3
+"""DeepSeek Search MCP stdio server.
+
+Thin JSON-RPC 2.0 wrapper exposing one tool, `search`, so OpenCode registers it
+as `deepseek_search`. Zero external dependencies (Python 3 stdlib only).
+
+Providers, in the order configured by the host overlay:
+
+1. `deepseek` — the DeepSeek Search API (`POST <base>/v1/tools/search`).
+   Needs an API key; without one the provider is simply unavailable.
+2. `searxng` — the prioritized engine chain of the sibling `searxng` skill
+   (`../searxng/searxng-search.sh`), which reads its own SEARXNG_* contract.
+
+The DeepSeek provider is abandoned for the next one on 402/408/429/5xx, on a
+transport error, or on HTTP 200 with an empty `results` array. Other 4xx
+answers (400/401/403/404) are caller errors and are reported without retrying.
+
+Protocol: MCP (https://modelcontextprotocol.io), version 2024-11-05.
+Transport: newline-delimited JSON-RPC over stdin/stdout (stdio).
+"""
+
+import json
+import os
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+from datetime import date, timedelta
+
+PROTOCOL_VERSION = "2024-11-05"
+SERVER_NAME = "deepseek"
+SERVER_VERSION = "1.0.0"
+
+DEFAULT_API_BASE = "https://api.deepseek.com"
+DEFAULT_PROVIDERS = "deepseek,searxng"
+DEFAULT_TIMEOUT = 25
+SEARXNG_TIMEOUT = 120
+
+MAX_QUERY_CHARS = 128
+MAX_COUNT = 50
+
+VALID_CATEGORIES = ("general", "images", "news", "it", "science")
+VALID_TIME_RANGES = ("day", "week", "month", "year")
+VALID_SAFESEARCH = (0, 1, 2)
+
+# Statuses that are caller errors: no point in retrying another provider.
+# Everything else (402/408/429/5xx, transport errors, empty results) falls
+# through to the next provider.
+FATAL_REASONS = ("http_400", "http_401", "http_403", "http_404")
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SKILL_DIR = os.path.dirname(SCRIPT_DIR)
+SKILLS_DIR = os.path.dirname(SKILL_DIR)
+SEARXNG_SCRIPT = os.path.join(SKILLS_DIR, "searxng", "searxng-search.sh")
+
+SEARCH_TOOL = {
+    "name": "search",
+    "description": (
+        "Search the web. Primary backend is the DeepSeek Search API (structured "
+        "results with a model-readable summary, publication date and authority "
+        "tier); hosts without a DeepSeek key, or any DeepSeek failure, fall back "
+        "to the configured self-hosted SearXNG engine chain. The answer names "
+        "the provider that served it (`provider`) and whether a provider "
+        "fallback happened (`fallback_used`). "
+        "Query operators are passed through: site:, -site:, -term, \"exact "
+        "phrase\", -\"excluded phrase\", lang:, after:YYYY[-MM[-DD]], "
+        "before:YYYY[-MM[-DD]]. `category`, `engines`, `pageno` and "
+        "`safesearch` are SearXNG-only and route the call to that provider. "
+        "For very recent topics always pass a `time_range`."
+    ),
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "The search query (required). Use quotes for exact versions (e.g. \"Gemma 4\").",
+            },
+            "count": {
+                "type": "integer",
+                "description": "Number of results to return (1-50, default 10).",
+                "minimum": 1,
+                "maximum": MAX_COUNT,
+                "default": 10,
+            },
+            "need_content": {
+                "type": "boolean",
+                "description": "Ask the DeepSeek provider for the page content inline (one request, no extra cost). Ignored by SearXNG.",
+                "default": False,
+            },
+            "language": {
+                "type": "string",
+                "description": "Language code, e.g. 'en', 'de', 'fr'; 'auto' leaves it open. Mapped to lang: on DeepSeek.",
+                "default": "en",
+            },
+            "time_range": {
+                "type": "string",
+                "description": "Freshness filter. Mapped to after:<date> on DeepSeek, passed natively to SearXNG.",
+                "enum": list(VALID_TIME_RANGES),
+            },
+            "site": {
+                "type": "string",
+                "description": "Restrict results to one or more sites (e.g. 'github.com' or 'github.com,arxiv.org').",
+            },
+            "after": {
+                "type": "string",
+                "description": "Only pages published after this date: YYYY, YYYY-MM or YYYY-MM-DD.",
+            },
+            "before": {
+                "type": "string",
+                "description": "Only pages published before this date: YYYY, YYYY-MM or YYYY-MM-DD.",
+            },
+            "category": {
+                "type": "string",
+                "description": "SearXNG-only: the search category. Routes the call to SearXNG.",
+                "enum": list(VALID_CATEGORIES),
+            },
+            "engines": {
+                "type": "string",
+                "description": "SearXNG-only: comma-separated engine list (e.g. 'wikipedia,github'). Routes the call to SearXNG and disables its chain.",
+            },
+            "pageno": {
+                "type": "integer",
+                "description": "SearXNG-only: results page (1-indexed). Values above 1 route the call to SearXNG.",
+                "minimum": 1,
+            },
+            "safesearch": {
+                "type": "integer",
+                "description": "SearXNG-only: safe search filter. Routes the call to SearXNG.",
+                "enum": list(VALID_SAFESEARCH),
+            },
+        },
+        "required": ["query"],
+    },
+}
+
+
+def send(message):
+    """Write one JSON-RPC message to stdout as a single line."""
+    sys.stdout.write(json.dumps(message))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
+def result(msg_id, payload):
+    send({"jsonrpc": "2.0", "id": msg_id, "result": payload})
+
+
+def error(msg_id, code, message, data=None):
+    err = {"code": code, "message": message}
+    if data is not None:
+        err["data"] = data
+    send({"jsonrpc": "2.0", "id": msg_id, "error": err})
+
+
+# --------------------------------------------------------------------------
+# Provider configuration (host-local overlay; this skill ships no credential)
+# --------------------------------------------------------------------------
+
+
+def configured_providers():
+    raw = os.environ.get("DEEPSEEK_SEARCH_PROVIDERS") or DEFAULT_PROVIDERS
+    return [p.strip().lower() for p in raw.split(",") if p.strip()]
+
+
+def api_key():
+    """The DeepSeek key from the environment or the key file.
+
+    `DEEPSEEK_SEARCH_API_KEY` wins when set and non-empty; otherwise the first
+    line of `DEEPSEEK_SEARCH_API_KEY_FILE` is used. No default, no shared
+    credential: without either, the deepseek provider does not exist.
+    """
+    direct = os.environ.get("DEEPSEEK_SEARCH_API_KEY")
+    if direct and direct.strip():
+        return direct.strip()
+    path = os.environ.get("DEEPSEEK_SEARCH_API_KEY_FILE")
+    if not path:
+        return ""
+    try:
+        with open(os.path.expanduser(path), encoding="utf-8") as handle:
+            return handle.readline().strip()
+    except OSError:
+        return ""
+
+
+def api_base():
+    return (os.environ.get("DEEPSEEK_SEARCH_API_BASE") or DEFAULT_API_BASE).rstrip("/")
+
+
+def timeout():
+    raw = os.environ.get("DEEPSEEK_SEARCH_TIMEOUT")
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return DEFAULT_TIMEOUT
+    return value if value > 0 else DEFAULT_TIMEOUT
+
+
+# --------------------------------------------------------------------------
+# Query shaping (SearXNG parameters -> DeepSeek operators)
+# --------------------------------------------------------------------------
+
+
+def shift_month(day, months):
+    """Move a date by whole months, clamping the day to the target month."""
+    month_index = day.month - 1 + months
+    year = day.year + month_index // 12
+    month = month_index % 12 + 1
+    day_of_month = day.day
+    while True:
+        try:
+            return date(year, month, day_of_month)
+        except ValueError:
+            day_of_month -= 1
+
+
+def after_date(time_range, today=None):
+    """The publication-date floor implied by `time_range`, as YYYY-MM-DD."""
+    base = today or date.today()
+    if time_range == "day":
+        return (base - timedelta(days=1)).isoformat()
+    if time_range == "week":
+        return (base - timedelta(days=7)).isoformat()
+    if time_range == "month":
+        return shift_month(base, -1).isoformat()
+    if time_range == "year":
+        return shift_month(base, -12).isoformat()
+    return ""
+
+
+def site_operator(site):
+    """`a,b` / `a b` -> 'site:a OR site:b'."""
+    names = [part for part in site.replace(",", " ").split() if part]
+    return " OR ".join("site:" + name for name in names)
+
+
+def fit_query(base, extras):
+    """Join base terms and operators into a query of at most 128 characters.
+
+    Words are dropped from the end of the base query until the composed string
+    fits; the operators are kept because they carry the caller's intent.
+    Returns (query, truncated).
+    """
+    words = base.split()
+    dropped = False
+    while words:
+        candidate = " ".join(words + extras)
+        if len(candidate) <= MAX_QUERY_CHARS:
+            return candidate, dropped
+        words.pop()
+        dropped = True
+    candidate = " ".join(extras)
+    if len(candidate) > MAX_QUERY_CHARS:
+        return candidate[:MAX_QUERY_CHARS], True
+    return candidate, True
+
+
+def compose_query(base, language, time_range, site, after, before):
+    """Build the DeepSeek query string from the tool arguments."""
+    extras = []
+    if site:
+        operator = site_operator(site)
+        if operator:
+            extras.append(operator)
+    if language and language.strip().lower() not in ("", "auto"):
+        extras.append("lang:" + language.strip())
+    floor = after.strip() if after else after_date(time_range)
+    if floor:
+        extras.append("after:" + floor)
+    if before and before.strip():
+        extras.append("before:" + before.strip())
+    return fit_query(base, extras)
+
+
+# --------------------------------------------------------------------------
+# Providers
+# --------------------------------------------------------------------------
+
+
+def deepseek_search(query, count, need_content, ori_question):
+    """One DeepSeek Search API call.
+
+    Returns {"ok": True, "results": [...]} or
+    {"ok": False, "reason": ..., "detail": ...} where `reason` is a stable
+    token: "http_402", "http_429", "http_500", "network", "bad_json", ...
+    """
+    payload = {"query": query, "count": count}
+    if need_content:
+        payload["need_content"] = True
+    if ori_question:
+        payload["ori_question"] = ori_question
+
+    request = urllib.request.Request(
+        api_base() + "/v1/tools/search",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": "Bearer " + api_key(),
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout()) as response:
+            body = json.loads(response.read().decode("utf-8", "replace"))
+    except urllib.error.HTTPError as exc:
+        detail = ""
+        try:
+            detail = exc.read().decode("utf-8", "replace")[:300]
+        except Exception:  # noqa: BLE001 - diagnostic only
+            detail = ""
+        return {"ok": False, "reason": "http_{}".format(exc.code), "status": exc.code,
+                "detail": detail}
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        return {"ok": False, "reason": "network", "detail": str(exc)}
+    except json.JSONDecodeError:
+        return {"ok": False, "reason": "bad_json", "detail": "response was not JSON"}
+
+    results = body.get("results") if isinstance(body, dict) else None
+    if not isinstance(results, list):
+        return {"ok": False, "reason": "bad_json", "detail": "no results array"}
+    if not results:
+        return {"ok": False, "reason": "empty", "detail": "no results"}
+    return {"ok": True, "results": results}
+
+
+def searxng_search(query, language, pageno, category, engines, time_range, safesearch):
+    """Delegate to the SearXNG skill's canonical chain script."""
+    try:
+        proc = subprocess.run(
+            [SEARXNG_SCRIPT, query, language, str(pageno), category, engines,
+             time_range, safesearch],
+            capture_output=True,
+            text=True,
+            timeout=SEARXNG_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "reason": "searxng_timeout", "detail": "timed out"}
+    except OSError as exc:
+        return {"ok": False, "reason": "searxng_unavailable", "detail": str(exc)}
+
+    output = (proc.stdout or "").strip()
+    if not output:
+        return {"ok": False, "reason": "searxng_failed",
+                "detail": (proc.stderr or "").strip()[:300]}
+    try:
+        envelope = json.loads(output)
+    except json.JSONDecodeError:
+        return {"ok": False, "reason": "searxng_failed",
+                "detail": output[:300]}
+    return {"ok": True, "envelope": envelope}
+
+
+def normalize_results(results, need_content):
+    """Map DeepSeek hits onto the skill's result shape (nulls dropped)."""
+    normalized = []
+    for hit in results:
+        if not isinstance(hit, dict):
+            continue
+        item = {
+            "title": hit.get("title") or "No title",
+            "url": hit.get("url") or "",
+            "snippet": hit.get("snippet") or "",
+            "summary": hit.get("summary") or "",
+            "date": hit.get("date"),
+            "authority": hit.get("authority"),
+            "rerank_score": hit.get("rerank_score"),
+        }
+        if need_content:
+            item["content"] = hit.get("content") or ""
+        normalized.append({k: v for k, v in item.items() if v is not None})
+    return normalized
+
+
+# --------------------------------------------------------------------------
+# Tool call
+# --------------------------------------------------------------------------
+
+
+def parse_arguments(args):
+    """Validate/normalise the tool arguments. Returns (params, warnings)."""
+    warnings = []
+
+    query = str(args.get("query") or "").strip()
+    if not query:
+        raise ValueError("Missing required argument 'query'.")
+
+    try:
+        count = int(args.get("count") or 10)
+    except (TypeError, ValueError):
+        count = 10
+    if count < 1:
+        count = 1
+    elif count > MAX_COUNT:
+        count = MAX_COUNT
+
+    language = str(args.get("language") or "en").strip()
+
+    time_range = str(args.get("time_range") or "").strip().lower()
+    if time_range not in VALID_TIME_RANGES:
+        time_range = ""
+
+    site = str(args.get("site") or "").strip()
+    after = str(args.get("after") or "").strip()
+    before = str(args.get("before") or "").strip()
+
+    category = str(args.get("category") or "general").strip().lower()
+    if category not in VALID_CATEGORIES:
+        category = "general"
+
+    engines = str(args.get("engines") or "").strip()
+
+    try:
+        pageno = int(args.get("pageno") or 1)
+        if pageno < 1:
+            pageno = 1
+    except (TypeError, ValueError):
+        pageno = 1
+
+    safesearch = ""
+    raw_safesearch = args.get("safesearch")
+    if raw_safesearch is not None:
+        try:
+            value = int(raw_safesearch)
+        except (TypeError, ValueError):
+            value = None
+        if value in VALID_SAFESEARCH:
+            safesearch = str(value)
+        else:
+            warnings.append("safesearch ignored: not one of 0, 1, 2")
+
+    need_content = bool(args.get("need_content"))
+    ori_question = str(args.get("ori_question") or "").strip()
+
+    return {
+        "query": query,
+        "count": count,
+        "language": language,
+        "time_range": time_range,
+        "site": site,
+        "after": after,
+        "before": before,
+        "category": category,
+        "engines": engines,
+        "pageno": pageno,
+        "safesearch": safesearch,
+        "need_content": need_content,
+        "ori_question": ori_question,
+    }, warnings
+
+
+def searxng_only_call(params):
+    """Decide whether the call must go to SearXNG (DeepSeek cannot express it)."""
+    if params["engines"]:
+        return True, "engines"
+    if params["category"] != "general":
+        return True, "category"
+    if params["pageno"] > 1:
+        return True, "pageno"
+    if params["safesearch"]:
+        return True, "safesearch"
+    return False, ""
+
+
+def run_search(args):
+    """Provider chain. Returns the tool's JSON envelope as a dict."""
+    params, warnings = parse_arguments(args)
+
+    wanted = configured_providers()
+    key = api_key()
+    unavailable = []
+    if "deepseek" not in wanted:
+        unavailable.append("deepseek")
+    elif not key:
+        unavailable.append("deepseek")
+
+    forced_searxng, forced_reason = searxng_only_call(params)
+    if forced_searxng:
+        warnings.append(
+            "'{}' is SearXNG-only - routing to the SearXNG provider".format(
+                forced_reason))
+
+    chain = []
+    for name in wanted:
+        if name == "deepseek" and name not in unavailable and not forced_searxng:
+            chain.append(name)
+        elif name == "searxng" and os.environ.get("SEARXNG_PRIMARY"):
+            chain.append(name)
+        elif name not in unavailable:
+            unavailable.append(name)
+
+    if not chain:
+        return {
+            "success": False,
+            "error": "No search provider available",
+            "suggestion": (
+                "Configure a DeepSeek key (DEEPSEEK_SEARCH_API_KEY_FILE) or a "
+                "SearXNG instance (SEARXNG_PRIMARY) in this host's "
+                "mcp.deepseek.environment - see skills/deepseek-search/env.sample"
+            ),
+            "providers_tried": [],
+            "providers_unavailable": unavailable,
+            "warnings": warnings,
+        }
+
+    providers_tried = []
+    failure = None
+
+    for index, provider in enumerate(chain):
+        providers_tried.append(provider)
+
+        if provider == "deepseek":
+            composed, truncated = compose_query(
+                params["query"], params["language"], params["time_range"],
+                params["site"], params["after"], params["before"])
+            if truncated:
+                warnings.append(
+                    "query shortened to {} characters for the DeepSeek API".format(
+                        MAX_QUERY_CHARS))
+
+            attempt = deepseek_search(
+                composed, params["count"], params["need_content"],
+                params["ori_question"])
+
+            if attempt["ok"]:
+                return {
+                    "success": True,
+                    "provider": "deepseek",
+                    "query": composed,
+                    "engine_used": "deepseek",
+                    "fallback_used": index > 0,
+                    "fallback_reason": failure,
+                    "providers_tried": providers_tried,
+                    "providers_unavailable": unavailable,
+                    "total_results": len(attempt["results"]),
+                    "results": normalize_results(attempt["results"],
+                                                 params["need_content"]),
+                    "warnings": warnings,
+                }
+
+            failure = attempt["reason"]
+            if attempt["reason"] in FATAL_REASONS:
+                return {
+                    "success": False,
+                    "error": "DeepSeek search failed: {}".format(attempt["reason"]),
+                    "detail": attempt.get("detail") or "",
+                    "query": composed,
+                    "providers_tried": providers_tried,
+                    "providers_unavailable": unavailable,
+                    "warnings": warnings,
+                }
+            continue
+
+        if provider == "searxng":
+            if params["need_content"]:
+                warnings.append("need_content is ignored by the SearXNG provider")
+            attempt = searxng_search(
+                params["query"], params["language"], params["pageno"],
+                params["category"], params["engines"], params["time_range"],
+                params["safesearch"])
+            if not attempt["ok"]:
+                failure = attempt["reason"]
+                continue
+
+            envelope = dict(attempt["envelope"])
+            engine_fallback = envelope.pop("fallback_used", False)
+            envelope["provider"] = "searxng"
+            envelope["engine_fallback_used"] = engine_fallback
+            envelope["fallback_used"] = index > 0
+            envelope["fallback_reason"] = failure
+            envelope["providers_tried"] = providers_tried
+            envelope["providers_unavailable"] = unavailable
+            envelope["warnings"] = warnings + list(envelope.get("warnings") or [])
+            return envelope
+
+    return {
+        "success": False,
+        "error": "All search providers failed",
+        "detail": failure or "unknown",
+        "query": params["query"],
+        "providers_tried": providers_tried,
+        "providers_unavailable": unavailable,
+        "warnings": warnings,
+    }
+
+
+# --------------------------------------------------------------------------
+# MCP plumbing
+# --------------------------------------------------------------------------
+
+
+def handle_initialize(msg_id, params):
+    result(
+        msg_id,
+        {
+            "protocolVersion": PROTOCOL_VERSION,
+            "capabilities": {"tools": {}},
+            "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
+        },
+    )
+
+
+def handle_tools_list(msg_id, params):
+    result(msg_id, {"tools": [SEARCH_TOOL]})
+
+
+def handle_tools_call(msg_id, params):
+    name = params.get("name")
+    args = params.get("arguments") or {}
+
+    if name != "search":
+        error(msg_id, -32601, "Unknown tool: {}".format(name))
+        return
+
+    try:
+        payload = run_search(args)
+    except ValueError as exc:
+        error(msg_id, -32602, str(exc))
+        return
+    except Exception as exc:  # noqa: BLE001 - last-resort guard on the wire
+        error(msg_id, -32603, "Internal error: {}".format(exc))
+        return
+
+    result(
+        msg_id,
+        {"content": [{"type": "text", "text": json.dumps(payload, ensure_ascii=False)}]},
+    )
+
+
+METHODS = {
+    "initialize": handle_initialize,
+    "tools/list": handle_tools_list,
+    "tools/call": handle_tools_call,
+}
+
+
+def dispatch(line):
+    try:
+        msg = json.loads(line)
+    except json.JSONDecodeError:
+        return
+
+    if not isinstance(msg, dict):
+        return
+
+    msg_id = msg.get("id")
+    method = msg.get("method")
+
+    # Notifications (no id) get no response.
+    if msg_id is None:
+        return
+
+    if method not in METHODS:
+        error(msg_id, -32601, "Method not found: {}".format(method))
+        return
+
+    try:
+        METHODS[method](msg_id, msg.get("params") or {})
+    except Exception as exc:  # noqa: BLE001 - last-resort guard on the wire
+        error(msg_id, -32603, "Internal error: {}".format(exc))
+
+
+def main():
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        dispatch(line)
+
+
+if __name__ == "__main__":
+    main()

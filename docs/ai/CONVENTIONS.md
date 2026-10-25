@@ -15,7 +15,8 @@ Follow these without question. Do not deviate unless explicitly told.
 - Lesson directories inside class folders live directly as `<YYYY-MM-DD>__<topic>/` with `lesson.html` + `README.md` (e.g., `2026-09-25__r-kennzahlen-und-verteilungen`); create-lesson never uses a separate `lessons/` folder (existing such folders are legacy).
 - Homework is generated as per-lesson `Hausübung.md` (singular) files inside lesson directories, not as cumulative `Hausübungen.md`.
 - MCP servers live inside the skill that owns them (`skills/<name>/scripts/`); `opencode.json` references the server by absolute path — no `~/bin` indirection.
-- Shared skills and scripts ship **no service endpoints and no credentials** — instance selection, endpoints and auth come exclusively from host-local overlays (e.g. `mcp.searxng.environment` in each host's `opencode.json`; see `skills/searxng/env.sample`). Never hardcode a domain, URL or credential default in shared code.
+- Shared skills and scripts ship **no credentials** and no host-local endpoints — instance selection, endpoints and auth come exclusively from host-local overlays (e.g. `mcp.deepseek.environment` in each host's `opencode.json`; see `skills/searxng/env.sample` and `skills/deepseek-search/env.sample`). Never hardcode a domain of a *host-run* service. A **vendor API base URL** may ship as a documented default (the provider's own public endpoint, e.g. `https://api.deepseek.com`), because it is not host-specific and is overridable via env for tests/proxies.
+- Skills that should not compete for the model's attention carry `metadata.opencode/autoinvoke: false` (hidden from `available_skills`, still loadable by ID / `@skill-id`). `slash: true` is **not** an opencode field and has no effect — never use it. Guard: `tests/test_skill_frontmatter.py`.
 
 ## Classroom Material (create-lesson)
 
@@ -64,15 +65,17 @@ Follow these without question. Do not deviate unless explicitly told.
 
 - Shared facts have exactly one home; every other document references it by name instead of restating it.
 - Grading: the German/UTF-8 output rule, the address-style class table, email/database rules, and the missing-email protocol live only in `grading-shared`. Per-question point totals live only in `knowledge-exam`.
-- Search: the parameter schema lives in the `searxng` MCP tool table; do not add a second table for the same schema.
+- Search: the parameter schema lives in the `deepseek-search` skill's tool table; do not add a second table for the same schema. Search skills are split by role: `deepseek-search` is the advertised entry point (provider chain), `searxng` is the hidden backend manual (engine chain, instance contract).
 - Skill reference material (examples, format templates, domain detail) lives in sibling files linked as `[X.md](./X.md)`; every such link must resolve. Guard: `tests/test_skill_links.py`.
 
 ## Search Strategy
 
-- **Freshness First:** For rapidly evolving topics (e.g., new AI models, recent software releases), always use the `time_range` parameter (e.g., `month` or `week`) in `searxng_search`.
+- **One entry point:** use the `deepseek_search` tool. It routes to SearXNG by itself (SearXNG-only hosts and SearXNG-only parameters); do not reach for `searxng_search` unless this session has no `deepseek_search`.
+- **Freshness First:** For rapidly evolving topics (e.g., new AI models, recent software releases), always pass `time_range` (e.g., `month` or `week`). On DeepSeek this becomes `after:<date>`, which filters on **publication date** — undated pages drop out; if the expected sources are undated, use explicit `after`/`before` or drop the filter and read the result dates.
 - **Exact Matching:** Use double quotes for specific version numbers or model names (e.g., `"Gemma 4"`, `"RTX 2070 Super"`) to avoid generic results.
-- **Noise Reduction:** Filter out irrelevant documentation sites using negative keywords (e.g., `-site:developer.mozilla.org`) if the results are cluttered with legacy web standards.
-- **Category Focus:** Prefer the `it` or `science` categories for technical research to leverage specialized search engines.
+- **Noise Reduction:** Filter irrelevant documentation sites with `site:` (restrict) or `-site:` (exclude) operators — e.g. `-site:developer.mozilla.org` when legacy web standards flood the results.
+- **Page content:** `need_content: true` returns page text in the same (single, billed) DeepSeek request instead of a second fetch round-trip.
+- **Category Focus (SearXNG path only):** `category: it` / `science` leverage specialised engines; any SearXNG-only parameter routes the call there.
 
 ## Development & Git Workflow
 

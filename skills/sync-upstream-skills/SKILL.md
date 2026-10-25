@@ -6,7 +6,7 @@ license: MIT
 
 # Sync Upstream Skills
 
-This repo owns a small set of skills transplanted from mattpocock's `skills` repo. They live here with opencode-native frontmatter (the upstream's `disable-model-invocation: true` becomes `slash: true` or is dropped; `argument-hint` and other Claude-specific fields are dropped). This skill re-applies upstream changes on demand without re-introducing a live second source.
+This repo owns a small set of skills transplanted from mattpocock's `skills` repo. They live here with opencode-native frontmatter (the upstream's `disable-model-invocation: true` becomes `metadata.opencode/autoinvoke: false` or is dropped; `argument-hint` and other Claude-specific fields are dropped). This skill re-applies upstream changes on demand without re-introducing a live second source.
 
 ## The mapping
 
@@ -31,7 +31,7 @@ For each `name -> upstream-path` entry in mapping.json:
 3. Compare the **body** (everything after the frontmatter delimiter). opencode ignores Claude-specific frontmatter fields (`disable-model-invocation`, `argument-hint`, `policy.*` in `agents/openai.yaml`), so ignore those when diffing; only the prose body is what changes upstream.
 4. If the body changed:
    - Take the upstream body verbatim.
-   - Re-attach the owned frontmatter (preserve `name`, `description`, `slash`, `license`). If the upstream `description` changed, update ours to match verbatim (the description is what steers the model's invocation in opencode, so it must stay in sync).
+   - Re-attach the owned frontmatter (preserve `name`, `description`, `metadata.opencode/autoinvoke`, `license`). If the upstream `description` changed, update ours to match verbatim (the description is what steers the model's invocation in opencode, so it must stay in sync).
    - Write the merged file back to `skills/<name>/SKILL.md`.
 5. Copy any **sibling files** the upstream changed (e.g. `*-FORMAT.md`, `GLOSSARY.md`). These are resource files referenced by the skill body. Copy verbatim; they carry no opencode frontmatter.
 6. If the upstream **added** a new sibling file the owned copy doesn't have, copy it. If the upstream **removed** one, delete ours.
@@ -68,10 +68,10 @@ When syncing, translate upstream frontmatter to opencode-native:
 |---|---|
 | `name` | `name` (verbatim) |
 | `description` | `description` (verbatim; keep up to date, this steers model invocation) |
-| `disable-model-invocation: true` | `slash: true` (user-invoked) |
-| (no `disable-model-invocation`) | omit `slash` (model-invoked) |
+| `disable-model-invocation: true` | `metadata.opencode/autoinvoke: false` (user-invoked) |
+| (no `disable-model-invocation`) | omit `metadata.opencode/autoinvoke` (model-invoked) |
 | `argument-hint` | drop (opencode ignores it) |
 | `policy.*` in `agents/openai.yaml` | drop (opencode-specific; not transplanted) |
 | (none) | `license: MIT` (attribution) |
 
-opencode only reads `name`, `description`, `slash` from the frontmatter. Everything else is ignored at runtime but kept for attribution and human readability.
+OpenCode 2 reads `name` and `description` (display + selection) and `metadata.opencode/autoinvoke` (set `false` to keep a skill out of the model's list while it stays loadable by ID). `license`/`compatibility` are accepted but not interpreted; **`slash: true` is ignored** — it was never an opencode field, so do not re-introduce it. Guard: `tests/test_skill_frontmatter.py`.

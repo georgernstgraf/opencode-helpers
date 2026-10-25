@@ -171,4 +171,4 @@ live in `~/.config/opencode/service.json`/`pass`.
 
 - Markdown for skills and commands
 - ev. JSON configs
-- Tests: `python3 -m unittest discover -s tests -v` — stdlib only and hermetic (local mock, no network, no live instance). Run them after changing `skills/searxng/searxng-search.sh` or its MCP server.
+- Tests: `python3 -m unittest discover -s tests -v` — stdlib only and hermetic (local mock, no network, no live instance). Run them after changing `skills/searxng/searxng-search.sh`, `skills/deepseek-search/scripts/opencode-deepseek-search`, or any `SKILL.md` frontmatter (the visibility guard pins `metadata.opencode/autoinvoke`).

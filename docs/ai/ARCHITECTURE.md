@@ -1,6 +1,6 @@
 # Architecture
 
-Living structural map of the system as of 2026-10-17.
+Living structural map of the system as of 2026-10-25.
 Overwritten when structural changes occur during a session.
 
 ## Overview
@@ -8,7 +8,7 @@ Overwritten when structural changes occur during a session.
 opencode-helpers is a template repository providing standardized skills,
 agents, commands, scripts, and knowledge persistence patterns for AI-assisted
 development workflows in opencode. Skills in `skills/` contain all workflow
-logic (and, for `searxng`, their own MCP server); the thin command layer in
+logic (and, for the search skills, their own MCP servers); the thin command layer in
 `commands/` delegates to skills. Global agents live in `agents/` as flat
 `<name>.md` files (linked via `~/.config/opencode/agents`). Utility scripts
 live in `scripts/` (retired ones in `scripts/archive/`). Executable code is
@@ -36,8 +36,9 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 | Script | Purpose |
 |--------|---------|
-| `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering |
-| `skills/searxng/searxng-search.sh` | Canonical search logic: prioritized engine chain against the SearXNG instance chain (`brave` → `google` → `mwmbl,searchmysite` → token-gated `braveapi`), returns JSON on stdout |
+| `skills/deepseek-search/scripts/opencode-deepseek-search` | MCP server (Python 3, stdlib only) providing the `deepseek_search` tool: DeepSeek Search API primary, SearXNG chain as fallback; routes SearXNG-only parameters (category/engines/pageno/safesearch) straight to the fallback |
+| `skills/searxng/scripts/opencode-searxng` | MCP server (Python 3, stdlib only) providing the `searxng_search` tool with category/engine/time-range/safesearch filtering — still the tool on hosts that run SearXNG only (school) |
+| `skills/searxng/searxng-search.sh` | Canonical SearXNG search logic (also the fallback backend of `deepseek-search`): prioritized engine chain against the SearXNG instance chain (`brave` → `google` → `mwmbl,searchmysite` → token-gated `braveapi`), returns JSON on stdout |
 | `skills/full-sync/scripts/full-sync.sh` | Multi-repo sync: fetch every remote, fast-forward/rebase clean checkouts onto their upstream, prune dead secondary remotes, `svn up`; never commits or pushes. `--host-steps` refreshes the host: apt update/upgrade, restart of the configured user services, reboot when pending — gated on a clean sync report |
 | `skills/full-sync/scripts/test-full-sync.sh` | Shell self-test for `full-sync.sh` against throwaway bare remotes/clones (23 checks; no real repository touched) |
 | `scripts/archive/` | Retired scripts (`opencode-searxng` legacy requests server, `opencode-ollama-sync`) — kept unregistered for reference |
@@ -52,6 +53,9 @@ the script (precedent: `skills/full-sync/scripts/test-full-sync.sh`).
 | File | Purpose |
 |------|---------|
 | `tests/searxng_mock.py` | In-process mock of the SearXNG JSON API plus a helper that points a temp copy of `searxng-search.sh` at it |
+| `tests/deepseek_search_mock.py` | In-process mock of the DeepSeek Search API (`POST /v1/tools/search`), scriptable per request (status/body/queue) |
+| `tests/test_deepseek_search_mcp.py` | Provider chain end to end: DeepSeek success, missing key, every fallback trigger (402/408/429/5xx/network/empty), fatal 4xx, SearXNG-only routing, operator/`time_range` mapping, query truncation, envelope keys |
+| `tests/test_skill_frontmatter.py` | Visibility guard: hidden skills carry `metadata.opencode/autoinvoke: false`, no inert `slash:` field, exactly one advertised search skill |
 | `tests/test_full_sync.py` | `full-sync.sh`: report keys, fetch/ff/rebase pull decisions, dead-remote pruning, credential redaction in report *and* log, exit codes, `max_depth`, svn status without committing, `--host-steps` gate |
 | `tests/test_searxng_search.py` | `searxng-search.sh` behavior: chain tiers (`brave`/`google`/free), the `< 3` token gate + merge/dedupe, explicit-engine/category bypass, preserved params, instance chain, first-responsive-instance reuse |
 | `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
@@ -77,7 +81,8 @@ the script (precedent: `skills/full-sync/scripts/test-full-sync.sh`).
 | `orchestration` | Scope-gated coordination for large work: decompose into sub-issues, delegate implementation to sub-agents, verify behind a hard test gate | Natural language ("large", multi-session work) |
 | `projectgrade` | Grade student project repositories holistically based on Git commits, GitHub Issues, Pull Requests, and further measurable contributions | Direct skill invocation |
 | `repograde` | Grade student repositories (full or date-filtered) in single-repo or bulk mode with plan presentation | Direct skill invocation |
-| `searxng` | Web search via the self-hosted SearXNG instance; owns the `searxng_search` MCP server and the standalone `searxng-search.sh` | MCP tool (automatic in all agents) plus direct invocation |
+| `deepseek-search` | Web search via the DeepSeek Search API with the SearXNG engine chain as fallback; without a key the chain is SearXNG only. Owns the `deepseek_search` MCP server | MCP tool (the only advertised search skill) |
+| `searxng` | Backend manual of the SearXNG chain (instance/credential contract, engine tiers, envelope diagnostics); owns `searxng-search.sh` and the `searxng_search` MCP server for SearXNG-only hosts | Hidden (`metadata.opencode/autoinvoke: false`), loadable via `@searxng`; its MCP tool stays registered where hosts run SearXNG only |
 | `sync-upstream-skills` | Re-transplant owned skills from the mattpocock upstream after a git pull; checks duplicate names and dangling references | Natural language ("sync skills") |
 | `teach` | Teach the user a new skill or concept | Direct invocation |
 | `lehrplan` | Austrian HTL teaching repos: Gegenstand identification incl. conformity check, RIS sync with Novellen-Check (NOR-Kopf method), year-wise curriculum extraction into `lehrplan/` | Natural language ("Unterricht", "RIS sync", "Lehrplan extrahieren") |
@@ -104,10 +109,11 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 - `skills/*` → `docs/ai/*`: Knowledge-persistence skill writes session context into knowledge files, then commits + pushes them (issue-referenced) — the run is only complete once they are on the trunk.
 - `docs/ai/*` → agent bootstrap: AGENTS.md instructs agents to read knowledge files before starting any task.
 - `repograde` bulk mode: fan-out to concurrent subagents → per-repo artifact files → fan-in aggregation into shared EMAIL.json.
+- `skills/deepseek-search/scripts/opencode-deepseek-search` (MCP) → OpenCode: exposes the `deepseek_search` tool. It calls the DeepSeek Search API (`POST <DEEPSEEK_SEARCH_API_BASE or https://api.deepseek.com>/v1/tools/search`) and, when no key is configured or the call fails (402/408/429/5xx/network/empty), shells out to `skills/searxng/searxng-search.sh`. The envelope reports `provider`, `fallback_used`/`fallback_reason`, `providers_tried`/`providers_unavailable`; on the SearXNG path the engine-level flag is `engine_fallback_used`.
 - `skills/searxng/scripts/opencode-searxng` (MCP) → OpenCode: exposes the `searxng_search` tool to all agents via JSON-RPC; the server shells out to `skills/searxng/searxng-search.sh` per call, which queries the instances configured in the **host overlay** (`SEARXNG_PRIMARY`/`SEARXNG_FALLBACK` in `mcp.searxng.environment`) — the skill itself ships no endpoints (#112).
 - `skills/searxng/searxng-search.sh` prioritized chain: for general searches it stops at the first tier that returns results — `bing`, then `yahoo`, then the free `mwmbl,searchmysite`, and finally `engines=braveapi` **only** when `bing` and `yahoo` both failed and the free tier yielded fewer than 3 hits. `bing` is the **only** engine that serves normal results; `yahoo`, the free tier and `braveapi` are **fallback-only**. `braveapi` results are merged ahead of the free results (URL-deduplicated); the answer carries `engine_used`/`fallback_used`/`tried`/`unresponsive_engines`. An explicit `engines=` argument bypasses the chain; the profile `SEARXNG_CHAIN=strict` skips the free tier. (`brave`/`google` were the chain until 2026-10-08; both went upstream-broken: `google`'s engine calls the retired `/wml/search` endpoint → 403, searxng#5867; `brave` → 429.)
 - SearXNG access control: the public vhost requires **HTTP Basic Auth** (shared secret in `/etc/nginx/searxng.htpasswd`) for both UI and API, and nginx applies `limit_req`/`limit_conn`. The container port `8888` is published only on `127.0.0.1`, so the instance is reachable solely through nginx. `/robots.txt` is served **without** auth (`location = /robots.txt`, `Disallow: /`) and every response carries `X-Robots-Tag: noindex, nofollow, noarchive` (the backend's own `X-Robots-Tag` is hidden with `proxy_hide_header`). The vhost logs to dedicated files (`/var/log/nginx/searxng.access.log`, custom `searxng` format incl. `rt=`, and `searxng.error.log`) rather than the shared `access.log`. Clients authenticate by reading `~/.config/opencode/searxng.cred` (or `$SEARXNG_AUTH`) in `searxng-search.sh`. Intended clients: claw, think, dell.
-- Think MCP deployment (`~/.config/opencode/opencode.json`, `mcp.searxng.environment`, #74): `SEARXNG_PRIMARY=http://10.8.0.16` (Gregor school instance — VPN `tun0`, port 80, no auth) with `SEARXNG_CHAIN=gregor` (`google` → `brave` → `braveapi`, no free tier); `SEARXNG_FALLBACK=https://searxng.claw.graf.priv.at` authenticated via `SEARXNG_FALLBACK_CRED_FILE` (`~/.config/opencode/searxng.cred`). The repo `opencode.json` carries the same block as a secret-free placeholder template. Purpose/rollout: Gregor is the school's **agentic** search instance — think live, dell replication next, then student agents (see DECISIONS.md 2026-09-17); no browser-UI role for student use.
+- Search deployment on **think** (2026-10-25): the host registers `mcp.deepseek.environment` with `DEEPSEEK_SEARCH_API_KEY_FILE` (key file mode `600`) and no `mcp.searxng` block any more; the tool is `deepseek_search`. The repo `opencode.json` carries the same server as a secret-free template (no key ⇒ SearXNG only). Historic reference (#74, superseded 2026-10-25): the `mcp.searxng` overlay used `SEARXNG_PRIMARY=http://10.8.0.16` (Gregor school instance — VPN `tun0`, port 80, no auth) with `SEARXNG_CHAIN=strict` (profile name `gregor` until 2026-10-08, when the chain became `bing` → `yahoo` → `braveapi`), plus `SEARXNG_FALLBACK=https://searxng.claw.graf.priv.at` authenticated via `SEARXNG_FALLBACK_CRED_FILE` (`~/.config/opencode/searxng.cred`). Purpose/rollout: Gregor is the school's **agentic** search instance — think live, dell replication next, then student agents (see DECISIONS.md 2026-09-17); no browser-UI role for student use.
 
 ## Host Services: OpenCode Server & Telegram Bot
 

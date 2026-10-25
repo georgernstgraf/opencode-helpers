@@ -1,13 +1,25 @@
 Open tasks:
 
-1. [ ] Quiz-Begründungen gegenlesen (#94): Die Sub-Agents haben in PMM/WMC/
+1. [ ] **`deepseek-search`-Rollout (neu 2026-10-25):** think ist umgestellt
+      (Host-Overlay `mcp.deepseek.environment` mit `DEEPSEEK_SEARCH_API_KEY_FILE`,
+      `mcp.searxng` dort entfernt, Key-Datei `~/.config/opencode/deepseek.key`
+      mode 600). Offen: **claw** und **elite** gleichziehen (Key-Datei + Overlay,
+      `mcp.searxng` raus, `opencode.service` restart, echte Suche + ein
+      erzwungener 402 als Fallback-Probe); **Schul-Hosts** (gregor/dell/kik)
+      bleiben bewusst ohne Key auf `searxng_search` — nach `git pull` prüfen,
+      dass die Suche dort unverändert funktioniert und dass
+      `metadata.opencode/autoinvoke` die Skills korrekt ausblendet.
+      elite: `deepseek.key` in `svn:ignore` von
+      `EDV/Deployed/elite/home/georg/.config/opencode/` aufnehmen (SVN-Seite).
+
+2. [ ] Quiz-Begründungen gegenlesen (#94): Die Sub-Agents haben in PMM/WMC/
       INFI/SWP pro Antwortoption `data-grund`-Begründungen verfasst (teils
       redaktionell neu formuliert, wo vorher nur eine pauschale Erklärung
       stand). Struktur ist verifiziert (122 Fragen/427 Optionen, richtige
       Option „Richtig", übrige „Falsch"); offen ist die inhaltliche
       Stichprobe, ob jede Begründung sachlich korrekt und textgedeckt ist.
 
-2. [ ] Policy observation (new): the continuous issue-awareness workflow
+3. [ ] Policy observation (new): the continuous issue-awareness workflow
       (`AGENTS.global.md` + proactive commit/push) shipped 2026-09-15.
       Watch daily practice; tune the green-commit gate and auto-close
       criteria if commits land broken or issues close prematurely.
@@ -15,7 +27,7 @@ Open tasks:
       load on each host (think/dell symlink replication pending — see
       task 4 for dell).
 
-3. [ ] writing-for-agents audit — **P4** (last phase): add Completion Criteria
+4. [ ] writing-for-agents audit — **P4** (last phase): add Completion Criteria
       ("Done when …") to each skill's instruction body and split the
       frontmatter `description` into clear trigger branches.
       Scope: ~20 skills under `skills/*/SKILL.md`.
@@ -26,7 +38,7 @@ Open tasks:
       NOT re-duplicate moved reference material. Verify with
       `python3 -m unittest discover -s tests -v`.
 
-4. [ ] dell-repo sync pending: dell's `~/repos/georgernstgraf/opencode-helpers`
+5. [ ] dell-repo sync pending: dell's `~/repos/georgernstgraf/opencode-helpers`
       sits on `d14cc25` with an uncommitted local change to
       `skills/lehrplan/SKILL.md` — the **Fachgruppen-Variante** for
       multi-subject repos (43 insertions, 2 deletions; self-contained
@@ -40,19 +52,19 @@ Open tasks:
       into dell's `~/.config/opencode/opencode.json` — rollout step 2
       after think (#74, DECISIONS.md 2026-09-17).
 
-5. [ ] Credentials im SVN (infra) — canonical task lives in
+6. [ ] Credentials im SVN (infra) — canonical task lives in
       `~/svn/georg/docs/ai/HANDOFF.md` **Task 5**
       (consolidate → `svn:ignore` → history rewrite → rotation of all leaked
       secrets incl. infra private keys). This repo only contributed the SearXNG
       access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
       credential) — that part is done. Track the SVN/secret work over there.
 
-6. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
+7. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
       weiterhin `<klasse>/prepared-lessons/` und das alte Ablagemodell. Bei
       nächster Gelegenheit auf die #90-Regeln angleichen (KM-Anforderung,
       `unterricht/prepared-lessons/`, Beamer-Boxen) — erst nach Rücksprache.
 
-7. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
+8. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
       Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/` und ggf. `kompetenzmodule/`
       im Zweig-Ordner. Betroffen u. a. GRG-INFI (`unterricht/HWII-INFI/`,
       `infi-hwii/kompetenzmodule/`), GRG-WMC (`unterricht/WMC/` — dokumentierte
@@ -62,7 +74,7 @@ Open tasks:
 
 Last updated: 2026-10-17.
 
-8. [ ] Host-Services nachziehen (#111): Die Unit-Vorlagen
+9. [ ] Host-Services nachziehen (#111): Die Unit-Vorlagen
       (`dotfiles/systemd/user/`) sind erst auf `kik` und `gregor` im Einsatz.
       Prüfen, ob `think`/`dell`/`claw` ebenfalls `opencode.service` +
       `oc-tg-bot-<host>.service` als **user** Units betreiben (inkl.

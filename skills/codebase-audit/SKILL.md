@@ -6,7 +6,7 @@ compatibility: opencode
 metadata:
   category: workflow
   scope: codebase
-slash: true
+  opencode/autoinvoke: false
 ---
 
 # Codebase Audit

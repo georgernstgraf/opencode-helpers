@@ -1,10 +1,17 @@
 ---
 name: searxng
-description: "Search the web using a configured self-hosted SearXNG instance. Use when: user asks to search the web, find information, or look something up."
-metadata: { "openclaw": { "emoji": "🔍" } }
+description: "Backend manual for the self-hosted SearXNG engine chain (instance contract, engine tiers, envelope diagnostics). Not advertised: search skills route to it automatically; load it by ID when diagnosing engine or instance failures."
+metadata: { "openclaw": { "emoji": "🔍" }, "opencode/autoinvoke": false }
 ---
 
 # SearXNG Web Search Skill
+
+> **Not advertised to the model.** This skill is loaded on demand (`@searxng`)
+> when engine/instance behaviour needs diagnosis. To search, use the
+> **`deepseek_search`** tool from the `deepseek-search` skill — it routes to the
+> chains documented here whenever SearXNG is the right backend. If a session
+> has no `deepseek_search` tool but does have `searxng_search`, that tool is
+> this skill's own MCP server and works exactly as described below.
 
 Search the web using self-hosted SearXNG instances. **This skill is
 instance-neutral**: it ships no endpoints and no credentials. Which instance(s)
