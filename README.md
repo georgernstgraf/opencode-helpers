@@ -21,7 +21,7 @@ Alle Skills und Kommandos werden von anderen Projekten mittels **symbolischer Li
 
 Die Suche hat eine **Provider-Kette**, die pro Host konfiguriert wird:
 - **DeepSeek Search API** (primär, wo ein Key liegt) — strukturierte Treffer mit modelllesbarem `summary`, Publikationsdatum und Authority-Stufe
-- **Selbstgehosteter [SearXNG](https://searxng.claw.graf.priv.at/)-Metasuchserver** als Fallback — Metasearch über Brave, Wikipedia, GitHub, Hacker News, ArXiv u.v.m., datenschutzfreundlich, keine Weitergabe an Google/Bing
+- **Selbstgehosteter [SearXNG](https://searx.graf.priv.at/)-Metasuchserver** als Fallback — Metasearch über Brave, Wikipedia, GitHub, Hacker News, ArXiv u.v.m., datenschutzfreundlich, keine Weitergabe an Google/Bing
 - **Skill `deepseek-search`** (das einzige beworbene Such-Skill) mit dem MCP-Server `skills/deepseek-search/scripts/opencode-deepseek-search` → Tool `deepseek_search`
 - **Ohne DeepSeek-Key** (z. B. auf Schul-Hosts) läuft die Kette rein über SearXNG — strukturell, nicht per Zufall; Keys liegen ausschließlich in Host-Overlays
 - **Der `searxng`-Skill** bleibt als Backend-Handbuch (Engine-Kette, Instanz-Vertrag, Diagnose) und ist per `@searxng` ladbar, aber nicht mehr beworben
@@ -200,7 +200,7 @@ All skills and commands are consumed by other projects via **symbolic links** �
 
 Search is a **provider chain** configured per host:
 - **DeepSeek Search API** (primary where a key is present) — structured hits with a model-readable `summary`, publication date and authority tier
-- **Self-hosted [SearXNG](https://searxng.claw.graf.priv.at/) metasearch** as the fallback — Brave, Wikipedia, GitHub, Hacker News, ArXiv and more, privacy-friendly, nothing sent to Google/Bing
+- **Self-hosted [SearXNG](https://searx.graf.priv.at/) metasearch** as the fallback — Brave, Wikipedia, GitHub, Hacker News, ArXiv and more, privacy-friendly, nothing sent to Google/Bing
 - **Skill `deepseek-search`** (the only advertised search skill) with the MCP server `skills/deepseek-search/scripts/opencode-deepseek-search` → tool `deepseek_search`
 - **Without a DeepSeek key** (e.g. on school hosts) the chain runs on SearXNG only — structurally, not by accident; keys live exclusively in host overlays
 - The **`searxng` skill** remains as the backend manual (engine chain, instance contract, diagnostics), loadable via `@searxng` but no longer advertised
