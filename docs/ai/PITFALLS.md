@@ -122,3 +122,25 @@ Do not "fix" the tests for this; export the identity variables for the run.
 - **DeepSeek-`fetch` ist nicht übernommen** (2026-10-25): Der Endpoint liefert Markdown mit massivem Backslash-Escaping (`\# CLI`, `\-`, `\|`, `\.`), das erst eine De-Escaping-Schicht braucht. `webfetch` deckt den Fall ab; `need_content: true` in der Suche liefert Seiteninhalt in derselben (einmal bezahlten) Anfrage.
 - **Kosten und Limits** (Stand 2026-10-25): $0,75/1 000 erfolgreiche Suchen = $0,00075 pro Suche, Abrechnung pro Request (nicht pro Treffer); Fehlschläge und leere Ergebnisse sind gratis. 100 QPS pro Account. Die „kostenlos für Harness-Tool-Calls"-Regel galt nur für DeepSeek Harness / Claude Code / Codex und endete am **2026-11-01** — nicht darauf verlassen.
 - **Provider- vs. Engine-Fallback heißen unterschiedlich** (2026-10-25): Im `deepseek_search`-Envelope bedeutet `fallback_used` den **Provider**-Wechsel (deepseek → searxng); die Engine-Kette darunter meldet sich als `engine_fallback_used`. Das alte `searxng_search`-Feld `fallback_used` hieß „nicht bing" — die Diagnose-Rezepte in dieser Datei entsprechend lesen.
+
+## Service Units (OpenCode 2.2.0, 2026-10-27)
+
+- **`serve --service` forkt seit 2.2.0** und beendet sich selbst (Status 0).
+  Eine Unit mit `Type=simple` gilt damit nach ~180 ms als beendet; systemd
+  killt die restliche Cgroup, der geforkte Daemon stirbt, `systemctl status`
+  zeigt `inactive` — und Clients starten einen eigenen Server im
+  Session-Scope (Orphan). `Type=forking` hilft nicht (getestet, gleiches
+  Ergebnis).
+- **Richtige Unit:** `Type=oneshot` + `RemainAfterExit=yes`,
+  `ExecStart=%h/.opencode/bin/opencode service start`,
+  `ExecStop=-%h/.opencode/bin/opencode service stop`, `TimeoutStopSec=30`.
+  Der Daemon läuft dann mit PPID = systemd --user, `status` zeigt
+  `active (exited)`, und `systemctl --user restart` ist der reguläre
+  Upgrade-Weg (`ExecStartPre` holt die Version; Journal: `From 2.1.4 → 2.2.0`).
+- **`opencode serve` (ohne `--service`)** lauscht zwar mit Port/Passwort aus
+  `~/.config/opencode/service.json`, registriert sich aber **nicht** in
+  `~/.local/state/opencode/service.json` → `opencode service status` sagt
+  `stopped`, TUI und Bots finden ihn per Auto-Discovery nicht.
+- **Verifikation nach jedem Restart:** `opencode api get /api/info` liefert
+  `version` und `pid`; dieser `pid` muss der Prozess mit PPID = systemd-User
+  Instanz sein (`ps -o pid,ppid,args -p <pid>`), nicht ein Terminal-Kind.

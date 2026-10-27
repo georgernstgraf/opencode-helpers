@@ -23,6 +23,16 @@
 # UMask=0077: Der Service legt Session-/Log-/Service-Dateien nur für den
 # Eigentümer an (Konvention der Geheimnis-Hygiene, vgl. claw). Kein Nachteil
 # auf Einzelnutzer-Hosts; ein zweiter Nutzer kann den Server nicht lesen.
+#
+# Type=oneshot/RemainAfterExit (seit OpenCode 2.2.0, 2026-10-27): Ab 2.2.0
+# forkt `opencode serve --service` nur noch einen Daemon und beendet sich
+# selbst. Mit `Type=simple` (oder `forking`) gilt die Unit damit sofort als
+# beendet und systemd killt den Daemon beim Verlassen der Cgroup — `systemctl
+# status` zeigt „inactive", während Clients einen eigenen Server im
+# Session-Scope starten (genau der Orphan-Zustand, den wir 2026-10-17/27 auf
+# elite und claw vorfanden). Deshalb startet die Unit den Daemon über die
+# dokumentierte Lifecycle-Schnittstelle (`opencode service start`) und merkt
+# sich den Zustand selbst; `ExecStop` fährt ihn über `service stop` herunter.
 
 [Unit]
 Description=OpenCode V2 Server (background service)
@@ -30,14 +40,15 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=simple
+Type=oneshot
+RemainAfterExit=yes
 UMask=0077
 WorkingDirectory=%h
 ExecStartPre=-%h/.opencode/bin/opencode upgrade --method curl
 TimeoutStartSec=300
-ExecStart=%h/.opencode/bin/opencode serve --service
-Restart=on-failure
-RestartSec=5
+ExecStart=%h/.opencode/bin/opencode service start
+ExecStop=-%h/.opencode/bin/opencode service stop
+TimeoutStopSec=30
 
 [Install]
 WantedBy=default.target
