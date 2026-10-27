@@ -8,10 +8,13 @@ Open tasks:
       `braveapi`, Server via `opencode reload` neu geladen, Config in SVN r7669
       von claw committet). **Schul-Hosts** (gregor/dell/kik) bleiben bewusst
       ohne Key auf `searxng_search` — gregor/kik geprüft, unverändert grün.
-      Offen: **elite** (Key-Datei + Overlay, `mcp.searxng` raus,
-      `opencode.service` restart, echte Suche + erzwungener 402;
-      `deepseek.key` in `svn:ignore` von
-      `EDV/Deployed/elite/home/georg/.config/opencode/` aufnehmen) und **dell**
+      **elite erledigt (2026-10-27):** Key-Datei
+      `~/.config/opencode/deepseek.key` (mode 600, aus der host-eigenen
+      auth-DB), `mcp.searxng` → `mcp.deepseek` mit
+      `SEARXNG_PRIMARY=https://searx.graf.priv.at` (+`searxng.cred`), echte
+      Suche + erzwungener 402 verifiziert, DeepSeek-Tool im laufenden Server
+      aktiv; elite-Config in SVN **r7694** committet (Verzeichnis hat
+      `svn:ignore *`, der Key bleibt draußen). Offen: **dell**
       (Overlay prüfen).
       Nebenbefund claw: dort läuft der georg-Server (PID auf :62764) in einem
       verwaisten Session-Scope (seit 2026-10-17, keine systemd-Unit) — bei

@@ -34,7 +34,10 @@ retirierte Cache-Datei `models-verbose.txt` (3 rote Tests seit `fb0b767`).
  `providers_unavailable: ["deepseek"]`. Auf kik entfernt: das ungenutzte
  `~/.config/opencode/searxng.cred` (User `searxng` = private claw-Credential,
  von keiner Config referenziert) — Schul-Hosts tragen damit keine privaten
- Credentials mehr. Offen: elite.
+ Credentials mehr. **elite erledigt (2026-10-27):** MCP-Server `deepseek`
+statt `searxng`, `SEARXNG_PRIMARY=https://searx.graf.priv.at` (+cred),
+Key-Datei mode 600 host-lokal, `deepseek_search` im laufenden Server aktiv,
+SVN r7694. Offen: dell.
 
 Host-Domain (2026-10-25): Die öffentliche claw-Instanz heißt jetzt
 **`https://searx.graf.priv.at`** (Basic-Auth unverändert, User `searxng`).
@@ -42,9 +45,11 @@ Der alte Name `searxng.claw.graf.priv.at` ist **ohne Redirect** stillgelegt —
 Vhost, `sites-enabled`-Symlink und Zertifikats-Lineage gelöscht, neues
 Zertifikat nur mit dem neuen SAN. Migriert: claw (catchlogx-Overlay,
 bench3d jetzt gegen `http://127.0.0.1:8888` statt gegen den öffentlichen
-Vhost) und think (`SEARXNG_PRIMARY`). **Offen: elite** (`SEARXNG_FALLBACK`)
-und dell — beide waren am 2026-10-25 nicht im VPN erreichbar und brechen mit
-dem alten Namen; Migration nur auf dem jeweiligen Host.
+Vhost) und think (`SEARXNG_PRIMARY`). **elite erledigt (2026-10-27, SVN
+r7694)** — dort wurde im selben Zug auf `deepseek-search` umgestellt, die
+SearXNG-Instanz hängt jetzt als `SEARXNG_PRIMARY` an der neuen Domain.
+**Offen: dell** (am 2026-10-25 nicht im VPN erreichbar, bricht mit dem alten
+Namen); Migration nur auf dem Host selbst.
 
 Davor: SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
 
