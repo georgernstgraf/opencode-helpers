@@ -37,7 +37,10 @@ retirierte Cache-Datei `models-verbose.txt` (3 rote Tests seit `fb0b767`).
  Credentials mehr. **elite erledigt (2026-10-27):** MCP-Server `deepseek`
 statt `searxng`, `SEARXNG_PRIMARY=https://searx.graf.priv.at` (+cred),
 Key-Datei mode 600 host-lokal, `deepseek_search` im laufenden Server aktiv,
-SVN r7694. Offen: dell.
+SVN r7694. **dell erledigt (2026-10-28):** gleiches Overlay (Key aus der
+eigenen auth-DB, `searxng.cred` von think, beide mode 600), Server restart,
+DeepSeek-Pfad und SearXNG-Fallback verifiziert. Rollout damit auf allen
+Privat-Hosts abgeschlossen.
 
 Host-Domain (2026-10-25): Die öffentliche claw-Instanz heißt jetzt
 **`https://searx.graf.priv.at`** (Basic-Auth unverändert, User `searxng`).
@@ -48,8 +51,8 @@ bench3d jetzt gegen `http://127.0.0.1:8888` statt gegen den öffentlichen
 Vhost) und think (`SEARXNG_PRIMARY`). **elite erledigt (2026-10-27, SVN
 r7694)** — dort wurde im selben Zug auf `deepseek-search` umgestellt, die
 SearXNG-Instanz hängt jetzt als `SEARXNG_PRIMARY` an der neuen Domain.
-**Offen: dell** (am 2026-10-25 nicht im VPN erreichbar, bricht mit dem alten
-Namen); Migration nur auf dem Host selbst.
+**dell erledigt (2026-10-28)** — gleiches Overlay; der alte Name ist damit
+auf keinem Host mehr in Betrieb (offen nur noch der DNS-Record beim Provider).
 
 Davor: SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
 
@@ -271,9 +274,10 @@ prepared-lessons umstellen.
 
 - [ ] P4 of the audit: Completion Criteria ("Done when …") + frontmatter
       description trigger branches across `skills/*`
-- [ ] dell replication: repo sync, `agents/` directory + `~/.config/opencode/agents`
-      symlink, plus `mcp.searxng.environment` (Gregor primary, chain `gregor`)
-      — rollout step 2 after think (see HANDOFF.md task 3)
+- [x] dell replication (2026-10-28): repo sync (`069c332` → `6f01376`),
+      `~/.config/opencode/{agents,skills,commands}`-Symlinks auf den Clone
+      vorhanden, Such-Overlay auf `mcp.deepseek` (DeepSeek primär, privates
+      SearXNG als Fallback) umgestellt — rollout step 2 after think done.
 
 ## Blockers
 

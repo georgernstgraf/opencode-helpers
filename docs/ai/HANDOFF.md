@@ -14,8 +14,13 @@ Open tasks:
       `SEARXNG_PRIMARY=https://searx.graf.priv.at` (+`searxng.cred`), echte
       Suche + erzwungener 402 verifiziert, DeepSeek-Tool im laufenden Server
       aktiv; elite-Config in SVN **r7694** committet (Verzeichnis hat
-      `svn:ignore *`, der Key bleibt draußen). Offen: **dell**
-      (Overlay prüfen).
+      `svn:ignore *`, der Key bleibt draußen). **dell erledigt (2026-10-28):**
+      Overlay `mcp.searxng` → `mcp.deepseek` (Key aus der eigenen auth-DB,
+      `SEARXNG_PRIMARY=https://searx.graf.priv.at` + `searxng.cred`, beide
+      Keys mode 600), Server restart, DeepSeek-Pfad und Fallback
+      (`provider: searxng`, `engine_used: yahoo`) verifiziert. Damit ist der
+      Rollout auf allen Privat-Hosts abgeschlossen; Schul-Hosts
+      (gregor/kik) bleiben bewusst keylos.
       Nebenbefund claw: dort läuft der georg-Server (PID auf :62764) in einem
       verwaisten Session-Scope (seit 2026-10-17, keine systemd-Unit) — bei
       Gelegenheit die Unit-Vorlage aus `dotfiles/systemd/user/` installieren
