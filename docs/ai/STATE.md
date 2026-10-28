@@ -54,6 +54,14 @@ SearXNG-Instanz hängt jetzt als `SEARXNG_PRIMARY` an der neuen Domain.
 **dell erledigt (2026-10-28)** — gleiches Overlay; der alte Name ist damit
 auf keinem Host mehr in Betrieb (offen nur noch der DNS-Record beim Provider).
 
+Davor: **Bot-Modelle (2026-10-28)** — die ganze Flotte stand auf der
+verschwundenen ID `zai-coding-plan/glm-5.1` (Plan zusaetzlich ohne Guthaben),
+gregor/kik auf einem abgelaufenen `opencode-go`-Key. Alle Bots laufen jetzt auf
+`deepseek` / `deepseek-flash` (DeepSeek V4.1 Flash, DeepSeek-API gehostet);
+kik bekam den Key als dokumentierte Ausnahme (Schulhost). Vorlage-Kopf in
+`dotfiles/systemd/user/oc-tg-bot.service` traegt jetzt den Standard, den
+Dead-Model-Hinweis und die „nie parallel restarten"-Regel.
+
 Davor: SearXNG-Skill ist **instanz-neutral** (#112, Commit 6596871): `searxng-search.sh` verlangt `SEARXNG_PRIMARY` (Pflicht) / `SEARXNG_FALLBACK` (optional) + `_AUTH`/`_CRED_FILE` je Instanz, kein Built-in-Endpoint und kein Shared-Cred-Default mehr; Profil `SEARXNG_CHAIN=strict` (Legacy-Alias `gregor` bis zur Host-Migration). Damit trägt die Instanz-Trennung Privat=claw / Schule=gregor (KI-Kustodiat #36): think/claw(georg+catchlogx) → claw, gregor/dell/kik → `http://10.50.11.10`, kein Cross-Fallback.
 
 Davor (#111): Host-Services sind seit 2026-10-17 versioniert und auf `kik` umgesetzt:
