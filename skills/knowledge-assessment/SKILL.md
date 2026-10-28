@@ -29,11 +29,23 @@ German/UTF-8 constraints, and reporting protocol.
 
 ## Execution Context
 
-This skill operates from the current working directory, which may be a plain
-local folder or a directory inside a Git working tree. The skill itself performs
-no Git operations: do not run any `git` commands and never commit the generated
-grading files. The repository-based skills (`repograde`, `projectgrade`) are the
-ones that use Git; their rules are unchanged.
+This skill operates in the teacher's private `<subject>-T` repository (e.g.
+`GRG-PMM-T`), the sibling of the public teaching repo. Submissions, exam files
+and the generated grading outputs all live there.
+
+**Git protocol:**
+
+- After the reports and `EMAIL.json` are written and validated, commit the
+  grading outputs to the current branch and push. This skill is explicitly
+  expected to run `git` commands for that purpose.
+- Commit message in German, following the repo convention (see the repo's
+  `AGENTS.md`), e.g. `WÜ 4AHWIT-y 2026-10-23: Bewertung und E-Mails (#12)`. If
+  the repo requires an issue number and none is known, ask for it instead of
+  guessing.
+- Commit only the grading outputs plus any previously untracked submission
+  files that belong to the same exam. Never modify, move or delete student
+  submission files.
+- Never commit grading outputs to a public repository.
 
 The skill grades student submissions located in the current working directory
 alongside knowledge-check solution files. **The solution files
@@ -44,8 +56,8 @@ present in the current working directory, ask the user for their location.
 
 ## Inputs
 
-- Student submission files in the current working directory (a plain folder or a
-  directory inside a Git working tree; no Git operations are performed); each
+- Student submission files in the current working directory (inside the private
+  `<subject>-T` repository; see the Git protocol above); each
   submission filename contains the class identifier that determines whether
   formal or informal address should be used.
 - Matching knowledge-check files with questions and solutions, including a
@@ -290,8 +302,9 @@ If the script exits with a non-zero status or reports errors on stderr,
 
 ### 5. Constraints
 
-- This skill performs no Git operations and must not commit its outputs, but may
-  run from a directory inside a Git working tree.
+- Generated grading files are committed and pushed in the private
+  `<subject>-T` repository (see the Git protocol above) — never in a public
+  repository.
 - Write all report files in German.
 - Write `EMAIL.json` bodies in German.
 - All student-facing content must use second-person address (Sie or Du).
