@@ -27,8 +27,9 @@ Never use English for the exam questions or solutions.
 
 Knowledge-check exam and solution files must be written into the teacher's
 **private test/exam repository** — the sibling repo named `<subject>-T`
-(e.g. `GRG-PMM-T` for `GRG-PMM`). **Never write them into the public
-teaching repo.**
+(e.g. `GRG-PMM-T` for `GRG-PMM`), and **only there**. **Never write them into
+the public teaching repo.** After the Quality Gate they are committed and
+pushed in that private repo (protocol step 7).
 
 Before generating files:
 
@@ -188,10 +189,27 @@ Kriterien ist in der Praxis schon verletzt worden:
   (z. B. einen unbehandelten Spec-Term vermeiden und das Verhalten stattdessen
   als beobachtbares Ergebnis abfragen).
 
-### 7. Constraints
+### 7. Commit im `-T`-Repo (Pflicht)
 
-- Do not commit any generated files, EVER. The teacher will add them manually
-  after the exam is over.
+Nach bestandenem Quality Gate werden **beide** Dateien (Angabe und Lösungen)
+im privaten `-T`-Repo committet und gepusht:
+
+- nur der aktuelle Branch, kein Branch-Wechsel, keine PRs;
+- Commit-Message auf Deutsch, mit Issue-Nummer nach der Konvention des
+  `-T`-AGENTS.md (`Thema: Beschreibung (#N)`); ist keine Nummer bekannt, beim
+  Nutzer nachfragen statt raten;
+- nur die neuen Prüfungsdateien stagen — fremde, unfertige Änderungen im
+  Arbeitsverzeichnis nicht mitnehmen;
+- vor dem Push `git fetch && git status -sb` prüfen und ggf. rebasen.
+
+Das `-T`-Repo ist privat; ein Push vor dem Prüfungstermin ist deshalb
+zulässig. Ins öffentliche Teaching-Repo gelangt eine Prüfung **nie**.
+
+### 8. Constraints
+
+- Generated exam and solution files are created **only** in the private
+  `<subject>-T` repo and are committed and pushed there (step 7). Never create
+  them in the public teaching repo, never commit them anywhere else.
 - Preserve existing files unless the task explicitly requires replacement.
 - Write both generated Markdown files in German.
 - UTF-8 is explicitly allowed and preferred in generated Markdown files.

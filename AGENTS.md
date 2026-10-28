@@ -132,9 +132,9 @@ This repo is the **single global skill source** (linked via `~/.config/opencode/
 linked via `~/.config/opencode/AGENTS.md`. It carries the continuous
 issue-awareness and proactive commit/push policy and overrides the opencode
 default "never commit unless asked" for those workflows (read-only skills and
-student-repo grading skills excluded; `knowledge-assessment` commits its
-reports in the private `<subject>-T` repo). Edit it here, not in
-`~/.config/opencode/`.
+student-repo grading skills excluded; `knowledge-assessment` and
+`knowledge-exam` create and commit their files in the private `<subject>-T`
+repo). Edit it here, not in `~/.config/opencode/`.
 
 ## Agent Source Rule
 
