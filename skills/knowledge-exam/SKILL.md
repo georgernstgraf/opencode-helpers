@@ -56,6 +56,11 @@ Additional rules (discovered in practice):
   `3ahwii`-artige Kürzel) — keine künstlichen Zusatz-Suffixe erfinden
   (`-x`, `-a` o. ä.), außer das `-T`-AGENTS.md verlangt sie explizit
   (z. B. bei mehreren parallelen Gruppen derselben Klasse).
+- **Nach der Auswertung dürfen Prüfung + Lösung ins öffentliche
+  Teaching-Repo** — die Veröffentlichung ist beabsichtigt (Transparenz für
+  Schüler:innen, Nachbereitung). Der Rohbestand mit den Abgaben bleibt im
+  `-T`-Repo. `knowledge_*`/`_solutions.md` im öffentlichen Repo sind daher
+  kein Leak; der Homework-Lauf meldet und verschiebt sie nicht.
 
 ## Inputs
 
@@ -203,7 +208,10 @@ im privaten `-T`-Repo committet und gepusht:
 - vor dem Push `git fetch && git status -sb` prüfen und ggf. rebasen.
 
 Das `-T`-Repo ist privat; ein Push vor dem Prüfungstermin ist deshalb
-zulässig. Ins öffentliche Teaching-Repo gelangt eine Prüfung **nie**.
+zulässig. Vor der Auswertung gelangt eine Prüfung **nie** ins öffentliche
+Teaching-Repo; nach der Auswertung ist die Veröffentlichung von Prüfung und
+Lösung im Teaching-Repo beabsichtigt (der Rohbestand mit den Abgaben bleibt
+im `-T`-Repo).
 
 ### 8. Constraints
 

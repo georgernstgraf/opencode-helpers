@@ -152,9 +152,10 @@ list current:
    - 2026-10-13: Kurzbeschreibung der Aufgabe → `2026-10-13_thema/`
    ```
 
-5. Insert the entry at the **top** of the list: the list runs **newest first**
-   (descending ISO date). Never reword or delete existing entries. A list that
-   still runs oldest-first gets flipped once, whole, in the same pass.
+5. Insert the entry at the **top** of the list: the list ALWAYS runs **newest
+   first** (descending ISO date) — no exceptions. Never reword or delete
+   existing entries. A list that still runs oldest-first gets flipped once,
+   whole, in the same pass.
 6. The list is an INDEX only — never copy the full task text into the cohort
    README.
 
@@ -163,6 +164,35 @@ list current:
 - Show the user what was created or updated.
 - Report the file path, the number of exercises added or changed, and whether
   the canonical list entry was added or already existed.
+
+## Termin-Verifikation mit `wu` (WebUntis)
+
+Das Datum einer Aufgabe ist **immer** der Termin, an dem im Unterricht
+gearbeitet und die Aufgabe gestellt wurde — belegt durch den Datumsordner,
+das Tages-README oder `Aufgabe.md`. Nie aus WebUntis ableiten.
+
+`wu` (Repo `webuntis-cli`) liefert den **nächsten** Unterrichtstermin und
+damit das „bis":
+
+- `wu lesson <KLASSE/FACH> termine --mit-lehrstoff` — alle Termine + Lehrstoff
+- `wu lesson <KLASSE/FACH> --datum <JJJJ-MM-TT>` — Details eines Termins
+
+Regeln:
+
+- Fälligkeit ist fast immer „nächster Unterrichtstermin, 00:00".
+- Ferien, Feiertage und entfallene Stunden: `wu` fragen, nicht „+7 Tage"
+  rechnen.
+- WebUntis-„Stoff" ist **Thema, nicht Hausübung**. Das WebUntis-Hausübungsfeld
+  wird nicht verwendet → kein HÜ-Beleg.
+- Kohorten können eine Woche versetzt sein (z. B. 3AAIF vs. 3CAIF): Termin pro
+  Kohorte prüfen, nie aus der Schwester-Kohorte übernehmen.
+
+## Prüfungs- und Lösungsdateien
+
+`knowledge_*`- und `_solutions.md`-Dateien in öffentlichen Unterrichts-Repos
+sind **nach** der Auswertung bewusst öffentlich (der Rohbestand mit den
+Abgaben liegt im privaten `<Fach>-T`-Repo). Der Homework-Lauf meldet sie nicht
+als Leak und verschiebt oder löscht sie nicht.
 
 ## Assignment Evidence
 
@@ -177,6 +207,9 @@ assignment is appropriate. Concrete examples of valid evidence:
 - The teacher's notes or commit messages reference an assignment.
 - The lesson material covers a topic with clear practice exercises that
   naturally follow from what was taught.
+
+WebUntis-Lehrstoff ist **kein** HÜ-Beleg — er dokumentiert das Thema, nicht
+die Aufgabe (siehe Termin-Verifikation mit `wu`).
 
 If the source material reveals the lesson topic but nothing suggests an
 assignment was intended, omit the assignment entry and report this to the
