@@ -140,8 +140,10 @@ relocate it.
 - If an open task would require more than ~30 minutes of agent work,
   do NOT put it in HANDOFF.md alone.
 - **GitHub-Projekte:** Create a GitHub issue:
-  `gh issue create --title "<title>" --body "<body>"`. In HANDOFF.md,
-  reference only the issue number:
+  `gh issue create --title "<title>" --body "<body>"` — but only **after**
+  the Duplicate Check from the `issue-workflow` skill reports no matching
+  open issue (reuse that issue instead, and reference its number here). In
+  HANDOFF.md, reference only the issue number:
   `1. [ ] See #42 — Refactor enrollment module to cursor pagination`
 - **SVN-Projekte ohne Issue-System** (z. B. `~/svn/georg`, Deployed-Trees auf
   murl/claw): es existiert KEIN Issue-Tracking — solche Aufgaben bleiben

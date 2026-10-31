@@ -18,9 +18,15 @@ Create a GitHub issue from `/tmp/issue.md`.
 
 ## Create the Issue
 
+Run the **Duplicate Check** from the `issue-workflow` skill first (search open
+issues and open PRs in this repository with the title terms). If a matching
+open issue exists, do not create anything — comment the plan there, keep the
+file for reference, and stop. Only when no open issue matches:
+
 Use `gh issue create` with:
 - `--title` = the extracted title (without the `# `)
-- `--body` = the remaining content (or `--body-file` if preferred)
+- `--body` = the remaining content (or `--body-file` if preferred), ending
+  with the `Duplicate check (YYYY-MM-DD): …` trace line
 
 Output the created issue URL to confirm success.
 

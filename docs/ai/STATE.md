@@ -1,8 +1,16 @@
 # Project State
 
-Current status as of 2026-10-25.
+Current status as of 2026-10-31.
 
 ## Current Focus
+
+Issue-Duplikate werden jetzt strukturell verhindert: `issue-workflow` hat ein
+**Duplicate-Check-Gate** vor jedem `gh issue create` (Repo-lokale Suche über
+`gh issue list --search`, `gh search issues "in:title,body"`, `gh search prs`;
+Entscheidungsmatrix inkl. „≥2 plausible Kandidaten → immer fragen"; Trace-Zeile
+`Duplicate check (YYYY-MM-DD): …` im neuen Issue-Body). Dieselbe Prüfung gilt
+per Verweis in `commands/tmpissue.md`, `knowledge-persistence`,
+`codebase-audit` und `stundenwiederholung` (#118).
 
 Suche hat jetzt ein **Rückgrat**: neuer Skill `deepseek-search` (MCP-Server
 `skills/deepseek-search/scripts/opencode-deepseek-search`, Server-ID
@@ -136,6 +144,11 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #118 2026-10-31 — issue-workflow: Duplicate-Check-Gate vor jeder
+      Issue-Erzeugung (3-Schritt-Suche im aktuellen Repo inkl. offener PRs,
+      Entscheidungsmatrix mit Pflicht-Rückfrage bei ≥2 Kandidaten,
+      Trace-Zeile im Issue-Body); Verweise in `commands/tmpissue.md`,
+      `knowledge-persistence`, `codebase-audit`, `stundenwiederholung`
 - [x] #111 2026-10-17 — Host-Services: `dotfiles/systemd/user/` (Vorlagen
       `opencode.service` mit `%h`, `oc-tg-bot.service` mit `<HOST>`/
       `<NODE_BIN_DIR>`-Platzhaltern, README) + Host-Abschnitt in

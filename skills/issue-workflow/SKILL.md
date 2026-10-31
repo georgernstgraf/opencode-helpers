@@ -26,15 +26,76 @@ being invoked.
 - At any point in a session, the agent must know which GitHub issue it is
   currently working under, and announce it (e.g., "Working under issue
   #123: <title>").
-- Before starting work, resolve the current issue: search open issues first
-  (`gh issue list` / `gh issue view <N> --json title,body,comments`) for one
-  matching the task.
-- If no existing issue matches and the task is clearly a new topic, create a
-  new issue immediately and **without user interaction**, then announce it.
+- Before starting work, resolve the current issue: run the **Duplicate Check**
+  (below) and reuse a matching open issue instead of creating a new one.
+- Only when the Duplicate Check finds no match and the task is clearly a new
+  topic, create a new issue immediately and **without user interaction**, then
+  announce it.
+- Never create an issue while an open issue already tracks all or part of the
+  same goal — see "Duplicate Check" for the decision matrix.
 - If the assignment is ambiguous (several candidate issues, or unclear
   whether a new one is needed), ask the user before touching code.
 - The assignment to an issue may change mid-session when the user redirects
   the work; resolve the new issue the same way.
+
+## Duplicate Check (Pflicht-Gate vor jeder Issue-Erzeugung)
+
+This gate is mandatory **before every `gh issue create`** — in the `start`
+mode, in continuous work, and in every other skill or command that creates
+issues (they reference this section instead of re-implementing it). Its scope
+is always the **current repository** (`--repo <owner>/<repo>` from
+`gh repo view --json nameWithOwner --jq .nameWithOwner`) — never an org-wide
+search.
+
+### 1. Search for candidates (all three, in parallel)
+
+```bash
+# open issues, keyword search
+gh issue list --repo <owner>/<repo> --state open --limit 50 \
+  --search "<terms>" --json number,title,labels,updatedAt
+# full text in title and body
+gh search issues --repo <owner>/<repo> --state open "in:title,body <terms>" \
+  --json number,title,updatedAt
+# in-flight work that is not yet an issue
+gh search prs --repo <owner>/<repo> --state open "<terms>" \
+  --json number,title
+```
+
+- Derive 2–4 **discriminating** terms from the planned title and scope
+  (module, file, feature noun, error string) — not the whole sentence. In
+  mixed-language trackers search German *and* English synonyms.
+- If the first pass returns nothing, repeat with the single broadest term (the
+  feature noun) so that different wording still matches.
+- Read every promising hit (`gh issue view <N> --json title,body,comments`).
+  Titles alone are not evidence; the goal stated in the body decides.
+
+### 2. Decide
+
+| Finding | Action |
+|---|---|
+| 0 plausible candidates | create the new issue |
+| 1 open issue covers the planned goal | **do not create** — work under it, add the new scope as a comment |
+| 1 open issue covers only part of the plan | **do not duplicate** — work under it; create a separate sub-issue only if the parent genuinely requires independent tracking (then link it formally, see "Sub-Issues") |
+| ≥2 plausible candidates, or unclear whether a new issue is needed | **stop and ask the user** — per candidate: number, title, `updatedAt`, one-line rationale |
+| only closed issues match | create the new issue; mention the closed one in the body as a regression/repeat |
+
+**Tie-breaker (asymmetric cost):** when in doubt, comment on the existing
+issue instead of opening a new one. A comment is cheap and reversible; a
+duplicate pollutes the tracker, its boards, and its auto-close logic. There is
+no "obviously new topic" shortcut around this matrix — passing it is what
+licenses creating without asking.
+
+### 3. Record the check (trace line)
+
+The body of every newly created issue ends with:
+
+```
+Duplicate check (YYYY-MM-DD): no matching open issue. Checked: #12, #34, search "backup restore".
+```
+
+When an existing issue is reused instead, post a comment that names the planned
+scope and the date. This keeps the check auditable and lets the duplicate rate
+be measured later.
 
 ## Trunk-Based Pull-Prinzip (universell)
 
@@ -131,9 +192,12 @@ Use this mode to explicitly begin or resume work (e.g., "issue start").
   `gh issue view <N> --json title,body,comments` and read the description plus comments.
   Check if the issue has a parent or should be linked as a sub-issue to an existing epic.
 - If `issue` is `new`, or if no usable issue exists for the current work,
-  create a new issue from the provided context. If the new issue is part of a larger epic, link it as a sub-issue immediately.
+  run the Duplicate Check first; only then create a new issue from the
+  provided context. If the new issue is part of a larger epic, link it as a
+  sub-issue immediately.
 - If no issue is supplied, infer whether there is already a current issue for
-  the work. If not, create one before proceeding.
+  the work (Duplicate Check). Only if none matches, create one before
+  proceeding.
 - Assess the codebase against the issue. If the requested functionality is
   already complete, comment with the finding and follow the completion
   criteria in "Issue Completion" (check open sub-issues first).
@@ -223,6 +287,9 @@ Applies at any time, independent of the modes:
 
 When creating an issue:
 
+- **Run the Duplicate Check first** (see "Duplicate Check"). No issue is
+  created before that gate reports no match — this is the primary anti-
+  duplication rule of this skill.
 - Write a short, outcome-oriented title.
 - Include enough body detail for a future agent to understand scope and intent.
 - **Link as Sub-Issue:** If this issue is a component of a larger task, identify the parent issue and link it as a sub-issue immediately after creation.
@@ -295,6 +362,8 @@ Issue comments should be compact but useful.
 ## Safety Constraints
 
 - Never fabricate issue numbers.
+- Never create an issue before the Duplicate Check ran and reported no match.
+- Never open a second issue for a goal that an open issue already tracks.
 - Never create an empty commit when there are no changes.
 - If there are no local changes in `commit` or `finish` mode, still update the
   issue comment as needed, but report that there was nothing to commit.
@@ -307,6 +376,8 @@ Issue comments should be compact but useful.
 At the end of the workflow, report:
 
 - the issue number used or created
+- the duplicate check result: which candidates were checked, or that no open
+  issue matched
 - whether a comment was added
 - whether a commit was created, including its message
 - whether knowledge persistence was run, and the hash of its commit (and that

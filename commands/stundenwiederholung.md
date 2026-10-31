@@ -72,7 +72,8 @@ students' voices and names — must **not** be committed. Ensure `transcript.md`
 
 The teaching repo requires an issue number on every commit:
 
-1. Use the `issue-workflow` skill to create a new GitHub issue — title like
+1. Use the `issue-workflow` skill to create a new GitHub issue (its
+   Duplicate Check gate runs first) — title like
    `Stundenwiederholung <Datum>: <Thema>`, body = a short summary of what the
    transcript contained.
 2. Commit the new/changed `README.md` (and `.gitignore` if it changed) with the

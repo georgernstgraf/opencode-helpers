@@ -79,7 +79,7 @@ Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technol
 |-------|-------------|--------|
 | `grading-shared` | Geteilte Protokolle: Adressstil, E-Mail-Formeln, DB-Lookup, Bulk-Konkurrenz | Referenziert von anderen Skills |
 | `homework` | Generiert per-Lesson `Hausübung.md` aus Git-Historie | Direkter Skill-Aufruf |
-| `issue-workflow` | Issue-Awareness als Dauerzustand: proaktives Commit/Push (grüne Commits), Abschluss-Kriterien, Sub-Issue-Regeln | Dauerzustand + Sprachsteuerung als Override (s.u.) |
+| `issue-workflow` | Issue-Awareness als Dauerzustand: proaktives Commit/Push (grüne Commits), Abschluss-Kriterien, Sub-Issue-Regeln, Pflicht-Duplicate-Check vor jeder Issue-Anlage | Dauerzustand + Sprachsteuerung als Override (s.u.) |
 | `knowledge-assessment` | Bewertet Knowledge-Check-Abgaben, erstellt Berichte + E-Mail-JSON | `/knowledge-assess` |
 | `knowledge-exam` | Generiert deutsche Mini-Schularbeiten + Lösungen aus Git-Historie | `/knowledge-exam` |
 | `knowledge-persistence` | Persistiert Session-Kontext in `docs/ai/` | Sprachsteuerung (s.u.) |
@@ -258,7 +258,7 @@ is a flat `agents/<name>.md` file (filename = agent name).
 |-------|-------------|------------|
 | `grading-shared` | Shared protocols: address style, email formulas, DB lookup, bulk concurrency | Referenced by other skills |
 | `homework` | Generate per-lesson `Hausübung.md` from Git history | Direct skill invocation |
-| `issue-workflow` | Continuous issue awareness: proactive commit/push (green commits), completion criteria, sub-issue rules | Continuous + natural language overrides (see below) |
+| `issue-workflow` | Continuous issue awareness: proactive commit/push (green commits), completion criteria, sub-issue rules, mandatory duplicate check before creating issues | Continuous + natural language overrides (see below) |
 | `knowledge-assessment` | Grade knowledge-check submissions, produce reports + email JSON | `/knowledge-assess` |
 | `knowledge-exam` | Generate German mini-exams + solutions from Git history | `/knowledge-exam` |
 | `knowledge-persistence` | Persist session context into `docs/ai/` | Natural language (see below) |

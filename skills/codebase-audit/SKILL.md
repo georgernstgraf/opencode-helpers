@@ -88,7 +88,8 @@ Turn the surviving findings into **tracer-bullet tickets** (semantics from `to-t
 
 ### 7. File the epic and sub-issues
 
-- Search open issues first and drop any finding already tracked.
+- Search open issues first (the **Duplicate Check** gate from
+  `issue-workflow`) and drop any finding already tracked.
 - Create the **epic** issue: title `Codebase audit <YYYY-MM-DD>: <repo>`, body = scope, the four axes, the tier, the tool set used, and a summary table of findings. This is the parent.
 - Create each **sub-issue** and link it to the epic using the Sub-Issues API protocol in `issue-workflow` (the formal parent-child link, never a text mention). Apply the triage label (`ready-for-agent` unless told otherwise).
 - If the user chose dry-run, stop after presenting the plan.
