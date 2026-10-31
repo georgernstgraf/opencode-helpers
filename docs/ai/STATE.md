@@ -1,8 +1,19 @@
 # Project State
 
-Current status as of 2026-10-31.
+Current status as of 2026-11-01.
 
 ## Current Focus
+
+Aufgaben-Index und WebUntis sind jetzt getrennt: der `homework`-Skill verlangt
+den **Repo-Termin** (Tag, an dem gearbeitet und die Aufgabe gestellt wurde)
+und nutzt `wu lesson <KLASSE/FACH> termine --mit-lehrstoff` nur für das
+**„bis"** (nächster Termin, 00:00; Ferien/entfallene Stunden via `wu`). Die
+`## Aufgaben`-Liste läuft **immer** neueste zuerst; WebUntis-„Stoff" gilt
+nicht als HÜ-Beleg; Prüfung/Lösung sind nach der Auswertung bewusst öffentlich
+(`knowledge-exam` angepasst). Anlass: Retrofit der Kohorten-READMEs in
+`GRG-INFI`, `GRG-SWP`, `GRG-PMM`, `GRG-WMC` (#119) — 8 Kohorten, 3baif
+bewusst ausgelassen; die README-/Link-Änderungen liegen dort uncommitted
+(homework-Skill ist read-only).
 
 Issue-Duplikate werden jetzt strukturell verhindert: `issue-workflow` hat ein
 **Duplicate-Check-Gate** vor jedem `gh issue create` (Repo-lokale Suche über
