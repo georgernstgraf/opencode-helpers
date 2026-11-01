@@ -12,7 +12,7 @@ Sehr geehrte Frau Huber,
 
 im Folgenden finden Sie die automatische Beurteilung Ihrer Leistungsfeststellung. Bitte beachten Sie, dass diese Beurteilung Irrtümer enthalten kann.
 
-Ich habe Ihre Aufgaben, welche im Zeitraum vom 4. März bis zum
+Ich habe Ihre Abgaben, welche im Zeitraum vom 4. März bis zum
 18. März aufgegeben waren, durchgesehen.
 
 In Ihrem Repository habe ich insgesamt 12 Commits in diesem Zeitraum
@@ -20,12 +20,12 @@ gefunden. Die Arbeit war regelmäßig verteilt, mit einem deutlichen
 Schwerpunkt in der ersten Woche. Die meisten Änderungen betrafen
 SQL-Skripte und Datenbank-Schema-Dateien.
 
-Aufgabe 1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
+Abgabe 1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
 statements für ein Bibliotheksverwaltungssystem.
-Aufgabe 2: Implementierung von JOIN-Operationen zwischen den Tabellen
+Abgabe 2: Implementierung von JOIN-Operationen zwischen den Tabellen
 der Bibliotheksdatenbank.
 
-Aufgabe 1 – Bibliotheksdatenbank:
+Abgabe 1 – Bibliotheksdatenbank:
 
 Sie haben die Tabellenstruktur sauber entworfen und die
 Fremdschlüsselbeziehungen korrekt definiert. Die INSERT-Statements
@@ -34,7 +34,7 @@ das Rückgabedatum als nullable Spalte definiert werden sollen, da
 ein Buch zum Zeitpunkt der Ausleihe noch nicht zurückgegeben sein
 muss. Bewertung: 80%.
 
-Aufgabe 2 – JOIN-Operationen:
+Abgabe 2 – JOIN-Operationen:
 
 ```sql
 SELECT b.Titel, a.Name
@@ -44,7 +44,7 @@ JOIN Autoren a ON ba.AutorID = a.AutorID;
 ```
 
 Dieser Dreifach-Join ist korrekt umgesetzt. Die Alias-Namen sind
-sinnvoll gewählt. Bei der LEFT JOIN-Aufgabe fehlt jedoch die
+sinnvoll gewählt. Beim LEFT JOIN fehlt jedoch die
 Berücksichtigung von Büchern ohne Ausleihe – hier wäre ein LEFT
 JOIN statt des INNER JOIN nötig gewesen. Bewertung: 65%.
 
@@ -54,8 +54,8 @@ Unterschiede zwischen den JOIN-Typen (INNER, LEFT, RIGHT) noch
 einmal anhand praktischer Beispiele nachzuvollziehen. Die
 Tabellenstruktur der Bibliotheksdatenbank ist Ihnen gut gelungen.
 
-Beide Aufgaben waren erkennbar abgegeben. Die erste Aufgabe war
-weitgehend vollständig, bei der zweiten Aufgabe gab es inhaltliche
+Beide Abgaben waren erkennbar eingereicht. Die erste Abgabe war
+weitgehend vollständig, bei der zweiten Abgabe gab es inhaltliche
 Lücken bei einzelnen JOIN-Varianten.
 
 Insgesamt ist eine solide Grundlage erkennbar. Es lohnt sich, die
@@ -76,19 +76,19 @@ Lieber Thomas,
 
 im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.
 
-Ich habe deine Aufgaben, welche im Zeitraum vom 4. März bis zum
+Ich habe deine Abgaben, welche im Zeitraum vom 4. März bis zum
 18. März aufgegeben waren, durchgesehen.
 
 In deinem Repository habe ich 8 Commits gefunden, die meisten davon
 in der zweiten Woche. Du hast dich intensiv mit den SQL-Themen
 auseinandergesetzt.
 
-Aufgabe 1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
+Abgabe 1: Erstellung einer SQL-Datenbank mit CREATE TABLE und INSERT
 statements für ein Bibliotheksverwaltungssystem.
-Aufgabe 2: Implementierung von JOIN-Operationen zwischen den Tabellen
+Abgabe 2: Implementierung von JOIN-Operationen zwischen den Tabellen
 der Bibliotheksdatenbank.
 
-Aufgabe 1 – Bibliotheksdatenbank:
+Abgabe 1 – Bibliotheksdatenbank:
 
 Du hast die Tabellen korrekt erstellt und die Beziehungen sauber
 modelliert. Die Datentypen sind durchgehend passend gewählt.
@@ -96,7 +96,7 @@ Die Index-Definitionen fehlen allerdings vollständig – bei einer
 Bibliotheksdatenbank mit Suchanfragen auf Titel und Autor wären
 Indizes sinnvoll. Bewertung: 75%.
 
-Aufgabe 2 – JOIN-Operationen:
+Abgabe 2 – JOIN-Operationen:
 
 Die einfachen JOINs hast du zuverlässig implementiert. Bei den
 komplexeren Abfragen mit Unterabfragen gibt es noch Unsicherheiten.
@@ -110,7 +110,7 @@ in denen ein LEFT JOIN nötig ist. Die Grundlagen sitzen, und mit
 etwas mehr Übung bei den komplexeren Abfragen wirst du noch
 sicherer.
 
-Beide Aufgaben sind erkennbar bearbeitet. Bei der zweiten Aufgabe
+Beide Abgaben sind erkennbar bearbeitet. Bei der zweiten Abgabe
 zeigen sich aber noch Lücken bei den komplexeren Abfragen.
 
 Insgesamt ist das eine brauchbare Arbeitsgrundlage. Wenn du die
@@ -131,9 +131,9 @@ Lieber Khalil,
 
 im Folgenden findest du die automatische Beurteilung deiner Leistungsfeststellung. Bitte beachte, dass diese Beurteilung Irrtümer enthalten kann.
 
-Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.
+Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Abgaben nachbewerten.
 
-Alle im Bewertungszeitraum aufgegebenen Aufgaben zählen derzeit mit 0%. Die Endbewertung liegt daher bei 0/100 (0%). Jede einzelne Aufgabe lässt sich nachholen, sobald dein Repository vorliegt.
+Alle Abgaben im Bewertungszeitraum zählen derzeit mit 0%. Die Endbewertung liegt daher bei 0/100 (0%). Jede einzelne Abgabe lässt sich nachholen, sobald dein Repository vorliegt.
 
 Ganz wichtig bleibt: Der erste Schritt ist der Repo-Link. Ohne ihn kann ich keinerlei Arbeit von dir sehen und bewerten.
 

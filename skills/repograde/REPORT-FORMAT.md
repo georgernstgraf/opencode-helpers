@@ -8,10 +8,11 @@ reports, plus the standardization rules for subagents.
 Reports MUST follow `grading-shared` Reporting Protocol (in German) and additionally include:
 
 - If date-filtered: clear indication of the cutoff date.
-- **Aufgaben-Abdeckung section**: Complete list of all assigned assignments
+- **Abgaben-Abdeckung section**: Complete list of all Abgaben
   with completion status and Abdeckungsquote percentage.
-- **Weighted final evaluation**: Base score x completion ratio.
-- Final evaluation with `Endbewertung: XX/100` (the weighted score, not base).
+- **Final evaluation** with `Endbewertung: XX/100`, computed as
+  `round(sum(effective_scores) / (N × 100) × 100)`. The Abdeckungsquote is
+  informative only and is NOT multiplied in — missing Abgaben already count 0.
 
 ### Mandatory `*_grading.md` Structure (EXACT ORDER)
 
@@ -27,7 +28,7 @@ sections in exactly this order:
 
 ## Pünktlichkeit der Abgaben
 
-## Aufgaben-Abdeckung
+## Abgaben-Abdeckung
 
 ## Codequalität
 
@@ -83,9 +84,9 @@ For each assignment, state the concrete deadline date (calculated per
 Use one bullet per assignment. Include the deadline timestamp and the date of
 the latest relevant commit as evidence. Keep each bullet to 1-2 sentences.
 
-Example: `Aufgabe 1 (23.2.): pünktlich — letzter Commit am 1.3. ≤ Deadline 2.3. 00:00`
+Example: `Abgabe 1 (23.2.): pünktlich — letzter Commit am 1.3. ≤ Deadline 2.3. 00:00`
 
-#### `## Aufgaben-Abdeckung`
+#### `## Abgaben-Abdeckung`
 
 This section MUST list all relevant assignments and state for each
 whether the work was completed, partially completed, or missing.
@@ -99,7 +100,7 @@ For each assignment, include:
 This section MUST end with:
 
 - `Abdeckungsquote: XX%`
-- `Abgedeckte Aufgaben: X von Y`
+- `Abgedeckte Abgaben: X von Y`
 
 #### `## Codequalität`
 

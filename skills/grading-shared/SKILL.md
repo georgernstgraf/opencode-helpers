@@ -28,29 +28,72 @@ Never use English for content intended for students.
 Import this skill at the beginning of any grading-related skill or command.
 Reference the sections below for consistent behavior.
 
+## Anrede-Gate (CRITICAL, Pflicht)
+
+Die Anrede (Du/Sie) wird **nicht** aus dem Klassennamen und **nicht** aus der
+Datenbank abgeleitet. Sie steht in genau einer Datei pro Kohorte:
+
+```
+<subject>-T/<kohorte>/anrede.txt
+```
+
+Die Datei enthält genau ein Wort: `Sie` oder `Du`.
+
+Ablauf:
+
+1. `-T`-Repo-Wurzel und Kohorten-Ordner bestimmen (der Lauf-Ordner
+   `<kohorte>/<YYYY-MM-DD>_<slug>/` liegt darin; `_class` zeigt auf das
+   öffentliche Schwester-Repo).
+2. Anrede mit dem mitgelieferten Skript lesen:
+
+   ```bash
+   ANREDE=$(~/.opencode/skills/grading-shared/read-anrede.sh \
+       "$T_REPO/$KOHORTE/anrede.txt") || exit 1
+   ```
+
+3. `Du` → informell, `Sie` → formell. Die Anrede gilt für **alle**
+   studentengerichteten Texte (E-Mails, `*_grading.md`, `GRADINGS.md`,
+   `CLASS.md`).
+
+**Stop-Regel (CRITICAL):** Fehlt die Datei, ist sie leer oder enthält sie
+etwas anderes als `Sie`/`Du`, sofort **STOPPEN** — vor dem ersten Schreibzugriff
+— und den Pfad samt Soll-Inhalt auf Deutsch melden:
+
+```
+FEHLT: /home/georg/r/GRG-WMC-T/3aaif/anrede.txt
+Bitte die Datei anlegen und genau 'Sie' oder 'Du' hineinschreiben.
+```
+
+Es gibt **keinen** Fallback auf eine Klassenliste und kein Raten. Das Gate gilt
+für `repograde`, `knowledge-assessment`, `knowledge-exam` und `projectgrade`;
+es läuft immer vor dem ersten Schreibzugriff eines Laufs.
+
+## Lauf-Umgebung (Grading)
+
+Repositorien-basierte Läufe (`repograde`) starten im Grading-Arbeitsverzeichnis
+`~/gits/<kohorte>-<fach>/` (z. B. `~/gits/3aaif-wmc/`). Das ist **kein**
+Git-Repo; es enthält:
+
+```
+~/gits/3aaif-wmc/_class            -> /home/georg/r/GRG-WMC/3aaif
+~/gits/3aaif-wmc/Abazi Hamza       -> Hamza473A        (Namens-Symlink)
+~/gits/3aaif-wmc/Hamza473A/        (Schüler-Repo, gelesen)
+```
+
+- `_class` zeigt in den öffentlichen Klassenordner des Teaching-Repos. Immer
+  mit `readlink -f` auflösen: `~/r` ist selbst ein Symlink auf
+  `repos/georgernstgraf/`, und das Ziel kann mit oder ohne Schrägstrich enden.
+- Das private Test-Repo ist das **Schwesterverzeichnis** mit Suffix `-T`:
+  `/…/GRG-<FACH>/<kohorte>` → `/…/GRG-<FACH>-T`.
+- Lauf-Ordner (alle Ausgaben eines Laufs, inkl. `noten.tsv`):
+  `<…>-T/<kohorte>/<YYYY-MM-DD>_<slug>/` — bei Bedarf anlegen.
+- Anrede-Datei: `<…>-T/<kohorte>/anrede.txt`.
+- `roster.tsv` (aus `wu … roster`) ist ein Zwischenprodukt und liegt unter
+  `/tmp/opencode/`, nie im Lauf-Ordner und nie im Commit.
+- `knowledge-assessment` läuft dagegen direkt im `-T`-Repo; der Lauf-Ordner
+  `<kohorte>/<YYYY-MM-DD>_<slug>/` ist dort CWD bzw. wird angelegt.
+
 ## Class Configuration
-
-### Address Style Mapping
-
-Determine formal vs informal address based on class identifier:
-
-| Class | Address Style |
-|-------|---------------|
-| `2ahwii` | Informal |
-| `3ahwii` | Informal |
-| `5ahwii` | Informal |
-| `4ahwit` | Informal |
-| `5ahwit` | Informal |
-| `4aaif` | Informal |
-| All others | Formal |
-
-### Implementation
-
-When processing student data:
-1. Extract class identifier from filename, directory, or database.
-2. Normalize to uppercase for comparison: `UPPER(klasse)`.
-3. Check if class is in the informal list above.
-4. Apply corresponding address style throughout all grading content.
 
 ### Name Parsing from Repository Basename (CRITICAL)
 
@@ -170,29 +213,29 @@ matching the email salutation style. This applies to:
 
 | Style | Pronoun | Verb Conjugation | Example |
 |-------|---------|-----------------|---------|
-| Formal (Sie) | Sie | 3rd person plural formal | "Sie haben die Aufgabe gut gelöst" |
-| Informal (Du) | Du | 2nd person informal | "Du hast die Aufgabe gut gelöst" |
+| Formal (Sie) | Sie | 3rd person plural formal | "Sie haben die Abgabe gut gelöst" |
+| Informal (Du) | Du | 2nd person informal | "Du hast die Abgabe gut gelöst" |
 
 ### Grading Content Examples
 
 **Formal Address (Sie) - Wrong ❌:**
 ```
-Der Student hat die Aufgabe gut gelöst. Er hat sich bemüht.
+Der Student hat die Abgabe gut gelöst. Er hat sich bemüht.
 ```
 
 **Formal Address (Sie) - Correct ✅:**
 ```
-Sie haben die Aufgabe gut gelöst. Sie haben sich bemüht.
+Sie haben die Abgabe gut gelöst. Sie haben sich bemüht.
 ```
 
 **Informal Address (Du) - Wrong ❌:**
 ```
-Der Schüler hat die Aufgabe gut gelöst. Er hat sich bemüht.
+Der Schüler hat die Abgabe gut gelöst. Er hat sich bemüht.
 ```
 
 **Informal Address (Du) - Correct ✅:**
 ```
-Du hast die Aufgabe gut gelöst. Du hast dich bemüht.
+Du hast die Abgabe gut gelöst. Du hast dich bemüht.
 ```
 
 ### Gender-Neutral Handling for Unclear Cases
@@ -238,7 +281,8 @@ judgment. The following rules apply to every grading skill (`repograde`,
 For every student submission, the agent has access to the following inputs and
 must base its evaluation exclusively on them:
 
-1. **Task instructions** — the assignment description (Aufgabe), exam questions, or project
+1. **Task instructions** — the assignment description (`Aufgabe.md` or the
+   `## Aufgabe` section of a Tages-README), exam questions, or project
    requirements that define what was asked of the student.
 2. **Expected solutions** — the reference solution or answer key against which
    student work is compared.
@@ -279,7 +323,8 @@ Table: `users`
 1. Match student by name (handle variations and partial matches).
 2. Normalize class comparison to uppercase: `WHERE UPPER(klasse) = UPPER(?)`.
 3. Retrieve `email` and `klasse` columns.
-4. Use `klasse` to determine address style.
+4. Use `klasse` only for reporting; the address style comes from the
+   Anrede-Gate (`anrede.txt`), never from the class name.
 5. If `vacuum.db` is missing at start, stop immediately with error.
 6. Track all students with missing email addresses.
 
@@ -354,11 +399,11 @@ email JSON files.** The following rules MUST be followed:
    ```json
    "body": "Sehr geehrte Frau Huber,
 
-   Sie haben die Aufgabe gut gelöst."
+   Sie haben die Abgabe gut gelöst."
    ```
    The correct form is:
    ```json
-   "body": "Sehr geehrte Frau Huber,\n\nSie haben die Aufgabe gut gelöst."
+   "body": "Sehr geehrte Frau Huber,\n\nSie haben die Abgabe gut gelöst."
    ```
 
 3. **Validate before writing.** Every `*_email.json` file must parse successfully
@@ -500,10 +545,15 @@ against student commits.
 
 ### Terminology (CRITICAL)
 
-- The canonical term is **Aufgabe** (plural: **Aufgaben**). All user-visible
-  content uses "Aufgabe 1", "Aufgabe 2", … spelled out — never "Hausübung",
-  "HÜ", or "homework".
-- **Übung** is NOT an Aufgabe. Übungen (e.g. "Jetzt du!") are in-class
+- **Abgabe** is the canonical term for the graded unit in ALL output: emails,
+  `*_grading.md`, `GRADINGS.md`, `CLASS.md`, scoring tables and the Noten-TSV.
+  User-visible content spells it out ("Abgabe 1", "Abgabe 2") with a sequential
+  number — never "Aufgabe", "Übung", "Hausübung", "HÜ", or "homework".
+- **Aufgabe** (plural: **Aufgaben**) survives only as the name of the task
+  document/artifact: `Aufgabe.md`, the `## Aufgaben` index in the cohort README,
+  and the assignment-discovery sources below. It is the task that was given,
+  not the submission that is graded.
+- **Übung** is neither: Übungen (e.g. "Jetzt du!") are in-class
   Mitarbeits-Elemente and MUST never appear in the assignment list.
 - The word **Hausübung** is legacy vocabulary. It is recognized only inside
   legacy sources (see below) and never used in new output.
@@ -902,7 +952,117 @@ for resolution before continuing.
 If the script exits with a non-zero status or reports errors on stderr,
 **STOP**, display its output to the user, and do not proceed.
 
+## Noten-TSV für den Google-Doc-Import (MANDATORY)
+
+Jeder Lauf, der `EMAIL.json` erzeugt, erzeugt zusätzlich eine **Noten-TSV**, die
+per Copy-Paste in die Noten-Tabelle des Lehrers übernommen wird
+(`repograde` und `knowledge-assessment`).
+
+### Ablage und Umfang
+
+- Dateiname: `noten.tsv` im **Lauf-Ordner** des privaten `-T`-Repos:
+  `<subject>-T/<kohorte>/<YYYY-MM-DD>_<slug>/noten.tsv`
+  (Lauf-Ordner bei Bedarf anlegen, siehe Zielordner-Regel der Skills).
+- **Pro Lauf eine völlig neue Datei.** Keine Fortschreibung, keine
+  Zustandsdatei: die TSV enthält immer nur die Spalten dieses Laufs.
+
+### Layout
+
+- Spalte **A** = Vollname (Nachname Vorname, exakt wie `wu … roster` und die
+  `-T`-Dateinamen)
+- Spalte **B** = leer (Trennspalte)
+- ab Spalte **C** je Abgabe (Hausübung) bzw. je Knowledge-Check eine Spalte
+
+| Zeile | Inhalt |
+|-------|--------|
+| 1 | `Abgabe <von>–<bis>` (z. B. `Abgabe 06.10.–13.10.2026`); bei WÜ `WÜ <ISO-Datum>` |
+| 2 | maximal erreichbare Punkte (100 je Abgabe; bei WÜ die Gesamtpunkte der Lösungsdatei) |
+| 3 | leer |
+| 4 ff. | Punkte je Schüler:in, ganzzahlig kaufmännisch gerundet, fehlend = `0` |
+
+Beispiel (Hausübungen):
+
+```
+		Abgabe 06.10.–13.10.2026	Abgabe 13.10.–20.10.2026
+		100	100
+			
+Abazi Hamza		80	53
+Ahmad Ali		0	0
+```
+
+### Datenquelle: Punkte-Sidecars
+
+Jeder Subagent schreibt zusätzlich zu `_grading.md` und `_email.json` einen
+Sidecar `<basename>_points.json` (bei `repograde` der Repo-Basename, bei
+`knowledge-assessment` der Schüler:innen-Name; JSON-Array mit genau einem
+Objekt, geschrieben mit `json.dump(..., ensure_ascii=False)`):
+
+Hausübung (`repograde`):
+
+```json
+[{
+  "name": "Abazi Hamza",
+  "kind": "homework",
+  "klasse": "3AAIF",
+  "assignments": [
+    {"from": "2026-10-06", "to": "2026-10-13",
+     "label": "Tooling & Git", "max": 100, "points": 80}
+  ]
+}]
+```
+
+`points` ist der Effective-Wert der Abgabe (`Quality × Factor`, also z. B.
+`52.5`), `max` ist `100` je Abgabe.
+
+Knowledge-Check (`knowledge-assessment`):
+
+```json
+[{
+  "name": "Abazi Hamza",
+  "kind": "knowledge",
+  "klasse": "3AAIF",
+  "exam": "2026-10-20",
+  "max": 145,
+  "points": 88
+}]
+```
+
+`max` stammt aus den Gesamtpunkten der Lösungsdatei
+(`knowledge_<klasse>_<datum>_solutions.md`), nie aus einer Annahme.
+
+Der Sidecar ist reine Ausgabeformatierung — die Bewertung selbst bleibt
+ausschließlich KI-Beurteilung.
+
+### Erzeugung: Probelauf zuerst (CRITICAL)
+
+```bash
+# 1. Roster beschaffen (TSV: Name<TAB>Klasse)
+wu lesson <KLASSE/FACH> roster > roster.tsv
+
+# 2. Probelauf — read-only, Tabelle geht nach stdout
+~/.opencode/skills/grading-shared/emit-grade-tsv.py --roster roster.tsv
+
+# 3. Erst nach Sichtung der Tabelle wirklich schreiben
+~/.opencode/skills/grading-shared/emit-grade-tsv.py --roster roster.tsv --write
+```
+
+Regeln:
+
+- Das Skript ist **ohne `--write` immer read-only**; der Probelauf ist Pflicht
+  und wird dem User gezeigt.
+- Zeilen kommen aus dem **Roster** (`wu lesson <KLASSE/FACH> roster`), nicht aus
+  den Abgaben — fehlende Abgaben erscheinen als `0`. Fällt `wu` aus: STOPP mit
+  deutscher Meldung (kein Raten, keine Alternativliste).
+- Namen werden normalisiert abgeglichen (`_` → Leerzeichen, Groß-/Kleinschreibung
+  egal). Abgaben ohne Roster-Eintrag werden angehängt **und** als Warnung
+  gemeldet; Roster-Einträge ohne Abgabe erscheinen mit `0`.
+- Widersprüchliche Maximalpunkte, gemischte Arten (Hausübung + Knowledge-Check)
+  oder fehlende Sidecars brechen mit Exitcode 1 ab.
+- Nach `--write` wird `noten.tsv` gemeinsam mit den übrigen Ausgaben im
+  `-T`-Repo committet.
+
 ## Email Body Format (CRITICAL)
+
 
 All grading email bodies MUST be clear ASCII text. This section defines the
 exact structure and formatting rules for every email body generated by any
@@ -938,8 +1098,8 @@ this exact paragraph order:
 2. **Automatic assessment disclaimer** — per Automatic Assessment Disclaimers section above.
 
 3. **Opening sentence** (address style dependent):
-   - Formal: `Ich habe Ihre Aufgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
-   - Informal: `Ich habe deine Aufgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Formal: `Ich habe Ihre Abgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
+   - Informal: `Ich habe deine Abgaben, welche im Zeitraum vom [Start-Datum] bis zum [End-Datum] aufgegeben waren, durchgesehen.`
    - Dates in German long format (e.g., "18. Februar 2026", "4. März 2026").
 
 3. **Commit summary** — Two to three sentences summarizing the commits
@@ -947,18 +1107,18 @@ this exact paragraph order:
    Mention overall activity, approximate number of substantive commits,
    and any notable patterns (gaps, bursts, consistent work).
 
-4. **Assignment overview** — A concise list of all assignments,
+4. **Assignment overview** — A concise list of all Abgaben,
    each in one to two sentences. Format:
 
    ```
-   Aufgabe 1: [Topic/content summary in 1-2 sentences]
-   Aufgabe 2: [Topic/content summary in 1-2 sentences]
+   Abgabe 1: [Topic/content summary in 1-2 sentences]
+   Abgabe 2: [Topic/content summary in 1-2 sentences]
    ```
 
-   Use "Aufgabe" spelled out with a sequential number. Never abbreviate
+   Use "Abgabe" spelled out with a sequential number. Never abbreviate
    (no "HÜ", no "A1").
 
-5. **Per-assignment evaluation** — For each assignment, provide
+5. **Per-assignment evaluation** — For each Abgabe, provide
    a detailed discussion and evaluation on a 0–100% scale. Each evaluation
    is a separate paragraph covering:
    - What the student did well.
@@ -967,7 +1127,7 @@ this exact paragraph order:
    - A percentage rating for that individual assignment.
 
 6. **Coverage / timeliness summary** — One short paragraph summarizing overall
-   assignment coverage and whether submissions were on time, late, partial, or
+   Abgaben coverage and whether submissions were on time, late, partial, or
    missing where relevant.
 
 7. **Recommendations and praise** — A warm, genuine paragraph with
@@ -994,10 +1154,10 @@ disclaimer, then the emphasis paragraph as the FIRST content paragraph
 (adapted to the address style), a short consequences paragraph, and the
 closing. The emphasis paragraph wording:
 
-- Informal: `Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.`
-- Formal: `Zu Ihrem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe Ihres Repositories ist keine positive Beurteilung möglich. Senden Sie mir bitte UMGEHEND den URL Ihres GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Aufgaben nachbewerten.`
+- Informal: `Zu deinem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe deines Repositories ist keine positive Beurteilung möglich. Sende mir bitte UMGEHEND den URL deines GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Abgaben nachbewerten.`
+- Formal: `Zu Ihrem Aufgaben-Repository liegt mir bislang kein Link vor. Das ist der mit Abstand wichtigste offene Punkt: Ohne die Bekanntgabe Ihres Repositories ist keine positive Beurteilung möglich. Senden Sie mir bitte UMGEHEND den URL Ihres GitHub-Repositories an grafg@spengergasse.at — genau so haben wir es in der ersten UE vereinbart. Sobald das Repository verfügbar ist, werde ich alle Abgaben nachbewerten.`
 
-Follow with one short paragraph stating that all assignments in the grading
+Follow with one short paragraph stating that all Abgaben in the grading
 period currently count 0% and that the final result is
 `Endbewertung: 0/100 (0%)`.
 
@@ -1142,6 +1302,8 @@ qualifies — not just that exact name.)
 This skill provides configuration and shared protocols. Consuming skills
 produce:
 - Per-student `*_grading.md` files with individual feedback (second-person German).
+- Per-student `*_points.json` sidecars with the graded points (machine-readable).
 - `EMAIL.json` with personalized payloads (second-person body).
+- `noten.tsv` as the Google-Doc import table (see Noten-TSV section).
 - `GRADINGS.md` class-wide overview (where applicable).
 - `CLASS.md` anonymized class patterns (where applicable).

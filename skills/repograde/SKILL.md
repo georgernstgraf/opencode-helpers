@@ -23,13 +23,13 @@ UTF-8 umlauts (ä, ö, ü, ß), never English.
 
 ## Dependencies
 
-This skill relies on `grading-shared` for: address style, email formulas,
-second-person address rules, database lookup, email JSON structure, name parsing
-from repository basename (CRITICAL: last word = first name, everything before it
-= last name), repository analysis protocol, assignment discovery protocol
-(Aufgaben-Discovery), bulk
-grading concurrency, German/UTF-8 constraints, JSON escaping rules, email body
-format, praise guidelines, and reporting protocol.
+This skill relies on `grading-shared` for: Anrede-Gate (`anrede.txt`), email
+formulas, second-person address rules, database lookup, email JSON structure,
+name parsing from repository basename (CRITICAL: last word = first name,
+everything before it = last name), repository analysis protocol, assignment
+discovery protocol (Aufgaben-Discovery), bulk grading concurrency, German/UTF-8
+constraints, JSON escaping rules, email body format, praise guidelines,
+Noten-TSV and reporting protocol.
 
 Derive output filenames from the repository basename, while using the provided
 repository path verbatim to locate the repository.
@@ -76,6 +76,49 @@ Resolution via Symlinks to determine the student's name.
 The CWD may also contain a `_class` symlink pointing to the corresponding class
 folder in the teaching repository (e.g., `_class -> /home/georg/repos/GRG-SWP/2ahwii/`).
 This symlink provides access to assignments and lesson materials.
+
+## Zielordner im `-T`-Repo (CRITICAL)
+
+Alle Ausgaben dieses Skills werden im **privaten `-T`-Repo** abgelegt, niemals
+im Arbeitsverzeichnis mit den Schüler-Repos und niemals im öffentlichen
+Teaching-Repo.
+
+Der normale Arbeitsplatz ist `~/gits/<kohorte>-<fach>/` (z. B.
+`~/gits/3aaif-wmc/`): **kein** Git-Repo, darin die Namens-Symlinks auf die
+Schüler-Repos und der `_class`-Symlink ins öffentliche Klassen-Repo:
+
+```
+~/gits/3aaif-wmc/_class -> /home/georg/r/GRG-WMC/3aaif
+~/gits/3aaif-wmc/Abazi Hamza -> Hamza473A
+```
+
+Auflösung (in dieser Reihenfolge):
+
+1. **CWD liegt bereits in einem `-T`-Repo:** `git rev-parse --show-toplevel`
+   liefert einen Pfad, dessen Basename auf `-T` endet → das ist die Wurzel.
+2. **Sonst über `_class`:** `readlink -f` auf `_class` (immer auflösen — `~/r`
+   ist selbst ein Symlink auf `repos/georgernstgraf/`); das Ziel hat die Form
+   `/…/GRG-<FACH>/<kohorte>` → `-T`-Wurzel ist das Schwesterverzeichnis
+   `/…/GRG-<FACH>-T`, die Kohorte ist der Basename des Ziels.
+3. **Sonst:** STOPP und den User fragen (kein Raten).
+
+Zielordner: `<T-Wurzel>/<kohorte>/<YYYY-MM-DD>_<slug>/`
+(z. B. `~/r/GRG-WMC-T/3aaif/2026-11-08_repokontrolle/`)
+
+- `<YYYY-MM-DD>` = heutiges Datum des Laufs.
+- `<slug>` = kurzer Lauf-Bezeichner (z. B. `repos`, `repokontrolle`); aus dem
+  User-Auftrag ableiten, sonst `repograde`.
+- Ordner **bei Bedarf anlegen** (`mkdir -p`) — ein neuer Semester-/Lauf-Ordner
+  ist der Normalfall, kein Fehler.
+
+Vor dem ersten Schreibzugriff läuft ein **Probelauf (read-only)**: der
+aufgelöste `-T`-Ordner, der Zielordner und die geplante Dateiliste werden
+angezeigt; es wird nichts angelegt und nichts geschrieben. Erst danach wird
+gearbeitet.
+
+Die Schüler-Repos bleiben im CWD und werden nur gelesen. `roster.tsv` ist eine
+Zwischendatei und landet unter `/tmp/opencode/` (nicht im Lauf-Ordner, nicht im
+Commit). Committet wird am Ende im `-T`-Repo (siehe Commit-Protokoll).
 
 ## Input
 
@@ -126,9 +169,15 @@ include:
    - Single-repo: show the path and basename (or resolved symlink name if available).
    - Bulk: list all discovered student repositories (resolved student name
      from symlink where available, otherwise basename), with count.
-5. **Output files** that will be generated:
-   - Single-repo: `<basename>_grading.md`, `<basename>_email.json`.
-   - Bulk: per-repo files + `GRADINGS.md` + shared `EMAIL.json`.
+5. **Zielordner im `-T`-Repo**: the resolved `-T` root, the run folder
+   `<kohorte>/<YYYY-MM-DD>_<slug>/` and whether it already exists (Probelauf,
+   read-only — see Zielordner section).
+6. **Anrede**: the word read from `<kohorte>/anrede.txt` (`Du`/`Sie`); missing
+   file stops the run.
+7. **Output files** that will be generated (inside the run folder):
+   - Single-repo: `<basename>_grading.md`, `<basename>_email.json`,
+     `<basename>_points.json`.
+   - Bulk: per-repo files + `GRADINGS.md` + shared `EMAIL.json` + `noten.tsv`.
    - Date-filtered bulk also: `CLASS.md`.
 
 Display this plan and proceed immediately without waiting for confirmation.
@@ -157,9 +206,13 @@ Protocol:
 9. Do not write `INDIVIDUAL.md`.
 10. Do not write `CLASS.md`.
 11. Do not modify shared `EMAIL.json`.
-12. Generate `<basename>_grading.md` as the repository grading report in German.
+12. Generate `<basename>_grading.md` as the repository grading report in German
+    (inside the `-T` run folder).
 13. Generate `<basename>_email.json` as a JSON array with exactly one object,
     following `grading-shared` Email JSON Structure and Email Body Format, using German body text.
+14. Generate `<basename>_points.json` as the points sidecar (see
+    `grading-shared` Noten-TSV) — one object with `name`, `kind: "homework"`,
+    `klasse` and `assignments[{from, to, label, max, points}]`.
 
 ### 2. Bulk mode
 
@@ -176,20 +229,46 @@ Protocol:
    Students below).
 2. Follow the `grading-shared` Bulk Grading Protocol for concurrency (default
    max 5, ~3 second delay between runs).
-3. Each subagent writes only `<basename>_grading.md` plus
-     `<basename>_email.json` in German, following `grading-shared` Email JSON
-     Structure, JSON Escaping Rules, and Email Body Format.
+3. Each subagent writes only `<basename>_grading.md`,
+     `<basename>_email.json` and `<basename>_points.json` in German, following
+     `grading-shared` Email JSON Structure, JSON Escaping Rules, and Email Body
+     Format, and the points-sidecar schema of the Noten-TSV section.
      Subagents MUST use the exact `*_grading.md` section headings and order
      defined in [REPORT-FORMAT.md](./REPORT-FORMAT.md). They MUST NOT produce
      free-form reports with different lengths or different structures per
      student.
-4. Subagents must never write shared `EMAIL.json`.
+4. Subagents must never write shared `EMAIL.json` and never write `noten.tsv`.
 5. Continue until all repositories are processed.
 6. After all subagents finish:
    - Generate `GRADINGS.md` in German with class-wide overview table.
    - If a date filter is active, also generate `CLASS.md` in German.
    - Aggregate per-repo `*_email.json` files into shared `EMAIL.json`
      following `grading-shared` rules, including JSON Escaping Rules.
+   - Build `noten.tsv` (see below).
+7. Commit and push the run folder in the `-T` repo (see Commit-Protokoll).
+
+### 2b. Noten-TSV und Commit (nach der Aggregation)
+
+1. Roster beschaffen:
+   `wu lesson <KLASSE/FACH> roster > /tmp/opencode/roster.tsv` (Fach aus der
+   `_class`-Adresse, z. B. `_class -> GRG-WMC/3aaif` → `wu lesson 3aaif/wmc roster`).
+   Schlägt `wu` fehl: STOPP mit deutscher Meldung.
+2. **Probelauf (read-only, Pflicht):**
+
+   ```bash
+   ~/.opencode/skills/grading-shared/emit-grade-tsv.py --roster /tmp/opencode/roster.tsv
+   ```
+
+   Die Tabelle dem User zeigen.
+3. Erst danach schreiben:
+   `… emit-grade-tsv.py --roster /tmp/opencode/roster.tsv --write` (ergibt
+   `noten.tsv` im Lauf-Ordner).
+4. `roster.tsv` ist nur ein Zwischenprodukt und wird nicht committet.
+5. **Commit-Protokoll:** im `-T`-Repo alle Ausgaben des Lauf-Ordners committen
+   und pushen — deutsche Commit-Message nach der Repo-Konvention mit
+   Issue-Nummer, z. B. `Abgaben 3AAIF 2026-11-01: Bewertungen, E-Mails und
+   Noten-TSV (#12)`. Ist keine Issue-Nummer bekannt, beim User nachfragen statt
+   raten. Niemals im öffentlichen Teaching-Repo committen.
 
 ### 3. No-Repository Students (Broken Name-Symlinks)
 
@@ -198,11 +277,12 @@ their repository URL. Per `grading-shared` Broken Name-Symlinks (Missing
 Repository):
 
 1. Treat the student as a normal grading case (never stop, never skip).
-2. Grade without evidence: ALL assignments 0%, `Endbewertung: 0/100`.
+2. Grade without evidence: ALL Abgaben 0%, `Endbewertung: 0/100`.
 3. Generate `<name>_grading.md` (mandatory structure, every section
-   explicitly stating "kein Repository — keine Evidence") and a
+   explicitly stating "kein Repository — keine Evidence"), a
    `<name>_email.json` whose body follows the Missing Repository Emphasis
-   variant: the URL submission is REQUIRED for a positive assessment.
+   variant (the URL submission is REQUIRED for a positive assessment), and a
+   `<name>_points.json` with 0 points for every Abgabe.
 4. Include the student in `GRADINGS.md` (0/100) and in the shared
    `EMAIL.json`.
 5. Skip all git commands and the Pre-Grading Verification for these students.
@@ -244,15 +324,15 @@ When a cutoff date is active:
   from a specific date onwards.
 - Base judgments on actual code and text changes, not only on commit messages.
 
-## Per-Assignment Scoring (CRITICAL)
+## Bewertung pro Abgabe (CRITICAL)
 
-Jede Aufgabe zählt 100 Basispunkte. Bei N Aufgaben sind maximal
+Jede Abgabe zählt 100 Basispunkte. Bei N Abgaben sind maximal
 N × 100 Prozentpunkte erreichbar. Die Endbewertung in /100 ergibt sich
 aus `erreichte_Punkte / max_Punkte × 100`.
 
-### Bewertung pro Aufgabe
+### Zwei Werte pro Abgabe
 
-Für jede Aufgabe werden zwei Werte ermittelt:
+Für jede Abgabe werden zwei Werte ermittelt:
 
 1. **Quality** (0–100%): Inhaltliche Bewertung — Korrektheit, Struktur,
    Vollständigkeit, technisches Verständnis. 0% wenn keine Abgabe erkennbar.
@@ -271,9 +351,9 @@ Scoring-Tabelle enthalten.
 **Format in `*_grading.md` (Markdown-Tabelle):**
 
 ```markdown
-| Aufgabe | Thema | Quality | Factor | Effective |
-|---------|-------|---------|--------|-----------|
-| 1       | [Thema] | 80% | 1.0 | 80% |
+| Abgabe | Thema | Quality | Factor | Effective |
+|--------|-------|---------|--------|-----------|
+| 1      | [Thema] | 80% | 1.0 | 80% |
 | 2       | [Thema] | 70% | 0.75 | 52.5% |
 | 3       | [Thema] | —  | —  | 0% |
 ```
@@ -281,24 +361,24 @@ Scoring-Tabelle enthalten.
 **Format in `*_email.json` body (ASCII):**
 
 ```
-Aufgabe 1 [Thema]: 80% (pünktlich) -> 80 Punkte
-Aufgabe 2 [Thema]: 70% (verspätet, daher 25% Abzug) -> 52.5 Punkte
-Aufgabe 3 [Thema]: nicht abgegeben -> 0 Punkte
+Abgabe 1 [Thema]: 80% (pünktlich) -> 80 Punkte
+Abgabe 2 [Thema]: 70% (verspätet, daher 25% Abzug) -> 52.5 Punkte
+Abgabe 3 [Thema]: nicht abgegeben -> 0 Punkte
 ```
 
 ### Gesamtbewertung
 
 ```
 erreichte_Punkte = sum(effective_score_i)
-max_Punkte = Anzahl_Aufgaben × 100
+max_Punkte = Anzahl_Abgaben × 100
 Endbewertung = round(erreichte_Punkte / max_Punkte × 100)
 ```
 
-Beispiel: Fünf Aufgaben, max. 500 Punkte:
+Beispiel: Fünf Abgaben, max. 500 Punkte:
 
-| Aufgabe | Thema | Quality | Factor | Effective |
-|---------|-------|---------|--------|-----------|
-| 1       | Hono REST-API | 80% | 1.0 | 80% |
+| Abgabe | Thema | Quality | Factor | Effective |
+|--------|-------|---------|--------|-----------|
+| 1      | Hono REST-API | 80% | 1.0 | 80% |
 | 2       | Fetch Response | 70% | 0.75 | 52.5% |
 | 3       | Promises | 90% | 1.0 | 90% |
 | 4       | Transpile | —  | —  | 0% |
@@ -310,18 +390,18 @@ Endbewertung: 57/100 (57%)
 ### Abdeckungsquote (informativ)
 
 ```
-Abdeckungsquote = (Anzahl Aufgaben mit Quality > 0%) / Anzahl_Aufgaben × 100
+Abdeckungsquote = (Anzahl Abgaben mit Quality > 0%) / Anzahl_Abgaben × 100
 ```
 
 Nicht abgegeben = 0%, abgegeben (auch verspätet) zählt für die Quote.
 Die Abdeckungsquote ist rein informativ; sie geht NICHT zusätzlich in
-die Endbewertung ein (fehlende Aufgaben sind bereits mit 0% eingerechnet).
+die Endbewertung ein (fehlende Abgaben sind bereits mit 0% eingerechnet).
 
 ### Edge Cases
 
 - **No assignments in period**: Report clearly, grade based on available work only.
-- **Empty repository**: Alle Aufgaben 0% → Endbewertung 0/100.
-- **Broken name-symlink (kein Repository)**: alle Aufgaben 0% → Endbewertung
+- **Empty repository**: Alle Abgaben 0% → Endbewertung 0/100.
+- **Broken name-symlink (kein Repository)**: alle Abgaben 0% → Endbewertung
   0/100; E-Mail mit Missing Repository Emphasis (Pflicht) — siehe
   `grading-shared` Broken Name-Symlinks.
 - **Late submissions**: Automatic 0.75 factor applied REGARDLESS of how late
@@ -332,18 +412,24 @@ die Endbewertung ein (fehlende Aufgaben sind bereits mit 0% eingerechnet).
 
 ## Outputs
 
+All outputs are written into the `-T` run folder
+`<T-Wurzel>/<kohorte>/<YYYY-MM-DD>_<slug>/` (see Zielordner section).
+
 ### Single-repo mode
 
 - `<basename>_grading.md` in German.
 - `<basename>_email.json` as a one-entry JSON array following `grading-shared`
   rules and Email Body Format, with German body text.
+- `<basename>_points.json` as the points sidecar.
 
 ### Bulk mode (all commits)
 
 - Per-repository `<basename>_grading.md` files in German.
 - Per-repository `<basename>_email.json` files following `grading-shared`
   rules and Email Body Format, with German body text.
+- Per-repository `<basename>_points.json` points sidecars.
 - `GRADINGS.md` with class-wide overview table in German.
+- `noten.tsv` as the Google-Doc import table (probelauf first, then written).
 - Shared `EMAIL.json`, created only after all per-repo outputs are finished.
 
 ### Bulk mode (date-filtered)
@@ -351,8 +437,10 @@ die Endbewertung ein (fehlende Aufgaben sind bereits mit 0% eingerechnet).
 - Per-repository `<basename>_grading.md` files in German.
 - Per-repository `<basename>_email.json` files following `grading-shared`
   rules and Email Body Format, with German body text.
+- Per-repository `<basename>_points.json` points sidecars.
 - `GRADINGS.md` with class-wide overview table in German (includes cutoff date in header).
 - `CLASS.md` with anonymized class-wide patterns and teacher recommendations in German.
+- `noten.tsv` as the Google-Doc import table.
 - Shared `EMAIL.json`, created only after all per-repo outputs are finished.
 
 ## GRADINGS.md Generation (Bulk Mode Only)
@@ -424,16 +512,16 @@ same fixed structure for every student:
 2. automatic assessment disclaimer paragraph,
 3. grading period opening,
 4. commit activity summary,
-5. assignment overview,
-6. per-assignment evaluation paragraphs — each ending with `Bewertung: XX%`
+5. Abgaben-Übersicht (`Abgabe 1: …`, `Abgabe 2: …`),
+6. Bewertungs-Absätze pro Abgabe — each ending with `Bewertung: XX%`
    and, if late, `(verspätet, daher 25% Abzug auf den erreichten Wert)`,
-7. scoring table (ASCII format per Per-Assignment Scoring),
+7. scoring table (ASCII format per Bewertung pro Abgabe),
 8. Erreichte Punkte and Endbewertung summary,
 9. closing.
 
-Within that fixed order, ensure that the combined assignment evaluation and
+Within that fixed order, ensure that the combined Abgaben-Bewertung and
 scoring paragraphs clearly communicate code quality, missing work, lateness,
-and the final result. The per-assignment Quality%, Factor, and Effective score
+and the final result. The Quality%, Factor, and Effective score of every Abgabe
 MUST all be visible per the Scoring Table format.
 
 Do not vary this structure between students. For students WITHOUT a
@@ -442,11 +530,13 @@ replaces paragraph groups 3–6 (see `grading-shared` Email Body Format).
 
 ## Constraints
 
-- This skill must NOT be invoked from within a Git repository.
+- The grading work directory (typically `~/gits/<kohorte>-<fach>/`) must NOT
+  itself be inside a Git repository. All outputs go to the `-T` repo instead.
 - This skill must NOT clone student repositories; use `git pull` to update.
 - If uncommitted changes exist in any student repository, STOP IMMEDIATELY.
 - If a date is provided and invalid, STOP IMMEDIATELY.
-- Do not commit changes or modify repository history.
+- Never commit student repositories or modify their history. The `-T` repo IS
+  committed (see Commit-Protokoll) — that is the only commit this skill makes.
 - All grading content follows `grading-shared` rules (German, second-person,
   UTF-8 umlauts, email structure, email body format, missing email handling).
 - In single-repo mode, stop if no assignment source is found.
@@ -458,6 +548,10 @@ replaces paragraph groups 3–6 (see `grading-shared` Email Body Format).
 - In date-filtered bulk mode, also generate `CLASS.md`.
 - In bulk mode, generate shared `EMAIL.json` only after all per-repo outputs
   are complete.
+- Run `emit-grade-tsv.py` in dry-run mode first and show the table; write
+  `noten.tsv` only with `--write`.
+- Stop immediately when `<kohorte>/anrede.txt` is missing or invalid
+  (`grading-shared` Anrede-Gate).
 - Use proper quoting for paths with spaces.
 - Present the plan to the user BEFORE starting any grading work.
 - Use pure AI evaluation for all grading; never write grading scripts. The

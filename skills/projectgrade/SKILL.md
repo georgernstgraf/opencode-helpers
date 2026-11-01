@@ -31,7 +31,7 @@ UTF-8 umlauts (ä, ö, ü, ß), never English.
 
 ## Dependencies
 
-This skill relies on `grading-shared` for: address style, email formulas,
+This skill relies on `grading-shared` for: Anrede-Gate (`anrede.txt`), email formulas,
 second-person address rules, database lookup, email JSON structure,
 repository analysis protocol, and reporting protocol.
 
@@ -317,8 +317,9 @@ Database path: `/home/georg/OneDrive/uploadthing.db`
 
 ### Address Style
 
-Use the `grading-shared` **Address Style Mapping** based on `klasse`; do not
-restate the class table here.
+Use the `grading-shared` **Anrede-Gate**: read `<subject>-T/<kohorte>/anrede.txt`
+with `read-anrede.sh`. A missing or invalid file stops the run — never derive
+the address style from the class name.
 
 ### Unmatched Students
 

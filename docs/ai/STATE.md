@@ -4,6 +4,24 @@ Current status as of 2026-11-01.
 
 ## Current Focus
 
+Grading liefert jetzt eine **Noten-Tabelle für das Google Doc**: beide
+E-Mail-Skills (`repograde`, `knowledge-assessment`) schreiben zusätzlich
+`<name>_points.json`-Sidecars, und `skills/grading-shared/emit-grade-tsv.py`
+baut daraus `noten.tsv` (Spalte A Vollname, B leer, ab C je Abgabe/Prüfung eine
+Spalte; Zeile 1 `Abgabe <von>–<bis>` bzw. `WÜ <Datum>`, Zeile 2 Maximalpunkte,
+Zeile 3 leer, ab Zeile 4 Punkte ganzzahlig gerundet, fehlend = 0; Zeilen aus
+`wu … roster`). Das Skript ist **read-only per Default** — der Probelauf ist
+Pflicht, erst `--write` legt die Datei an. Ablage: `-T`-Repo,
+`<kohorte>/<YYYY-MM-DD>_<slug>/`; `repograde` committet den Lauf-Ordner dort
+jetzt selbst (`AGENTS.global.md`-Ausnahme erweitert). Neu ist außerdem das
+**harte Anrede-Gate**: `skills/grading-shared/read-anrede.sh` liest
+`<subject>-T/<kohorte>/anrede.txt` (`Sie`/`Du`); fehlt oder ungültig → Stopp
+vor jedem Schreibzugriff (gilt für `repograde`, `knowledge-assessment`,
+`knowledge-exam`, `projectgrade`). Terminologie: die bewertete Einheit heißt in
+allen Ausgaben **Abgabe** (`Aufgabe.md` bleibt der Dateiname der Aufgabe).
+Rollout offen: `anrede.txt` existiert noch in keiner Kohorte — vor dem nächsten
+Grading-Lauf anlegen.
+
 Aufgaben-Index und WebUntis sind jetzt getrennt: der `homework`-Skill verlangt
 den **Repo-Termin** (Tag, an dem gearbeitet und die Aufgabe gestellt wurde)
 und nutzt `wu lesson <KLASSE/FACH> termine --mit-lehrstoff` nur für das
@@ -155,6 +173,12 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] #120 2026-11-01 — Noten-TSV + Anrede-Gate: `emit-grade-tsv.py`
+      (read-only Probelauf, `--write`), `read-anrede.sh` (Stopp bei fehlender/
+      ungültiger `anrede.txt`), Punkte-Sidecars in `repograde`/
+      `knowledge-assessment`, `-T`-Lauf-Ordner + Commit für `repograde`,
+      Terminologie „Abgabe", `~`/`gits`-Laufumgebung dokumentiert; Tests
+      `tests/test_emit_grade_tsv.py` + `tests/test_read_anrede.py`
 - [x] #118 2026-10-31 — issue-workflow: Duplicate-Check-Gate vor jeder
       Issue-Erzeugung (3-Schritt-Suche im aktuellen Repo inkl. offener PRs,
       Entscheidungsmatrix mit Pflicht-Rückfrage bei ≥2 Kandidaten,

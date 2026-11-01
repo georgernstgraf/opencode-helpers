@@ -37,9 +37,14 @@ Before generating files:
    if it does not exist, stop and ask the user.
 2. Verify it is up to date (`git fetch && git status -sb`).
 3. Read the target repo's `AGENTS.md` — it defines repo-specific conventions:
-   file naming (`knowledge_<klasse>_<date>.md` + `_solutions.md`), class
-   folder layout (flat vs. dated subfolder, cohort suffixes like `4ahwit-x`),
-   and the formelle Anrede rule (Du vs. Sie per class).
+   file naming (`knowledge_<klasse>_<date>.md` + `_solutions.md`) and class
+   folder layout (flat vs. dated subfolder, cohort suffixes like `4ahwit-x`).
+4. **Anrede-Gate (CRITICAL):** read the Anrede exclusively from
+   `<subject>-T/<kohorte>/anrede.txt` via
+   `~/.opencode/skills/grading-shared/read-anrede.sh` (content `Sie` or `Du`).
+   If the file is missing, empty, or invalid: **STOP** before writing anything
+   and report the path plus the required content in German. Never derive the
+   Anrede from the class name or from `AGENTS.md`.
 
 Additional rules (discovered in practice):
 
@@ -189,7 +194,7 @@ Kriterien ist in der Praxis schon verletzt worden:
   (skriptbasiert prüfbar).
 - **Keine Duplikate:** derselbe Fakt (oder dieselbe Rechnung mit denselben
   Zahlen) nicht doppelt prüfen — weder MC↔MC noch MC↔Freitext.
-- **Sprache:** durchgehend Du/Sie laut `-T`-AGENTS.md, echte Umlaute,
+- **Sprache:** durchgehend Du/Sie laut Anrede-Gate (`anrede.txt`), echte Umlaute,
   kein Englisch in Fragen; Fachbegriffe nur, wenn sie unterrichtet wurden
   (z. B. einen unbehandelten Spec-Term vermeiden und das Verhalten stattdessen
   als beobachtbares Ergebnis abfragen).

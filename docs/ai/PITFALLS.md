@@ -152,3 +152,33 @@ Do not "fix" the tests for this; export the identity variables for the run.
   Repo (Ordner/Tages-README/`Aufgabe.md`), `wu` liefert nur den nächsten
   Termin („bis"). Das WebUntis-Hausübungsfeld wird nicht verwendet.
 
+
+## Grading / `-T`-Repos (seit 2026-11-01, #120)
+
+- **Die Anrede steht in einer Datei, nicht im Klassennamen.** `<subject>-T/<kohorte>/anrede.txt`
+  enthält genau `Sie` oder `Du`; fehlt sie, stoppen `repograde`,
+  `knowledge-assessment`, `knowledge-exam` und `projectgrade` vor dem ersten
+  Schreibzugriff (`read-anrede.sh`). Es gibt bewusst keinen Fallback — die
+  frühere Klassentabelle in `grading-shared` ist ersetzt, nicht ergänzt.
+- **Das Grading-Arbeitsverzeichnis ist kein Git-Repo.** `~/gits/<kohorte>-<fach>/`
+  enthält nur Namens-Symlinks auf die Schüler-Repos und `_class`. `git`
+  funktioniert dort nicht — Repo-Operationen laufen im Symlink-Ziel, Ausgaben
+  gehen ins `-T`-Repo.
+- **`~/r` ist ein Symlink auf `repos/georgernstgraf/`.** `_class`-Ziele können
+  mit oder ohne abschließenden Schrägstrich auftreten — immer `readlink -f`
+  verwenden, sonst entstehen zwei scheinbar verschiedene Pfade zum selben Ziel.
+- **Roster ≠ Abgaben (`wu lesson <KLASSE/FACH> roster`).** Der Roster enthält
+  die ganze Klasse (auch Teilnehmer:innen fremder Klassen, z. B.
+  `Khalil Ammar 5AAIF`), nicht nur die Abgeber:innen. Deshalb ist der Roster die
+  Zeilenquelle der Noten-TSV; wer nicht abgibt, steht dort mit `0`. Umgekehrt
+  können Abgabedateien Namen tragen, die im Roster fehlen — `emit-grade-tsv.py`
+  hängt sie an und warnt, statt sie zu verschlucken.
+- **Namensform variiert je Quelle.** `-T`-Dateinamen nutzen `Nachname_Vorname`,
+  `repograde`-Symlinks/`wu`-Roster `Nachname Vorname`. Abgleich nur über die
+  Normalisierung in `emit-grade-tsv.py` (Unterstrich → Leerzeichen, NFC,
+  casefold) — keine Ad-hoc-Vergleiche im Prompt.
+- **`noten.tsv` ist pro Lauf neu.** Keine Fortschreibung, keine Zustandsdatei:
+  die Google-Doc-Tabelle ist die kumulative Quelle, die TSV liefert nur die
+  Spalten des aktuellen Laufs (Namen + neue Spalten).
+- **`roster.tsv` gehört nicht in den Lauf-Ordner.** Zwischendatei unter
+  `/tmp/opencode/` ablegen — sonst landet sie im `-T`-Commit.

@@ -37,6 +37,11 @@ descriptions.
 ## Invocation Context
 
 - The user sits inside a class folder that is part of a Git repository.
+- Wird der Skill aus einem Grading-Arbeitsverzeichnis `~/gits/<kohorte>-<fach>/`
+  gestartet (das ist **kein** Git-Repo, enthält aber `_class` und die
+  Namens-Symlinks auf die Schüler-Repos), zuerst über `readlink -f _class` in
+  den öffentlichen Klassenordner wechseln — dort liegen `Aufgabe.md`,
+  Tagesordner und die Kohorten-README.
 - The class folder contains lesson directories named `<ISO-date>_<topic>`
   (e.g., `2026-03-21_promises`, `2026-04-01_async-await`).
 - The skill auto-detects the current lesson directory from recent Git activity.

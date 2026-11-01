@@ -74,12 +74,13 @@ workflows below.
 
 The proactive commit/push and auto-close rules DO NOT apply when:
 
-- running grading or read-only skills (`homework`, `repograde`,
-  `grading-shared`, `projectgrade`) — those skills forbid committing and must
-  never be overridden,
-- `knowledge-assessment` and `knowledge-exam` are the exceptions: they create
-  and commit their files inside the private `<subject>-T` repo (never in a
-  public repo and never in student repositories),
+- running grading or read-only skills (`homework`, `grading-shared`,
+  `projectgrade`) — those skills forbid committing and must never be
+  overridden,
+- `knowledge-assessment`, `knowledge-exam` and `repograde` are the exceptions:
+  they create and commit their files inside the private `<subject>-T` repo
+  (never in a public repo and never in student repositories), and `repograde`
+  still never commits a student repository,
 - working inside student repositories (grading targets stay untouched),
 - the user explicitly asks to hold changes back,
 - the session is a non-coding personal agent without a repository work
