@@ -1006,13 +1006,27 @@ Hausübung (`repograde`):
   "klasse": "3AAIF",
   "assignments": [
     {"from": "2026-10-06", "to": "2026-10-13",
-     "label": "Tooling & Git", "max": 100, "points": 80}
+     "label": "Tooling & Git",
+     "title": "Aufgabe 1: Tooling & Git (bis 13.10.2026)",
+     "max": 100, "points": 80}
   ]
 }]
 ```
 
 `points` ist der Effective-Wert der Abgabe (`Quality × Factor`, also z. B.
 `52.5`), `max` ist `100` je Abgabe.
+
+`assignments` enthält **genau einen Eintrag je Aufgabe** des Laufs, nicht einen
+Sammelwert über den ganzen Zeitraum. `title` ist optional und bestimmt den Text
+in Zeile 1 der TSV; er ist Pflicht, sobald zwei Aufgaben denselben Zeitraum
+haben (gleiche Deadline), weil die Spalten sonst verschmelzen. Ohne `title`
+bleibt es beim automatischen `Abgabe <von>–<bis>`.
+
+Wird dieselbe Aufgabe mehrfach gestellt (etwa mit verschobenem Termin), ist sie
+**eine** Aufgabe: ein Eintrag, und es gilt der **spätere** Abgabetermin. Zwei
+Schreibweisen desselben Zeitpunkts (z. B. `2026-09-23` 23:59 und
+`2026-09-24T00:00:00`) sind kein zweiter Termin — dort gilt die Schreibweise,
+die der Unterrichts-/Angabepraxis entspricht.
 
 Knowledge-Check (`knowledge-assessment`):
 
@@ -1067,22 +1081,28 @@ Läufe, die vor Einführung der Noten-TSV (2026-11-01) entstanden sind, haben
 `GRADINGS.md` und `EMAIL.json`, aber weder `*_points.json` noch `noten.tsv`.
 Diese Lücke wird nachgezogen, ohne die Bewertung neu zu machen:
 
-1. Punkte aus der **Übersichtstabelle der `GRADINGS.md`** lesen — Spalte
-   „Gesamt" (Knowledge-Check) bzw. „Endbewertung" (Repo-Lauf). Die Tabelle ist
-   die maßgebliche Quelle, nicht die Einzelgutachten.
-2. Sidecars **außerhalb** des Repos erzeugen (z. B. unter `/tmp/opencode/`) und
+1. **Knowledge-Checks:** Punkte aus der Übersichtstabelle der `GRADINGS.md`
+   (Spalte „Gesamt") — dort gibt es nur eine Spalte je Lauf.
+2. **Repo-Läufe:** Punkte **je Aufgabe** aus dem Abschnitt `## Endbewertung`
+   des jeweiligen `<name>_grading.md` (`Quality × Factor`, `max = 100`). Die
+   Übersichtstabelle der `GRADINGS.md` taugt dafür nicht — sie enthält nur die
+   aggregierte Endbewertung. Ein Lauf mit N Aufgaben ergibt N Spalten.
+3. Sidecars **außerhalb** des Repos erzeugen (z. B. unter `/tmp/opencode/`) und
    dort `emit-grade-tsv.py --out <lauf>/noten.tsv --write` aufrufen.
    Die Sidecars sind hier reine Zwischenprodukte und werden **nicht**
    committet; committet wird ausschließlich `noten.tsv`.
-3. Repo-Läufe haben keine Einzel-Abgaben mehr rekonstruierbar: eine Spalte
-   `Abgabe <von>–<bis>` mit `max = 100` und der Endbewertung als Wert.
-4. **Namensabweichungen vor dem Lauf explizit mappen.** Gutachten führen oft
+4. Spaltenkopf je Aufgabe: `title` = `Aufgabe N: <Thema> (bis DD.MM.YYYY)`.
+   Thema und Deadline aus den Einzelgutachten (Mehrheitsschreibweise). Keine
+   `von`-Daten erfinden — die Abgabezeiträume sind oft nicht belegbar.
+5. **Namensabweichungen vor dem Lauf explizit mappen.** Gutachten führen oft
    Kurzformen (`Moza Lukas`, `Figueroa Denise`), der Roster den vollen
    WebUntis-Namen (`Moza Lukas, Kevin`, `Figueroa Castillo Karla Denise`).
    Ohne Mapping erscheint die Person doppelt: einmal mit `0` aus dem Roster,
    einmal angehängt mit ihren Punkten.
-5. **Verifikation:** jede Datenzeile der `GRADINGS.md` muss mit exakt demselben
-   Wert in der TSV stehen; Differenzen sind ein Abbruchgrund.
+6. **Verifikation:** die Summe der Einzelwerte muss die Zeile „Erreichte
+   Punkte" des Gutachtens ergeben. Weicht sie ab, ist die **Quelldatei**
+   fehlerhaft — nicht die TSV. Solche Fälle dokumentieren und dem User
+   vorlegen, statt die Differenz einer Aufgabe zuzuschlagen.
 
 ## Email Body Format (CRITICAL)
 

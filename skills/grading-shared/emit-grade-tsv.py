@@ -10,7 +10,9 @@ die per Copy-Paste in die Noten-Tabelle uebernommen wird.
 Aufbau:
   - Spalte A = Vollname (Nachname Vorname), Spalte B = leer, ab Spalte C je
     Abgabe (Hausuebung) bzw. je Knowledge-Check eine Spalte
-  - Zeile 1: "Abgabe <von> <bis>" bzw. "WÜ <ISO-Datum>"
+  - Zeile 1: "Abgabe <von> <bis>" bzw. "WÜ <ISO-Datum>"; traegt ein
+    Assignment ein Feld ``title``, ersetzt dieser Text die Zeile-1-Angabe und
+    unterscheidet Aufgaben, die denselben Abgabezeitraum haben
   - Zeile 2: maximal erreichbare Punkte
   - Zeile 3: leer
   - Zeile 4 ff.: Punkte, ganzzahlig kaufmaennisch gerundet, fehlend = 0
@@ -275,18 +277,23 @@ def baue_spalten(daten: list[dict], kind: str) -> list[Spalte]:
                     f"({start.isoformat()} > {ende.isoformat()})"
                 )
             maximum = runde(aufgabe["max"])
-            key = (start.isoformat(), ende.isoformat())
+            titel = aufgabe.get("title")
+            if titel is not None and (not isinstance(titel, str) or not titel.strip()):
+                raise UsageError(f"{datei}: Feld 'title' ist leer oder kein Text")
+            titel = titel.strip() if titel else ""
+            # Der Titel gehoert in den Schluessel: zwei Aufgaben koennen
+            # denselben Abgabezeitraum haben (z. B. gleiche Deadline).
+            key = (start.isoformat(), ende.isoformat(), titel)
             bekannt = gesehen.get(key)
             if bekannt is None:
-                spalte = Spalte(
-                    key, f"Abgabe {formatiere_zeitraum(start, ende)}", maximum
-                )
+                label = titel or f"Abgabe {formatiere_zeitraum(start, ende)}"
+                spalte = Spalte(key, label, maximum)
                 gesehen[key] = spalte
                 spalten.append(spalte)
             elif bekannt.maximum != maximum:
                 raise UsageError(
                     "Widerspruechliche Maximalpunkte fuer "
-                    f"{key[0]}–{key[1]}: {bekannt.maximum} und {maximum} ({datei})."
+                    f"{bekannt.label}: {bekannt.maximum} und {maximum} ({datei})."
                 )
 
     spalten.sort(key=lambda s: s.key)
@@ -301,9 +308,11 @@ def punkte_je_student(
 
     werte: dict[tuple, int] = {}
     for aufgabe in eintrag["assignments"]:
+        titel = aufgabe.get("title")
         key = (
             parse_datum(aufgabe["from"], "from", eintrag["_datei"]).isoformat(),
             parse_datum(aufgabe["to"], "to", eintrag["_datei"]).isoformat(),
+            titel.strip() if isinstance(titel, str) else "",
         )
         werte[key] = runde(aufgabe["points"])
     return werte
