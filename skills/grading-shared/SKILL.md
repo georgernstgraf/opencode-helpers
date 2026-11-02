@@ -1061,6 +1061,29 @@ Regeln:
 - Nach `--write` wird `noten.tsv` gemeinsam mit den übrigen Ausgaben im
   `-T`-Repo committet.
 
+### Nachträgliche TSV für Läufe ohne Sidecars
+
+Läufe, die vor Einführung der Noten-TSV (2026-11-01) entstanden sind, haben
+`GRADINGS.md` und `EMAIL.json`, aber weder `*_points.json` noch `noten.tsv`.
+Diese Lücke wird nachgezogen, ohne die Bewertung neu zu machen:
+
+1. Punkte aus der **Übersichtstabelle der `GRADINGS.md`** lesen — Spalte
+   „Gesamt" (Knowledge-Check) bzw. „Endbewertung" (Repo-Lauf). Die Tabelle ist
+   die maßgebliche Quelle, nicht die Einzelgutachten.
+2. Sidecars **außerhalb** des Repos erzeugen (z. B. unter `/tmp/opencode/`) und
+   dort `emit-grade-tsv.py --out <lauf>/noten.tsv --write` aufrufen.
+   Die Sidecars sind hier reine Zwischenprodukte und werden **nicht**
+   committet; committet wird ausschließlich `noten.tsv`.
+3. Repo-Läufe haben keine Einzel-Abgaben mehr rekonstruierbar: eine Spalte
+   `Abgabe <von>–<bis>` mit `max = 100` und der Endbewertung als Wert.
+4. **Namensabweichungen vor dem Lauf explizit mappen.** Gutachten führen oft
+   Kurzformen (`Moza Lukas`, `Figueroa Denise`), der Roster den vollen
+   WebUntis-Namen (`Moza Lukas, Kevin`, `Figueroa Castillo Karla Denise`).
+   Ohne Mapping erscheint die Person doppelt: einmal mit `0` aus dem Roster,
+   einmal angehängt mit ihren Punkten.
+5. **Verifikation:** jede Datenzeile der `GRADINGS.md` muss mit exakt demselben
+   Wert in der TSV stehen; Differenzen sind ein Abbruchgrund.
+
 ## Email Body Format (CRITICAL)
 
 
