@@ -1,8 +1,17 @@
 # Project State
 
-Current status as of 2026-11-01.
+Current status as of 2026-11-02.
 
 ## Current Focus
+**create-lesson Quiz-Format 2.0 (#122, 2026-11-02):** Der Skill verlangt
+Checkbox-Lernquizzes (0–4 richtig, Überprüfen-Button je Quiz, Färbung,
+Infokugeln, Nochmal versuchen, Show-Modal), drei Übungsbeispiele pro Lesson
+(`Übungsbeispiele.md`) und keine Tages-README-Vorlage mehr; Lehrplan/KM
+stehen als `<details>`-Block in der Lesson, der Abschlussbericht liefert
+die Kopierzeile. Referenz-Umsetzung: GRG-PMM#40 (KM7-02). Offen: die
+übrigen Fächer-Repos ziehen bei ihrer nächsten Lesson nach (bewusst
+zurückgestellt).
+
 
 Grading liefert jetzt eine **Noten-Tabelle für das Google Doc**: beide
 E-Mail-Skills (`repograde`, `knowledge-assessment`) schreiben zusätzlich

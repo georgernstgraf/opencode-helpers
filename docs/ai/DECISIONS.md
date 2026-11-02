@@ -515,3 +515,27 @@ Each entry documents WHAT was decided and WHY.
 - **Considered**: turbo als Default behalten (verworfen — Qualität); Modell pro Host unterschiedlich (verworfen — Hosts sollen gleich sein); Modell zentral konfigurieren (verworfen — es gibt keinen zentralen Ort, die Bot-`.env` ist der einzige).
 - **Tradeoff**: Etwas höhere Transkriptions-Latenz. Neue Hosts müssen den Wert bewusst setzen — der Unit-Template-Kommentar (`dotfiles/systemd/user/oc-tg-bot.service`) nennt ihn deshalb explizit.
 - **Issue**: #111
+
+## 2026-11-02: create-lesson — Quiz-Format 2.0 und Übungsbeispiele (#122)
+
+- **Choice**: Lernquizzes im Skill sind Checkbox-Quizzes mit **0–4 richtigen
+  Optionen** (Lösungsmenge je Frage), **einem Überprüfen-Button je Quiz**,
+  Färbung, Infokugeln mit Lösungsmenge und Begründungen sowie
+  „Nochmal versuchen". Quizze sind mit dem Stoff **verzahnt** (W3Schools-
+  Muster, ~4 Fragen je Abschnitt), die Schwierigkeit steigt, die Gesamtzahl
+  folgt dem LM-Urteil bei vollständiger Stoffabdeckung.
+- **Reason**: Das Quiz ist ein Lernquiz, kein Punkttest; Mehrfach-richtig
+  entspricht dem WÜ-Format und verhindert Rate-Erfolge; ein zentraler
+  Prüf-Button macht die Auflösung zum gemeinsamen Klassengespräch.
+- **Choice**: Jede Lesson erzeugt **drei abzugebende Übungsbeispiele**
+  (`Übungsbeispiele.md`, Beispiel 1–3, je ≥ 2 Teilaufgaben); der letzte
+  Lesson-Abschnitt heißt „Übungsbeispiele".
+- **Choice**: Die **Tages-README-Vorlage entfällt**; der Abschlussbericht
+  liefert eine Kopierzeile, Lehrplan/KM/Runtime stehen als
+  `<details>`-Block in der Lesson.
+- **Considered**: Alpine.js für die Quiz-Interaktion (verworfen — CDN-Verbot,
+  Vanilla-JS im zentralen `assets/quiz.js` reicht); fixe 5×4-Quizstruktur
+  (verworfen — Umfang folgt dem Stoff).
+- **Tradeoff**: `assets/quiz.js` der Repos muss beide Modi können
+  (Checkbox = neu, Radio = alt), sonst brechen bestehende Lessons.
+- **Issue**: #122
