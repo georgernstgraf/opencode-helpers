@@ -1,6 +1,6 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Lektion und Präsentation in einem — Erklärung, Quiz, Aufgabe, beamer-tauglich) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Lektion und Präsentation in einem — Erklärung, Lernquizzes, drei Übungsbeispiele, beamer-tauglich) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
 license: MIT
 compatibility: opencode
 ---
@@ -9,8 +9,9 @@ compatibility: opencode
 
 Richtet zu einem **Kompetenzmodul (KM) oder einem Thema daraus** eine
 **Lesson** her: eine selbständige HTML-Seite für Schüler:innen mit Erklärung,
-interaktivem Quiz und integrierter **Aufgabe** am Lesson-Ende (Aufgabe =
-Mitarbeit). Der Skill arbeitet **in `unterricht/`** und legt dort **Prepared
+**Lernquizzes** über den Stoff verteilt und **drei abzugebenden
+Übungsbeispielen** am Lesson-Ende (die Beispiele = Mitarbeit). Der Skill
+arbeitet **in `unterricht/`** und legt dort **Prepared
 Lessons** ab; die Übernahme in den Kohortenordner erfolgt **per Hand** durch
 die Lehrperson. Konventionsbasiert, nicht auf ein Fach verdrahtet (Vorbild:
 `lehrplan`- und `teach`-Skill).
@@ -114,7 +115,7 @@ ausschließlich Lesson-Ordner (Grundregel 3):
 3. **Arbeitsort `unterricht/`.** Prepared Lessons liegen **flach** unter
    `unterricht/` als `<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
    `SA` = schulautonom; `<NN>` läuft **pro KM**) und bestehen aus
-   `lesson.html` + `aufgabe.md` (plus Tages-README-Vorlage, siehe
+   `lesson.html` + `Übungsbeispiele.md` (siehe
    § Prepared Lessons) — **kein lauffähiger Projektcode** (siehe
    § Beispielprojekte). Die `lesson.html` ist **zugleich die Präsentation**
    (Grundregel 6): **kein** separater Foliensatz. **`unterricht/`
@@ -168,11 +169,10 @@ Ein Beispielprojekt liegt dort als eigenständiger Ordner
 (z. B. `Beispielprojekte/km8-01-hono-formulare/`; `<#>` = KM, `<NN>` wie in der
 zugehörigen Lesson). Jeder Ordner hat eine eigene README, eigene Abhängigkeiten
 und ist für sich lauffähig und getestet. Die Lesson **verweist** darauf und
-**dupliziert keinen Projektcode** — der Verweis steht im Lesson-Text bzw. in der
-Aufgabe, nicht als eingebettete Projektdatei. Da die Beispielprojekt-Ablage
+**dupliziert keinen Projektcode** — der Verweis steht im Lesson-Text bzw. in
+den Übungsbeispielen, nicht als eingebettete Projektdatei. Da die Beispielprojekt-Ablage
 **nicht** auf GitHub Pages liegt, erfolgt der Verweis aus der deployten Lesson
-per **GitHub-URL** (siehe § Lernplattform); die Tages-README-Vorlage darf relativ
-verweisen.
+per **GitHub-URL** (siehe § Lernplattform).
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
@@ -237,10 +237,11 @@ einzige zulässige Rückfrage.
 3. **Kopf (themenfokussiert):** Zeile 1 = `Lektion <PREFIX>-<NN> · Thema`
    (`KM<#>`/`SA`, z. B. `KM5-03`). Zeile 2 klein = `Wiederholung aus KMx`
    bzw. leer — **keine Klasse, kein Semester, keine UE** (die Lesson ist
-   kohortenagnostisch; UE/Klasse stehen nur im Tages-README nach der
-   Übernahme). Thema zuerst, Provenienz zweitrangig aber auffindbar.
+   kohortenagnostisch; UE/Klasse stehen nur im Kohorten-README, das die
+   Lehrperson selbst pflegt). Thema zuerst, Provenienz zweitrangig aber auffindbar.
    Lehrplan, KM-Bezug und Runtime gehören **nicht** in den HTML-Header — sie
-   stehen unten im Tages-README (siehe § Tages-README).
+   stehen am Lesson-Ende im zugeklappten `<details>`-Block
+   (siehe § Kopierzeile & Lehrplan-Details).
 4. **HTML-Gerüst, Bootstrap & Badge:** Jede Lesson nutzt im `<head>` den
    **generischen Inline-Bootstrap** (findet `assets/loader.js` über die
    Ahnen-Verzeichnisse; Repo-Name nirgends im Code) mit `data-css`/`data-js`
@@ -265,31 +266,52 @@ einzige zulässige Rückfrage.
    Zusammenfassung (Tabelle) + Ausblick (thematisch auf verwandte
    Prepared Lessons bzw. den Semesterplan — ohne feste UE-Zuordnung).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
-6. **Quiz:** so viele Fragen, wie der Stoff braucht — **keine harte
-   Obergrenze** (auch 10+ sind in Ordnung). Die Richtige-Positionen über die
-   tatsächliche Fragenzahl ausgewogen rotieren, je Frage genau eine Richtige;
-   Antwortoptionen gleiche Wortzahl (möglichst Zeichenzahl) — keine
-   Format-Hinweise. Fragen decken **ausschließlich** Stoff, der in der Lesson
-   tatsächlich eingeführt wurde — kein Vorgriff auf spätere Lessons, keine nur
-   beiläufig genannten Begriffe. Markup:
-   `<div class="quiz" data-loesung="N">` (zentrales `assets/quiz.js`).
-   Jede Antwortoption trägt eine **eigene Begründung** im Attribut
-   `data-grund` (`<input type="radio" name="qK" value="i" data-grund="…">`):
-   die richtige Option begründet, *warum* sie stimmt, jede falsche, *warum*
-   sie falsch ist; jede Begründung ist durch den Lesson-Text gedeckt. Die
-   Rückmeldung erscheint **sofort beim Wählen** (Radio-`change`), **kein**
-   separater „Prüfen"-Button: bei falscher Wahl nur die Begründung der
-   gewählten Option (erneut wählbar, jeder Fehlversuch begründet), erst bei
-   richtiger Wahl die richtige Begründung. Pro Frage ein eindeutiger
-   Radio-`name`.
-7. **Aufgabe:** Abschnitt **„Aufgabe"** direkt am Lesson-Ende anhängen
-   (nach Zusammenfassung/Ausblick): stufenweise aus dem Lesson-Stoff gestuft,
-   Vorhersage-Aufgabe zuerst, plus Abgabehinweis (in neutraler Form, z. B.
-   „Abgabe nach Vorgabe deiner Lehrperson"). Der schülerseitige Begriff ist
-   immer **Aufgabe**, nie „Hausübung" — die Aufgabe **ist** die Mitarbeit.
-   Die Tages-README-Vorlage verweist darauf (z. B. „Aufgabe: Abschnitt am
-   Lesson-Ende"). Existiert ein Aufgaben-Master im Repo, auf ihn verlinken
-   statt duplizieren.
+6. **Lernquizzes (Format 2.0).** Quizze sind **Lernquizzes**, keine
+   Punkteprüfung: Sie prüfen ausschließlich den *zuvor erklärten* Stoff und
+   sind über die Lesson **verzahnt** — nach jedem Stoffabschnitt ein Quiz
+   (W3Schools-Muster: rund vier Fragen am Ende eines Abschnitts). Wie viele
+   Quizze und Fragen nötig sind, entscheidet das LM-Urteil; Maßstab ist, dass
+   der behandelte Stoff **vollständig** abgedeckt ist. Ein einzelnes Quiz mit
+   einer Frage ist nie genug. Die **Fragetypen werden durchmischt** (Begriff,
+   Code lesen, Interpretation, Übertragung), und die Schwierigkeit **steigt**
+   über die Lesson (leicht → schwer); jedes Quiz trägt ein kleines Badge mit
+   der Stufe. Antwortoptionen möglichst gleiche Wortzahl — keine
+   Format-Hinweise.
+   Markup (zentrales `assets/quiz.js`, das Badge, „Show", Infokugeln und
+   Prüf-Button selbst injiziert):
+   `<div class="quiz" data-titel="Quiz 1" data-stufe="leicht">` mit je Frage
+   `<div class="frage" data-loesung="0,2">` — `data-loesung` ist die
+   **Lösungsmenge** als Indexliste; **0 bis 4 Optionen** dürfen richtig sein
+   (Extremfälle ausdrücklich erlaubt, wie in den Wissensüberprüfungen). Jede
+   Frage hat **vier Optionen als Checkboxen** (keine Radios —
+   Mehrfach-richtig braucht Mehrfachauswahl) mit eindeutigem `name`, und
+   **jede Option trägt eine eigene Begründung** in `data-grund`:
+   die richtige, *warum* sie stimmt, jede falsche, *warum* sie falsch ist;
+   jede Begründung ist durch den Lesson-Text gedeckt. **Ein
+   „Überprüfen"-Button je Quiz** wertet alle Fragen auf einmal aus (keine
+   Sofort-Auswertung beim Anklicken): je Frage erscheint **richtig** (Auswahl
+   = Lösungsmenge) oder **falsch**, die Kärtchen färben sich (weiches
+   Neongrün/Neonrot, augenschonend), und **Infokugeln** neben den Fragen
+   zeigen bei Hover/Tipp die Lösungsmenge samt Begründungen. Danach wird der
+   Button zu **„Nochmal versuchen"** und setzt alle Kästchen zurück. **Kein
+   Punktestand** — die Wahrheit zählt, nicht die Quote.
+   **Show-Modal:** Das Quiz steht inline in der Lesson; ein „Show"-Button
+   öffnet es bildschirmfüllend als Modal (Backdrop-Blur, Kreuz oben rechts
+   zum Zurückschließen) — der Beamer-/Klassenmodus. Beides ist dasselbe DOM.
+   **Kein CDN, kein Framework** (kein Alpine/Reveal): Vanilla-JS im zentralen
+   `assets/quiz.js`, CSS in `assets/lesson.css`.
+7. **Übungsbeispiele:** Jede Lesson erzeugt **drei abzugebende Beispiele** in
+   `Übungsbeispiele.md` (im Lesson-Ordner), gegliedert als `Beispiel 1:` bis
+   `Beispiel 3:`. Jedes Beispiel ist eine **Matura-/Testaufgaben-artige
+   Aufgabe mit mindestens zwei Teilaufgaben** — eine einzelne Frage ist nie
+   genug. Die drei Beispiele decken unterschiedliche Zwecke ab: Kernübung zum
+   Stoff, Selbsttest im WÜ-Format (vier Optionen, 0–4 richtig, Musterlösung)
+   und Transfer auf neue Daten bzw. eine neue Situation; die Lehrperson weist
+   daraus zu („als Hausübung: Beispiel 2"). Die Lesson endet mit einem
+   Abschnitt **„Übungsbeispiele"**, der die drei Beispiele anreißt und auf die
+   Datei verweist; Abgabehinweis in neutraler Form („Abgabe nach Vorgabe
+   deiner Lehrperson"). Der Begriff „Hausübung" kommt in keiner Schülerdatei
+   vor — die Beispiele **sind** die Mitarbeit.
 8. **Beamer-Check & Code-Stil (Lektion = Präsentation):** Die `lesson.html`
    ist zugleich die Präsentation — projizierbare Grundschrift/Kontraste, ein
    Gedanke pro bildschirmgroßem Block, keine dunklen Code-Boxen; Code
@@ -311,12 +333,11 @@ einzige zulässige Rückfrage.
 **Prepared Lesson** (undatiert, vorbereitet, **kohortenagnostisch**) liegt
 **flach** in `unterricht/<PREFIX>-<NN>-<slug>/` (`KM<#>` = Kompetenzmodul,
 `SA` = schulautonom; `<NN>` läuft pro KM) zusammen mit
-`lesson.html` + `aufgabe.md` — **ausschließlich
+`lesson.html` + `Übungsbeispiele.md` — **ausschließlich
 Unterrichtsmaterial, kein lauffähiger Projektcode** (§ Beispielprojekte). Die
 `lesson.html` ist **zugleich die Präsentation** (Lektion und Präsentation in
-einem, Grundregel 6). Dazu
-gehört eine **Tages-README-Vorlage** `<PREFIX>-<NN>-<slug>.md` (Inhalt +
-`## Aufgabe` + `## Housekeeping`, siehe § Tages-README).
+einem, Grundregel 6). Eine Tages-README-Vorlage wird **nicht** erzeugt — die
+Lehrperson pflegt das Kohorten-README selbst (§ Kopierzeile).
 
 **Übernahme in den Unterricht — ausschließlich manuell durch die Lehrperson:**
 
@@ -325,55 +346,47 @@ gehört eine **Tages-README-Vorlage** `<PREFIX>-<NN>-<slug>.md` (Inhalt +
    entscheidet).
 2. Sie **kopiert** sie per Hand aus dem Unterrichtsordner in den
    **Kohortenordner** und **fügt das Datum manuell in den Ordnernamen** ein:
-   `<klasse>/YYYY-MM-DD__thema/` mit `lesson.html` plus `README.md`
-   (aus der Vorlage).
+   `<klasse>/YYYY-MM-DD__thema/` mit `lesson.html` (das README pflegt sie
+   selbst).
 3. Der Skill schreibt **nie** direkt in Kohortenordner, liest keine
    Kohorten-Statistiken und führt keinen Lernfortschritt — die Lesson ist
    bis zur Übernahme kohortenfrei.
 
-## Tages-README (Layout, Pflicht bei der Übernahme)
+## Kopierzeile & Lehrplan-Details
 
-Zu einer Lesson gehört ein Tages-README **im selben Datums-Ordner**
-`<klasse>/YYYY-MM-DD__thema/README.md` (aus der Vorlage `<PREFIX>-<NN>-<slug>.md`). Oben
-steht der Inhalt: Lektions-Link plus ein bis zwei Zeilen, was die Lesson lehrt
-(Liste mit Demo/Quiz/…). Die Aufgabe ist **Pflicht** und steht als **erster
-eigener `## Aufgabe`-Abschnitt (H2)** — nicht als Listenpunkt. Die
-**Housekeeping-Infos** (Lehrplan · KM-Bezug · Runtime) stehen als
-**letzter Abschnitt** — nie im Kopf, nie im HTML-Header:
+Zwei Dinge reisen mit der Lesson, statt in einer Vorlage zu leben:
 
-```
-# <Thema> (<Datum>)
-
-Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
-- Demo/Quiz/… (Inhalt, soweit vorhanden)
-
-## Aufgabe
-<Kurzbeschreibung> — Abgabe <Konvention>
-
-## Housekeeping
-- Lehrplan: <Pfad/Link>
-- KM-Bezug: <KM + Thema (+ ggf. UE)>
-- Runtime: <z. B. Deno, R/tidyverse>
-```
+- **Kopierzeile für das Kohorten-README:** Der Abschlussbericht des Skills
+  enthält die fertige Zeile zum Kopieren — relativer Pfad zur `lesson.html`
+  plus Kurztitel, z. B.
+  `[KM7-02 Chi-Quadrat-Test](unterricht/KM7-02-chi-quadrat-test/lesson.html)`.
+  Die Lehrperson klebt sie ins Kohorten-README und ergänzt selbst, was
+  aufgegeben wird („als Hausübung: Beispiel 2"). Kein weiteres Template.
+- **Lehrplan-Details in der Lesson:** Am Lesson-Ende (vor dem Footer) steht ein
+  zugeklappter `<details>`/`<summary>`-Block **„Lehrplan & Einordnung"** mit
+  Lehrplan-Pfad, KM-Bezug (KM + Thema, ggf. UE) und Runtime. Diese Angaben
+  gehören **nicht** in den HTML-Kopf.
 
 ## Verifikation (vor Abgabe, Pflicht)
 
 1. Jeder Code-Block läuft wie abgedruckt (per Ausführung gegen die echten
    Daten prüfen; behauptete Zahlen = berechnete Zahlen).
-2. Alle relativen Links auflösbar (Assets, Nachbar-Lessons, Aufgabe,
+2. Alle relativen Links auflösbar (Assets, Nachbar-Lessons, Übungsbeispiele,
    Semesterplan).
 3. Kein CDN / keine externen Abhängigkeiten (läuft über den lokalen
    Live-Server `serve.sh`), außer verlinkter Lektüre.
-4. Quiz klickbar, je Frage genau eine Richtige, Rotation über die
-   tatsächliche Fragenzahl eingehalten; **jede Frage ist durch den
-   Lesson-Text gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff);
-   die Auswahl wertet **sofort** aus (kein Prüf-Button) und **jede Option
+4. Quiz **klickbar** prüfen: Checkboxen wählen → **Überprüfen** → je Frage
+   richtig/falsch, Kärtchen färben sich, **Infokugeln** zeigen bei Hover/Tipp
+   Lösungsmenge und Begründungen → **„Nochmal versuchen"** setzt zurück und
+   wird wieder zum Überprüfen-Button; **„Show"** öffnet das bildschirmfüllende
+   Modal, das Kreuz schließt es. **Jede Frage ist durch den Lesson-Text
+   gedeckt** (kein nur genannter Begriff, kein Folge-UE-Stoff); **jede Option
    hat einen substanziellen, textgedeckten `data-grund`** (richtig wie
-   falsch) — Fehlwahl zeigt die Begründung genau dieser Option, richtige
-   Wahl die richtige Begründung.
-5. Aufgabe: Abschnitt am Lesson-Ende vorhanden (oder Aufgaben-Master-Link)
-   **und** Tages-README-Vorlage mit erstem eigenem `## Aufgabe`-Abschnitt (H2)
-   und `## Housekeeping` zuletzt — Pflicht.
+   falsch); `data-loesung` nennt die Lösungsmenge (0–4 Indizes); die
+   Schwierigkeit steigt über die Lesson.
+5. Übungsbeispiele: `Übungsbeispiele.md` mit `Beispiel 1:`–`Beispiel 3:`
+   (je mindestens zwei Teilaufgaben) **und** Abschnitt „Übungsbeispiele" am
+   Lesson-Ende **und** `<details>`-Block „Lehrplan & Einordnung" — Pflicht.
 6. Light/Dark-Umschalter vorhanden und klickbar; Default folgt dem
    Betriebssystem, die Wahl überlebt den Reload, Print bleibt hell.
 7. Bootstrap + Badge: generische Inline-Bootstrap im `<head>` vorhanden und
@@ -399,18 +412,21 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
     der **Pages-Basis** (deployte URL nach dem Push bzw. lokal `/<repo>/…`
     simuliert) — Assets/Bootstrap, Badge, Quiz, Theme und Navigator-Link
     funktionieren in allen Kontexten; kein `<base>`, kein root-absoluter Pfad,
-    kein `file://`. Das Quiz **klickbar** prüfen (Radio wählen → Begründung
-    erscheint): Lokal kann das Timing den `DOMContentLoaded`-Fallstrick
+    kein `file://`. Das Quiz **klickbar** prüfen (Checkboxen wählen →
+    Überprüfen → Färbung/Infokugeln → Nochmal versuchen; Show-Modal öffnen und
+    schließen): Lokal kann das Timing den `DOMContentLoaded`-Fallstrick
     kaschieren, unter der Pages-Basis tritt er auf (siehe Bauablauf Schritt 4).
 
 ## Nachziehen (gleicher Commit)
 
-- Tages-README-Vorlage nach § Tages-README (Aufgabe als erster
-  `## Aufgabe`-Abschnitt (H2), Housekeeping-Block zuletzt).
+- `Übungsbeispiele.md` (Beispiel 1–3) und der `<details>`-Block
+  „Lehrplan & Einordnung" in der Lesson.
 - Neue Lesson im Root-`index.html` verlinken (Lernplattform-Navigator) —
   Pflicht im selben Commit, nur `unterricht/`-Ziele.
 - Neue Fachbegriffe ins **Root-`GLOSSAR.md`** (mit KM-Verweis; UE-Verweis
   nur, wenn tatsächlich zugeordnet).
+- Im Abschlussbericht: **Kopierzeile** (Pfad + Kurztitel) für das
+  Kohorten-README.
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
 
 ## Was dieser Skill NICHT tut
@@ -419,8 +435,8 @@ Lesson: `lesson.html` im selben Ordner — <ein Satz, was sie lehrt>.
 - Keine Lessons unterhalb der KM-Anforderung oder ohne Bezug zu KM/Unterlagen
   erfinden.
 - Keinen separaten Foliensatz anlegen. Die `lesson.html` **ist** die
-  Präsentation (Lektion und Präsentation in einem, Grundregel 6). Die Aufgabe
-  gehört in die Lesson — ein separater
+  Präsentation (Lektion und Präsentation in einem, Grundregel 6). Die
+  Übungsbeispiele gehören in die Lesson — ein separater
   Aufgaben-Master entsteht nur, wenn die Repo-Konvention einen verlangt.
 - **Keine Kohorten-Verwaltung:** nicht in Kohortenordner schreiben, keine
   Lessons-Tabellen in Klassen-READMEs pflegen, keinen Lernfortschritt von
