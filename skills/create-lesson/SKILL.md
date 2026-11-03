@@ -265,7 +265,8 @@ einzige zulässige Rückfrage.
    früherer Lessons) → Typische Fehler (je mit Anti-Beispiel-Code) →
    Zusammenfassung (Tabelle) + Ausblick (thematisch auf verwandte
    Prepared Lessons bzw. den Semesterplan — ohne feste UE-Zuordnung).
-   Dazu Lektüre-Box mit Pflicht-Charakter am Anfang.
+   Dazu Lektüre-Box mit Pflicht-Charakter am Anfang. In allen Schritten gilt
+   die **Schülerperspektive** (§ Schülerperspektive).
 6. **Lernquizzes (Format 2.0).** Quizze sind **Lernquizzes**, keine
    Punkteprüfung: Sie prüfen ausschließlich den *zuvor erklärten* Stoff und
    sind über die Lesson **verzahnt** — nach jedem Stoffabschnitt ein Quiz
@@ -327,6 +328,31 @@ einzige zulässige Rückfrage.
     `index.html` verlinken — Titel + Ein-Zeiler unter dem passenden
     Jahrgangs-/KM-Block. Nur `unterricht/`-Ziele, keine Kohorten-/Lehrplan-
     Links (siehe § Lernplattform).
+
+## Schülerperspektive (Erklärungsempathie)
+
+Eine Lesson liest jemand, der den Stoff zum ersten Mal sieht. Beim Bauen und
+Nachziehen immer aus dieser Perspektive prüfen:
+
+- **Sparsam mit Abkürzungen und Fachjargon.** Symbole wie `df`, `p`, H₀, χ²,
+  `NA`, Spaltenkürzel — beim ersten Auftreten einführen, dann wiederverwenden;
+  die Langform bevorzugen, wenn der Kontext sie nicht trägt.
+- **Nichts Unerklärtes in den Text werfen.** Jede Zahl, jedes Symbol, jeder
+  Begriff, den der Schüler nachvollziehen soll, muss herleitbar sein:
+  Rechenschritte, wo der Zwischenschritt nicht trivial ist; Werte nicht vom
+  Himmel fallen lassen; eine Eigenschaft, die später Konsequenzen hat
+  (z. B. eine Formeleigenschaft, aus der eine R-Warning folgt), nicht
+  unverbunden stehen lassen.
+- **Warnings und überraschender Output werden erklärt** — nicht als
+  isolierter „Was tun"-Absatz, sondern als Konsequenz von etwas, das die
+  Lesson bereits eingeführt hat.
+- **Empathie vor Knappheit.** Der Skill neigt dazu, Dinge kurz und wenig
+  erklärt hinzuschreiben. Korrekturrichtung: lieber ein Zwischenschritt
+  mehr als einer zu wenig — der Leser darf nirgends abgehängt werden.
+
+Beispielhaft (aus einer χ²-Überarbeitung): Beitrags-Tabelle statt nur
+Gesamtsumme, Frei/Fest-Gitter statt nur df-Formel, Kontrollsumme der
+Randsummen nach der Umrechnung.
 
 ## Prepared Lessons (Ablage & Lebenszyklus)
 

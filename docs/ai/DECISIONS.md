@@ -539,3 +539,29 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: `assets/quiz.js` der Repos muss beide Modi können
   (Checkbox = neu, Radio = alt), sonst brechen bestehende Lessons.
 - **Issue**: #122
+
+## 2026-11-03: create-lesson — Schülerperspektive (Erklärungsempathie) (#123)
+
+- **Choice**: Neuer Abschnitt „Schülerperspektive" zwischen Bauablauf und
+  Prepared Lessons, verankert per Querverweis in Dramaturgie-Schritt 5:
+  sparsam mit Abkürzungen/Fachjargon (beim ersten Auftreten einführen),
+  nichts Unerklärtes in den Text werfen (Rechenzwischenschritte, keine vom
+  Himmel fallenden Werte), Warnings als Konsequenz bereits eingeführter
+  Konzepte erklären statt als isolierter „Was tun"-Absatz, Empathie vor
+  Knappheit.
+- **Reason**: Beim Überarbeiten der KM7-02-Chi-Quadrat-Lesson (GRG-PMM)
+  fielen wiederkehrende Mängel auf: df/H₀/p ohne Einführung, übersprungene
+  Rechenschritte (z. B. die M3-Zellbeitragsdivision), die
+  „seltene-Zellen"-Formeleigenschaft stand unverbunden neben der
+  Chi-Approximations-Warning. Die Lehrperson wünschte explizit eine
+  allgemeine Regel („Empathie mit einem Schüler, der die Materie zum ersten
+  Mal sieht") statt einer Liste fachspezifischer Anweisungen.
+- **Considered**: Sechs konkrete Statistik-Didaktikmuster (Beitrags-Tabelle,
+  Randsummen-Kontrolle, Frei/Fest-Gitter, H₀-Sprachhygiene,
+  Formel-als-Konsequenz-Bindung, Plain-Text-Formeln) als eigene Regeln
+  (verworfen — zu domainspezifisch für einen konventionsbasierten,
+  fachunabhängigen Skill); die Muster bleiben als „Beispielhaft"-Zeile im
+  Abschnitt erhalten.
+- **Tradeoff**: Die Regel ist weicher und damit weniger mechanisch prüfbar
+  als eine Punktliste; die Verifikation bleibt beim LM-Urteil.
+- **Issue**: #123
