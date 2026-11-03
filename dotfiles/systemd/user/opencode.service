@@ -9,6 +9,14 @@
 #   systemctl --user daemon-reload
 #   systemctl --user enable --now opencode.service
 #
+# ACHTUNG (2026-11-03): Kein In-TUI-„Upgrade" und kein manuelles
+# `opencode upgrade` ausführen, solange diese Unit den Server verwaltet — der
+# Client ersetzt einen version-mismatch-Daemon durch einen Session-Scope-Orphan
+# (Unit bleibt active, echter Server überlebt Logout nicht). In
+# ~/.config/opencode/opencode.jsonc steht deshalb `"update": "disable"`; der
+# einzige Upgrade-Weg ist `systemctl --user restart opencode.service`
+# (ExecStartPre holt die Version).
+#
 # `%h` ist das Home des Users (systemd-Specifier) — die Unit ist damit für
 # georg und grafg identisch. Host/Port/Passwort stehen NICHT in der Unit,
 # sondern in ~/.config/opencode/service.json:

@@ -144,6 +144,16 @@ Do not "fix" the tests for this; export the identity variables for the run.
 - **Verifikation nach jedem Restart:** `opencode api get /api/info` liefert
   `version` und `pid`; dieser `pid` muss der Prozess mit PPID = systemd-User
   Instanz sein (`ps -o pid,ppid,args -p <pid>`), nicht ein Terminal-Kind.
+- **In-TUI-Upgrade ist auf Service-Hosts verboten** (2026-11-03): setzt man die
+  Binary außerhalb von `systemctl --user restart` neu (z. B. das „Upgrade" im
+  TUI), läuft der systemd-Daemon auf der alten Version weiter. Beim nächsten
+  Clientstart ersetzt ihn OpenCode selbst (`background service starting
+  reason=version-mismatch`) durch einen Server im **Session-Scope** — die Unit
+  zeigt weiter `active`/`MainPID=0`, der echte Server überlebt Logout/Terminal
+  aber nicht. Deshalb `"update": "disable"` in `~/.config/opencode/opencode.jsonc`
+  auf Service-Hosts und nur via `systemctl --user restart opencode.service`
+  upgraden. Orphan-Eckdiag: `cat /proc/$(pgrep -f "[o]pencode serve --service")/cgroup`
+  muss `app.slice/opencode.service` enthalten.
 - **WebUntis-„Stoff" ist Thema, nicht Hausübung (2026-11-01, #119).** Der
   Datumsordner einer Lesson kann am **Vorbereitungstag** entstehen (z. B.
   `5ahwit/2026-09-30-chi-quadrat-test/`, unterrichtet am 14.10.); umgekehrt
