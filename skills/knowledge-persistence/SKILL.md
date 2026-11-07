@@ -92,6 +92,10 @@ HISTORY.md.
 ### 3. Write Updates
 
 - Append new entries to the appropriate file.
+- Before appending to a collection file, check the concept-boundary
+  rules in [FILE-TEMPLATES.md](./FILE-TEMPLATES.md) ("Concept
+  Boundaries and Splitting") — split instead of growing a file that
+  mixes entries with independent lifespans.
 - If an existing entry is now outdated, MOVE it to HISTORY.md (do not
   leave superseded content in active files).
 - Never duplicate an entry that already exists.

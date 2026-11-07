@@ -46,6 +46,51 @@ Envelope rules:
 - Known content still in force after a superseded entry is removed keeps
   its existing frontmatter; only `generated.at` gets bumped.
 
+## Concept Boundaries and Splitting
+
+OKF sets NO size limits — conformance (OKF-SPEC.md §11) only checks
+frontmatter and reserved filenames. The rules below derive from the
+spec's own signals (§2 one concept = one unit, §4.2 structured bodies,
+§6 links, §8 progressive disclosure, §10.1 "split when trust state
+differs") and are the house rule for this skill.
+
+**Split an entry into its own concept file when ANY of these holds:**
+
+- The entry needs its own `status` / `stale_after` / `verified` /
+  `sources` (the spec's only hard splitting rule, §10.1: revenue,
+  profit and margin each verify independently — three concepts, not
+  three entries in one frontmatter).
+- The entry must be linkable on its own ("see the pitfall about X",
+  not "see PITFALLS.md somewhere").
+- The file carries more than 2–3 independent themes with their own
+  lifespans.
+- Soft trigger for bootstrap-loaded files: beyond ~700 lines or
+  ~30 KB, split along concept axes.
+
+**Keep entries together when:**
+
+- the file narrates and links other concepts (STATE, HANDOFF,
+  ARCHITECTURE — the §10.4/Appendix A pattern: the overview stays one
+  readable concept and links the details);
+- the entries share trust state and are read as one unit (grouped
+  bullets of one topic, e.g. convention rules of a single domain).
+
+**Never split by size or arbitrary chunks.** A split mid-thought
+yields two concepts worth less than the original and breaks links.
+
+**When splitting:**
+
+- New concept IDs stay meaningful: `<topic>/<slug>.md` in a
+  subdirectory with its own `index.md` (OKF §3, §8).
+- The original file keeps an overview section linking the new
+  concepts (do not leave a stub without pointers).
+- `log.md` records the move (**Creation** for each new concept,
+  **Update** for the original).
+- The Confirmation step (SKILL.md step 9) lists every split
+  explicitly — a split is never silent.
+- A split performed in a legacy repo migrates only the moved entries;
+  unrelated legacy files stay untouched until their own next touch.
+
 ## DECISIONS.md
 
 Records ACTIVE architectural and technical decisions — one-time
