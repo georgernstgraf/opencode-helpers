@@ -14,6 +14,9 @@ metadata:
 
 This skill extracts the agent's accumulated understanding from the current
 session and persists it into a structured set of knowledge files on disk.
+The files follow the **Open Knowledge Format (OKF) v0.2** — the full
+specification is vendored alongside this skill in
+[OKF-SPEC.md](./OKF-SPEC.md).
 Use this skill at any checkpoint during or at the end of a productive
 session, or when explicitly asked to "save context", "persist knowledge",
 or "update knowledge file".
@@ -31,17 +34,29 @@ Create any missing files. Never delete entries from HISTORY.md (it is
 an append-only archive). Do delete superseded entries from active files
 by relocating them to HISTORY.md.
 
+`docs/ai/` is treated as an OKF **bundle**: every non-reserved `.md` file
+is a concept document carrying a YAML frontmatter envelope with the
+required `type` field plus the trust and lifecycle fields (see
+[FILE-TEMPLATES.md](./FILE-TEMPLATES.md)). The reserved filenames
+`index.md` and `log.md` carry no (or only `okf_version`) frontmatter.
+
 ```text
 docs/ai/
-├── HANDOFF.md
-├── DECISIONS.md
-├── ARCHITECTURE.md
-├── CONVENTIONS.md
-├── PITFALLS.md
-├── DOMAIN.md
-├── STATE.md
-└── HISTORY.md
+├── index.md        (OKF §8: progressive-disclosure index, okf_version)
+├── log.md          (OKF §9: per-run persistence log, date-grouped)
+├── HANDOFF.md      type: Handoff
+├── DECISIONS.md    type: Decisions
+├── ARCHITECTURE.md type: Architecture
+├── CONVENTIONS.md  type: Conventions
+├── PITFALLS.md     type: Pitfalls
+├── DOMAIN.md       type: Domain Notes
+├── STATE.md        type: State
+└── HISTORY.md      type: History Archive
 ```
+
+Legacy files without frontmatter are tolerated (OKF conformance is
+permissive, OKF-SPEC.md §11) but MUST receive the envelope the next time
+the skill touches them — no big-bang migration is required.
 
 **Active files** (must match current HEAD; no superseded entries):
 HANDOFF.md, DECISIONS.md, ARCHITECTURE.md, CONVENTIONS.md, PITFALLS.md,
@@ -54,9 +69,15 @@ HISTORY.md.
 
 ### 1. Discovery
 
+- Start at `docs/ai/index.md` (OKF §8 progressive disclosure) if it
+  exists; it lists what is present, including legacy files.
 - Read all existing files in `docs/ai/` to understand what is
-  already persisted.
-- If the directory does not exist, create it.
+  already persisted. Files WITHOUT frontmatter are legacy-but-valid;
+  any file you end up editing must first receive the OKF envelope
+  (see [FILE-TEMPLATES.md](./FILE-TEMPLATES.md), "Frontmatter
+  Envelope").
+- If the directory does not exist, create it (with `index.md` and
+  `log.md`).
 - If a file does not exist, create it with the template in
   [FILE-TEMPLATES.md](./FILE-TEMPLATES.md).
 
@@ -77,6 +98,21 @@ HISTORY.md.
 - Write only facts. One item per bullet. No preamble, no commentary,
   no summaries at the top of the file.
 
+**Frontmatter maintenance (every touched file):**
+
+- On any edit, update `generated.at` to the current run's ISO 8601
+  UTC datetime (OKF §5.2).
+- When you verified an entry against the current codebase/config
+  before writing it, set `verified: { by: opencode/knowledge-persistence, at: <ISO> }`
+  (machine-confirmed trust tier, OKF §5.3). Never fabricate a
+  `human:` verification — only a human may add `by: human:<id>`.
+- Set `sources` with the active GitHub issue when the entry
+  references one (OKF §5.1); keep existing `sources` entries that
+  remain relevant.
+- Files are `status: stable` by default; per-entry lifecycle lives in
+  the entry text (`[ACTIVE until #NNN]`, HISTORY relocation), not in
+  the file-level `status` field.
+
 ### 3b. Prune Superseded Entries
 
 For each active file being updated, scan for entries that no longer
@@ -96,6 +132,7 @@ For each superseded entry found:
 4. Leave a ONE-LINE pointer in the active file ONLY if a future reader
    would otherwise re-discover the same pitfall; otherwise delete
    cleanly.
+5. Bump `generated.at` on the active file and on `HISTORY.md`.
 
 **PITFALLS.md special case**: Distinguish between:
 - **(a) Permanent non-obvious constraints** (e.g., "Room validates
@@ -151,6 +188,18 @@ relocate it.
 - This keeps HANDOFF.md small and actionable while large work is
   properly tracked (via issues in GitHub, via HANDOFF.md in SVN).
 
+### 5b. Update `log.md` and regenerate `index.md`
+
+- **`log.md`** (OKF §9): append one date-grouped entry at the top of
+  the log (newest first) summarizing this run: for each updated file
+  an `**Update**` / `**Creation**` / `**Deprecation**` line linking
+  the concept. NO frontmatter in `log.md`.
+- **`index.md`** (OKF §8): regenerate from the current directory
+  state. Keep `okf_version: "0.2"` in the bundle-root frontmatter
+  (the only frontmatter an `index.md` may carry). Entries include the
+  concept's `description`. Skip files the run did not touch only to
+  note them as unchanged — the index always lists ALL files.
+
 ### 6. Update `AGENTS.md`
 
 - Ensure the project-level `AGENTS.md` (in project root or `.opencode/`)
@@ -189,6 +238,9 @@ relocate it.
 
 - After committing and pushing, list every file that was created or modified,
   and for each show the number of entries added, updated, or removed.
+- Confirm the OKF state of `docs/ai/`: every concept file carries a
+  parseable frontmatter with non-empty `type`; `index.md` was
+  regenerated; `log.md` records this run (OKF-SPEC.md §11).
 - State the commit hash and that it was pushed.
 
 ## File Templates and Content Rules
@@ -234,3 +286,10 @@ creating or overwriting it.
   existing ones. — gilt diesbezüglich nur für GitHub-Projekte;
   SVN-Projekte ohne Issue-System haben schlicht keine Issues (dann
   entfällt der ganze Mechanik still).
+- **OKF Integrity**: `docs/ai/` is an OKF v0.2 bundle
+  ([OKF-SPEC.md](./OKF-SPEC.md)). The reserved filenames `index.md`
+  and `log.md` are never used for concept documents, `log.md` gets no
+  frontmatter, and frontmatter `type` is always present and non-empty.
+  Unknown extra frontmatter keys are allowed (producers may extend).
+- **No fabricated trust**: never write a `human:<id>` `verified` entry
+  on your own — machine-verified is the maximum an agent may claim.

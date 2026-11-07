@@ -32,7 +32,11 @@ persistence patterns for AI-assisted development workflows.
 
 ## Knowledge Bootstrap
 
-Before starting any task, read the following files in order:
+Before starting any task, read the knowledge entry point first:
+
+0. `docs/ai/index.md` (OKF index — falls vorhanden; analog zum File-List-Fallback weiter unten) ← **start here**
+
+Then, in order:
 
 1. `docs/ai/HANDOFF.md` ← **read first, act on it**
 2. `docs/ai/CONVENTIONS.md`
@@ -42,6 +46,10 @@ Before starting any task, read the following files in order:
 6. `docs/ai/STATE.md`
 7. `docs/ai/DOMAIN.md` (if task involves business logic)
 8. `docs/ai/HISTORY.md` (reference only — read last, as needed)
+
+Knowledge files follow the Open Knowledge Format v0.2 (Spec:
+`skills/knowledge-persistence/OKF-SPEC.md`); Legacy-Files ohne
+Frontmatter sind toleriert und migrieren beim nächsten Touch.
 
 If the user says "continue", "resume", or "finish where we left off":
 read and act on HANDOFF.md immediately without asking clarifying questions. If `HANDOFF.md` contains open tasks, complete them before starting any new work unless the user explicitly says otherwise.
