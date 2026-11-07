@@ -267,7 +267,7 @@ einzige zulässige Rückfrage.
    Prepared Lessons bzw. den Semesterplan — ohne feste UE-Zuordnung).
    Dazu Lektüre-Box mit Pflicht-Charakter am Anfang. In allen Schritten gilt
    die **Schülerperspektive** (§ Schülerperspektive).
-6. **Lernquizzes (Format 2.0).** Quizze sind **Lernquizzes**, keine
+6. **Lernquizzes (Format 2.1).** Quizze sind **Lernquizzes**, keine
    Punkteprüfung: Sie prüfen ausschließlich den *zuvor erklärten* Stoff und
    sind über die Lesson **verzahnt** — nach jedem Stoffabschnitt ein Quiz
    (W3Schools-Muster: rund vier Fragen am Ende eines Abschnitts). Wie viele
@@ -282,13 +282,18 @@ einzige zulässige Rückfrage.
    Markup (zentrales `assets/quiz.js` injiziert Badge, Infokugeln und
    Prüf-Button):
    `<div class="quiz" data-titel="Quiz: <thema-slug>">` mit je Frage
-   `<fieldset class="frage" data-loesung="0,2">`; die Frage steht im
+   `<fieldset class="frage">`; die Frage steht im
    `<legend class="frage-text">`, die Optionen in `<div class="optionen">`.
-   `data-loesung` ist die **Lösungsmenge** als Indexliste; **0 bis 4
+   Die **Lösungsmenge steht an den Optionen selbst**: jede richtige Option
+   trägt `data-richtig` am Input (Attribut vorhanden = richtig); **0 bis 4
    Optionen** dürfen richtig sein (Extremfälle ausdrücklich erlaubt, wie in
-   den Wissensüberprüfungen). Jede Frage hat **vier Optionen als Checkboxen**
-   (keine Radios — Mehrfach-richtig braucht Mehrfachauswahl) mit
-   lesson-präfixiertem, eindeutigem `name` und `value` = DOM-Position, und
+   den Wissensüberprüfungen) — bei 0-richtig trägt **keine** Option das
+   Attribut. **Kein `data-loesung`, keine Positions- oder
+   Buchstabenkodierung:** `quiz.js` mischt die Optionen beim Laden
+   (Fisher-Yates), die Markup-Reihenfolge ist bedeutungslos — deshalb gibt
+   es auch keine Rotationsprüfung mehr. Jede Frage hat **vier Optionen als
+   Checkboxen** (keine Radios — Mehrfach-richtig braucht Mehrfachauswahl)
+   mit lesson-präfixiertem, eindeutigem `name`, und
    **jede Option trägt eine eigene Begründung** in `data-grund`: die
    richtige, *warum* sie stimmt, jede falsche, *warum* sie falsch ist; jede
    Begründung ist durch den Lesson-Text gedeckt. **Ein
@@ -403,8 +408,9 @@ Muster erkennbar wird.
   Dokumentgliederung.
 - **Quiz-Vertrag** (siehe Bauablauf Schritt 6): `fieldset.frage` +
   `legend.frage-text`, `div.optionen` mit vier Checkbox-Labels,
-  `data-grund` je Option, `name` lesson-präfixiert, `value` =
-  DOM-Position, `data-loesung` als Indexliste.
+  `data-grund` je Option, `name` lesson-präfixiert, `data-richtig` an
+  jeder richtigen Option (kein `data-loesung`; Reihenfolge egal —
+  `quiz.js` mischt).
 - **Keine Inline-Styles**, keine Kohorten-, UE- oder Semesterangaben im
   Header oder Text (nur Provenienz wie „Wiederholung aus KM5"); Lehrplan
   ausschließlich im `<details>`-Block am Ende.
@@ -474,8 +480,11 @@ Zwei Dinge reisen mit der Lesson, statt in einer Vorlage zu leben:
    versuchen"** setzt zurück und wird wieder zum Überprüfen-Button. **Jede
    Frage ist durch den Lesson-Text gedeckt** (kein nur genannter Begriff,
    kein Folge-UE-Stoff); **jede Option hat einen substanziellen,
-   textgedeckten `data-grund`** (richtig wie falsch); `data-loesung` nennt
-   die Lösungsmenge (0–4 Indizes); keine Stufen- oder Modal-Reste.
+   textgedeckten `data-grund`** (richtig wie falsch); `data-richtig` steht
+   an jeder richtigen Option (0–4, bei 0 keine), **kein `data-loesung`**;
+   die Optionsreihenfolge ändert sich bei Reload (Shuffle), Farbe und
+   Infokugel müssen der richtigen Option folgen. Keine Stufen- oder
+   Modal-Reste.
 5. Aufgabe: `aufgabe.md` mit `Beispiel 1:`–`Beispiel 3:`
    (je mindestens zwei Teilaufgaben) **und** Abschnitt „Aufgabe" am
    Lesson-Ende **und** `<details>`-Block „Lehrplan & Einordnung" — Pflicht.
