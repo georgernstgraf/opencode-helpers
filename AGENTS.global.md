@@ -56,6 +56,31 @@ workflows below.
 - Pin the agent too (`--agent <id>`) when the job depends on a specific system
   prompt or permission set.
 
+## Context Economy (Subagent Delegation)
+
+- The main session's context is the scarcest resource. Delegate
+  context-heavy, well-specified units to a fresh subagent instead of
+  running them inline — large file reads, verbose verification, batch
+  conversions of similar items, research that ends in a summary
+  anyway. Before a big inline read, ask: "Would a subagent absorb
+  this?"
+- Work orders are self-contained: the subagent starts with zero
+  history. Include (or link) the full spec — a spec file works — with
+  exact paths, the reference pattern, verification steps and their
+  expected results, and the boundaries (e.g. off-limits files, who
+  commits).
+- Reports are signal-dense, not just short: verdicts plus anomalies
+  verbatim, plus pointers (paths, line numbers) to what deserves a
+  look. Echoing bulk (full file contents, raw logs) stays in the
+  subagent — a report that hides the evidence behind its own verdict
+  is a failed report.
+- The report navigates the verification gate, it never replaces it:
+  spot-check claims before acting on them, and continue the
+  subagent's session for detail instead of re-doing its work inline.
+- Known-up-front work (N items, M done): prepare the shared spec and
+  parameterized scripts once, centrally — then each item is one short
+  prompt plus one short report.
+
 ## Issue Completion
 
 - When the agent believes the issue's goal is fully implemented, it **closes

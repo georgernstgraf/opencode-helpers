@@ -18,6 +18,9 @@ on diffs and debugging.
   between parts.
 - **Act directly**: a single focused change (one file, one concern). Delegation
   would cost more context than the change itself.
+  Exception: even single-focus work is worth delegating when the unit
+  itself is context-heavy (large reads, verbose verification) — see
+  "Context Economy (Subagent Delegation)" in `AGENTS.global.md`.
 
 ## Non-default behaviors
 
