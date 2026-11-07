@@ -238,9 +238,13 @@ relocate it.
 
 - After committing and pushing, list every file that was created or modified,
   and for each show the number of entries added, updated, or removed.
-- Confirm the OKF state of `docs/ai/`: every concept file carries a
-  parseable frontmatter with non-empty `type`; `index.md` was
-  regenerated; `log.md` records this run (OKF-SPEC.md §11).
+- Confirm the OKF state of every file **this run created or modified**
+  (parseable frontmatter, non-empty `type`; `index.md` regenerated;
+  `log.md` records this run — OKF-SPEC.md §11). List any remaining
+  legacy files (no frontmatter) with a one-line note that they are
+  tolerated and migrate on their next touch. Never migrate untouched
+  files just to make the confirmation pass — that would be the
+  big-bang migration this skill forbids.
 - State the commit hash and that it was pushed.
 
 ## File Templates and Content Rules
