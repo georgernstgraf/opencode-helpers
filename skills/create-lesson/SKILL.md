@@ -34,6 +34,12 @@ nicht zu einer Kohorte und nicht zu einer fest geplanten Unterrichtseinheit:
   Unterrichtsordner in den jeweiligen **Kohortenordner** und fügt das **Datum
   manuell in den Ordnernamen** ein. Der Skill schreibt nie in Kohortenordner
   und führt keine Kohorten-Statistik.
+- **Keine Zuordnung, auch nicht im Bericht.** Der Skill ordnet eine Lesson
+  **nie** einer Kohorte zu — nicht im Ordnernamen, nicht in Kopf oder Text,
+  nicht im Abschlussbericht und nicht in den Wissensdateien
+  (`HANDOFF.md`, `STATE.md`, `HISTORY.md`). Formulierungen wie „noch keiner
+  Kohorte zugeordnet“ machen aus einer bewussten Eigenschaft eine offene
+  Aufgabe und sind zu vermeiden.
 
 Kanonische Referenz-Implementierung (zentrales `assets/`, Bootstrap/Badge,
 `<PREFIX>-<NN>-<slug>/`, Stil-Leitfaden):
@@ -210,9 +216,11 @@ Befund melden). **Kein Nachfragen** — Lücken autonom aus (a) Semesterplan,
 
 ## Bestellformat
 
-`KM/Teil-KM + Thema` — eine Ziel-UE oder Kohorte kann genannt werden, ist
-aber **optional** und wird nur als Kontext notiert (nicht in die Lesson
-gebacken). Beispiele:
+`KM/Teil-KM + Thema` — eine Ziel-UE oder Kohorte kann in der Bestellung
+genannt werden, ist aber **optional**. Sie ist reine Kontextinformation für
+die Lehrperson: Sie wird weder in die Lesson geschrieben noch als Zuordnung
+dokumentiert — nicht im Abschlussbericht, nicht in `HANDOFF.md`/`STATE.md`.
+Beispiele:
 
 - „KM3 Basis-Webtechniken, Thema: CSS-Basics"
 - „Wiederholung Verteilungen aus KM5, Thema: Hypergeometrische Verteilung"
@@ -459,8 +467,10 @@ Zwei Dinge reisen mit der Lesson, statt in einer Vorlage zu leben:
   enthält die fertige Zeile zum Kopieren — relativer Pfad zur `lesson.html`
   plus Kurztitel, z. B.
   `[KM7-02 Chi-Quadrat-Test](unterricht/KM7-02-chi-quadrat-test/lesson.html)`.
-  Die Lehrperson klebt sie ins Kohorten-README und ergänzt selbst, was
-  aufgegeben wird („als Hausübung: Beispiel 2"). Kein weiteres Template.
+  Die Kopierzeile ist ein **Angebot an die Lehrperson**: Der Skill trägt sie
+  nirgends ein und wertet sie nicht als Zuordnung. Die Lehrperson klebt sie ins
+  Kohorten-README und ergänzt selbst, was aufgegeben wird („als Hausübung:
+  Beispiel 2"). Kein weiteres Template.
 - **Lehrplan-Details in der Lesson:** Am Lesson-Ende (vor dem Footer) steht ein
   zugeklappter `<details>`/`<summary>`-Block **„Lehrplan & Einordnung"** mit
   Lehrplan-Pfad, KM-Bezug (KM + Thema, ggf. UE) und Runtime. Diese Angaben
