@@ -163,6 +163,14 @@ Do not "fix" the tests for this; export the identity variables for the run.
   `systemctl --user start opencode.service`. Erste Diagnose nach dem
   Bot-Restart, nicht nur `is-active` prüfen: `systemctl --user status` +
   `cat /proc/<pid>/cgroup`.
+- **Eine offene TUI gewinnt das Rennen um den Port (2026-11-11, think):**
+  Nach dem Kill des Orphans startete eine 1,5 Tage alte `opencode`-TUI (alte
+  Binary, z. B. 2.2.5) ihren eigenen `serve --service` **3 Sekunden vor**
+  `ExecStart` und hielt `:4096`; die Unit meldete `active`, ihr Daemon war
+  aber nie der Besitzer. Prüfgröße ist nicht `is-active`, sondern
+  `cat /proc/<pid-aus-api-info>/cgroup` → muss `app.slice/opencode.service`
+  enthalten. Konsequenz: alte TUIs auf Service-Hosts schließen (Sessions sind
+  persistent, `--continue` holt sie zurück), dann `restart`.
 - **`npx …@latest` beim Bot-Restart kann am eigenen Cache scheitern
   (2026-11-11, claw):** Beim Upgrade 0.26.6 → 0.27.0 startete der Prozess,
   während npx den Paketordner noch schrieb → `ENOENT … dist/app/services/

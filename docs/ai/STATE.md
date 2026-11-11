@@ -349,10 +349,10 @@ prepared-lessons umstellen.
 
 ## Pending
 
-- [ ] **think `opencode.service` failed + Orphan** (2026-11-11): Unit seit
-      2026-11-08 `failed (oom-kill, Peak 23,5 G)`, Host wird von einem
-      Terminal-Scope-Orphan auf `:4096` bedient. Fix braucht Rücksprache
-      (beendet laufende Sessions) — Details in `HANDOFF.md` Task 1.
+- [ ] **think TUI-Disziplin** (2026-11-11 bereinigt): Unit neu gestartet,
+      Orphan und alte TUI entfernt, jetzt 2.2.7 unter systemd auf `:4096`.
+      Offen bleibt die OOM-Ursache vom 2026-11-08 — Details in `HANDOFF.md`
+      Task 1.
 - [ ] P4 of the audit: Completion Criteria ("Done when …") + frontmatter
       description trigger branches across `skills/*` (plus #131)
 - [x] dell replication (2026-10-28): repo sync (`069c332` → `6f01376`),

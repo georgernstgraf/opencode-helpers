@@ -1,16 +1,12 @@
 Open tasks:
 
-1. [ ] **think: `opencode.service` gefailt + Orphan-Daemon (2026-11-11).** Die
-      Unit steht seit 2026-11-08 09:52 auf `failed (Result: oom-kill)`
-      (Peak 23,5 G / 12,6 G Swap), bedient wird der Host aber weiter von einem
-      Orphan `opencode serve --service` (PID 408868, PPID = systemd, aber
-      Cgroup `app-org.gnome.Terminal.slice/vte-spawn-…`) auf `127.0.0.1:4096`.
-      Symptom: Clients und `oc-tg-bot-home` laufen normal, nur
-      `systemctl --user is-active` meldet `failed`; nach Logout/Reboot ist der
-      Server weg. Fix (nur mit Rücksprache, beendet laufende Sessions):
-      Orphan killen → `systemctl --user start opencode.service` → `opencode api
-      get /api/info` + `cat /proc/<pid>/cgroup` prüfen. Ursache des OOM
-      (23,5 G Peak bei 30 G RAM, chrome im gleichen Scope) mitdenken.
+1. [ ] **think: TUI-Disziplin beobachten (2026-11-11 erledigt).** Der
+      Orphan-Daemon und die 1,5 Tage alte TUI (PID 614678, v2.2.5) sind weg;
+      `opencode.service` läuft auf 2.2.7 unter systemd (PPID = systemd --user,
+      Cgroup `app.slice/opencode.service`, `:4096`), Bot `active`. Offen ist
+      nur die Ursache des vorangegangenen `oom-kill` (Peak 23,5 G / 12,6 G
+      Swap bei 30 G RAM, brave + chrome im selben Scope) — bei erneutem
+      Ausfall Speicherdruck prüfen, nicht die Unit.
 
 2. [ ] Quiz-Begründungen gegenlesen (#94): Die Sub-Agents haben in PMM/WMC/
       INFI/SWP pro Antwortoption `data-grund`-Begründungen verfasst (teils
