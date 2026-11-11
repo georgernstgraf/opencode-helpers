@@ -22,8 +22,12 @@ HIDDEN_SKILLS = {
     "codebase-audit",
     "grill-me",
     "grill-with-docs",
+    "handoff",
+    "protokoll",
     "searxng",
     "teach",
+    "to-questionnaire",
+    "wait-what",
 }
 
 # The two search skills; exactly one of them may be advertised.
@@ -68,6 +72,28 @@ class SkillVisibilityTest(unittest.TestCase):
             [],
             "`slash: true` is ignored by OpenCode 2 - use "
             "metadata.opencode/autoinvoke: false instead: " + ", ".join(offenders),
+        )
+
+    def test_no_claude_era_inert_fields(self):
+        """`disable-model-invocation` / `argument-hint` are Claude fields.
+
+        OpenCode 2 ignores unknown frontmatter, so a skill carrying them is
+        advertised to the model although it was meant to be user-invoked.
+        """
+        offenders = sorted(
+            "{}:{}".format(skill.parent.name, field)
+            for skill in SKILLS.glob("*/SKILL.md")
+            for field in ("disable-model-invocation", "argument-hint")
+            if re.search(
+                r"^\s*" + field + r"\s*:", frontmatter(skill.parent), re.MULTILINE
+            )
+        )
+        self.assertEqual(
+            offenders,
+            [],
+            "Claude-era frontmatter is inert in OpenCode 2 - use "
+            "metadata.opencode/autoinvoke: false (and drop argument-hint): "
+            + ", ".join(offenders),
         )
 
     def test_exactly_one_advertised_search_skill(self):

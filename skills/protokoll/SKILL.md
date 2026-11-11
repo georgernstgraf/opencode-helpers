@@ -1,7 +1,7 @@
 ---
 name: protokoll
 description: Bereinigt ein Whisper-Meeting-Transkript in-place zu einem Protokoll (Extrakt + Verlauf).
-disable-model-invocation: true
+metadata: { "opencode/autoinvoke": false }
 ---
 
 Turn a raw Whisper meeting transcript into a **Protokoll**, edited in place: the **Extrakt** (decisions, action items, open points) up front, the **Verlauf** (topic-wise narrative) behind it. Output language follows the transcript's language — in practice German with proper UTF-8 umlauts.
