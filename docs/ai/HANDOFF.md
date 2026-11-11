@@ -20,32 +20,19 @@ Open tasks:
       Watch daily practice; tune the green-commit gate and auto-close
       criteria if commits land broken or issues close prematurely.
 
-4. [ ] writing-for-agents audit — **P4** (last phase): add Completion Criteria
-      ("Done when …") to each skill's instruction body and split the
-      frontmatter `description` into clear trigger branches.
-      Scope: ~20 skills under `skills/*/SKILL.md`.
-      Prior phases shipped: P1 (`c4cff84`), P2 SSOT (`dbc9bde`),
-      P3a progressive disclosure (`070961a`).
-      P3a established the sibling pattern (`[X.md](./X.md)`, guarded by
-      `tests/test_skill_links.py`) — P4 must keep resolving links and must
-      NOT re-duplicate moved reference material. Verify with
-      `python3 -m unittest discover -s tests -v`.
-      Nearby: #131 (Observed-Drift-Klausel in `knowledge-persistence`) ist
-      Skill-Text derselben Familie — im selben Zug erledigen.
-
-5. [ ] Credentials im SVN (infra) — canonical task lives in
+4. [ ] Credentials im SVN (infra) — canonical task lives in
       `~/svn/georg/docs/ai/HANDOFF.md` **Task 5**
       (consolidate → `svn:ignore` → history rewrite → rotation of all leaked
       secrets incl. infra private keys). This repo only contributed the SearXNG
       access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
       credential) — that part is done. Track the SVN/secret work over there.
 
-6. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
+5. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
       weiterhin `<klasse>/prepared-lessons/` und das alte Ablagemodell. Bei
       nächster Gelegenheit auf die #90-Regeln angleichen (KM-Anforderung,
       `unterricht/prepared-lessons/`, Beamer-Boxen) — erst nach Rücksprache.
 
-7. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
+6. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
       Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/` und ggf. `kompetenzmodule/`
       im Zweig-Ordner. Betroffen u. a. GRG-INFI (`unterricht/HWII-INFI/`,
       `infi-hwii/kompetenzmodule/`), GRG-WMC (`unterricht/WMC/` — dokumentierte
@@ -71,3 +58,14 @@ Last updated: 2026-11-11.
 - STT quality-first flottenweit: `whisper-large-v3` in `oc-tg-bot` +
   `oc-tg-bot-zazentimer` (claw), `oc-tg-bot-home` (think), `oc-tg-bot-dell`
   (dell) — Bots neu gestartet; gregor war schon korrekt (#46).
+- writing-for-agents-Audit abgeschlossen: P4 (`568215c`, #133) ergänzt
+  `## Done when` + Trigger-Branches in 17 Skills, und #131 (`b32d0f2`) bringt
+  die Observed-Drift-Klausel in `knowledge-persistence` + `AGENTS.global.md`.
+  Dabei `codebase-audit` gequotet — sein `description` war ungültiges YAML
+  (unquoted `": "`), was kein Test prüfte; der YAML-Sweep der Batch-Specs
+  hat es aufgedeckt.
+- Offen aus P4 (nicht im Scope, eigener Entscheid nötig): `handoff` und
+  `wait-what` tragen Claude-Ära-Felder (`disable-model-invocation`,
+  `argument-hint`), die opencode ignoriert — Umstellung auf
+  `metadata.opencode/autoinvoke: false` + Aufnahme in `HIDDEN_SKILLS` wäre
+  eine Sichtbarkeits-Änderung.

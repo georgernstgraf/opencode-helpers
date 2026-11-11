@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-11-02.
+Current status as of 2026-11-11.
 
 ## Current Focus
 **create-lesson Quiz-Format 2.0 (#122, 2026-11-02):** Der Skill verlangt
@@ -180,6 +180,18 @@ Doppelstunden-Umfang, KM-Vollständigkeit und Beamer-taugliche Code-Boxen.
 Erste Anwendung: GRG-WMC auf zentrales `assets/` + selbst-geführte
 prepared-lessons umstellen.
 
+- [x] 2026-11-11 — writing-for-agents-Audit abgeschlossen: P4 (`568215c`,
+      #133) ergänzt `## Done when` (4–8 verifizierbare Punkte) und
+      Trigger-Branches in 17 Skills (issue-workflow, full-sync, orchestration,
+      handoff, sync-upstream-skills, create-lesson, lehrplan, homework,
+      knowledge-exam, repograde, projectgrade, knowledge-assessment,
+      knowledge-persistence, deepseek-search, writing-for-agents, wait-what,
+      fork-policy); #131 (`b32d0f2`) bringt „2b. Observed Drift" in
+      `knowledge-persistence` plus die Pflicht-Ebene in `AGENTS.global.md`.
+      Außer Scope: 6 transplantierte Skills, `grading-shared`/`searxng`.
+      Nebenbefund: `codebase-audit` hatte ungültiges YAML im `description`
+      (unquoted `": "`) — gequotet, YAML-Sweep jetzt für alle 28 Skills grün.
+
 ## Completed (this cycle)
 
 - [x] 2026-11-11 — Flotten-Nachzug (#116, #111, #46, #110, #115, #114):
@@ -353,8 +365,6 @@ prepared-lessons umstellen.
       Orphan und alte TUI entfernt, jetzt 2.2.7 unter systemd auf `:4096`.
       Offen bleibt die OOM-Ursache vom 2026-11-08 — Details in `HANDOFF.md`
       Task 1.
-- [ ] P4 of the audit: Completion Criteria ("Done when …") + frontmatter
-      description trigger branches across `skills/*` (plus #131)
 - [x] dell replication (2026-10-28): repo sync (`069c332` → `6f01376`),
       `~/.config/opencode/{agents,skills,commands}`-Symlinks auf den Clone
       vorhanden, Such-Overlay auf `mcp.deepseek` (DeepSeek primär, privates
@@ -366,9 +376,10 @@ None
 
 ## Next Session Suggestion
 
-Start with P4: for each skill, add a short "Done when" completion criterion and
-split the frontmatter `description` into clear trigger branches, without
-re-introducing moved reference material. Keep the link guard green
-(`python3 -m unittest discover -s tests -v`). `codebase-audit` (#107) already
-ships a `Done when` block and trigger-branch description — use it as the
-reference pattern.
+Die Skill-Audit-Kette ist abgeschlossen (P1–P4 + Observed Drift). Als Nächstes
+bietet sich der redaktionelle Rest an: die Quiz-Begründungen aus #94 stichproben-
+artig gegenlesen (Struktur ist verifiziert, Inhalt nicht), oder — als
+Entscheidungsfrage — die Claude-Ära-Felder in `handoff`/`wait-what`
+(`disable-model-invocation`) auf `metadata.opencode/autoinvoke: false`
+umstellen, was eine Sichtbarkeits-Änderung ist und in `tests/test_skill_frontmatter.py`
+(`HIDDEN_SKILLS`) mitgezogen werden muss.
