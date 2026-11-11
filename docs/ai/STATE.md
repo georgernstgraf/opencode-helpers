@@ -191,6 +191,11 @@ prepared-lessons umstellen.
       Außer Scope: 6 transplantierte Skills, `grading-shared`/`searxng`.
       Nebenbefund: `codebase-audit` hatte ungültiges YAML im `description`
       (unquoted `": "`) — gequotet, YAML-Sweep jetzt für alle 28 Skills grün.
+- [x] 2026-11-11 — Claude-Ära-Frontmatter repariert (`47fd1f9`):
+      `disable-model-invocation` in `handoff`, `wait-what`, `protokoll` und
+      `to-questionnaire` auf `metadata.opencode/autoinvoke: false` umgestellt,
+      `argument-hint` entfernt, `HIDDEN_SKILLS` erweitert; neuer Guard
+      `test_no_claude_era_inert_fields` (Suite 125).
 
 ## Completed (this cycle)
 
@@ -361,10 +366,6 @@ prepared-lessons umstellen.
 
 ## Pending
 
-- [ ] **think TUI-Disziplin** (2026-11-11 bereinigt): Unit neu gestartet,
-      Orphan und alte TUI entfernt, jetzt 2.2.7 unter systemd auf `:4096`.
-      Offen bleibt die OOM-Ursache vom 2026-11-08 — Details in `HANDOFF.md`
-      Task 1.
 - [x] dell replication (2026-10-28): repo sync (`069c332` → `6f01376`),
       `~/.config/opencode/{agents,skills,commands}`-Symlinks auf den Clone
       vorhanden, Such-Overlay auf `mcp.deepseek` (DeepSeek primär, privates
@@ -376,10 +377,8 @@ None
 
 ## Next Session Suggestion
 
-Die Skill-Audit-Kette ist abgeschlossen (P1–P4 + Observed Drift). Als Nächstes
-bietet sich der redaktionelle Rest an: die Quiz-Begründungen aus #94 stichproben-
-artig gegenlesen (Struktur ist verifiziert, Inhalt nicht), oder — als
-Entscheidungsfrage — die Claude-Ära-Felder in `handoff`/`wait-what`
-(`disable-model-invocation`) auf `metadata.opencode/autoinvoke: false`
-umstellen, was eine Sichtbarkeits-Änderung ist und in `tests/test_skill_frontmatter.py`
-(`HIDDEN_SKILLS`) mitgezogen werden muss.
+Offen ist nur noch der redaktionelle Rest aus #94: die `data-grund`-Begründungen
+in PMM/WMC/INFI/SWP inhaltlich gegenlesen (Struktur ist verifiziert: 122
+Fragen/427 Optionen, richtige Option „Richtig"). Sonst ist der Stand grün —
+Skill-Audit P1–P4 abgeschlossen, Observed-Drift-Klausel aktiv, Claude-Ära-
+Frontmatter beseitigt, Flotte nachgezogen.
