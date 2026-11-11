@@ -1,6 +1,13 @@
 ---
 name: homework
-description: Generate per-lesson assignment files (Aufgabe.md) from recent class Git history and teaching material, and keep the canonical assignment list in the cohort README current
+description: Generate per-lesson assignment files (Aufgabe.md) from recent class
+  Git history and teaching material, and keep the canonical assignment list in
+  the cohort README current. Use when the user says "generate homework",
+  "Aufgabe generieren", "Aufgabe anlegen", "Aufgabenliste nachziehen",
+  "retrofit the assignment list" or "create the Aufgabe for today's lesson",
+  at the end of a lesson, or when the canonical assignment list in a cohort
+  README is behind. Do not use for grading submissions (repograde) or for
+  writing exams (knowledge-exam).
 license: MIT
 compatibility: opencode
 metadata:
@@ -234,6 +241,22 @@ user.
 - Group commits from the same teaching session into one assignment entry.
 - Do not fabricate dates, details, or exercises not supported by the source
   material.
+
+## Done when
+
+- [ ] The target lesson directory `<YYYY-MM-DD>_<topic>` is identified (from
+      recent Git activity, or by asking when several candidates match), and all
+      its sources are read.
+- [ ] The plan is shown to the user before writing: lesson directory, sources
+      read, deduced topics, target `Aufgabe.md` path.
+- [ ] `Aufgabe.md` exists in that directory with 2-4 exercises in German; an
+      existing `Aufgabe.md` or legacy `Hausübung.md` was read and enriched, not
+      overwritten or renamed.
+- [ ] The cohort README carries an `## Aufgaben` entry for this lesson, at the
+      top, newest first, as an index link — no task text copied into it.
+- [ ] The confirmation names the file path, the number of exercises added or
+      changed, and whether the list entry was added or already existed.
+- [ ] Nothing was committed, and no `Hausübungen.md` was created or referenced.
 
 ## Output Expectations
 

@@ -1,6 +1,12 @@
 ---
 name: orchestration
-description: Coordinate large work as a pure orchestrator: decompose into sub-issues and delegate implementation to sub-agents behind a hard verification gate. Use when the work spans more than one session, needs more than one sub-issue, or touches multiple dependent files/concerns; do not use it for a single focused change.
+description: >-
+  Coordinate large work as a pure orchestrator: decompose into sub-issues and
+  delegate implementation to sub-agents behind a hard verification gate. Use
+  when the work spans more than one session, needs more than one sub-issue,
+  touches multiple dependent files or concerns, or the user says "orchestrate
+  this", "split this into sub-issues", "delegate this" or "coordinate the work".
+  Do not use for a single focused change — delegation costs more than the change.
 license: MIT
 ---
 
@@ -89,3 +95,18 @@ sub-issues touch disjoint file sets. Delegation is a three-phase routine:
 - Never create empty commits.
 - Escalate to the user when a blocker is fundamental (a design decision is
   needed, or a dependency is missing).
+
+## Done when
+
+- [ ] The work is decomposed into sub-issues, each with a real issue number.
+- [ ] Every target repo was pulled (`git pull --ff-only` / `svn up`) and the
+      discovery scan re-ran at dispatch time.
+- [ ] Every delegation brief carried the mandatory components (Step 0 pull,
+      self-discovery, atomic finish, process cleanup, report shape).
+- [ ] No sub-issue counted as done without its full test suite green; red
+      reports were re-delegated with the failure details.
+- [ ] The post-flight sweep ran in every touched repo (`git status -sb`,
+      `git log origin/main..HEAD`) and stray processes were killed.
+- [ ] An independent aggregate verification passed against the pushed state.
+- [ ] The parent issue was closed only after the diff review and with no open
+      sub-issues.

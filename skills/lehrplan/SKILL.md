@@ -1,6 +1,18 @@
 ---
 name: lehrplan
-description: "Richtet österreichische HTL-Unterrichts-Repositorien ein und pflegt sie — drei Kernaufgaben: das gesetzliche Lehrplan-Material eines Ausbildungszweigs (z. B. WII, WIT, KIF) aus dem RIS beschaffen inklusive jährlichem Novellen-Check, den Lehrplan eines konkreten Gegenstands aus dem Gesetz extrahieren (mit Erläuterung pro Lernziel: was der Inhalt tatsächlich IST, plus praktische Anwendungen), und Semesterpläne interaktiv entwerfen. Aufrufen, wenn der Nutzer 'Lehrplan', 'Unterrichtsvorbereitung prüfen', 'Lehrplan auf Novellen prüfen', 'RIS sync', 'Lehrplan extrahieren', 'Jahrespläne neu ziehen', 'Semesterplan erstellen/überarbeiten', 'Erläuterungen ergänzen', 'Gesetzesmaterial holen' sagt oder in einem Repo arbeitet, das der lehrplan/-Konvention folgt."
+description: "Richtet österreichische HTL-Unterrichts-Repositorien ein und pflegt
+  sie — drei Kernaufgaben: das gesetzliche Lehrplan-Material eines
+  Ausbildungszweigs (z. B. WII, WIT, KIF) aus dem RIS beschaffen inklusive
+  jährlichem Novellen-Check, den Lehrplan eines konkreten Gegenstands aus dem
+  Gesetz extrahieren (mit Erläuterung pro Lernziel: was der Inhalt tatsächlich
+  IST, plus praktische Anwendungen), und Semesterpläne interaktiv entwerfen.
+  Use when der Nutzer 'Lehrplan', 'Unterrichtsvorbereitung prüfen', 'Lehrplan
+  auf Novellen prüfen', 'RIS sync', 'Gesetzesmaterial holen', 'Lehrplan
+  extrahieren', 'Jahrespläne neu ziehen', 'Erläuterungen ergänzen',
+  'Semesterplan erstellen/überarbeiten' oder 'Einheiten erstellen' sagt, oder
+  wenn in einem Repo gearbeitet wird, das der lehrplan/-Konvention folgt.
+  Do not use for Prepared Lessons (create-lesson), Aufgaben im Kohortenordner
+  (homework) oder Wissensüberprüfungen (knowledge-exam)."
 license: MIT
 compatibility: opencode
 metadata:
@@ -606,6 +618,30 @@ generische RIS-Muster dort ergänzen.
 - **Keine Auto-Migration.** Alt-Layouts werden gemeldet (Befund mit
   Migrationsvorschlag); verschoben/umbenannt wird nur nach
   ausdrücklicher Nutzer-Bestätigung.
+
+## Done when
+
+- [ ] Aufgabe A hat berichtet: Gegenstand, Ausbildungszweig(e), Rechtsgrundlage
+      (BGBl. + Anlage), RIS-Verweise und Klassen — alles aus den Repo-Docs
+      gelesen, nichts erfunden.
+- [ ] Der Konformitäts-Check ist Punkt für Punkt durchgeführt und mit genau
+      einem der drei Sätze abgeschlossen („muss noch ausgeführt werden" /
+      „ist vollständig ausgeführt" / „Repo noch nicht lehrplan-aktiviert").
+- [ ] Aufgabe 1 (falls beauftragt): der Novellen-Check stützt sich auf die
+      NOR-Kopf-Zeile der Anlage samt Abfragedatum; eine neue Novelle wurde
+      **vor** dem Download berichtet und danach unter `lehrplan/RIS/` abgelegt
+      und in `METADATA.md` eingetragen.
+- [ ] Aufgabe 2 (falls beauftragt): `LEHRPLAN.md` und jeder Klassen-Extrakt
+      tragen die Erläuterungs-Ebene (KM-Überblick, Lernziel- und
+      Lehrstoff-Erläuterungen); bestehende Annotationen sind erhalten oder als
+      zu prüfen markiert.
+- [ ] Aufgabe 3 (falls beauftragt): der UE-Raster-Entwurf wurde im
+      Nutzer-Review bestätigt, **erst dann** stehen `jg<N>-einheiten.md` bzw.
+      `jg<N>-semesterplan-{ws,ss}.md` in `lehrplan/<zweig-ordner>/`.
+- [ ] Alle Ausgaben sind deutsch mit echten UTF-8-Umlauten; kein Gesetzestext
+      und keine BGBl.-Referenz ist ohne gefetchte Quelle zitiert.
+- [ ] Alt-Layouts sind als Befund mit Migrationsvorschlag gemeldet, nichts ist
+      migriert, umbenannt oder committet.
 
 ## Randbedingungen
 

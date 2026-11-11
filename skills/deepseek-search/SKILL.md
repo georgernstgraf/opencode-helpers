@@ -1,6 +1,6 @@
 ---
 name: deepseek-search
-description: "Search the web via the DeepSeek Search API, falling back to a self-hosted SearXNG instance; on hosts without a DeepSeek key it runs SearXNG only (e.g. school hosts). Use when: user asks to search the web, find information, look something up, or wants current/latest sources."
+description: "Search the web via the DeepSeek Search API, falling back to a self-hosted SearXNG instance; on hosts without a DeepSeek key it runs SearXNG only (e.g. school hosts). Use when the user asks to search the web, find information, look something up, wants current/latest sources, needs news or fresh release dates, restricts a search to a site or a date range, or when only the deepseek_search tool is available. Do not use for fetching a single known URL."
 metadata: { "opencode/autoinvoke": true }
 ---
 
@@ -144,3 +144,16 @@ pass `time_range` — `week` or `month`. Because DeepSeek filters on publication
 date and not every page carries a date, a filtered DeepSeek search returns only
 dated pages; if the expected sources are undated, pass `after`/`before`
 explicitly or drop the filter and check the result dates.
+
+## Done when
+
+- [ ] A `deepseek_search` call carried the query plus the filters the question
+      needs — `time_range` for fast-moving topics, `site`/`after`/`before` where
+      the answer depends on them.
+- [ ] The answering provider is stated (`provider`, `fallback_used`), and a
+      fallback is explained by its `fallback_reason` rather than left silent.
+- [ ] `providers_unavailable` and `warnings` were read, and a shortened query or
+      a SearXNG-only feature routing was reported to the user.
+- [ ] Result `date`s were checked; when dated sources were expected but absent,
+      the filter was relaxed or `after`/`before` passed explicitly.
+- [ ] The answer names the sources it rests on: URL plus date.

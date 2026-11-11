@@ -1,6 +1,10 @@
 ---
 name: fork-policy
-description: Enforce clean-main branch policy on forked repositories
+description: Enforce clean-main branch policy on forked repositories. Use when
+  the repository has more than one remote, when starting or finishing issue work
+  in a fork, before any commit there, or when the user says "feature branch",
+  "never commit to main", "fork policy" or "clean main". Do not use for a
+  repository with a single remote, where trunk-based commits on main are correct.
 license: MIT
 compatibility: opencode
 metadata:
@@ -93,6 +97,17 @@ When both `fork-policy` and `issue-workflow` are active:
   policy is satisfied.
 - When finishing an issue, the agent must push the feature branch and create or
   update a pull request rather than merging to main directly.
+
+## Done when
+
+- [ ] Fork status was decided by remote count: `git remote | wc -l` greater
+      than 1 means the policy applies.
+- [ ] A feature branch named `feat|fix|chore/issue-N-<description>` existed
+      before implementation started, with an issue behind the number.
+- [ ] `git branch --show-current` was checked before every commit, and a commit
+      on `main`/`master` in a fork was aborted, not forced.
+- [ ] Finishing pushed the feature branch and opened or updated a pull request
+      instead of merging into main.
 
 ## Activation
 

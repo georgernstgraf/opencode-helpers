@@ -1,6 +1,6 @@
 ---
 name: repograde
-description: Grade student repositories with optional date filtering in single-repo or bulk mode
+description: Grade student repositories with optional date filtering in single-repo or bulk mode. Use when the user says "repograde", "grade the repos", "grade this repo since <date>", "bewerte die Abgaben", "korrigiere die Repos", or asks for a repo grading run over a class folder or a single student repository. Do not use for project grading with issues and PRs (use projectgrade) or for knowledge-check exams (use knowledge-assessment).
 license: MIT
 compatibility: opencode
 metadata:
@@ -557,3 +557,23 @@ replaces paragraph groups 3–6 (see `grading-shared` Email Body Format).
 - Use pure AI evaluation for all grading; never write grading scripts. The
   sub-agent fan-out in bulk mode handles parallelism — do not write batch
   processing scripts or evaluation programs.
+
+## Done when
+
+- [ ] Plan presented before any grading work: mode, date filter, assignments,
+  repositories, `-T` run folder (read-only Probelauf) and the Anrede source.
+- [ ] `anrede.txt` read via `read-anrede.sh`; a missing or invalid file stopped
+  the run before the first write.
+- [ ] Scoring table with Quality, Factor and Effective per Abgabe present in
+  every `*_grading.md` and every email body.
+- [ ] Single-repo mode: `<basename>_grading.md`, `<basename>_email.json` and
+  `<basename>_points.json` written in the `-T` run folder.
+- [ ] Bulk mode: per-repo files plus `GRADINGS.md`, shared `EMAIL.json` and
+  `noten.tsv` (dry-run table shown first, `--write` only after) generated once
+  the last subagent finished.
+- [ ] Date-filtered bulk mode additionally produced `CLASS.md` without student
+  names.
+- [ ] No-repository students (broken name-symlinks) graded 0/100 with the
+  Missing Repository Emphasis email, not skipped.
+- [ ] Student repositories read-only: no commit, no history change, no clone;
+  only the run folder committed and pushed in the `-T` repo.

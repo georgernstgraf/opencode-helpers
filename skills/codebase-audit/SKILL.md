@@ -1,6 +1,6 @@
 ---
 name: codebase-audit
-description: One-shot, interactive assessment of a whole codebase (a Git repository) across four axes: security (in depth), structure and clean layers, coupling and entanglement (Wartbarkeit), and architecture (deep modules). Fans out parallel sub-agents, lets the user steer scope and importance, then files one epic with formally linked sub-issues. Use when the user asks for a full repo audit, workflow health check, whole-project security review, maintainability assessment, or says "audit the codebase", "codebase audit", "assess this repo".
+description: "One-shot, interactive assessment of a whole codebase (a Git repository) across four axes: security (in depth), structure and clean layers, coupling and entanglement (Wartbarkeit), and architecture (deep modules). Fans out parallel sub-agents, lets the user steer scope and importance, then files one epic with formally linked sub-issues. Use when the user asks for a full repo audit, workflow health check, whole-project security review, maintainability assessment, or says \"audit the codebase\", \"codebase audit\", \"assess this repo\"."
 license: MIT
 compatibility: opencode
 metadata:

@@ -1,6 +1,11 @@
 ---
 name: issue-workflow
-description: Continuous issue awareness with proactive issue-linked commit and push; natural-language modes (start, commit, finish) remain as manual overrides
+description: Continuous issue awareness with proactive issue-linked commit and
+  push; natural-language modes (start, commit, finish) remain as manual
+  overrides. Use when a commit, push or closure is pending, when work starts or
+  resumes, or when the user says "issue start", "neues issue", "issue commit",
+  "checkpoint", "finish issue" or "issue fertig". Do not use in read-only
+  grading skills or on student repositories.
 license: MIT
 compatibility: opencode
 metadata:
@@ -384,3 +389,20 @@ At the end of the workflow, report:
   it was pushed)
 - the issue number and its final state: when the issue was closed, state this
   explicitly (e.g. "Issue #123 closed"); otherwise note that it remains open
+
+## Done when
+
+- [ ] The current issue is resolved via the Duplicate Check and announced by
+      number.
+- [ ] Every newly created issue carries the duplicate-check trace line, or a
+      reuse comment was posted on the existing issue.
+- [ ] Every commit references a real issue number and passed the affected area's
+      tests/lint first.
+- [ ] Each completed unit is pushed to the trunk line, or a read-only scope
+      exclusion is named in the report.
+- [ ] In `commit`/`finish` mode, knowledge persistence ran and its own commit was
+      pushed.
+- [ ] A parent issue was closed only after its sub-issues were listed and all
+      found closed.
+- [ ] The final report names the issue number, its state, the duplicate-check
+      result, and the commit messages used.

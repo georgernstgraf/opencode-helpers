@@ -1,6 +1,6 @@
 ---
 name: sync-upstream-skills
-description: Re-transplant owned skills from their mattpocock upstream after a git pull, applying upstream content changes while preserving opencode-native frontmatter. Also checks for duplicate skill names and dangling cross-skill references. Use when the user says "sync skills", "refresh from upstream", "pull matt's skills", or wants to bring the owned transplanted skills up to date.
+description: Re-transplant owned skills from their mattpocock upstream after a git pull, applying upstream content changes while preserving opencode-native frontmatter. Also checks for duplicate skill names and dangling cross-skill references. Use when the user says "sync skills", "refresh from upstream", "pull matt's skills", "sync upstream", "update the transplanted skills", or wants to bring the owned transplanted skills up to date. Do not use to add or rename a transplanted skill — that stays manual.
 license: MIT
 ---
 
@@ -59,6 +59,21 @@ Summarize: which skills changed, which sibling files changed, any dup-name or da
 - It does **not** add a live `~/.opencode/skills` source or a `skills` array pointing at matt's repo. The single-source rule stands: this repo is the only global source, matt's repo is pull-only.
 - It does **not** transplanted-skills sync rename or namespace skills. If you want to rename a transplanted skill, edit the directory + frontmatter `name` together and remove the entry from mapping.json (or point it at a new upstream) manually.
 - It does **not** add new transplanted skills. To add one, create the directory, copy `SKILL.md` + siblings, write opencode-native frontmatter, and add an entry to mapping.json by hand.
+
+## Done when
+
+- [ ] The upstream was pulled and its state reported — or "already up to date"
+      ended the run.
+- [ ] Every entry in `mapping.json` was compared body-only and merged with the
+      owned frontmatter preserved.
+- [ ] Added, changed and removed sibling files were copied or deleted.
+- [ ] The dup-name check scanned every `skills/*/SKILL.md` and reported duplicate
+      `name` values and directory/name mismatches.
+- [ ] The `/skill-name` dangling-reference check ran.
+- [ ] The summary names the changed skills, the changed siblings, and any
+      dup-name or dangling-reference issues, and the user was asked to review and
+      commit.
+- [ ] `tests/test_skill_frontmatter.py` passes.
 
 ## Frontmatter translation table
 

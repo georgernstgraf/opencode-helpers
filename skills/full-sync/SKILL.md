@@ -1,6 +1,14 @@
 ---
 name: full-sync
-description: "Full sync routine: pull all working repositories, let the agent decide what uncommitted work to commit and what to push, then bring the host up to date — apt update/upgrade, restart of opencode.service and the OpenCode Telegram bots (they upgrade themselves on restart), and a reboot when one is pending. Use when the user says 'full sync', 'Voll-Sync', 'repo sync', 'morning sync', 'Morgen-Sync', 'Tagesstart', 'sync everything', 'pull all repos', 'commit and push everything', or wants the daily sync routine."
+description: >-
+  Full sync routine: pull all working repositories, let the agent decide what
+  uncommitted work to commit and what to push, then bring the host up to date —
+  apt update/upgrade, restart of opencode.service and the OpenCode Telegram bots
+  (they upgrade themselves on restart), and a reboot when one is pending. Use
+  when the user says "full sync", "Voll-Sync", "repo sync", "morning sync",
+  "Morgen-Sync", "sync everything", "Tagesstart", "pull all repos" or "commit
+  and push everything", or wants the daily sync routine. Do not use for a single
+  repository — a plain `git pull` is enough there.
 license: MIT
 compatibility: opencode
 metadata:
@@ -263,6 +271,21 @@ restart takes an unsent report with it; the log path is the fallback.
 
 Name the log path so the user can read the raw report afterwards, and state
 what the host steps did (packages, services, reboot).
+
+## Done when
+
+- [ ] Phase A ran and every repository's `pull`/`behind` state was read.
+- [ ] Every dirty repository was either committed or named in the report with
+      its reason; no secrets match and no `max_review_files` overflow was staged.
+- [ ] No commit snapshotted a repository another agent was still writing.
+- [ ] Every committed repository ended at `behind=0`, or its leftover state is
+      in the report.
+- [ ] Pushes satisfied all five Phase C conditions; forks stayed on their
+      branches.
+- [ ] The report table plus the "left alone" section were composed before the
+      `--host-steps` invocation.
+- [ ] `--host-steps` ran last, and the report states its outcome (packages,
+      services, reboot) and the log path.
 
 ## Self-test
 

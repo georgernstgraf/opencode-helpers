@@ -1,6 +1,12 @@
 ---
 name: knowledge-exam
-description: Generate German knowledge-check exams and solution files from the taught material (class Git history + WebUntis Lehrstoff)
+description: Generate German knowledge-check exams and solution files from the
+  taught material (class Git history + WebUntis Lehrstoff). Use when the user
+  says "Wissensüberprüfung erstellen", "Knowledge-Check generieren", "Prüfung
+  schreiben", "create the knowledge check", "generate a mini-exam" or "make the
+  exam for class X", or asks for exam questions plus solutions from what was
+  actually taught. Do not use for grading submissions (knowledge-assessment) or
+  for assignments in the class folder (homework).
 license: MIT
 compatibility: opencode
 metadata:
@@ -228,6 +234,25 @@ im `-T`-Repo).
 - UTF-8 is explicitly allowed and preferred in generated Markdown files.
 - Do not replace German umlauts with transliterations such as `ae`, `oe`, or
   `ue` unless the surrounding source material explicitly requires that form.
+
+## Done when
+
+- [ ] The `-T` repo is located and fetched, its `AGENTS.md` is read, and the
+      Anrede comes from `anrede.txt` — or the run stopped with a German report
+      before anything was written.
+- [ ] `exam-date` is resolved to `<isodate>`, and `mc-count` / `free-count` are
+      either supplied by the user or explicitly confirmed.
+- [ ] The scope is fenced by the cohort's WebUntis Lehrstoff; terms with no
+      Lehrstoff ("offen") are reported.
+- [ ] `knowledge_<class>_<isodate>.md` and
+      `knowledge_<class>_<isodate>_solutions.md` exist in the cohort folder of
+      the `-T` repo, with the required question counts and scoring (MC = 4 P,
+      free-form = 15 P with matching totals).
+- [ ] The Quality Gate ran and passed: no rater pattern, exam↔solutions
+      consistent, no duplicate fact, Du/Sie consistent, real umlauts.
+- [ ] Both files are committed and pushed in the `-T` repo only, German commit
+      message with the issue number; nothing was written to the public teaching
+      repo.
 
 ## Output Expectations
 

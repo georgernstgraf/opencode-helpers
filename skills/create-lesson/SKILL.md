@@ -1,6 +1,19 @@
 ---
 name: create-lesson
-description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine kohortenagnostische Lesson her (self-contained HTML: Lektion und Präsentation in einem — Erklärung, Lernquizzes, drei Aufgaben, beamer-tauglich) und legt sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode, Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich, aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte. Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit ausarbeiten', 'Wiederholungs-Lektion', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den Unterricht gebraucht wird."
+description: "Richtet zu einem Kompetenzmodul (KM) oder einem Thema daraus eine
+  kohortenagnostische Lesson her (self-contained HTML: Lektion und Präsentation
+  in einem — Erklärung, Lernquizzes, drei Aufgaben, beamer-tauglich) und legt
+  sie als Prepared Lesson in unterricht/<PREFIX>-<NN>-<slug>/ ab (und verlinkt
+  sie im Lernplattform-Navigator index.html) — ohne lauffähigen Projektcode,
+  Beispielprojekte liegen in der Beispielprojekt-Ablage des Repos. Eine
+  Zuordnung zu einer geplanten Unterrichtseinheit im Semesterplan ist möglich,
+  aber optional — die Lesson gehört zum Thema und KM, nicht zu einer Kohorte.
+  Use when the user says 'Lektion bauen/erstellen', 'Unterrichtseinheit
+  ausarbeiten', 'Wiederholungs-Lektion', 'eine Lektion für den Unterricht
+  bauen', 'on demand eine Lektion einstreuen' oder eine Lesson-HTML für den
+  Unterricht gebraucht wird. Do not use for Selbstlern-Pfade (teach),
+  Semesterpläne (lehrplan) oder das Nachtragen von Aufgaben im Kohortenordner
+  (homework)."
 license: MIT
 compatibility: opencode
 ---
@@ -544,6 +557,30 @@ Zwei Dinge reisen mit der Lesson, statt in einer Vorlage zu leben:
 - Im Abschlussbericht: **Kopierzeile** (Pfad + Kurztitel) für das
   Kohorten-README.
 - Commit-Message nach Repo-Konvention (mit Issue-Nummer, falls verlangt).
+
+## Done when
+
+- [ ] `unterricht/<PREFIX>-<NN>-<slug>/` enthält `lesson.html` und
+      `aufgabe.md` — sonst nichts (kein lauffähiger Projektcode, kein
+      Hilfsordner, kein separates `praesentation.html`).
+- [ ] Die Verifikationsliste (14 Punkte) ist durchgegangen: jeder Code-Block
+      läuft wie abgedruckt, alle relativen Links lösen auf, kein CDN.
+- [ ] Die Lesson trägt eine Doppelstunde: Stoff für ~90 min, Quizze nach jedem
+      Stoffabschnitt, Beamer-Check bestanden (keine dunklen Code-Boxen, ein
+      Gedanke pro Block).
+- [ ] `aufgabe.md` enthält `Beispiel 1:`–`Beispiel 3:` mit je mindestens zwei
+      Teilaufgaben; die Lesson endet mit dem Abschnitt „Aufgabe" und dem
+      `<details>`-Block „Lehrplan & Einordnung".
+- [ ] Das Quiz ist **klickbar** geprüft (Überprüfen → Färbung + Infokugeln →
+      „Nochmal versuchen") und läuft lokal, im VS-Code-Browser und unter der
+      Pages-Basis.
+- [ ] Die Lesson ist im Root-`index.html` verlinkt (Titel + Ein-Zeiler) und
+      neue Fachbegriffe stehen im Root-`GLOSSAR.md`.
+- [ ] Der Abschlussbericht enthält die Kopierzeile für das Kohorten-README —
+      und nirgends (Lesson, Bericht, `HANDOFF.md`/`STATE.md`) eine
+      Kohorten- oder UE-Zuordnung.
+- [ ] Lesson, `index.html`-Eintrag und Glossar-Ergänzung liegen im selben
+      Commit.
 
 ## Was dieser Skill NICHT tut
 

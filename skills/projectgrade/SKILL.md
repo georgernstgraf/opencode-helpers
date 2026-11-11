@@ -1,6 +1,6 @@
 ---
 name: projectgrade
-description: Grade student project repositories based on Git commits, GitHub Issues, and Pull Requests
+description: Grade student project repositories based on Git commits, GitHub Issues, and Pull Requests. Use when the user says "projectgrade", "grade the project", "bewerte das Projekt", "Projektarbeit benoten", or asks for a holistic grading of a collaborative repository from inside it, based on commits, issues, reviews and PRs. Do not use for per-lesson assignments (use repograde) or for knowledge-check exams (use knowledge-assessment).
 license: MIT
 compatibility: opencode
 metadata:
@@ -408,3 +408,21 @@ Always use `grading-shared` for:
 - Offline coordination (Slack, verbal discussion, external research) cannot
   be detected. The grading report should acknowledge this limitation.
 - Use pure AI evaluation; never write scripts to automate project assessment.
+
+## Done when
+
+- [ ] Verified inside the project Git repository, `git pull` run and a clean
+  `git status`; any of these failing stopped the run.
+- [ ] `anrede.txt` read via `read-anrede.sh`; a missing or invalid file stopped
+  the run before any output was written.
+- [ ] Every contributor email extracted and matched in `uploadthing.db`;
+  unresolved names reported and the email payload held back.
+- [ ] Evidence collected for commits, deleted branches (merge history plus PR
+  API), issues, PR reviews and further contributions.
+- [ ] `<basename>_grading.md` written in German in the
+  [REPORT-FORMAT.md](./REPORT-FORMAT.md) structure, listing every contributor's
+  work.
+- [ ] `<basename>_email.json` written in German with one payload per graded
+  student, consistent with the report.
+- [ ] Repository left unmodified: no commit, no history change, no issue or PR
+  written.
