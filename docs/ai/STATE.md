@@ -196,6 +196,13 @@ prepared-lessons umstellen.
       `to-questionnaire` auf `metadata.opencode/autoinvoke: false` umgestellt,
       `argument-hint` entfernt, `HIDDEN_SKILLS` erweitert; neuer Guard
       `test_no_claude_era_inert_fields` (Suite 125).
+- [x] 2026-11-11 — Quiz-Begründungen inhaltlich gegengelesen (#94-Nachlauf):
+      53 Dateien/1784 Optionen in PMM/WMC/INFI/SWP, 55 Begründungen korrigiert,
+      21 kaputte `data-grund`-Attribute (ASCII-Quote) und eine fehlende
+      `data-richtig`-Markierung repariert; maschineller Vollcheck (Präfixe vs.
+      `data-richtig`/`data-loesung`) über alle vier Repos grün. Commits in den
+      Fach-Repos (`6c233ee`, `a1da493`, `5274752`, `5e3e274`), Reviews dort
+      geschlossen, Folge-Issue GRG-PMM#49 für Antwortschlüssel/Prosa-Reste.
 
 ## Completed (this cycle)
 
@@ -377,8 +384,9 @@ None
 
 ## Next Session Suggestion
 
-Offen ist nur noch der redaktionelle Rest aus #94: die `data-grund`-Begründungen
-in PMM/WMC/INFI/SWP inhaltlich gegenlesen (Struktur ist verifiziert: 122
-Fragen/427 Optionen, richtige Option „Richtig"). Sonst ist der Stand grün —
-Skill-Audit P1–P4 abgeschlossen, Observed-Drift-Klausel aktiv, Claude-Ära-
-Frontmatter beseitigt, Flotte nachgezogen.
+Der Skill-Audit (P1–P4 + Observed Drift) und der #94-Nachlauf sind abgeschlossen.
+Offen ist nur GRG-PMM#49 (Antwortschlüssel `KM7-03/q10`, drei Fragen ohne
+richtige Option, zwei Prosa-Widersprüche) — inhaltliche Entscheidungen am
+Lektionstext, kein Skill-Thema. Dazu die drei HANDOFF-Punkte ohne Termin:
+#92-Folge-Migration in den Fach-Repos, PMM-Ablagemodell angleichen, SVN-Task 5
+(Credentials/History-Rewrite).
