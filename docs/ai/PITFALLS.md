@@ -154,6 +154,23 @@ Do not "fix" the tests for this; export the identity variables for the run.
   auf Service-Hosts und nur via `systemctl --user restart opencode.service`
   upgraden. Orphan-Eckdiag: `cat /proc/$(pgrep -f "[o]pencode serve --service")/cgroup`
   muss `app.slice/opencode.service` enthalten.
+- **Ein gefailter Unit-Start ist nicht immer sichtbar (2026-11-11, think):**
+  `opencode.service` stand zwei Tage auf `failed (Result: oom-kill)` (23,5 G
+  Peak), während ein **Orphan** aus einem GNOME-Terminal-Scope
+  (`app-org.gnome.Terminal.slice/...`) auf `:4096` lauschte — Clients und Bot
+  waren zufrieden, `systemctl --user is-active` war die einzige rote Lampe.
+  Vor dem Neustart den Orphan beenden (sonst `address already in use`), dann
+  `systemctl --user start opencode.service`. Erste Diagnose nach dem
+  Bot-Restart, nicht nur `is-active` prüfen: `systemctl --user status` +
+  `cat /proc/<pid>/cgroup`.
+- **`npx …@latest` beim Bot-Restart kann am eigenen Cache scheitern
+  (2026-11-11, claw):** Beim Upgrade 0.26.6 → 0.27.0 startete der Prozess,
+  während npx den Paketordner noch schrieb → `ENOENT … dist/app/services/
+  attach-service.js`, Exit 1. Kein Defekt, sondern ein Race: Nach dem
+  Neustart ist die Datei da, der nächste Versuch läuft. Der Retry kommt wegen
+  `RestartSec=1min` erst eine Minute später (`activating (auto-restart)`) —
+  also nicht sofort „kaputt" rufen, sondern nach einem expliziten `restart`
+  erneut prüfen.
 - **WebUntis-„Stoff" ist Thema, nicht Hausübung (2026-11-01, #119).** Der
   Datumsordner einer Lesson kann am **Vorbereitungstag** entstehen (z. B.
   `5ahwit/2026-09-30-chi-quadrat-test/`, unterrichtet am 14.10.); umgekehrt

@@ -19,7 +19,7 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 
 | Agent | Purpose | Model |
 |-------|---------|-------|
-| `lehrplan-annotator` | Authors the Erläuterungs-Ebene (KM-Überblicke, Lernziel- und Lehrstoff-Erläuterungen as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria; law text stays untouched | `opencode-go/glm-5.3` (non-flash — explanation authoring needs the strongest language model) |
+| `lehrplan-annotator` | Authors the Erläuterungs-Ebene (KM-Überblicke, Lernziel- und Lehrstoff-Erläuterungen as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria; law text stays untouched | `cortecs/glm-5.3#high` (non-flash — explanation authoring needs the strongest language model) |
 
 ## Commands (`commands/`)
 
@@ -125,8 +125,10 @@ Long reference material lives in sibling files next to a skill's `SKILL.md`, lin
 Every host runs OpenCode V2 as a **user** systemd unit (templates:
 `dotfiles/systemd/user/`, install notes next to them):
 
-- `opencode.service` → `opencode serve --service` (`ExecStartPre` auto-upgrade,
-  `Restart=on-failure`, `UMask=0077`). The server binds **`127.0.0.1` only** and
+- `opencode.service` → `opencode service start` with `Type=oneshot` +
+  `RemainAfterExit=yes` (since OpenCode 2.2.0 `serve --service` forks and exits,
+  so a `Type=simple` unit dies with its cgroup — PITFALLS, #116), `ExecStartPre`
+  auto-upgrade, `ExecStop` → `opencode service stop`, `UMask=0077`. The server binds **`127.0.0.1` only** and
   is password-protected (HTTP Basic Auth, user `opencode`, password in
   `~/.config/opencode/service.json`; `opencode service get password`). Port:
   host-pinned via `opencode service set port` or the V2 default `49374`.
@@ -148,6 +150,7 @@ restart: `opencode upgrade` in `ExecStartPre`, `npx …@latest` for the bot).
 |------|--------|-----|-------|
 | gregor | `127.0.0.1:4096` (pinned) | `oc-tg-bot-gregor` | reference setup |
 | kik | `127.0.0.1:49374` (V2 default) | `oc-tg-bot-kik` (`@schurlix_kik_bot`) | installed 2026-10-17 (#111) |
+| dell | V2 default | `oc-tg-bot-dell` (`@schurlixclaw_bot`) | verified 2026-11-11: unit `Type=oneshot` active, `Linger=yes`, `STT_MODEL=whisper-large-v3`, `mcp.deepseek` overlay (#116) |
 
 ## SearXNG Egress
 

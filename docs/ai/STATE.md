@@ -182,6 +182,18 @@ prepared-lessons umstellen.
 
 ## Completed (this cycle)
 
+- [x] 2026-11-11 — Flotten-Nachzug (#116, #111, #46, #110, #115, #114):
+      dell per SSH von claw erreichbar (Pubkey dauerhaft in
+      `dell:~georg/.ssh/authorized_keys`, über think eingetragen); dell auf
+      `5627852` gezogen (die `lehrplan`-Fachgruppen-Variante war längst in
+      `main`), Unit `Type=oneshot`/2.2.6 aktiv, `Linger=yes`, Symlinks +
+      `mcp.deepseek`-Overlay geprüft. STT flottenweit auf `whisper-large-v3`
+      (claw beide Bots, think, dell — gregor war korrekt), Bots neu gestartet.
+      claw-Orphan-Befund aus 2026-10-17 erledigt (Unit läuft unter systemd).
+      `docs/ai/ARCHITECTURE.md` auf `opencode service start`/`cortecs`
+      korrigiert. Siehe PITFALLS: npx-Cache-Race beim Bot-Upgrade, gefailter
+      Unit-Start bei laufendem Orphan (think, offen)
+
 - [x] #120 2026-11-01 — Noten-TSV + Anrede-Gate: `emit-grade-tsv.py`
       (read-only Probelauf, `--write`), `read-anrede.sh` (Stopp bei fehlender/
       ungültiger `anrede.txt`), Punkte-Sidecars in `repograde`/
@@ -337,8 +349,12 @@ prepared-lessons umstellen.
 
 ## Pending
 
+- [ ] **think `opencode.service` failed + Orphan** (2026-11-11): Unit seit
+      2026-11-08 `failed (oom-kill, Peak 23,5 G)`, Host wird von einem
+      Terminal-Scope-Orphan auf `:4096` bedient. Fix braucht Rücksprache
+      (beendet laufende Sessions) — Details in `HANDOFF.md` Task 1.
 - [ ] P4 of the audit: Completion Criteria ("Done when …") + frontmatter
-      description trigger branches across `skills/*`
+      description trigger branches across `skills/*` (plus #131)
 - [x] dell replication (2026-10-28): repo sync (`069c332` → `6f01376`),
       `~/.config/opencode/{agents,skills,commands}`-Symlinks auf den Clone
       vorhanden, Such-Overlay auf `mcp.deepseek` (DeepSeek primär, privates
