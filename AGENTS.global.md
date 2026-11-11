@@ -41,6 +41,16 @@ workflows below.
 - SVN working copies: the analogue is frequent, clear `svn ci` with a
   descriptive German commit message.
 
+## Observed Drift
+
+When an observation in a session contradicts a statement in `docs/ai/` or
+`AGENTS.md` (a host's command output, a file that is not where the docs say,
+a documented command that returns nothing or something else), fix it or file
+a HANDOFF task **in the same session**. It never stays only in the chat or in
+agent-private memory. The `knowledge-persistence` skill describes the how
+(section "2b. Observed Drift"); a single observation is enough for a task,
+not necessarily for a replacement statement.
+
 ## Headless Agent Jobs
 
 - Any unattended opencode run (systemd timer, cron, CI, scripted

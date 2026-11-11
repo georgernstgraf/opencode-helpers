@@ -1,6 +1,11 @@
 ---
 name: knowledge-persistence
 description: Persist session context into the structured docs/ai knowledge files
+  (OKF bundle; committed and pushed at the end). Use when the user says
+  "remember", "merk dir das", "save context", "persist knowledge" or "update
+  knowledge file", at a session checkpoint, or when an observation in this
+  session contradicts docs/ai/ or AGENTS.md. Do not use for reading the
+  knowledge files at session start — that is plain bootstrapping.
 license: MIT
 compatibility: opencode
 metadata:
@@ -131,6 +136,34 @@ here): HISTORY.md (one file, never split, never pruned) and the
   changes that emerged during this session and are NOT yet in the file.
 - Ignore transient chatter, failed attempts that were fully superseded,
   and speculative discussion that did not lead to a conclusion.
+
+### 2b. Observed Drift
+
+Drift is any observation **during** the session that contradicts a
+statement in `docs/ai/` or `AGENTS.md`: a command output on a host, a file
+that is not where the docs say, a documented command that returns nothing
+or something else. Documented commands (in `AGENTS.md`, runbooks, skill
+instructions) count as statements — if they do not do what they promise,
+that is drift.
+
+- Drift is handled **in the same session**, never left in the chat or in
+  agent-private memory.
+- Two outcomes, and the evidence decides which:
+  - **Correct it** — the observation is conclusive, so the statement is
+    fixed under the prune protocol (3b) with a reason of the form
+    `observed YYYY-MM-DD on <host>: <evidence>`.
+  - **Open a HANDOFF task** — the observation is real but not conclusive.
+    The task names file, line and evidence. A single observation is enough
+    for a task, not always for a new statement: writing a replacement
+    guess would swap one wrong statement for another.
+- A file carrying an observed contradiction counts as "being updated"
+  for 3b, even when the session otherwise adds nothing new to it.
+- Section 6 extends to **stale commands**, not just the bootstrap block:
+  a documented command that fails or misreports is drift as well.
+- What is *not* drift, and not worth a task: a host that has evidently
+  moved on (different version, renamed unit) when the docs never claimed
+  that state, and transient failures (network, rate limits) that say
+  nothing about the documented behaviour.
 
 ### 3. Write Updates
 
@@ -375,6 +408,23 @@ the link.
   skip it and state that it was not available, instead of hand-waving
   conformance.
 - State the commit hash and that it was pushed.
+
+## Done when
+
+- [ ] `docs/ai/index.md` and every file the run touches were read; on a host
+      context, the host bundle and its topic files as well.
+- [ ] Every fact, decision and status change of the session was diffed against
+      the files; observed drift is either corrected or filed as a HANDOFF task.
+- [ ] Every touched file carries the OKF envelope with a bumped `generated.at`;
+      superseded entries were moved to HISTORY.md, not deleted.
+- [ ] HANDOFF.md holds only open tasks (or `No pending tasks. Last cleared:
+      …`), and STATE.md was overwritten, not appended.
+- [ ] One `log.md` entry was appended and every affected `index.md` (root,
+      `hosts/`, `topics/`, each host) was regenerated.
+- [ ] OKF conformance is confirmed — `okf-check` run, or its unavailability
+      stated instead of hand-waved.
+- [ ] The changes are committed with the active issue reference and pushed
+      (SVN: `svn ci`), or "nothing to persist" was reported.
 
 ## File Templates and Content Rules
 
