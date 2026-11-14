@@ -68,6 +68,14 @@ not necessarily for a replacement statement.
 
 ## Context Economy (Subagent Delegation)
 
+- **Measured, not theoretical (2026-11-13/14, `polished-recognition` epic
+  #158).** 4 sub-issues + review + docs wave = 7 commits, 10 sub-agents,
+  closed at **~12 % of the window**: one report in, one filtered
+  verification out per unit — never a diff, never a test log, never
+  inline debugging.
+- **Trigger.** More than one file, more than one verification cycle, or a
+  read whose value is a summary → load the `orchestration` skill, run it in
+  waves with a spec file per unit (`/tmp/opencode/specs/<issue>-<wave>.md`).
 - The main session's context is the scarcest resource. Delegate
   context-heavy, well-specified units to a fresh subagent instead of
   running them inline — large file reads, verbose verification, batch
@@ -87,6 +95,9 @@ not necessarily for a replacement statement.
 - The report navigates the verification gate, it never replaces it:
   spot-check claims before acting on them, and continue the
   subagent's session for detail instead of re-doing its work inline.
+- **A cached green is not a green.** Force test execution before a wave
+  counts: `BUILD SUCCESSFUL in 2s` over an `UP-TO-DATE` task verified
+  nothing.
 - Known-up-front work (N items, M done): prepare the shared spec and
   parameterized scripts once, centrally — then each item is one short
   prompt plus one short report.

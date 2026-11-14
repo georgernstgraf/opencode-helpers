@@ -17,6 +17,14 @@ dependencies — is coordinated, not implemented inline. The main agent plans,
 decomposes, delegates, and verifies; its context stays on the plan rather than
 on diffs and debugging.
 
+## Measured payoff
+
+`polished-recognition` epic #158 (2026-11-13/14): 4 sub-issues, an
+independent code review and a docs wave — 7 commits, 10 sub-agents,
+601→618 tests green, five issues closed — and the orchestrator ended at
+**~12 % of its context window**. Per unit: one report in, one filtered
+verification command out.
+
 ## When to coordinate vs. act directly
 
 - **Coordinate** (this skill): the work spans more than one session, needs more
@@ -42,7 +50,15 @@ on diffs and debugging.
 
 One sub-issue per sub-agent. Run sub-agents sequentially unless their
 sub-issues touch disjoint file sets. Delegation is a three-phase routine:
-**pre-flight → brief → post-flight** (template: [delegation-brief.md](./delegation-brief.md)).
+**pre-flight → brief → post-flight**.
+
+**Work-order medium.** A unit larger than one file gets a spec file at
+`/tmp/opencode/specs/<issue>-<wave>.md`, one per unit and wave, written by
+the orchestrator and referenced from the prompt. The spec
+([work-order.md](./work-order.md)) carries the facts the orchestrator
+already holds, so the sub-agent does not re-derive them and the prompt stays
+a pointer. A small unit still fits in a single prompt
+([delegation-brief.md](./delegation-brief.md)).
 
 **Pre-flight (orchestrator, immediately before dispatch):**
 - `git pull --ff-only` (SVN: `up`) in every target repo; resolve divergence
@@ -72,7 +88,13 @@ sub-issues touch disjoint file sets. Delegation is a three-phase routine:
   status.
 - Find and kill stray processes (`ps`) — sub-agent verification servers.
 - Run an independent aggregate verification **against the pushed state** —
-  a green verification against a stale tree is worthless.
+  a green verification against a stale tree is worthless. Read its output
+  **filtered** (`./gradlew test --console=plain | grep -E
+  'FAILED|BUILD|tests completed'`) and force execution first: a
+  `BUILD SUCCESSFUL in 2s` over an `UP-TO-DATE` task verified nothing
+  (epic #158).
+- **Spot-check one claim** from each report against the tree before acting
+  on it — that is what caught the cache hit.
 
 ## Pointers
 
