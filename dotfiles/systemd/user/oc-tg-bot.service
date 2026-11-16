@@ -29,7 +29,8 @@
 #       verschwundene Modell-ID oder ein leeres Guthaben faellt erst bei der
 #       ERSTEN Nachricht auf — der Bot startet trotzdem `active`. Nach jedem
 #       Wechsel einen echten Lauf pruefen (opencode run -m … "BOT-OK").
-#       npx-Bots nie parallel restarten (ENOTEMPTY im gemeinsamen _npx-Cache).
+#       npx-Bots nie parallel restarten (ENOTEMPTY im gemeinsamen _npx-Cache) —
+#       der ExecStartPre-flock serialisiert den Install (s. u.).
 #   STT_API_URL, STT_API_KEY, STT_MODEL=whisper-large-v3 (Groq, quality-first:
 #   non-turbo — Voice-Transkription, siehe DECISIONS.md 2026-10-17)
 #
@@ -45,6 +46,12 @@ Wants=network-online.target
 [Service]
 Environment=OPENCODE_TELEGRAM_HOME=%h/.config/oc-tg-bot-<HOST>
 Environment=PATH=<NODE_BIN_DIR>:/usr/bin:/bin
+# Install-Serialisierung (#134): zwei npx-Bots gleichzeitig (Boot, full-sync)
+# racen gegen denselben _npx-Cache → `npm error ENOTEMPTY`, danach fehlt dem
+# bin-Ziel das Exec-Bit (`Permission denied`, Restart-Loop). Der flock-Warm-up
+# hält nur den Install exklusiv; ExecStart findet das Paket fertig vor.
+# `-` = Warm-up darf scheitern, ExecStart installiert dann selbst (ungeschützt).
+ExecStartPre=-/usr/bin/flock -w 300 %h/.npm/.npx-install.lock <NODE_BIN_DIR>/npx -y @grinev/opencode-telegram-bot@latest --help
 ExecStart=<NODE_BIN_DIR>/npx -y @grinev/opencode-telegram-bot@latest
 Restart=always
 RestartSec=60

@@ -179,6 +179,17 @@ Do not "fix" the tests for this; export the identity variables for the run.
   `RestartSec=1min` erst eine Minute später (`activating (auto-restart)`) —
   also nicht sofort „kaputt" rufen, sondern nach einem expliziten `restart`
   erneut prüfen.
+- **Zwei `npx`-Bots gleichzeitig = zerstörter `_npx`-Cache (2026-11-16, claw,
+  #134):** Starten `oc-tg-bot.service` und `oc-tg-bot-zazentimer.service` beim
+  Boot gemeinsam, racen beide `npx -y …@latest` gegen **denselben** Cache. Bei
+  einem neuen Release kollidiert der Rename (`npm error ENOTEMPTY … rename
+  '@grinev/opencode-telegram-bot' -> '.opencode-telegram-bot-…'`), danach hat
+  `dist/cli.js` kein Exec-Bit mehr → `sh: 1: opencode-telegram: Permission
+  denied`, `Restart=always` dreht im Minutentakt (510 Restarts in 8 h). Der
+  Reinstall allein heilt es **nicht** — npm lässt den alten `.bin`-Symlink
+  stehen und chmoddet nicht; erst `rm -rf ~/.npm/_npx/<hash>` + Clean-Install
+  ergibt wieder `755`. Dauerhaft: `ExecStartPre` mit `flock` (Template
+  `dotfiles/systemd/user/oc-tg-bot.service`) serialisiert nur den Install.
 - **WebUntis-„Stoff" ist Thema, nicht Hausübung (2026-11-01, #119).** Der
   Datumsordner einer Lesson kann am **Vorbereitungstag** entstehen (z. B.
   `5ahwit/2026-09-30-chi-quadrat-test/`, unterrichtet am 14.10.); umgekehrt
