@@ -154,50 +154,123 @@ abzugrenzen. Minimal-Commits sind Stunden-Anker, keine vollständige Abdeckung.
 
 - Create `knowledge_<class>_<isodate>.md` inside the class folder.
 - Include exactly `mc-count` multiple-choice questions.
-- Each multiple-choice question must have exactly 4 answer options.
+- Each multiple-choice question must have exactly 4 answer options, formatted
+  as bracket lines (see "Answer-option format" below).
 - Each multiple-choice question is worth 4 points total.
 - Make the questions as unambiguous as possible, put enough context in.
 - Score multiple-choice questions per option: award 1 point for each option that
   is handled correctly, whether it was correctly checked or correctly left
   blank.
-- For every multiple-choice question, explicitly allow students to mark `-`
+- For every multiple-choice question, explicitly allow students to mark `[-]`
   and briefly explain why they consider the answer ambiguous or
   context-dependent.
 - Include exactly `free-count` free-form questions.
 - Each free-form question is worth 15 points.
 - Put a friendly "Gutes Gelingen" footer at the bottom.
 
+#### Answer-option format (CRITICAL — the exam must be answerable by editing)
+
+Every MC option is an **editable checkbox line**, not a lettered text block.
+The student answers by replacing the empty bracket; anything that interrupts
+that replacement is a defect:
+
+- Option line: `[ ] <Aussage>` — exactly `[ ]`, one space, then the statement.
+- **No letters** (`a)`, `b)`, `A)`, `1.`), **no bullets** (`-`, `*`), **no
+  Markdown task-list syntax** (`- [ ]`), **no indentation**.
+- **One statement = one physical line.** Never wrap a long statement: break
+  points ruin the replacement and the machine-readable answer. Long lines are
+  explicitly fine.
+- Exactly 4 such lines per MC question, contiguous (no blank lines between
+  them), directly under the question stem.
+- 1–3 of the 4 statements are true; vary the count from question to question.
+
+```markdown
+### 1. Polymarket: der Weg über die CDN
+
+Welche Aussagen über den Angriff auf Polymarket sind richtig?
+
+[ ] Die Angreifer übernahmen eine CDN und lieferten statt des erwarteten ein bösartiges Skript aus.
+[ ] Das Skript entzog Guthaben von Wallets, sobald eine Seite aufgerufen wurde.
+[ ] Das Skript wurde ungeprüft von einer fremden Quelle geladen, ohne fixierte Version.
+[ ] Der Einstiegspunkt lag im eigenen Git-Repository von Polymarket.
+```
+
+#### Mandatory "Hinweise" block (verbatim wording, adapted only for Du/Sie)
+
+The hint block must teach the bracket mechanic — without it the students
+answer with letters out of habit:
+
+```markdown
+- Bei jeder Aussage steht eine leere Klammer `[ ]`. Ersetze sie durch `[x]`,
+  wenn die Aussage zutrifft. Lass sie leer, wenn sie nicht zutrifft.
+- Hältst du eine Aussage für mehrdeutig, schreibe `[-]` und begründe das in
+  einem Satz unter der Frage.
+- Pro Frage können mehrere Aussagen zutreffen. Falsch angekreuzte Aussagen
+  kosten Punkte, korrekt leer gelassene bringen Punkte. Raten zahlt sich also
+  nicht aus.
+- Erlaubte Hilfsmittel: keine.
+```
+
+For `Sie`-classes, switch to the formal form (`Ersetzen Sie …`, `Halten Sie …`).
+
 ### 5. Generate Solution File
 
 - Create `knowledge_<class>_<isodate>_solutions.md` in the same folder.
 - Keep the student-facing exam and the solution file separate.
 - Do not include the solutions in the student-facing exam file.
-- Solution layout per MC question: which options are correct (z. B.
-  „Richtig: a ☑, b ☑, c ☐, d ☑") **plus** ein Satz Begründung je Option —
-  die Markierungen müssen mit den Erklärungen übereinstimmen (Abweichung
-  zwischen Header-Zeile und ✔/✘-Erklärungen war schon ein echter Fehler).
-- Solution layout per free-form question: Musterlösung + Wertungs-Skizze,
-  deren Teilschritte **exakt** auf die Frage-Punkte (Standard 15 P) summieren.
+- Solution layout per MC question — **same number and same title as in the
+  exam**, then only two things:
+  1. one header line `Richtig: ☑ ☑ ☐ ☑` with exactly 4 marks, in the order of
+     the exam's statements;
+  2. a numbered list `1.`–`4.` with **one short reason per position**, each
+     line starting with the same mark (`1. ☑ – …`).
+- The statements are **not** repeated in the solution file. The mapping
+  position → statement is purely ordinal, so header line and position list must
+  match exactly (same count, same order, same mark), and every reason must
+  paraphrase its statement closely enough to identify the position without
+  looking it up.
 - The solution file is teacher-facing: kein Schüler-Footer (Name/Datum-Felder,
   „Gutes Gelingen") am Ende.
+- Solution layout per free-form question: Musterlösung + Wertungs-Skizze,
+  deren Teilschritte **exakt** auf die Frage-Punkte (Standard 15 P) summieren.
+
+```markdown
+### 1. Polymarket: der Weg über die CDN
+
+Richtig: ☑ ☑ ☑ ☐
+
+1. ☑ – Die CDN lieferte statt des erwarteten ein bösartiges Skript aus.
+2. ☑ – Beim Aufruf der Seite wurden Guthaben aus den Wallets abgezogen.
+3. ☑ – Geladen wurde ungeprüft und ohne fixierte Version.
+4. ☐ – Der Einstieg lag gerade nicht im eigenen Git-Repository.
+```
 
 ### 6. Quality Gate (vor der Übergabe, Pflicht)
 
 Vor der Ablieferung beide Dateien systematisch prüfen — jedes dieser
 Kriterien ist in der Praxis schon verletzt worden:
 
-- **Rater-Sicherheit:** Option a) darf nicht (fast) immer die richtige sein.
-  Bei erkennbaren Mustern rotieren: wahre Option mit einer falschen Position
-  tauschen (Text wandert, Lösungsmarkierung wandert mit). Faustregel: blindes
-  Ankreuzen (z. B. „immer a+b+c") darf nicht mehr als ~70 % bringen.
-  Falsche Optionen über die Positionen a–d verteilen, nicht geballt auf d).
-  Die Anzahl korrekter Optionen je Frage mischen (nicht alle Fragen mit
-  „3 richtige").
+- **Format (vor allem anderen, maschinell):**
+  `[check-exam-format.sh](./scripts/check-exam-format.sh) <exam.md>`
+  muss ohne Fehler durchlaufen. Es erzwingt je MC-Frage genau vier Zeilen
+  `[ ] <Aussage>`, keine Buchstaben-Labels (`a)`, `b)`), keine
+  Aufzählungszeichen (`- [ ]`), keine eingerückten Fortsetzungszeilen und den
+  Hinweisblock mit `[x]`/`[-]`. Bei Verstoß die Frage neu schreiben, nicht den
+  Prüfer umgehen.
+- **Rater-Sicherheit:** Die erste Aussage einer Frage darf nicht (fast) immer
+  richtig sein. Bei erkennbaren Mustern rotieren: wahre Aussage mit einer
+  falschen Position tauschen (Text wandert, Lösungsmarkierung wandert mit).
+  Faustregel: blindes Ankreuzen (alles `[x]`, „immer die ersten drei") darf
+  nicht mehr als ~70 % bringen. Falsche Aussagen über die vier Positionen
+  verteilen, nicht geballt auf die letzte. Die Anzahl richtiger Aussagen je
+  Frage mischen (1–3), nicht alle Fragen mit „3 richtige".
 - **Wertung:** MC = 4 P; Summen der Freitext-Wertungs-Skizzen = Frage-Punkte;
   Gesamtpunkte in Header und Footer identisch.
-- **Konsistenz Exam↔Solutions:** Fragennummerierung, Titel, Reihenfolge und
-  Optionentexte deckungsgleich; Markierungen passend zur Option-Reihenfolge
-  (skriptbasiert prüfbar).
+- **Konsistenz Exam↔Solutions:** Fragennummerierung, Titel und Reihenfolge
+  deckungsgleich; Kopfzeile `Richtig: …` und Positionsliste stimmen in Anzahl,
+  Reihenfolge und Marke exakt überein (die Aussagen werden in der Lösung nicht
+  wiederholt — eine verschobene Position ist ohne Abzählen unsichtbar, also
+  Position für Position gegen die Angabe prüfen).
 - **Keine Duplikate:** derselbe Fakt (oder dieselbe Rechnung mit denselben
   Zahlen) nicht doppelt prüfen — weder MC↔MC noch MC↔Freitext.
 - **Sprache:** durchgehend Du/Sie laut Anrede-Gate (`anrede.txt`), echte Umlaute,
@@ -248,8 +321,12 @@ im `-T`-Repo).
       `knowledge_<class>_<isodate>_solutions.md` exist in the cohort folder of
       the `-T` repo, with the required question counts and scoring (MC = 4 P,
       free-form = 15 P with matching totals).
-- [ ] The Quality Gate ran and passed: no rater pattern, exam↔solutions
-      consistent, no duplicate fact, Du/Sie consistent, real umlauts.
+- [ ] The Quality Gate ran and passed: format linter green, no rater pattern,
+      exam↔solutions consistent, no duplicate fact, Du/Sie consistent, real
+      umlauts.
+- [ ] Format: every MC question has exactly four `[ ]`-statement lines (one
+      statement per physical line, no letters, no bullets); the solutions file
+      carries `Richtig: ☑ …` plus four position reasons per MC question.
 - [ ] Both files are committed and pushed in the `-T` repo only, German commit
       message with the issue number; nothing was written to the public teaching
       repo.

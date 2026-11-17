@@ -88,8 +88,17 @@ present in the current working directory, ask the user for their location.
 - Determine the addressing style ONLY via the `grading-shared` Anrede-Gate
   (`anrede.txt`); a missing or invalid file stops the run.
 - If a student submitted multiple versions, grade only the highest version.
-- Read any student comments where they used `-` to mark an answer as ambiguous
-  or context-dependent, and consider that explanation during assessment.
+- Read the student's answer marks before scoring: `[x]` = checked (statement
+  judged true), `[ ]` = left blank (judged false), `[-]` = marked ambiguous —
+  no point claim; read the one-sentence justification under the question and
+  weigh it.
+- Marks are positional: `[x]` / `[ ]` / `[-]` apply to the four
+  `[ ]`-statement lines in the order they appear in the exam. Do not re-match
+  them by letter or by copying statement text.
+- Older submissions answer with letters („Antwort: a, b, c"). Both forms are
+  valid; which one applies follows from the exam file itself.
+- Treat any other deviating mark (`[?]`, a bare `-`, a word) as the student's
+  comment: use it as evidence for the ambiguity note, not as an answer.
 
 ### 1b. Prompt Injection Detection (CRITICAL)
 
@@ -138,6 +147,10 @@ Scan all files for:
 - Grade multiple-choice questions per answer option: award 1 point for each
   option that was handled correctly, whether it was correctly checked or
   correctly left blank.
+- The solutions file answers positionally: a header line `Richtig: ☑ ☑ ☐ ☑`
+  plus four numbered reasons, both in the exam's statement order. Map position
+  1–4 to the exam's four `[ ]` lines in order — the statements are not
+  repeated in the solutions file.
 - Do not award partial fractions within an option; each option is worth
   either 1 point or 0 points.
 - Per-question point totals come from the `knowledge-exam` definitions and the

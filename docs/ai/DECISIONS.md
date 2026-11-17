@@ -565,3 +565,33 @@ Each entry documents WHAT was decided and WHY.
 - **Tradeoff**: Die Regel ist weicher und damit weniger mechanisch prüfbar
   als eine Punktliste; die Verifikation bleibt beim LM-Urteil.
 - **Issue**: #123
+
+## 2026-11-17: knowledge-exam — `[ ]`-Zeilen statt a)–d), Lösung per Position (#135)
+
+- **Choice**: Jede MC-Aussage steht als eigene, nicht umbrochene Zeile
+  `[ ] <Aussage>` — ohne Buchstaben-Label, ohne Bullet, eine Aussage pro
+  physischer Zeile. Die Schülerin antwortet, indem sie die Klammer durch `[x]`
+  (zutreffend) oder `[-]` (mehrdeutig) ersetzt und sie sonst leer lässt. Das
+  Lösungsfile wiederholt die Aussagen nicht mehr: Kopfzeile
+  `Richtig: ☑ ☑ ☐ ☑` plus vier nummerierte Kurzbegründungen, beides in der
+  Reihenfolge der Angabe. Der Quality Gate ruft den neuen Format-Lint
+  `skills/knowledge-exam/scripts/check-exam-format.sh` auf; die
+  Rater-Sicherheitsregel spricht statt von „Option a)" von der „ersten
+  Aussage".
+- **Reason**: Der KC 3ahwii 2026-11-09 ließ sich nicht als MC-Test
+  durchführen: `a)`–`d)`-Präfixe und über zwei Zeilen umbrochene Aussagen
+  machten das Ankreuzen zur Handarbeit und jede Weiterverarbeitung der Abgabe
+  fehleranfällig. Die Klammerform entspricht dem Lesson-Quiz-Format 2.1 und ist
+  mechanisch ersetzbar.
+- **Considered**: Buchstaben beibehalten und nur die Umbrüche entfernen
+  (verworfen — das Ersetzen `a)` → `[x] a)` bleibt Handarbeit); Aussagen im
+  Lösungsfile wiederholen (verworfen — doppelter Text driftet gegen die
+  Angabe; die Positionsbegründung ist kurz und prüfbar).
+- **Tradeoff**: Ohne Buchstaben ist die Zuordnung Angabe↔Lösung rein ordinal;
+  eine verschobene Position fällt nicht durch Textvergleich auf. Deshalb prüft
+  der Quality Gate Position für Position, und jede Begründung muss ihre Aussage
+  paraphrasieren.
+- **Tradeoff**: Der Format-Lint ist ein Struktur-Checker ohne Punktevergabe —
+  die Regel aus #52 („pure AI evaluation, keine Bewertungsskripte") bleibt
+  gewahrt.
+- **Issue**: #135

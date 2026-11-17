@@ -21,8 +21,10 @@ All grading-related skills and commands reference this shared configuration.
 
 ## Rules
 
-- Knowledge exams contain exactly 10 multiple-choice questions and 3 free-text questions.
+- Knowledge exams contain 10 multiple-choice questions and 3 free-text questions by default; the per-run `mc-count`/`free-count` override the defaults.
 - Multiple-choice questions have exactly 4 answer options, worth 4 points total (1 point per correctly handled option).
+- MC options are printed as editable checkbox lines `[ ] <Aussage>` (one statement per physical line, no letters, no bullets); students answer by replacing the bracket with `[x]` (true) or `[-]` (ambiguous), leaving `[ ]` for false.
+- Solutions identify options positionally (`Richtig: ☑ ☑ ☐ ☑` plus one reason per position); the statements are not repeated.
 - Free-text questions are worth 15 points each.
 - Address style and email formulas: see `grading-shared` skill for centralized configuration.
 - Students have one week to complete homework from the assignment date (e.g., March 11th assignment → March 18th deadline); submissions are only late after this one-week period.

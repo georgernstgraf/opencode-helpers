@@ -1,8 +1,18 @@
 # Project State
 
-Current status as of 2026-11-11.
+Current status as of 2026-11-17.
 
 ## Current Focus
+**Knowledge-Check-Format (#135, 2026-11-17):** MC-Aussagen sind jetzt
+editierbare Klammerzeilen `[ ] <Aussage>` (eine Aussage pro physischer Zeile,
+keine Buchstaben/Labels), beantwortet durch `[x]` / `[-]`; die Lösungsdatei
+antwortet rein positionell (`Richtig: ☑ ☑ ☐ ☑` + vier Kurzbegründungen) und
+wiederholt die Aussagen nicht. Der Quality Gate ruft
+`skills/knowledge-exam/scripts/check-exam-format.sh` auf (Format-Lint, keine
+Bewertung); `knowledge-assessment` parst beide Antwortformen (Klammern und
+ältere Buchstaben-Abgaben). Der KC 3ahwii 2026-11-09 bleibt als Archiv in der
+alten Form.
+
 **create-lesson Quiz-Format 2.0 (#122, 2026-11-02):** Der Skill verlangt
 Checkbox-Lernquizzes (0–4 richtig, Überprüfen-Button je Quiz, Färbung,
 Infokugeln, Nochmal versuchen, Show-Modal), drei Übungsbeispiele pro Lesson
