@@ -11,6 +11,7 @@ Zero external dependencies (Python 3 stdlib only).
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -24,6 +25,19 @@ VALID_SAFESEARCH = (0, 1, 2)
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SEARCH_SCRIPT = os.path.join(os.path.dirname(SCRIPT_DIR), "searxng-search.sh")
+
+
+def search_argv(args):
+    """Return the argv that can execute the search shell script here.
+
+    Windows cannot execute a file by its shebang, so the script is handed to
+    bash explicitly there. POSIX hosts keep the direct invocation.
+    """
+    if os.name == "nt":
+        bash = shutil.which("bash")
+        if bash:
+            return [bash, SEARCH_SCRIPT, *args]
+    return [SEARCH_SCRIPT, *args]
 
 SEARCH_TOOL = {
     "name": "search",
@@ -162,8 +176,8 @@ def handle_tools_call(msg_id, params):
 
     try:
         proc = subprocess.run(
-            [SEARCH_SCRIPT, str(query), language, str(pageno),
-             category, engines, time_range, safesearch],
+            search_argv([str(query), language, str(pageno),
+                         category, engines, time_range, safesearch]),
             capture_output=True,
             text=True,
             timeout=90,
@@ -176,6 +190,13 @@ def handle_tools_call(msg_id, params):
             msg_id,
             -32603,
             "Search script not found: {}".format(SEARCH_SCRIPT),
+        )
+        return
+    except OSError as exc:
+        error(
+            msg_id,
+            -32603,
+            "Search script could not be executed: {}".format(exc),
         )
         return
 

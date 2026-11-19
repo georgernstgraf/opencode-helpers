@@ -21,6 +21,7 @@ Transport: newline-delimited JSON-RPC over stdin/stdout (stdio).
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -323,12 +324,25 @@ def deepseek_search(query, count, need_content, ori_question):
     return {"ok": True, "results": results}
 
 
+def searxng_argv(args):
+    """Return the argv that can execute the SearXNG shell script here.
+
+    Windows cannot execute a file by its shebang, so the script is handed to
+    bash explicitly there. POSIX hosts keep the direct invocation.
+    """
+    if os.name == "nt":
+        bash = shutil.which("bash")
+        if bash:
+            return [bash, SEARXNG_SCRIPT, *args]
+    return [SEARXNG_SCRIPT, *args]
+
+
 def searxng_search(query, language, pageno, category, engines, time_range, safesearch):
     """Delegate to the SearXNG skill's canonical chain script."""
     try:
         proc = subprocess.run(
-            [SEARXNG_SCRIPT, query, language, str(pageno), category, engines,
-             time_range, safesearch],
+            searxng_argv([query, language, str(pageno), category, engines,
+                          time_range, safesearch]),
             capture_output=True,
             text=True,
             timeout=SEARXNG_TIMEOUT,
