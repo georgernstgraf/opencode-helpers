@@ -123,6 +123,8 @@ def invocations(log):
         return sum(1 for line in fh if line.strip())
 
 
+@unittest.skipUnless(os.name == "posix",
+                     "fixtures write #!/bin/sh stubs; POSIX-only")
 class OcModelsReportTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

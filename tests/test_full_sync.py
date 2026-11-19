@@ -53,6 +53,8 @@ def git(repo, *args):
     ).stdout.strip()
 
 
+@unittest.skipUnless(os.name == "posix",
+                     "full-sync is POSIX-only (hardcoded /tmp roots, ln -s)")
 class FullSyncTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="full-sync-test-")
@@ -363,6 +365,8 @@ class FullSyncTest(unittest.TestCase):
         self.assertNotIn("ERROR", result.stdout)
 
 
+@unittest.skipUnless(os.name == "posix",
+                     "full-sync is POSIX-only (hardcoded /tmp roots, ln -s)")
 @unittest.skipUnless(shutil.which("svnadmin") and shutil.which("svn"),
                      "subversion tools not available")
 class FullSyncSvnTest(unittest.TestCase):
