@@ -6,7 +6,8 @@ description: Generate German knowledge-check exams and solution files from the
   schreiben", "create the knowledge check", "generate a mini-exam" or "make the
   exam for class X", or asks for exam questions plus solutions from what was
   actually taught. Do not use for grading submissions (knowledge-assessment) or
-  for assignments in the class folder (homework).
+  for assignments in the class folder (homework), and not for LaTeX-PLFs built
+  from a task pool with Gruppen A/B (use plf-bauen).
 license: MIT
 compatibility: opencode
 metadata:
@@ -72,6 +73,8 @@ Additional rules (discovered in practice):
   Schüler:innen, Nachbereitung). Der Rohbestand mit den Abgaben bleibt im
   `-T`-Repo. `knowledge_*`/`_solutions.md` im öffentlichen Repo sind daher
   kein Leak; der Homework-Lauf meldet und verschiebt sie nicht.
+- **Gedruckte PLFs mit Gruppen A/B** entstehen aus dem Aufgabenpool (LaTeX-
+  Fragmente, Punktesatz, Lösungsschlüssel) — dafür gilt der Skill `plf-bauen`.
 
 ## Inputs
 
