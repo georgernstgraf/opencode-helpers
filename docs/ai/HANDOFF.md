@@ -1,23 +1,34 @@
 Open tasks:
 
-1. [ ] Policy observation: the continuous issue-awareness workflow
+1. [ ] #138 Nachlauf **dell**: der Inline-Block `commands.tmpissue` steht noch
+      in `dell:~/.config/opencode/opencode.json` (think und das think-SVN-
+      Template sind mit r7903 entkoppelt; dell-Änderungen nur vom Host selbst
+      committen). `agents`/`skills`/`commands`-Symlinks existieren dort laut
+      Flotten-Nachzug 2026-11-11 bereits — prüfen, ob
+      `~/.config/opencode/commands` auf `opencode-helpers/commands` zeigt, dann
+      Block entfernen und `opencode api GET /api/command` gegenprüfen.
+2. [ ] `~/AGENTS.md` (unversioniert) nennt nur die `skills`/`agents`-Symlinks;
+      die `commands`-Kette (seit #138) dort nachziehen, falls die Datei weiter
+      gepflegt wird.
+
+3. [ ] Policy observation: the continuous issue-awareness workflow
       (`AGENTS.global.md` + proactive commit/push) shipped 2026-09-15.
       Watch daily practice; tune the green-commit gate and auto-close
       criteria if commits land broken or issues close prematurely.
 
-2. [ ] Credentials im SVN (infra) — canonical task lives in
+4. [ ] Credentials im SVN (infra) — canonical task lives in
       `~/svn/georg/docs/ai/HANDOFF.md` **Task 5**
       (consolidate → `svn:ignore` → history rewrite → rotation of all leaked
       secrets incl. infra private keys). This repo only contributed the SearXNG
       access-control half (nginx Basic-Auth + `8888` on `127.0.0.1` + wrapper
       credential) — that part is done. Track the SVN/secret work over there.
 
-3. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
+5. [ ] PMM (`GRG-PMM`) bleibt kanonische create-lesson-Referenz, nutzt aber
       weiterhin `<klasse>/prepared-lessons/` und das alte Ablagemodell. Bei
       nächster Gelegenheit auf die #90-Regeln angleichen (KM-Anforderung,
       `unterricht/prepared-lessons/`, Beamer-Boxen) — erst nach Rücksprache.
 
-4. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
+6. [ ] #92 Folge-Migration (lehrplan): Andere Repos tragen noch die alte
       Zweig-Fach-Ebene `unterricht/<ZWEIG>-<FACH>/` und ggf. `kompetenzmodule/`
       im Zweig-Ordner. Betroffen u. a. GRG-INFI (`unterricht/HWII-INFI/`,
       `infi-hwii/kompetenzmodule/`), GRG-WMC (`unterricht/WMC/` — dokumentierte
@@ -25,7 +36,7 @@ Open tasks:
       melden und (nach Rücksprache) auf Fach-/Zweig-Ebene umstellen. Prüfen, ob
       `kompetenzmodule/` je Fach ans `lehrplan/`-Root wandert.
 
-Last updated: 2026-11-11.
+Last updated: 2026-11-22.
 
 ## Erledigt am 2026-11-11 (Flotten-Nachzug)
 

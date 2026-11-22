@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-11-17.
+Current status as of 2026-11-22.
 
 ## Current Focus
 **Knowledge-Check-Format (#135, 2026-11-17):** MC-Aussagen sind jetzt
@@ -215,6 +215,19 @@ prepared-lessons umstellen.
       geschlossen, Folge-Issue GRG-PMM#49 für Antwortschlüssel/Prosa-Reste.
 
 ## Completed (this cycle)
+
+- [x] 2026-11-22 — Commands dateibasiert, `/tmpissue` auf den vollen
+      `issue-workflow` gezogen (#138): `commands/tmpissue.md` verweist jetzt auf
+      das Skill (dreistufiges Duplicate-Check-Gate, Entscheidungsmatrix inkl.
+      Rückfrage, Trace-Zeile, Sub-Issue-Link, Ansage der Issue-Nummer,
+      Löschen nur nach Erfolg). Der Inline-Block `commands.tmpissue` ist aus
+      `~/.config/opencode/opencode.json` und dem think-SVN-Template entfernt;
+      global geladen wird über den neuen Symlink
+      `~/.config/opencode/commands` → `opencode-helpers/commands` (Verifikation:
+      `opencode api GET /api/command` listet `tmpissue` mit neuer Description).
+      SVN r7903 (think-Template + `topics/svn-config-tracking.md`). Offen: dell
+      muss seinen Inline-Block selbst entfernen (Symlinks existieren dort
+      bereits).
 
 - [x] 2026-11-11 — Flotten-Nachzug (#116, #111, #46, #110, #115, #114):
       dell per SSH von claw erreichbar (Pubkey dauerhaft in

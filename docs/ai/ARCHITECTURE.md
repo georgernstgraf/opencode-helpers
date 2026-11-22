@@ -30,7 +30,13 @@ persisted to a structured set of knowledge files in `docs/ai/`.
 | `/knowledge-exam` | Generate a German mini-exam from Git history | `knowledge-exam` |
 | `/knowledge-persist` | Persist session context into docs/ai/ files | `knowledge-persistence` |
 | `/nextprompt` | Run `aitranscribe -q` and treat output as next instruction | none (external tool) |
-| `/tmpissue` | Create a GitHub issue from /tmp/issue.md, then delete it | none (`gh` CLI) |
+| `/tmpissue` | Create a GitHub issue from `/tmp/issue.md` per the `issue-workflow` skill (duplicate-check gate, sub-issue link), then delete the file | `issue-workflow` |
+
+Commands are discovered as **files**: `~/.config/opencode/commands/` for global
+use (symlink into this repo's `commands/`), `.opencode/commands/` per project;
+the legacy singular `command/` also works. No command is defined inline in
+`opencode.json` — an inline `commands.<name>.template` shadows nothing but
+drifts from `commands/<name>.md` (see DECISIONS 2026-11-22).
 
 ## Scripts
 
@@ -64,6 +70,7 @@ the script (precedent: `skills/full-sync/scripts/test-full-sync.sh`).
 | `tests/test_searxng_search.py` | `searxng-search.sh` behavior: chain tiers (`brave`/`google`/free), the `< 3` token gate + merge/dedupe, explicit-engine/category bypass, preserved params, instance chain, first-responsive-instance reuse |
 | `tests/test_opencode_searxng.py` | MCP protocol (`initialize`/`tools/list`) and hermetic `tools/call` integration in a temp skill layout |
 | `tests/test_skill_links.py` | Every `](./…)` link in a `skills/*/SKILL.md` resolves to an existing sibling file |
+| `tests/test_commands.py` | Command layer guard: every `commands/*.md` has frontmatter `description` + non-empty body, and no checked-in `opencode.json` defines inline `commands.<name>.template` (drift source of #138) |
 
 ## Skills (`skills/`)
 

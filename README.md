@@ -69,6 +69,21 @@ Definition ist eine flache `agents/<name>.md` (Dateiname = Agent-Name).
 |-------|-------------|--------|
 | `lehrplan-annotator` | Autorenschaft der Erläuterungs-Ebene (KM-Überblicke, Lernziel-/Lehrstoff-Erläuterungen als Blockquote-Annotationen) für HTL-Lehrplan-Extrakte nach den Qualitätskriterien des `lehrplan`-Skills | `glm-5.3` (non-flash) |
 
+### Commands
+
+Slash-Kommandos sind **dateibasiert** versioniert (`commands/<name>.md`) und
+global via `~/.config/opencode/commands` verlinkt — dieselbe Symlink-Kette wie
+`skills` und `agents`:
+
+```bash
+ln -s /pfad/zu/opencode-helpers/commands ~/.config/opencode/commands
+```
+
+Der Body der Datei ist der Prompt-Template, `description` steht im
+Frontmatter. **Keine Inline-Templates in `opencode.json`** für Kommandos, die
+hier versioniert sind: zwei Quellen driften garantiert auseinander (genau das
+passierte mit `/tmpissue`, bis es in #138 entkoppelt wurde).
+
 ### Identität & Präferenzen (`IAM.md`)
 
 Die Datei [`IAM.md`](IAM.md) beschreibt die Entwickler-Identität (Name, Technologie-Stack, Lehrfächer) sowie Kommunikationspräferenzen. Sie wird vom opencode-Agenten automatisch beim Start eingelesen und hilft, Antworten konsistent an die Bedürfnisse des Entwicklers anzupassen.
@@ -117,7 +132,7 @@ Sechs Skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `tea
 | `/knowledge-exam <klasse> <wochen> <prüfungsdatum>` | Generiert Mini-Schularbeit + Lösungen |
 | `/knowledge-persist` | Persistiert Session-Wissen in `docs/ai/` |
 | `/nextprompt` | Führt `aitranscribe -q` aus und nutzt Output als nächste Anweisung |
-| `/tmpissue` | Erstellt GitHub-Issue aus `/tmp/issue.md` |
+| `/tmpissue` | Erstellt GitHub-Issue aus `/tmp/issue.md` nach dem `issue-workflow`-Skill (Duplicate Check, Sub-Issue-Link) |
 
 ### Natural Language Workflows (keine Slash-Kommandos)
 
@@ -248,6 +263,21 @@ is a flat `agents/<name>.md` file (filename = agent name).
 |-------|-------------|-------|
 | `lehrplan-annotator` | Authors the Erläuterungs-Ebene (KM overviews, learning-objective and curriculum-text explanations as blockquote annotations) for HTL curriculum extracts per the `lehrplan` skill's quality criteria | `glm-5.3` (non-flash) |
 
+### Commands
+
+Slash commands are versioned as **files** (`commands/<name>.md`) and linked
+globally via `~/.config/opencode/commands` — the same symlink chain as `skills`
+and `agents`:
+
+```bash
+ln -s /path/to/opencode-helpers/commands ~/.config/opencode/commands
+```
+
+The file body is the prompt template, `description` lives in the frontmatter.
+**No inline templates in `opencode.json`** for commands that are versioned
+here: two sources always drift apart (exactly what happened to `/tmpissue`
+until it was decoupled in #138).
+
 ### Identity & Preferences (`IAM.md`)
 
 [`IAM.md`](IAM.md) describes the developer's identity (name, tech stack, teaching subjects) and communication preferences. It is read automatically by opencode on startup and helps tailor responses to the developer's needs.
@@ -296,7 +326,7 @@ Six skills (`grill-me`, `grilling`, `grill-with-docs`, `domain-modeling`, `teach
 | `/knowledge-exam <class> <weeks> <exam-date>` | Generate mini-exam + solutions |
 | `/knowledge-persist` | Persist session knowledge into `docs/ai/` |
 | `/nextprompt` | Run `aitranscribe -q` and use output as next instruction |
-| `/tmpissue` | Create GitHub issue from `/tmp/issue.md` |
+| `/tmpissue` | Create a GitHub issue from `/tmp/issue.md` following the `issue-workflow` skill (duplicate check, sub-issue link) |
 
 ### Natural Language Workflows (no slash commands)
 
