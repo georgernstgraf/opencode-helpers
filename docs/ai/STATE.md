@@ -225,9 +225,18 @@ prepared-lessons umstellen.
       global geladen wird über den neuen Symlink
       `~/.config/opencode/commands` → `opencode-helpers/commands` (Verifikation:
       `opencode api GET /api/command` listet `tmpissue` mit neuer Description).
-      SVN r7903 (think-Template + `topics/svn-config-tracking.md`). Offen: dell
-      muss seinen Inline-Block selbst entfernen (Symlinks existieren dort
-      bereits).
+      SVN r7903 (think-Template + `topics/svn-config-tracking.md`).
+      **Flotten-Rollout 2026-11-22:** `commands`-Symlink auf claw, elite,
+      gregor, kik angelegt (elite hatte ihn schon), gregor-Inline-Block live
+      entfernt, Repos überall auf `38b89e7`, anschließend per
+      `opencode api GET '/api/command?location[directory]=/home/georg'`
+      verifiziert — alle fünf Hosts listen die 7 Repo-Commands mit der neuen
+      `tmpissue`-Description. gregor und elite dabei per Restart von
+      2.2.0/2.2.5 auf 2.3.2 gezogen; kik listet auch auf 2.0.32. murl fährt
+      kein opencode. SVN r7904 (`topics/opencode-fleet.md`, inkl. Befund
+      „`/api/command` ohne `location[directory]` liefert je nach Server-cwd
+      `[]`" und „Restart nach Symlink-Anlage nötig"). **Offen: dell**
+      (2026-11-22 nicht erreichbar) — HANDOFF Task 1.
 
 - [x] 2026-11-11 — Flotten-Nachzug (#116, #111, #46, #110, #115, #114):
       dell per SSH von claw erreichbar (Pubkey dauerhaft in

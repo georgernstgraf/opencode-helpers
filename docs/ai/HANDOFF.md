@@ -1,12 +1,13 @@
 Open tasks:
 
-1. [ ] #138 Nachlauf **dell**: der Inline-Block `commands.tmpissue` steht noch
-      in `dell:~/.config/opencode/opencode.json` (think und das think-SVN-
-      Template sind mit r7903 entkoppelt; dell-Änderungen nur vom Host selbst
-      committen). `agents`/`skills`/`commands`-Symlinks existieren dort laut
-      Flotten-Nachzug 2026-11-11 bereits — prüfen, ob
-      `~/.config/opencode/commands` auf `opencode-helpers/commands` zeigt, dann
-      Block entfernen und `opencode api GET /api/command` gegenprüfen.
+1. [ ] #138 Nachlauf **dell** (einziger offener Host): Inline-Block
+      `commands.tmpissue` steht noch in `dell:~/.config/opencode/opencode.json`
+      (dell war am 2026-11-22 nicht erreichbar). Auf dem Host: Repo
+      auf `38b89e7` ziehen, `~/.config/opencode/commands` →
+      `opencode-helpers/commands` prüfen, Block entfernen, dann
+      `systemctl --user restart opencode.service` und
+      `opencode api GET '/api/command?location[directory]=/home/georg'`
+      gegenprüfen (Flotten-Stand: think/claw/elite/gregor/kik verifiziert).
 2. [ ] `~/AGENTS.md` (unversioniert) nennt nur die `skills`/`agents`-Symlinks;
       die `commands`-Kette (seit #138) dort nachziehen, falls die Datei weiter
       gepflegt wird.
