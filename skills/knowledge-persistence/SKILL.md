@@ -90,6 +90,24 @@ root, `hosts/`, `topics/` and each `hosts/<host>/` carry an `index.md`
 that is a pure link list without frontmatter (`okf_version` only in the
 bundle root). `log.md` remains a single bundle-root file.
 
+**Theme bundles (project repos).** A bundle MAY keep its category content
+in per-theme concepts instead of one category file:
+`decisions/<slug>.md`, `pitfalls/<slug>.md`, `state/<slug>.md`, each with
+its own `index.md`. The category file (`DECISIONS.md`, `PITFALLS.md`,
+`STATE.md`) is then a **router**: frontmatter, a routing table, and — for
+DECISIONS — the newest entries as links only. This skill appends a new
+entry to the matching theme file, never to the router, and adds one line
+to the theme's `index.md`. Slugs are shared across the three bundles so
+that one theme is one look (`foundations`, `build-release`, `ime-field`,
+`session-lifecycle`, `audio-pipeline`, `stt-providers`, `workbench`,
+`recognition-service`); a bundle that needs an extra slug (`testing`,
+`device-lab`) declares it in its own `index.md`. When an entry plausibly
+belongs to two themes, it is stored once and both files carry a one-line
+pointer under **Also stored elsewhere** — never a duplicated body. Splits
+into theme concepts follow "Concept Boundaries and Splitting"
+([FILE-TEMPLATES.md](./FILE-TEMPLATES.md)) and are proven lossless: the
+set of moved blocks must be byte-identical to the original.
+
 Legacy files without frontmatter are tolerated (OKF conformance is
 permissive, OKF-SPEC.md §11) but MUST receive the envelope the next time
 the skill touches them — no big-bang migration is required.
