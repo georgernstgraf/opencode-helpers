@@ -38,15 +38,42 @@ oc-restart()   { systemctl --user restart opencode.service && echo "opencode.ser
 # Port 28894 ist der Windows-Default (Linux wäre 49374) und steht in swift's
 # service.json fest; Firewall/Client-URLs hängen daran.
 # Hosts ohne VPN/pass (z. B. kik) scheitern bewusst mit Fehlermeldung.
-oc-attach-swift() {   # TUI an den swift-Server (Windows, VPN 10.8.0.5:28894) hängen
-  local pw
+OC_SWIFT_DIR="C:/Users/admin/repos/georgernstgraf/diktatwerkstatt"  # Server-Location der TUI auf swift
+_oc_swift_new_session() {  # intern: neue Session in OC_SWIFT_DIR anlegen, gibt die ID aus
+  local pw="$1" base="$2"
+  OPENCODE_PASSWORD="$pw" opencode api --server "$base" post /api/session \
+    -H 'content-type: application/json' \
+    -d "{\"location\":{\"directory\":\"$OC_SWIFT_DIR\"}}" 2>/dev/null \
+    | jq -r '(.data // .).id // empty'
+}
+oc-attach-swift() {   # TUI an den swift-Server (VPN 10.8.0.5:28894), Session in diktatwerkstatt
+  local pw sid base
+  base="http://10.8.0.5:28894"
   pw="$(PASSWORD_STORE_DIR="$HOME/svn/georg/private/password-store" \
         pass show swift/opencode-server-password 2>/dev/null | head -1)"
   if [ -z "$pw" ]; then
     echo "oc-attach-swift: kein Passwort aus pass (Store/GPG-Key fehlt) oder Host ohne VPN-Zugang (z. B. kik)" >&2
     return 1
   fi
-  OPENCODE_PASSWORD="$pw" opencode --continue --server http://10.8.0.5:28894 "$@"
+  sid=""
+  case "$1" in
+    ses_*) sid="$1"; shift ;;   # explizite Session-ID: direkt anhängen
+    --new) shift ;;             # frische Session in diktatwerkstatt erzwingen
+    *)
+      # neueste Session in der diktatwerkstatt-Location (Sessions sind serverweit;
+      # Slash-Normalisierung, weil Windows-Pfade \\ liefern)
+      sid="$(OPENCODE_PASSWORD="$pw" opencode api --server "$base" get /api/session 2>/dev/null \
+        | jq -r --arg dir "$OC_SWIFT_DIR" \
+          '(.data // .) | map(select(((.location.directory // "") | gsub("\\\\"; "/")) == $dir)) \
+           | sort_by(-.time.updated) | (.[0].id // empty)')"
+    ;;
+  esac
+  [ -z "$sid" ] && sid="$(_oc_swift_new_session "$pw" "$base")"
+  if [ -z "$sid" ]; then
+    echo "oc-attach-swift: keine diktatwerkstatt-Session gefunden und keine neue anlegbar (API/Firewall?)" >&2
+    return 1
+  fi
+  OPENCODE_PASSWORD="$pw" opencode --server "$base" --session "$sid" "$@"
 }
 
 # === systemd user services ===
