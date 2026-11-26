@@ -32,6 +32,23 @@ oc-all-sessions() {   # ALLE Sessions des lokalen Servers (neueste zuerst), opti
 }
 oc-restart()   { systemctl --user restart opencode.service && echo "opencode.service neu gestartet"; }
 
+# === OpenCode an einen entfernten Server hängen (TUI via VPN) ===
+# Muster: think -> swift (Windows-Flotten-Host, [hosts/swift]).
+# Passwort zur Laufzeit aus pass — nie im Klartext hier (KEINE SECRETS).
+# Port 28894 ist der Windows-Default (Linux wäre 49374) und steht in swift's
+# service.json fest; Firewall/Client-URLs hängen daran.
+# Hosts ohne VPN/pass (z. B. kik) scheitern bewusst mit Fehlermeldung.
+oc-attach-swift() {   # TUI an den swift-Server (Windows, VPN 10.8.0.5:28894) hängen
+  local pw
+  pw="$(PASSWORD_STORE_DIR="$HOME/svn/georg/private/password-store" \
+        pass show swift/opencode-server-password 2>/dev/null | head -1)"
+  if [ -z "$pw" ]; then
+    echo "oc-attach-swift: kein Passwort aus pass (Store/GPG-Key fehlt) oder Host ohne VPN-Zugang (z. B. kik)" >&2
+    return 1
+  fi
+  OPENCODE_PASSWORD="$pw" opencode --continue --server http://10.8.0.5:28894 "$@"
+}
+
 # === systemd user services ===
 su-status()    { systemctl --user status "$@"; }
 su-stop()      { systemctl --user stop "$@"; }
