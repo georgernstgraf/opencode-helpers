@@ -1,0 +1,12 @@
+[Unit]
+Description=opencode-Server-Port: Firewall-Regel (Loopback+VPN erlaubt, sonst REJECT)
+Documentation=https://github.com/georgernstgraf/opencode-helpers
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/repos/georgernstgraf/opencode-helpers/dotfiles/oc-firewall.sh apply
+ExecStop=%h/repos/georgernstgraf/opencode-helpers/dotfiles/oc-firewall.sh remove
+
+[Install]
+WantedBy=default.target
