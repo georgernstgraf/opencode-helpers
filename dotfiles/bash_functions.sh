@@ -63,9 +63,7 @@ oc-attach-swift() {   # TUI an den swift-Server (VPN 10.8.0.5:28894), Session in
       # neueste Session in der diktatwerkstatt-Location (Sessions sind serverweit;
       # Slash-Normalisierung, weil Windows-Pfade \\ liefern)
       sid="$(OPENCODE_PASSWORD="$pw" opencode api --server "$base" get /api/session 2>/dev/null \
-        | jq -r --arg dir "$OC_SWIFT_DIR" \
-          '(.data // .) | map(select(((.location.directory // "") | gsub("\\\\"; "/")) == $dir)) \
-           | sort_by(-.time.updated) | (.[0].id // empty)')"
+        | jq -r --arg dir "$OC_SWIFT_DIR" '(.data // .) | map(select(((.location.directory // "") | gsub("\\\\"; "/")) == $dir)) | sort_by(-.time.updated) | (.[0].id // empty)')"
     ;;
   esac
   [ -z "$sid" ] && sid="$(_oc_swift_new_session "$pw" "$base")"
