@@ -23,13 +23,19 @@ House rules on top of the spec (see OKF-SPEC.md):
 
 Usage:
     okf-check [--root DIR] [--preserve-from DIR] [--allow-lost FILE]
-              [--max-report N] [--hosts a,b,c] [--rules FILE]
-              [--no-placement-lint]
+              [--allow-missing NAME[,NAME...]] [--max-report N]
+              [--hosts a,b,c] [--rules FILE] [--no-placement-lint]
 
     --preserve-from DIR   Compare non-empty lines of an older tree with the
                           current tree. Every line of the old tree must still
                           appear (multiset comparison). Used to prove that a
                           migration moved text instead of dropping it.
+    --allow-missing NAME  Link targets whose basename is in NAME (comma-
+                          separated, repeatable) and that do not exist are
+                          reported as an info line (LOCAL:) instead of a
+                          broken-link error — e.g. gitignored local-only
+                          files such as LOCAL.md. If the file exists, it is
+                          checked normally.
     --hosts a,b,c         Host names for the placement lint (default:
                           subdirectories of <root>/hosts). Neither a
                           hosts/ directory nor --hosts: the lint is
@@ -61,6 +67,10 @@ def fail(msg):
 
 def warn(msg):
     print("WARN:  " + msg)
+
+
+def info(msg):
+    print("LOCAL: " + msg)
 
 
 def read(path):
@@ -203,13 +213,16 @@ def check_indexes(root):
     return errors
 
 
-def check_links(root):
+def check_links(root, allow_missing=()):
     errors = 0
     for path in all_markdown(root):
         rel = os.path.relpath(path, root)
         for target in LINK_RE.findall(read(path)):
             resolved = resolve_link(os.path.dirname(path), target, root)
             if resolved and not os.path.exists(resolved):
+                if os.path.basename(resolved) in allow_missing:
+                    info(rel + ": link to local-only file: " + target)
+                    continue
                 fail(rel + ": broken link " + target)
                 errors += 1
     return errors
@@ -343,6 +356,12 @@ def main():
                     help="older tree whose non-empty lines must survive")
     ap.add_argument("--allow-lost", metavar="FILE",
                     help="lines deliberately rewritten (one per file line)")
+    ap.add_argument("--allow-missing", metavar="NAME[,NAME...]",
+                    action="append", default=[],
+                    help="link targets whose basename is in NAME and that "
+                         "do not exist are reported as LOCAL: info lines "
+                         "instead of broken-link errors (repeatable, "
+                         "comma-separated)")
     ap.add_argument("--max-report", type=int, default=40)
     ap.add_argument("--hosts", metavar="a,b,c",
                     help="host names for the placement lint "
@@ -372,9 +391,16 @@ def main():
         hosts = discover_hosts(root)
         placement = True
 
+    allow_missing = {
+        name.strip()
+        for chunk in args.allow_missing
+        for name in chunk.split(",")
+        if name.strip()
+    }
+
     errors, _ = check_conformance(root, rules)
     errors += check_indexes(root)
-    errors += check_links(root)
+    errors += check_links(root, allow_missing)
     errors += check_log(root)
     warnings = check_placement(root, hosts) if placement else 0
 

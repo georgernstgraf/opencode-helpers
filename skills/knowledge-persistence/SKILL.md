@@ -428,6 +428,14 @@ the link.
   not into a forked checker:
   `okf-check --root docs/ai --rules project-rules.json` with e.g.
   `{"Foliensatz": ["title", "quellen", "pdf_seiten"]}`.
+  Gitignored local-only files (e.g. a `LOCAL.md` that is gitignored for
+  person data and linked from `index.md`) do not exist in a fresh clone,
+  which would make the link a broken-link error there. Link them as
+  usual and pass `--allow-missing LOCAL.md` (comma-separated, repeatable,
+  matches by basename): missing targets whose basename is listed are
+  reported as an info line (`LOCAL: … link to local-only file`) instead
+  of an error — without touching the exit code. If the file exists, it is
+  checked normally.
   **No vendoring in project repos:** project repos call the Skill-Checker
   via the skill path — they never keep their own copy. (Origin note: the
   checker was ported from the SVN toolset, `~/svn/georg

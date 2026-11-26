@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Self-test for skills/knowledge-persistence/scripts/okf-check.
 # Covers the seven acceptance cases from opencode-helpers#141 plus the
-# --rules project-rules case. Runs entirely in tmpdir fixtures; stdlib-only
+# --rules project-rules case and the --allow-missing LOCAL.md amendment. Runs entirely in tmpdir fixtures; stdlib-only
 # checker, so it also runs under python3 -I.
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -85,6 +85,15 @@ printf -- '---\ntype: Foliensatz\ntitle: f\n---\n\nBody.\n' \
 printf '{"Foliensatz": ["title", "quellen", "pdf_seiten"]}' \
     > "$TMP/c8/rules.json"
 
+# Case 9 (--allow-missing): gitignored local-only files (e.g. LOCAL.md).
+# (a) index.md links a missing LOCAL.md without the flag -> broken-link
+# error; (b) with --allow-missing LOCAL.md -> LOCAL: info line, exit 0;
+# (c) --allow-missing for a file that DOES exist -> checked normally.
+mkdir -p "$TMP/c9"
+printf -- '---\nokf_version: "0.2"\n---\n\n# Bundle index\n\n- [a](a.md)\n- [local](LOCAL.md)\n' \
+    > "$TMP/c9/index.md"
+printf -- '---\ntype: overview\ntitle: a\n---\n\nBody.\n' > "$TMP/c9/a.md"
+
 # ------------------------------------------------------------------- cases
 # 1: missing frontmatter -> conformance error
 assert 1 "nofm.md: missing frontmatter block" \
@@ -140,6 +149,27 @@ printf -- '---\ntype: Foliensatz\ntitle: f\nquellen:\n  - a\npdf_seiten: 3\n---\
     > "$TMP/c8/f1.md"
 assert 0 "OK: 1 concept(s)" \
     python3 -I "$CHECKER" --root "$TMP/c8" --rules "$TMP/c8/rules.json"
+
+# 9a: missing LOCAL.md link without --allow-missing -> broken-link error
+assert 1 "index.md: broken link LOCAL.md" \
+    python3 -I "$CHECKER" --root "$TMP/c9"
+# 9b: with --allow-missing LOCAL.md -> info line instead of error, exit 0
+assert 0 "index.md: link to local-only file: LOCAL.md" \
+    python3 -I "$CHECKER" --root "$TMP/c9" --allow-missing LOCAL.md
+# 9b': the flag is repeatable and comma-separated
+assert 0 "link to local-only file: LOCAL.md" \
+    python3 -I "$CHECKER" --root "$TMP/c9" \
+    --allow-missing OTHER.md --allow-missing "LOCAL.md,ALSO.md"
+# 9c: --allow-missing for a file that exists -> checked normally
+printf 'local-only.\n' > "$TMP/c9/LOCAL.md"
+out="$(python3 -I "$CHECKER" --root "$TMP/c9" --allow-missing LOCAL.md 2>&1)"
+if grep -q "local-only file" <<<"$out"; then
+    echo "FAIL: --allow-missing downgraded an existing file"
+    fails=$((fails + 1))
+else
+    echo "ok: case '--allow-missing with existing file checked normally'"
+fi
+rm "$TMP/c9/LOCAL.md"
 
 # ------------------------------------------------------------------ result
 elapsed=$((SECONDS - t0))
