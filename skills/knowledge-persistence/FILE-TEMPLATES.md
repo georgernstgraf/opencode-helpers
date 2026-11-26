@@ -46,6 +46,13 @@ Envelope rules:
 - Legacy files without frontmatter are tolerated (OKF conformance is
   permissive, §11) but MUST be migrated the next time the skill touches
   them. Migration means: prepend the envelope, keep the body intact.
+- Project-specific required frontmatter keys are NOT enforced by forking
+  the checker: they go into a JSON rules file passed to the Skill-Checker
+  (`--rules <file.json>`, e.g. `{"Foliensatz": ["title", "quellen",
+  "pdf_seiten"]}`). The checker itself lives in this skill
+  (`scripts/okf-check`, called as
+  `python3 <skill-dir>/scripts/okf-check --root docs/ai`); project repos
+  never vendor a copy.
 - Known content still in force after a superseded entry is removed keeps
   its existing frontmatter; only `generated.at` gets bumped.
 

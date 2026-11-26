@@ -416,15 +416,22 @@ the link.
   tolerated and migrate on their next touch. Never migrate untouched
   files just to make the confirmation pass — that would be the
   big-bang migration this skill forbids.
-- **Run the bundle checker** where it is available:
-  `EDV/Toolset/okf-check --root docs/ai`. It verifies conformance
-  (frontmatter, reserved filenames), that every `index.md` links all
-  concepts of its directory, and that links resolve. After a move or a
-  split, prove losslessness against the previous state:
-  `EDV/Toolset/okf-check --root docs/ai --preserve-from <exported-old-tree>`.
-  The tool lives in the `~/svn/georg` working copy; in other projects
-  skip it and state that it was not available, instead of hand-waving
-  conformance.
+- **Run the bundle checker** — it is part of this skill, so it is always
+  available:
+  `python3 <skill-dir>/scripts/okf-check --root docs/ai` (where
+  `<skill-dir>` is this skill's directory, `skills/knowledge-persistence`).
+  It verifies conformance (frontmatter, reserved filenames), that every
+  `index.md` links all concepts of its directory, and that links resolve.
+  After a move or a split, prove losslessness against the previous state:
+  `okf-check --root docs/ai --preserve-from <exported-old-tree>`.
+  Project-specific required frontmatter keys go into a JSON rules file,
+  not into a forked checker:
+  `okf-check --root docs/ai --rules project-rules.json` with e.g.
+  `{"Foliensatz": ["title", "quellen", "pdf_seiten"]}`.
+  **No vendoring in project repos:** project repos call the Skill-Checker
+  via the skill path — they never keep their own copy. (Origin note: the
+  checker was ported from the SVN toolset, `~/svn/georg
+  EDV/Toolset/okf-check`, r7781; that copy has been removed.)
 - State the commit hash and that it was pushed.
 
 ## Done when
@@ -439,8 +446,8 @@ the link.
       …`), and STATE.md was overwritten, not appended.
 - [ ] One `log.md` entry was appended and every affected `index.md` (root,
       `hosts/`, `topics/`, each host) was regenerated.
-- [ ] OKF conformance is confirmed — `okf-check` run, or its unavailability
-      stated instead of hand-waved.
+- [ ] OKF conformance is confirmed — the Skill-Checker
+      (`scripts/okf-check`) was run, not hand-waved.
 - [ ] The changes are committed with the active issue reference and pushed
       (SVN: `svn ci`), or "nothing to persist" was reported.
 

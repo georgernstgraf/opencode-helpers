@@ -1,0 +1,395 @@
+#!/usr/bin/env python3
+"""Check an Open Knowledge Format (OKF v0.2) bundle for conformance.
+
+This is the single source of truth for bundle checking. It lives in the
+knowledge-persistence skill (opencode-helpers,
+skills/knowledge-persistence/scripts/okf-check) next to the OKF spec it
+verifies (OKF-SPEC.md). Ported from the SVN toolset copy
+(~/svn/georg EDV/Toolset/okf-check, r7781) when that copy was removed.
+
+House rules on top of the spec (see OKF-SPEC.md):
+
+  * Every non-reserved .md file has parseable YAML frontmatter with a
+    non-empty `type`.
+  * Every directory that contains concepts has an `index.md` that links
+    all of its concept files.
+  * A bundle-root `index.md` carries no frontmatter except `okf_version`.
+  * `log.md` carries no frontmatter.
+  * Relative/absolute markdown links between concepts resolve.
+  * Host-placement lint (warnings): host-tagged headings/bullets in a
+    bundle-root concept file suggest content that belongs in hosts/<host>/.
+    Host names come from `hosts/*/` in the bundle itself; a project may
+    override them with --hosts.
+
+Usage:
+    okf-check [--root DIR] [--preserve-from DIR] [--allow-lost FILE]
+              [--max-report N] [--hosts a,b,c] [--rules FILE]
+              [--no-placement-lint]
+
+    --preserve-from DIR   Compare non-empty lines of an older tree with the
+                          current tree. Every line of the old tree must still
+                          appear (multiset comparison). Used to prove that a
+                          migration moved text instead of dropping it.
+    --hosts a,b,c         Host names for the placement lint (default:
+                          subdirectories of <root>/hosts). Neither a
+                          hosts/ directory nor --hosts: the lint is
+                          skipped with a warning (not an error).
+    --rules FILE          JSON {"<type>": ["key", ...]}: extra required
+                          frontmatter keys per concept type — project
+                          rules on top of the OKF house rules, so a
+                          project never has to fork this checker.
+
+Exit codes: 0 ok, 1 conformance errors, 2 usage error, 4 lost lines.
+
+Project repos: call this script via the skill path
+(`python3 <skill-base>/scripts/okf-check --root docs/ai`) — do not vendor
+a copy (see SKILL.md, Confirmation step).
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+
+LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+
+
+def fail(msg):
+    print("ERROR: " + msg)
+
+
+def warn(msg):
+    print("WARN:  " + msg)
+
+
+def read(path):
+    with open(path, encoding="utf-8") as fh:
+        return fh.read()
+
+
+def split_frontmatter(text):
+    """Return (frontmatter_lines, body, ok) for a markdown document."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None, text, False
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            return lines[1:i], "\n".join(lines[i + 1:]), True
+    return None, text, False
+
+
+def frontmatter_keys(fm_lines):
+    """Parse top-level `key: value` pairs of a simple YAML block."""
+    data = {}
+    for line in fm_lines:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if line[0] in " \t":
+            continue  # nested value of the previous key
+        m = re.match(r"^([A-Za-z0-9_.-]+)\s*:\s*(.*)$", line)
+        if not m:
+            return None
+        key, value = m.group(1), m.group(2).strip()
+        data[key] = value.strip("'\"")
+    return data
+
+
+def concept_files(root):
+    out = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[::] = [d for d in dirnames if not d.startswith(".")]
+        for name in sorted(filenames):
+            if name.endswith(".md") and name not in ("index.md", "log.md"):
+                out.append(os.path.join(dirpath, name))
+    return out
+
+
+def all_markdown(root):
+    out = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[::] = [d for d in dirnames if not d.startswith(".")]
+        for name in sorted(filenames):
+            if name.endswith(".md"):
+                out.append(os.path.join(dirpath, name))
+    return out
+
+
+def resolve_link(base_dir, target, root):
+    if target.startswith(("http://", "https://", "mailto:", "#")):
+        return None
+    target = target.split("#", 1)[0]
+    if not target:
+        return None
+    if target.startswith("/"):
+        return os.path.normpath(os.path.join(root, target.lstrip("/")))
+    return os.path.normpath(os.path.join(base_dir, target))
+
+
+def check_conformance(root, rules=None):
+    errors = 0
+    warnings = 0
+    for path in all_markdown(root):
+        rel = os.path.relpath(path, root)
+        name = os.path.basename(path)
+        text = read(path)
+        fm, body, has_fm = split_frontmatter(text)
+        if name == "log.md":
+            if has_fm:
+                fail(rel + ": log.md must not carry frontmatter")
+                errors += 1
+            continue
+        if name == "index.md":
+            if has_fm:
+                data = frontmatter_keys(fm)
+                if data is None:
+                    fail(rel + ": unparseable frontmatter")
+                    errors += 1
+                else:
+                    extra = set(data) - {"okf_version"}
+                    if extra:
+                        fail(rel + ": index.md may only carry okf_version, found " +
+                             ", ".join(sorted(extra)))
+                        errors += 1
+            continue
+        if not has_fm:
+            fail(rel + ": missing frontmatter block")
+            errors += 1
+            continue
+        data = frontmatter_keys(fm)
+        if data is None:
+            fail(rel + ": unparseable frontmatter")
+            errors += 1
+            continue
+        if not data.get("type"):
+            fail(rel + ": frontmatter has no non-empty type")
+            errors += 1
+        for key in ("generated", "verified"):
+            if key in data and "by:" not in data[key]:
+                fail(rel + ": %s lacks an actor (by:)" % key)
+                errors += 1
+        required = rules.get(data.get("type")) if rules else None
+        if required:
+            for key in required:
+                if key not in data:
+                    fail(rel + ": type '%s' requires frontmatter key '%s' "
+                              "(--rules)" % (data.get("type"), key))
+                    errors += 1
+    return errors, warnings
+
+
+def check_indexes(root):
+    errors = 0
+    concepts = concept_files(root)
+    by_dir = {}
+    for path in concepts:
+        by_dir.setdefault(os.path.dirname(path), []).append(path)
+    for dirpath, paths in by_dir.items():
+        index = os.path.join(dirpath, "index.md")
+        if not os.path.isfile(index):
+            warn(os.path.relpath(dirpath, root) + "/: no index.md")
+            continue
+        text = read(index)
+        linked = set()
+        for target in LINK_RE.findall(text):
+            resolved = resolve_link(dirpath, target, root)
+            if resolved:
+                linked.add(os.path.normpath(resolved))
+        for path in paths:
+            if os.path.normpath(path) not in linked:
+                fail(os.path.relpath(index, root) + ": does not link " +
+                     os.path.relpath(path, root))
+                errors += 1
+    return errors
+
+
+def check_links(root):
+    errors = 0
+    for path in all_markdown(root):
+        rel = os.path.relpath(path, root)
+        for target in LINK_RE.findall(read(path)):
+            resolved = resolve_link(os.path.dirname(path), target, root)
+            if resolved and not os.path.exists(resolved):
+                fail(rel + ": broken link " + target)
+                errors += 1
+    return errors
+
+
+def check_log(root):
+    log = os.path.join(root, "log.md")
+    if not os.path.isfile(log):
+        warn("log.md missing at bundle root")
+        return 0
+    text = read(log)
+    dates = re.findall(r"^## (\d{4}-\d{2}-\d{2})", text, re.MULTILINE)
+    if not dates:
+        fail("log.md has no date headings (YYYY-MM-DD)")
+        return 1
+    if dates != sorted(dates, reverse=True):
+        fail("log.md dates are not newest-first")
+        return 1
+    return 0
+
+
+def discover_hosts(root):
+    """Host names for the placement lint: subdirectories of <root>/hosts.
+
+    Returns None when the bundle has no hosts/ directory (the placement
+    lint is then skipped with a warning, not an error).
+    """
+    hosts_dir = os.path.join(root, "hosts")
+    if not os.path.isdir(hosts_dir):
+        return None
+    return sorted(
+        d for d in os.listdir(hosts_dir)
+        if os.path.isdir(os.path.join(hosts_dir, d)) and not d.startswith(".")
+    )
+
+
+def host_patterns(hosts):
+    head = re.compile(
+        r"^#{1,3} .*\((?:" + "|".join(hosts) + r")(?:[/, ].*)?\)", re.IGNORECASE
+    )
+    tag = re.compile(r"\[(?:" + "|".join(hosts) + r")(?:[/,][a-z0-9/ ,.-]+)?\]")
+    return head, tag
+
+
+def check_placement(root, hosts):
+    warnings = 0
+    if not hosts:
+        warn("no hosts/ directory in bundle and no --hosts: "
+             "placement lint skipped")
+        return 0
+    head_re, tag_re = host_patterns(hosts)
+    for path in all_markdown(root):
+        rel = os.path.relpath(path, root)
+        if os.sep in rel:
+            continue  # only the bundle root is "global"
+        if os.path.basename(path) in ("index.md", "log.md", "HISTORY.md"):
+            continue
+        for nr, line in enumerate(read(path).splitlines(), 1):
+            if head_re.match(line) or tag_re.search(line):
+                warn("%s:%d looks host-specific: %s" %
+                     (rel, nr, line.strip()[:90]))
+                warnings += 1
+    return warnings
+
+
+def nonempty_lines(tree):
+    lines = []
+    for path in all_markdown(tree):
+        for line in read(path).splitlines():
+            stripped = line.strip()
+            if stripped:
+                lines.append((os.path.relpath(path, tree), stripped))
+    return lines
+
+
+def check_preservation(old_tree, new_tree, max_report, allow_lost=None):
+    allowed = set()
+    if allow_lost:
+        with open(allow_lost, encoding="utf-8") as fh:
+            allowed = {line.strip() for line in fh if line.strip()}
+    old = nonempty_lines(old_tree)
+    new = nonempty_lines(new_tree)
+    available = {}
+    for rel, line in new:
+        available.setdefault(line, []).append(rel)
+    missing = []
+    for rel, line in old:
+        if available.get(line):
+            available[line].pop()
+        elif line in allowed:
+            continue
+        else:
+            missing.append((rel, line))
+    if not missing:
+        print("OK: %d/%d non-empty lines preserved%s" %
+              (len(old), len(old),
+               " (+%d allowed rewrite(s))" % len(allowed) if allowed else ""))
+        return 0
+    print("LOST: %d of %d non-empty lines no longer present" %
+          (len(missing), len(old)))
+    for rel, line in missing[:max_report]:
+        print("  %s: %s" % (rel, line[:160]))
+    if len(missing) > max_report:
+        print("  ... %d more" % (len(missing) - max_report))
+    return 4
+
+
+def load_rules(path):
+    """Load --rules JSON: {"<type>": ["required", "keys", ...]} or None on
+    usage error (message already printed)."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            rules = json.load(fh)
+    except (OSError, ValueError) as exc:
+        print("ERROR: --rules: cannot load %s: %s" % (path, exc))
+        return None
+    valid = isinstance(rules, dict) and all(
+        isinstance(v, list) and all(isinstance(k, str) for k in v)
+        for v in rules.values()
+    )
+    if not valid:
+        print('ERROR: --rules: expected JSON {"<type>": ["key", ...]}')
+        return None
+    return rules
+
+
+def main():
+    ap = argparse.ArgumentParser(description="OKF v0.2 bundle checker")
+    ap.add_argument("--root", default="docs/ai", help="bundle root (default docs/ai)")
+    ap.add_argument("--preserve-from", metavar="DIR",
+                    help="older tree whose non-empty lines must survive")
+    ap.add_argument("--allow-lost", metavar="FILE",
+                    help="lines deliberately rewritten (one per file line)")
+    ap.add_argument("--max-report", type=int, default=40)
+    ap.add_argument("--hosts", metavar="a,b,c",
+                    help="host names for the placement lint "
+                         "(default: subdirectories of <root>/hosts)")
+    ap.add_argument("--rules", metavar="FILE",
+                    help='JSON {"<type>": ["key", ...]}: extra required '
+                         "frontmatter keys per concept type")
+    ap.add_argument("--no-placement-lint", action="store_true")
+    args = ap.parse_args()
+
+    root = os.path.abspath(args.root)
+    if not os.path.isdir(root):
+        print("ERROR: bundle root not found: " + root)
+        return 2
+
+    rules = load_rules(args.rules) if args.rules else None
+    if args.rules and rules is None:
+        return 2
+
+    if args.no_placement_lint:
+        hosts = None
+        placement = False
+    elif args.hosts:
+        hosts = [h.strip() for h in args.hosts.split(",") if h.strip()]
+        placement = True
+    else:
+        hosts = discover_hosts(root)
+        placement = True
+
+    errors, _ = check_conformance(root, rules)
+    errors += check_indexes(root)
+    errors += check_links(root)
+    errors += check_log(root)
+    warnings = check_placement(root, hosts) if placement else 0
+
+    concepts = len(concept_files(root))
+    status = 0
+    if args.preserve_from:
+        status = check_preservation(os.path.abspath(args.preserve_from),
+                                    root, args.max_report, args.allow_lost)
+    if errors:
+        print("FAIL: %d conformance error(s), %d warning(s), %d concepts" %
+              (errors, warnings, concepts))
+        return 1
+    print("OK: %d concept(s), %d warning(s)" % (concepts, warnings))
+    return status
+
+
+if __name__ == "__main__":
+    sys.exit(main())
