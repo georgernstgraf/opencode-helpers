@@ -1,8 +1,26 @@
+---
+type: State
+title: Project State
+description: Current status of the opencode-helpers skills and helpers.
+tags: [helpers, state]
+generated: { by: opencode/knowledge-persistence, at: 2026-11-26T18:35:00Z }
+status: stable
+---
 # Project State
 
-Current status as of 2026-11-22.
+Current status as of 2026-11-26.
 
 ## Current Focus
+**OKF-Bundle-Checker konsolidiert (#141, 2026-11-26):** Der generische
+Bundle-Checker lebt als Skill-Script
+`skills/knowledge-persistence/scripts/okf-check` (stdlib-only, `python3 -I`,
+generischer Host-Lint aus `hosts/*/`, `--rules <datei.json>` für
+Projekt-Pflichtfelder, `--allow-missing` für gitignored LOCAL-Dateien,
+Selbsttest `scripts/test_okf_check.sh`, 17 Fälle ~1 s). Die SVN-Kopie
+(`EDV/Toolset/okf-check`, Herkunft r7781) ist in r7924 entfernt;
+Sub-Issues: webuntis-cli#30 (OKF-Migration) und GRG-POSTHEORIE-T#28
+(Fork ersetzt) — beide geschlossen.
+
 **Knowledge-Check-Format (#135, 2026-11-17):** MC-Aussagen sind jetzt
 editierbare Klammerzeilen `[ ] <Aussage>` (eine Aussage pro physischer Zeile,
 keine Buchstaben/Labels), beantwortet durch `[x]` / `[-]`; die Lösungsdatei
