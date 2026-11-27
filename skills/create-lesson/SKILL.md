@@ -173,7 +173,13 @@ starten kann.
 Fertige Beispielprojekte gehören in die **Beispielprojekt-Ablage des Repos**,
 außerhalb von `unterricht/`. Die Ablage wird ermittelt — **die Repo-Konvention
 gewinnt, nicht ein fester Name**:
-
+**Die Grenze ist die Installationsfreiheit (Hellwig-Regel, 2026-11-27):**
+*installationsfrei → darf in die Lesson, installierbar → muss in die
+Beispielprojekt-Ablage.* Installationsfrei heißt: nur Skripte (R/Python/SQL) +
+Daten + Markdown — **keine** Manifeste (`package.json`, `renv.lock`,
+`requirements.txt`), kein Build, kein Server; `Rscript runbook.R` bzw.
+`python3 analyse.py` läuft ohne Setup-Schritt. Sobald Abhängigkeiten verwaltet
+oder Dienste gestartet werden, gilt der restliche Abschnitt.
 1. Explizite Nennung in `AGENTS.md`, `README.md` oder
    `docs/ai/ARCHITECTURE.md` (z. B. GRG-SWP: `Sample_Projects/`).
 2. Sonst ein vorhandener Top-Level-Ordner mit diesem Zweck — **auch abweichend
@@ -192,6 +198,27 @@ und ist für sich lauffähig und getestet. Die Lesson **verweist** darauf und
 der Aufgabe, nicht als eingebettete Projektdatei. Da die Beispielprojekt-Ablage
 **nicht** auf GitHub Pages liegt, erfolgt der Verweis aus der deployten Lesson
 per **GitHub-URL** (siehe § Lernplattform).
+
+### Nachtrag zu einer bereits gebauten Lesson
+
+Wächst einer bestehenden Lesson später ein Zusatzbeispiel zu (Normalfall: das
+gute Beispiel entsteht erst nach der ersten Durchführung), ist **keine neue
+Ablage-Entscheidung** nötig. Installationsfreie Nachträge liegen im einen Slot
+
+```
+unterricht/<LESSON>/beispiele/<slug>/
+├── README.md      # Auftrag, Ausführung, erwartetes Ergebnis
+├── .here          # ankert here::here() im Projekt (nur R)
+├── runbook.R      # includes: source(here::here("R", "01_….R"))
+├── R/01…0N.R
+└── daten/         # Rohdaten + README.md (Quelle, Stand, Lizenz)
+```
+
+Pflicht: eigener `daten/README.md`; **keine fremden PDFs** ins Repo (nur
+Fakten-CSVs + Quellenlink — der Slot wird deployt); Verlinkung aus
+`lesson.html` (relativ) und `aufgabe.md` (Aufgabenblock); Root-`index.html`
+bleibt unverändert; `check-links` grün. Ein installierbarer Nachtrag geht
+dagegen in die Beispielprojekt-Ablage wie oben.
 
 ## Präludium: Repo-Stand lesen (vor jedem Bau)
 
