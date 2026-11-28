@@ -25,7 +25,10 @@ Model data is collected from the OpenCode V2 API via
 `opencode api get /api/model` (the shared background service is discovered
 automatically) and cached as the raw JSON response at
 ~/.local/share/oc-models-report/models-api.json ($XDG_DATA_HOME respected),
-regenerated whenever it is missing or older than 12 hours. Internal
+regenerated whenever it is missing or older than 12 hours. A response
+that is valid but carries an empty model list is never cached (it has
+been observed transiently from the server, 2026-11-28); the collect is
+retried once, and an existing cache is kept on failure. Internal
 overrides (mainly for tests): OC_MODELS_REPORT_CACHE_DIR,
 OC_MODELS_REPORT_MAX_AGE (seconds), OC_MODELS_REPORT_CMD (command line to
 run instead of `opencode api get /api/model`).
@@ -203,6 +206,13 @@ def collect(path, cmd):
     piping the `opencode api` response races the CLI's exit and truncates
     it at pipe-buffer boundaries (observed 256/384 KiB of ~477 KiB); a
     regular file always receives the complete response.
+
+    The response is validated before it is stored: a syntactically valid
+    API dump with an empty model list (observed transiently from the V2
+    server, 2026-11-28) raises RuntimeError instead of being cached — an
+    empty catalog would poison every subsequent run until the next
+    refresh. Callers (ensure_dump) decide whether to retry or fall back
+    to the previous cache.
     """
     os.makedirs(os.path.dirname(path), exist_ok=True)
     fd, tmp = tempfile.mkstemp(
@@ -224,6 +234,11 @@ def collect(path, cmd):
                 f"{' '.join(cmd)} failed (exit {proc.returncode})"
                 + (f": {detail[-1]}" if detail else "")
             )
+        with open(tmp) as fh:
+            raw = fh.read()
+        api = load_api_dump(raw)
+        if api is not None and not api:
+            raise RuntimeError(f"{' '.join(cmd)} returned an empty model catalog")
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -234,13 +249,25 @@ def collect(path, cmd):
 
 
 def ensure_dump(path, force, age_limit):
-    """Return True when the dump was (re)generated in this run."""
+    """Return True when the dump was (re)generated in this run.
+
+    A failed collect is retried once (after a short pause — the V2 server
+    has been observed answering with an empty catalog transiently,
+    2026-11-28). If the retry also fails, an existing cache is kept with
+    a warning; only when there is no cache at all does the run exit 2.
+    """
     if not needs_refresh(path, force, age_limit):
         return False
+    had_cache = os.path.isfile(path)
+    cmd = collect_cmd()
     try:
-        collect(path, collect_cmd())
+        try:
+            collect(path, cmd)
+        except RuntimeError:
+            time.sleep(2)
+            collect(path, cmd)
     except RuntimeError as exc:
-        if os.path.isfile(path):
+        if had_cache:
             print(f"warning: {exc}; using cached dump", file=sys.stderr)
             return False
         print(f"error: {exc}", file=sys.stderr)
